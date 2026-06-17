@@ -104,16 +104,6 @@ export default function Login({ status }: { status?: string }) {
                     Sign in
                 </button>
             </form>
-
-            <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                Don't have an account?{' '}
-                <Link
-                    href={route('app.auth.show-register')}
-                    className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-                >
-                    Sign up
-                </Link>
-            </p>
         </GuestLayout>
     );
 }
