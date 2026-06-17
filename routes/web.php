@@ -36,8 +36,6 @@ Route::group(['domain' => config('app.domain')], function () {
     Route::middleware('guest')->group(function () {
         Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('app.auth.show-login');
         Route::post('/auth/login', [AuthController::class, 'login'])->name('app.auth.login');
-        Route::get('/auth/register', [AuthController::class, 'showRegister'])->name('app.auth.show-register');
-        Route::post('/auth/register', [AuthController::class, 'register'])->name('app.auth.register');
         Route::get('/auth/forgot-password', [PasswordResetController::class, 'showForgot'])->name('app.auth.show-forgot');
         Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])->name('app.auth.forgot');
         Route::get('/auth/reset-password/{token}', [PasswordResetController::class, 'showReset'])->name('app.auth.show-reset');
