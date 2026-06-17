@@ -1,0 +1,11 @@
+{
+    "singleQuote": true,
+    "plugins": [
+        "prettier-plugin-organize-imports",
+        "prettier-plugin-tailwindcss"
+    ],
+    "tabWidth": 2,
+    "useTabs": false,
+    "htmlWhitespaceSensitivity": "ignore",
+    "printWidth": 180
+}

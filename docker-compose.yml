@@ -1,0 +1,201 @@
+x-app-env: &app-env
+  APP_NAME: 'marketix'
+  APP_ENV: ${APP_ENV}
+  APP_KEY: ${APP_KEY}
+  APP_DEBUG: ${APP_DEBUG}
+  APP_URL: ${APP_URL}
+  APP_DOMAIN: ${APP_DOMAIN}
+  APP_LOCALE: de
+  APP_FALLBACK_LOCALE: en
+  APP_MAINTENANCE_DRIVER: file
+  BCRYPT_ROUNDS: 12
+  LOG_CHANNEL: stack
+  LOG_STACK: single
+  LOG_DEPRECATIONS_CHANNEL: null
+  LOG_LEVEL: debug
+  DB_CONNECTION: mariadb
+  DB_HOST: db
+  DB_PORT: 3306
+  DB_DATABASE: db
+  DB_USERNAME: db
+  DB_PASSWORD: db
+  SESSION_DRIVER: database
+  SESSION_LIFETIME: 120
+  SESSION_ENCRYPT: false
+  SESSION_PATH: /
+  SESSION_DOMAIN: null
+  BROADCAST_CONNECTION: log
+  FILESYSTEM_DISK: local
+  QUEUE_CONNECTION: redis
+  CACHE_STORE: database
+  REDIS_CLIENT: phpredis
+  REDIS_HOST: redis
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+  REDIS_PORT: 6379
+  MAIL_MAILER: smtp
+  MAIL_SCHEME: null
+  VITE_APP_NAME: 'marketix'
+  OCTANE_SERVER: 'frankenphp'
+  # RegenerateTraefikConfigJob writes the dynamic file provider config here;
+  # the path is shared with the traefik container via the traefik_dynamic volume.
+  TRAEFIK_DYNAMIC_FILE: /traefik/custom-domains.yml
+  TRAEFIK_APP_URL: 'http://app:8000'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Traefik — edge router. Docker provider for the app, file provider (watched)
+  # for the dynamically generated custom-domain routes, Let's Encrypt for TLS.
+  # ---------------------------------------------------------------------------
+  traefik:
+    image: traefik:v3.3
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=web
+      - --providers.file.directory=/traefik
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_acme:/acme
+      - traefik_dynamic:/traefik:ro # reads custom-domains.yml written by the app
+    networks:
+      - web
+
+  # ---------------------------------------------------------------------------
+  # Web app — FrankenPHP + Laravel Octane (built from the repo Dockerfile).
+  # The entrypoint waits for the DB, caches config/views, and runs migrations.
+  # ---------------------------------------------------------------------------
+  app:
+    image: noixdev/marketix:latest
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "true"
+    networks:
+      - web
+      - marketix_internal
+    volumes:
+      - storage:/app/storage # persist uploads, logs, generated PDFs/QR codes
+      - traefik_dynamic:/traefik # writes custom-domains.yml for Traefik's file provider
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 8000) ? 0 : 1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      # HTTPS Router — primary application host (APP_DOMAIN from env)
+      - traefik.http.routers.marketix.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.marketix.entrypoints=websecure
+      - traefik.http.routers.marketix.tls.certresolver=letsencrypt
+      - traefik.http.services.marketix.loadbalancer.server.port=8000
+
+  # ---------------------------------------------------------------------------
+  # Queue worker — Laravel Horizon (Redis-backed).
+  # Reuses the same built image; migrations are left to the app container.
+  # ---------------------------------------------------------------------------
+  horizon:
+    image: noixdev/marketix:latest
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "false"
+    networks:
+      - marketix_internal
+    command: ["php", "artisan", "horizon"]
+    stop_signal: SIGTERM # let Horizon shut down workers gracefully
+    volumes:
+      - storage:/app/storage
+    depends_on:
+      app:
+        condition: service_healthy # ensures migrations have run first
+      redis:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Scheduler — runs Laravel's scheduled tasks (`schedule:work` stays alive).
+  # ---------------------------------------------------------------------------
+  scheduler:
+    image: noixdev/marketix:latest
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      RUN_MIGRATIONS: "false"
+    networks:
+      - marketix_internal
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - storage:/app/storage
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Database — MariaDB 11.8 (matches the ddev dev environment).
+  # ---------------------------------------------------------------------------
+  db:
+    image: mariadb:11.8
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: db
+      MARIADB_USER: db
+      MARIADB_PASSWORD: db
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - marketix_internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Redis — Horizon queue backend (and available for cache/sessions).
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redisdata:/data
+    networks:
+      - marketix_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  storage:
+  dbdata:
+  redisdata:
+  traefik_acme:
+  traefik_dynamic:
+
+networks:
+  # Edge network shared by Traefik and the app (Traefik routes over this).
+  web:
+  # Backend network for app/horizon/scheduler ⇄ db/redis. Not published to host.
+  marketix_internal:
