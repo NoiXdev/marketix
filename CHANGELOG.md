@@ -1,4 +1,11 @@
-## 1.0.0 (2026-06-17)
+## [1.0.1](https://github.com/NoiXdev/marketix/compare/v1.0.0...v) (2026-06-17)
+
+
+### Bug Fixes
+
+* force SSL scheme ([56b8c7e](https://github.com/NoiXdev/marketix/commit/56b8c7ed18e313cc71a143164e65191693ab45b6))
+
+## [1.0.0](https://github.com/NoiXdev/marketix/compare/e725c216767ec0acddee93a913a96e8ebe30480a...v1.0.0) (2026-06-17)
 
 
 ### Features
