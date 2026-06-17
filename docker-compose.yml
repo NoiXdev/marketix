@@ -107,6 +107,8 @@ services:
       - traefik.http.routers.marketix.entrypoints=websecure
       - traefik.http.routers.marketix.tls.certresolver=letsencrypt
       - traefik.http.services.marketix.loadbalancer.server.port=8000
+      # Watchtower auto-updates this container when noixdev/marketix:latest changes.
+      - com.centurylinklabs.watchtower.enable=true
 
   # ---------------------------------------------------------------------------
   # Queue worker — Laravel Horizon (Redis-backed).
@@ -129,6 +131,8 @@ services:
         condition: service_healthy # ensures migrations have run first
       redis:
         condition: service_healthy
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
 
   # ---------------------------------------------------------------------------
   # Scheduler — runs Laravel's scheduled tasks (`schedule:work` stays alive).
@@ -147,6 +151,8 @@ services:
     depends_on:
       app:
         condition: service_healthy
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
 
   # ---------------------------------------------------------------------------
   # Database — MariaDB 11.8 (matches the ddev dev environment).
@@ -186,6 +192,30 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
+
+  # ---------------------------------------------------------------------------
+  # Watchtower — automatically pulls & redeploys updated images. Uses the
+  # community-maintained nicholas-fedor fork (the original containrrr/watchtower
+  # was archived Dec 2025). Runs in label-enable mode: only app/horizon/scheduler
+  # (tagged com.centurylinklabs.watchtower.enable=true) are updated — the pinned,
+  # stateful traefik/db/redis containers are deliberately left untouched.
+  # ---------------------------------------------------------------------------
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    restart: unless-stopped
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"     # only watch containers with the enable label
+      WATCHTOWER_CLEANUP: "true"          # prune the old image after each update
+      WATCHTOWER_ROLLING_RESTART: "true"  # update containers one at a time
+      WATCHTOWER_POLL_INTERVAL: 300       # check every 5 minutes
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # noixdev/marketix is private: mount a docker config with pull credentials
+      # so Watchtower can authenticate to the registry. Generate it on the host
+      # with `docker login` (writes ~/.docker/config.json), then uncomment:
+      # - ~/.docker/config.json:/config.json:ro
+    networks:
+      - marketix_internal
 
 volumes:
   storage:
