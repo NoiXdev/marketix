@@ -25,8 +25,8 @@ class QrCode extends Model
     {
         return [
             'is_dynamic' => 'boolean',
-            'content'    => 'array',
-            'style'      => 'array',
+            'content' => 'array',
+            'style' => 'array',
         ];
     }
 
@@ -50,12 +50,12 @@ class QrCode extends Model
 
         return Collection::make([
             'BEGIN:VCARD', 'VERSION:3.0',
-            ! empty($c['name'])    ? 'FN:'.$c['name']                    : null,
-            ! empty($c['org'])     ? 'ORG:'.$c['org']                    : null,
-            ! empty($c['phone'])   ? 'TEL:'.$c['phone']                  : null,
-            ! empty($c['email'])   ? 'EMAIL:'.$c['email']                : null,
-            ! empty($c['url'])     ? 'URL:'.$c['url']                    : null,
-            ! empty($c['address']) ? 'ADR:;;'.$c['address'].';;;'        : null,
+            ! empty($c['name']) ? 'FN:'.$c['name'] : null,
+            ! empty($c['org']) ? 'ORG:'.$c['org'] : null,
+            ! empty($c['phone']) ? 'TEL:'.$c['phone'] : null,
+            ! empty($c['email']) ? 'EMAIL:'.$c['email'] : null,
+            ! empty($c['url']) ? 'URL:'.$c['url'] : null,
+            ! empty($c['address']) ? 'ADR:;;'.$c['address'].';;;' : null,
             'END:VCARD',
         ])->filter()->implode("\r\n");
     }

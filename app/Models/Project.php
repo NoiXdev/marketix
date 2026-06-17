@@ -15,13 +15,13 @@ class Project extends Model
 
     protected $fillable = [
         'name',
-        'locked'
+        'locked',
     ];
 
     protected function casts(): array
     {
         return [
-            'locked' => 'boolean'
+            'locked' => 'boolean',
         ];
     }
 

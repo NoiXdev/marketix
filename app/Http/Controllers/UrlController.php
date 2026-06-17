@@ -39,41 +39,41 @@ class UrlController extends Controller
     public function show(Request $request, StatisticsAggregator $stats, int $url)
     {
         $project = $request->get('project');
-        $model   = $project->urls()->with(['domain', 'qrCode'])->findOrFail($url);
+        $model = $project->urls()->with(['domain', 'qrCode'])->findOrFail($url);
 
-        $days  = (int) $request->input('days', 30);
-        $days  = in_array($days, [7, 30, 90], true) ? $days : 30;
+        $days = (int) $request->input('days', 30);
+        $days = in_array($days, [7, 30, 90], true) ? $days : 30;
         $since = now()->subDays($days - 1)->startOfDay();
 
         return inertia('Links/Show', [
             'link' => [
-                'id'            => $model->id,
-                'slug'          => $model->slug,
-                'url'           => $model->url,
-                'type'          => $model->type->value,
-                'type_label'    => $model->type->label(),
-                'status'        => $model->status->value,
-                'clicks'        => $model->clicks,
+                'id' => $model->id,
+                'slug' => $model->slug,
+                'url' => $model->url,
+                'type' => $model->type->value,
+                'type_label' => $model->type->label(),
+                'status' => $model->status->value,
+                'clicks' => $model->clicks,
                 // Distinct-IP over all time so this matches the range "unique"
                 // card's semantics (rangeUnique) — both count unique IPs, just
                 // over different windows. (The denormalized urls.unique_clicks
                 // counter uses a 24h-dedup rule and is not comparable.)
                 'unique_clicks' => $stats->uniqueClicks($project->id, $model->id),
-                'expired_at'    => $model->expired_at?->toISOString(),
-                'created_at'    => $model->created_at->toISOString(),
-                'has_qr_code'   => $model->qrCode !== null,
-                'domain'        => $model->domain
+                'expired_at' => $model->expired_at?->toISOString(),
+                'created_at' => $model->created_at->toISOString(),
+                'has_qr_code' => $model->qrCode !== null,
+                'domain' => $model->domain
                     ? ['id' => $model->domain->id, 'name' => $model->domain->name]
                     : null,
             ],
-            'days'         => $days,
-            'rangeClicks'  => $stats->totalClicks($project->id, $model->id, $since),
-            'rangeUnique'  => $stats->uniqueClicks($project->id, $model->id, $since),
-            'clicksByDay'  => $stats->clicksByDay($project->id, $model->id, $days),
+            'days' => $days,
+            'rangeClicks' => $stats->totalClicks($project->id, $model->id, $since),
+            'rangeUnique' => $stats->uniqueClicks($project->id, $model->id, $since),
+            'clicksByDay' => $stats->clicksByDay($project->id, $model->id, $days),
             'topCountries' => $stats->breakdown($project->id, $model->id, 'country', $since),
-            'topCities'    => $stats->breakdown($project->id, $model->id, 'city', $since),
-            'topBrowsers'  => $stats->breakdown($project->id, $model->id, 'browser', $since),
-            'topOs'        => $stats->breakdown($project->id, $model->id, 'os', $since),
+            'topCities' => $stats->breakdown($project->id, $model->id, 'city', $since),
+            'topBrowsers' => $stats->breakdown($project->id, $model->id, 'browser', $since),
+            'topOs' => $stats->breakdown($project->id, $model->id, 'os', $since),
             'topReferrers' => $stats->breakdown($project->id, $model->id, 'domain', $since),
             'recentClicks' => $stats->recentClicks($project->id, $model->id, $since),
         ]);

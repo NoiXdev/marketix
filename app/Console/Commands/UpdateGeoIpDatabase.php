@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 class UpdateGeoIpDatabase extends Command
 {
     protected $signature = 'geoip:update';
+
     protected $description = 'Download the MaxMind GeoLite2-City database';
 
     public function handle(): int
@@ -16,6 +17,7 @@ class UpdateGeoIpDatabase extends Command
 
         if (! $licenseKey) {
             $this->error('MAXMIND_LICENSE_KEY is not configured in .env');
+
             return self::FAILURE;
         }
 
@@ -27,19 +29,20 @@ class UpdateGeoIpDatabase extends Command
         );
 
         // Stream download to a temp file
-        $tmpFile = tempnam(sys_get_temp_dir(), 'geoip') . '.tar.gz';
+        $tmpFile = tempnam(sys_get_temp_dir(), 'geoip').'.tar.gz';
 
         $response = Http::withOptions(['sink' => $tmpFile])->timeout(120)->get($downloadUrl);
 
         if (! $response->successful()) {
             $this->error("Download failed: HTTP {$response->status()}");
             @unlink($tmpFile);
+
             return self::FAILURE;
         }
 
         $this->info('Extracting…');
 
-        $extractDir = sys_get_temp_dir() . '/geoip_extract_' . time();
+        $extractDir = sys_get_temp_dir().'/geoip_extract_'.time();
         mkdir($extractDir, 0755, true);
 
         try {
@@ -48,15 +51,17 @@ class UpdateGeoIpDatabase extends Command
         } catch (\Exception $e) {
             $this->error("Extraction failed: {$e->getMessage()}");
             @unlink($tmpFile);
+
             return self::FAILURE;
         }
 
         // Locate the .mmdb file inside the extracted directory
-        $mmdbFiles = glob($extractDir . '/*/*.mmdb');
+        $mmdbFiles = glob($extractDir.'/*/*.mmdb');
 
         if (empty($mmdbFiles)) {
             $this->error('GeoLite2-City.mmdb not found in archive.');
             @unlink($tmpFile);
+
             return self::FAILURE;
         }
 
@@ -65,7 +70,7 @@ class UpdateGeoIpDatabase extends Command
             mkdir($destDir, 0755, true);
         }
 
-        $dest = $destDir . '/GeoLite2-City.mmdb';
+        $dest = $destDir.'/GeoLite2-City.mmdb';
         rename($mmdbFiles[0], $dest);
 
         // Cleanup
@@ -89,7 +94,7 @@ class UpdateGeoIpDatabase extends Command
                 continue;
             }
 
-            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            $path = $dir.DIRECTORY_SEPARATOR.$item;
             is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
         }
 

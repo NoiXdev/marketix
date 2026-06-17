@@ -106,7 +106,7 @@ class TeamManagementTest extends TestCase
     public function test_admin_can_revoke_invitation(): void
     {
         [$admin, $project] = $this->projectWithAdmin();
-        $invite = \App\Models\ProjectInvitation::factory()->create(['project_id' => $project->id]);
+        $invite = ProjectInvitation::factory()->create(['project_id' => $project->id]);
 
         $this->actingAs($admin)
             ->delete(route('app.project.team.invitations.destroy', ['project' => $project->id, 'invitation' => $invite->id]))

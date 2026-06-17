@@ -28,7 +28,7 @@ class StatisticsAggregator
      */
     public function clicksByDay(int $projectId, ?int $urlId, int $days): array
     {
-        $now   = now();
+        $now = now();
         $since = $now->copy()->subDays($days - 1)->startOfDay();
 
         $rows = $this->base($projectId, $urlId)
@@ -44,10 +44,10 @@ class StatisticsAggregator
 
         $out = [];
         for ($i = $days - 1; $i >= 0; $i--) {
-            $date  = $now->copy()->subDays($i)->format('Y-m-d');
-            $row   = $rows->get($date);
+            $date = $now->copy()->subDays($i)->format('Y-m-d');
+            $row = $rows->get($date);
             $out[] = [
-                'date'   => $date,
+                'date' => $date,
                 'clicks' => (int) ($row->clicks ?? 0),
                 'unique' => (int) ($row->unique_clicks ?? 0),
             ];
@@ -104,7 +104,7 @@ class StatisticsAggregator
     /**
      * The most recent individual clicks, latest first.
      *
-     * @return Collection<int, \App\Models\Statistic>
+     * @return Collection<int, Statistic>
      */
     public function recentClicks(int $projectId, ?int $urlId, ?Carbon $since = null, int $limit = 50): Collection
     {

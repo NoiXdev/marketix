@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
+use App\Models\QrCode;
+use App\Models\Url;
 use App\Models\User;
+use App\Services\GeoIpService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -17,7 +21,7 @@ class QrCodeBackingLinkTest extends TestCase
     {
         parent::setUp();
         // DomainObserver dispatches a Traefik-config job that writes to disk.
-        Queue::fake([\App\Jobs\RegenerateTraefikConfigJob::class]);
+        Queue::fake([RegenerateTraefikConfigJob::class]);
     }
 
     /**
@@ -97,7 +101,7 @@ class QrCodeBackingLinkTest extends TestCase
             'user_id' => $user->id, // set by UrlObserver
         ]);
 
-        $url = \App\Models\Url::where('slug', 'promo')->firstOrFail();
+        $url = Url::where('slug', 'promo')->firstOrFail();
         $this->assertDatabaseHas('qr_codes', [
             'name' => 'My QR',
             'type' => 'link',
@@ -130,7 +134,7 @@ class QrCodeBackingLinkTest extends TestCase
             ['X-Inertia' => 'true'],
         );
 
-        $qr = \App\Models\QrCode::firstOrFail();
+        $qr = QrCode::firstOrFail();
 
         $this->actingAs($user)->putJson(
             route('app.project.qrcodes.update', ['project' => $project->id, 'qrCode' => $qr->id]),
@@ -160,7 +164,7 @@ class QrCodeBackingLinkTest extends TestCase
             $this->payload(['domain_id' => $domain->id, 'slug' => 'promo']),
             ['X-Inertia' => 'true'],
         );
-        $qr = \App\Models\QrCode::firstOrFail();
+        $qr = QrCode::firstOrFail();
         $urlId = $qr->url_id;
 
         $this->actingAs($user)->putJson(
@@ -182,7 +186,7 @@ class QrCodeBackingLinkTest extends TestCase
             $this->payload(['domain_id' => $domain->id, 'slug' => 'promo']),
             ['X-Inertia' => 'true'],
         );
-        $qr = \App\Models\QrCode::firstOrFail();
+        $qr = QrCode::firstOrFail();
         $urlId = $qr->url_id;
 
         $this->actingAs($user)->delete(
@@ -195,7 +199,7 @@ class QrCodeBackingLinkTest extends TestCase
 
     private function fakeGeo(): void
     {
-        $this->app->instance(\App\Services\GeoIpService::class, new class extends \App\Services\GeoIpService
+        $this->app->instance(GeoIpService::class, new class extends GeoIpService
         {
             public function __construct() {}
 
@@ -216,7 +220,7 @@ class QrCodeBackingLinkTest extends TestCase
             $this->payload(['domain_id' => $domain->id, 'slug' => 'promo']),
             ['X-Inertia' => 'true'],
         );
-        $urlId = \App\Models\QrCode::firstOrFail()->url_id;
+        $urlId = QrCode::firstOrFail()->url_id;
 
         // Scanning the QR == visiting its short link.
         $this->get('http://links.test/promo')->assertRedirect('https://example.com/landing');
@@ -254,7 +258,7 @@ class QrCodeBackingLinkTest extends TestCase
             $this->payload(['type' => 'text', 'is_dynamic' => false, 'content' => ['text' => 'hi']]),
             ['X-Inertia' => 'true'],
         );
-        $qr = \App\Models\QrCode::firstOrFail();
+        $qr = QrCode::firstOrFail();
         $this->assertNull($qr->url_id);
 
         $this->actingAs($user)->putJson(
@@ -297,7 +301,7 @@ class QrCodeBackingLinkTest extends TestCase
             ]),
             ['X-Inertia' => 'true'],
         )->assertSessionHasNoErrors();
-        $urlId = \App\Models\QrCode::firstOrFail()->url_id;
+        $urlId = QrCode::firstOrFail()->url_id;
 
         $response = $this->get('http://links.test/jane');
 

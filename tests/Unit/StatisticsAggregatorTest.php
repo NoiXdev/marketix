@@ -26,7 +26,7 @@ class StatisticsAggregatorTest extends TestCase
     }
 
     /**
-     * @return array{0: \App\Models\Project, 1: \App\Models\User}
+     * @return array{0: Project, 1: User}
      */
     private function makeProjectAndUser(): array
     {

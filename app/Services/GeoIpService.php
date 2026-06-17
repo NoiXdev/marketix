@@ -21,9 +21,9 @@ class GeoIpService
     {
         if (! $this->reader) {
             return [
-                'country'          => null,
-                'city'             => null,
-                'country_code'     => null,
+                'country' => null,
+                'city' => null,
+                'country_code' => null,
                 'subdivision_code' => null,
             ];
         }
@@ -32,16 +32,16 @@ class GeoIpService
             $record = $this->reader->city($ip);
 
             return [
-                'country'          => $record->country->name,
-                'city'             => $record->city->name,
-                'country_code'     => $record->country->isoCode,
+                'country' => $record->country->name,
+                'city' => $record->city->name,
+                'country_code' => $record->country->isoCode,
                 'subdivision_code' => $record->mostSpecificSubdivision->isoCode,
             ];
         } catch (\Exception) {
             return [
-                'country'          => null,
-                'city'             => null,
-                'country_code'     => null,
+                'country' => null,
+                'city' => null,
+                'country_code' => null,
                 'subdivision_code' => null,
             ];
         }

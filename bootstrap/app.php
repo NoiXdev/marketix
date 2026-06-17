@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Middleware\EnsureProjectAdmin;
+use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,15 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            HandleInertiaRequests::class,
+            AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $middleware->redirectGuestsTo('/auth/login');
 
         $middleware->alias([
-            'project_admin' => \App\Http\Middleware\EnsureProjectAdmin::class,
-            'super_admin' => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'project_admin' => EnsureProjectAdmin::class,
+            'super_admin' => EnsureSuperAdmin::class,
         ]);
 
         //

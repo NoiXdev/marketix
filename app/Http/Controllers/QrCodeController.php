@@ -211,5 +211,4 @@ class QrCodeController extends Controller
 
         return QrTarget::redirectTarget($data['type'], $data['content']);
     }
-
 }

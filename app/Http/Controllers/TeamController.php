@@ -10,6 +10,7 @@ use App\Models\ProjectInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TeamController extends Controller
 {
@@ -79,7 +80,7 @@ class TeamController extends Controller
     {
         /** @var Project $project */
         $project = $request->get('project');
-        $data = $request->validate(['role' => ['required', \Illuminate\Validation\Rule::enum(ProjectRole::class)]]);
+        $data = $request->validate(['role' => ['required', Rule::enum(ProjectRole::class)]]);
 
         if ($data['role'] === ProjectRole::Member->value && $this->isLastAdmin($project, $user)) {
             return back()->with('error', 'A project must keep at least one admin.');

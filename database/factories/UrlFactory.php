@@ -4,10 +4,8 @@ namespace Database\Factories;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
-use App\Models\Domain;
 use App\Models\Project;
 use App\Models\Url;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 

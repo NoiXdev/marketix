@@ -16,12 +16,12 @@ class DashboardController extends Controller
         $days = in_array($days, [7, 30, 90, 180, 365], true) ? $days : 30;
 
         return inertia('Dashboard', [
-            'urlsCount'          => $project->urls()->count(),
-            'domainsCount'       => $project->domains()->count(),
-            'totalClicks'        => $project->urls()->sum('clicks'),
-            'totalUniqueClicks'  => $project->urls()->sum('unique_clicks'),
-            'days'               => $days,
-            'clicksByDay'        => $this->clicksByDay($project->id, $days),
+            'urlsCount' => $project->urls()->count(),
+            'domainsCount' => $project->domains()->count(),
+            'totalClicks' => $project->urls()->sum('clicks'),
+            'totalUniqueClicks' => $project->urls()->sum('unique_clicks'),
+            'days' => $days,
+            'clicksByDay' => $this->clicksByDay($project->id, $days),
         ]);
     }
 
@@ -48,10 +48,10 @@ class DashboardController extends Controller
 
         $clicksByDay = [];
         for ($i = $days - 1; $i >= 0; $i--) {
-            $date          = now()->subDays($i)->format('Y-m-d');
-            $row           = $rows->get($date);
+            $date = now()->subDays($i)->format('Y-m-d');
+            $row = $rows->get($date);
             $clicksByDay[] = [
-                'date'   => $date,
+                'date' => $date,
                 'clicks' => (int) ($row->clicks ?? 0),
                 'unique' => (int) ($row->unique_clicks ?? 0),
             ];

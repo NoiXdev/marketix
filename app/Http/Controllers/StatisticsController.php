@@ -12,8 +12,8 @@ class StatisticsController extends Controller
     public function show(Request $request, StatisticsAggregator $stats)
     {
         $project = $request->get('project');
-        $days    = (int) $request->input('days', 30);
-        $days    = in_array($days, [7, 30, 90], true) ? $days : 30;
+        $days = (int) $request->input('days', 30);
+        $days = in_array($days, [7, 30, 90], true) ? $days : 30;
 
         // Top links is a project-wide join (urls + domains), not part of the
         // per-link aggregator, so it stays here.
@@ -32,15 +32,15 @@ class StatisticsController extends Controller
             ->get();
 
         return inertia('Statistics/Index', [
-            'days'          => $days,
-            'totalClicks'   => $stats->totalClicks($project->id, null),
-            'uniqueClicks'  => $stats->uniqueClicks($project->id, null),
-            'clicksByDay'   => $stats->clicksByDay($project->id, null, $days),
-            'topLinks'      => $topLinks,
-            'topCountries'  => $stats->breakdown($project->id, null, 'country'),
-            'topBrowsers'   => $stats->breakdown($project->id, null, 'browser'),
-            'topOs'         => $stats->breakdown($project->id, null, 'os'),
-            'topReferrers'  => $stats->breakdown($project->id, null, 'domain'),
+            'days' => $days,
+            'totalClicks' => $stats->totalClicks($project->id, null),
+            'uniqueClicks' => $stats->uniqueClicks($project->id, null),
+            'clicksByDay' => $stats->clicksByDay($project->id, null, $days),
+            'topLinks' => $topLinks,
+            'topCountries' => $stats->breakdown($project->id, null, 'country'),
+            'topBrowsers' => $stats->breakdown($project->id, null, 'browser'),
+            'topOs' => $stats->breakdown($project->id, null, 'os'),
+            'topReferrers' => $stats->breakdown($project->id, null, 'domain'),
         ]);
     }
 }

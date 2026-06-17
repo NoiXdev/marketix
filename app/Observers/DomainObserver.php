@@ -14,7 +14,7 @@ class DomainObserver
 
     public function updating(Domain $domain): void
     {
-        if($domain->isDirty('name')){
+        if ($domain->isDirty('name')) {
             RegenerateTraefikConfigJob::dispatch();
         }
     }
