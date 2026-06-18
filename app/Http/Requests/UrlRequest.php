@@ -26,7 +26,7 @@ class UrlRequest extends FormRequest
         $ignoreId = $this->route('url'); // null on store, the URL id on update
 
         return [
-            'domain_id' => ['required', 'integer', Rule::exists('domains', 'id')->where('project_id', $project->id)],
+            'domain_id' => ['required', 'ulid', Rule::exists('domains', 'id')->where('project_id', $project->id)],
             'slug' => [
                 'required', 'string', 'max:255', 'alpha_dash',
                 Rule::unique('urls', 'slug')

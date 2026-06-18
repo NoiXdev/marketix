@@ -65,7 +65,7 @@ class TeamController extends Controller
             ->with('success', 'Invitation sent.');
     }
 
-    public function destroyInvitation(Request $request, int $invitation)
+    public function destroyInvitation(Request $request, string $invitation)
     {
         /** @var Project $project */
         $project = $request->get('project');
@@ -76,7 +76,7 @@ class TeamController extends Controller
             ->with('success', 'Invitation revoked.');
     }
 
-    public function updateMember(Request $request, int $user)
+    public function updateMember(Request $request, string $user)
     {
         /** @var Project $project */
         $project = $request->get('project');
@@ -92,7 +92,7 @@ class TeamController extends Controller
             ->with('success', 'Member updated.');
     }
 
-    public function destroyMember(Request $request, int $user)
+    public function destroyMember(Request $request, string $user)
     {
         /** @var Project $project */
         $project = $request->get('project');
@@ -111,7 +111,7 @@ class TeamController extends Controller
             ->with('success', 'Member removed.');
     }
 
-    private function isLastAdmin(Project $project, int $userId): bool
+    private function isLastAdmin(Project $project, string $userId): bool
     {
         $isAdmin = $project->users()->where('users.id', $userId)
             ->wherePivot('role', ProjectRole::Admin->value)->exists();

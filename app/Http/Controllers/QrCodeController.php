@@ -113,7 +113,7 @@ class QrCodeController extends Controller
             ->with('success', 'QR code created.');
     }
 
-    public function edit(Request $request, int $qrCode)
+    public function edit(Request $request, string $qrCode)
     {
         $project = $request->get('project');
         $model = $project->qrCodes()->with('url.domain')->findOrFail($qrCode);
@@ -136,7 +136,7 @@ class QrCodeController extends Controller
         ]);
     }
 
-    public function update(QrCodeRequest $request, int $qrCode)
+    public function update(QrCodeRequest $request, string $qrCode)
     {
         $project = $request->get('project');
         $model = $project->qrCodes()->findOrFail($qrCode);
@@ -177,7 +177,7 @@ class QrCodeController extends Controller
             ->with('success', 'QR code updated.');
     }
 
-    public function destroy(Request $request, int $qrCode)
+    public function destroy(Request $request, string $qrCode)
     {
         $project = $request->get('project');
         $model = $project->qrCodes()->findOrFail($qrCode);

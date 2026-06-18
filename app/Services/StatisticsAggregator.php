@@ -14,7 +14,7 @@ class StatisticsAggregator
     /**
      * Base statistics query scoped to a project and (optionally) a single URL.
      */
-    private function base(int $projectId, ?int $urlId): Builder
+    private function base(string $projectId, ?string $urlId): Builder
     {
         return Statistic::query()
             ->where('project_id', $projectId)
@@ -27,7 +27,7 @@ class StatisticsAggregator
      *
      * @return list<array{date: string, clicks: int, unique: int}>
      */
-    public function clicksByDay(int $projectId, ?int $urlId, int $days): array
+    public function clicksByDay(string $projectId, ?string $urlId, int $days): array
     {
         $now = now();
         $since = $now->copy()->subDays($days - 1)->startOfDay();
@@ -63,7 +63,7 @@ class StatisticsAggregator
      *
      * @return list<array{date: string, clicks: int, unique: int}>
      */
-    public function clicksByDayBetween(int $projectId, ?int $urlId, CarbonImmutable $start, CarbonImmutable $end): array
+    public function clicksByDayBetween(string $projectId, ?string $urlId, CarbonImmutable $start, CarbonImmutable $end): array
     {
         $startDay = $start->startOfDay();
         $endDay = $end->startOfDay();
@@ -97,7 +97,7 @@ class StatisticsAggregator
     /**
      * Total clicks, optionally restricted to a trailing window.
      */
-    public function totalClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
+    public function totalClicks(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
@@ -108,7 +108,7 @@ class StatisticsAggregator
     /**
      * Distinct-IP clicks, optionally restricted to a trailing window.
      */
-    public function uniqueClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
+    public function uniqueClicks(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
@@ -123,7 +123,7 @@ class StatisticsAggregator
      *
      * @return Collection<int, \stdClass>
      */
-    public function breakdown(int $projectId, ?int $urlId, string $column, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 8): Collection
+    public function breakdown(string $projectId, ?string $urlId, string $column, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 8): Collection
     {
         $allowed = ['country', 'city', 'browser', 'os', 'domain'];
         if (! in_array($column, $allowed, true)) {
@@ -147,7 +147,7 @@ class StatisticsAggregator
      *
      * @return Collection<int, Statistic>
      */
-    public function recentClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 50): Collection
+    public function recentClicks(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 50): Collection
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))

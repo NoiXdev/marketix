@@ -25,8 +25,8 @@ class RecordClickStatisticJob implements ShouldQueue
      * @param  array<string, mixed>  $geo
      */
     public function __construct(
-        private int $urlId,
-        private int $projectId,
+        private string $urlId,
+        private string $projectId,
         private ?string $ip,
         private string $userAgent,
         private ?string $referer,

@@ -36,7 +36,7 @@ class UrlController extends Controller
         ]);
     }
 
-    public function show(Request $request, StatisticsAggregator $stats, int $url)
+    public function show(Request $request, StatisticsAggregator $stats, string $url)
     {
         $project = $request->get('project');
         $model = $project->urls()->with(['domain', 'qrCode'])->findOrFail($url);
@@ -102,7 +102,7 @@ class UrlController extends Controller
             ->with('success', 'Link created.');
     }
 
-    public function edit(Request $request, int $url)
+    public function edit(Request $request, string $url)
     {
         $project = $request->get('project');
         $model = $project->urls()->with(['domain', 'pixels'])->findOrFail($url);
@@ -131,7 +131,7 @@ class UrlController extends Controller
         ]);
     }
 
-    public function update(UrlRequest $request, int $url)
+    public function update(UrlRequest $request, string $url)
     {
         $project = $request->get('project');
         $model = $project->urls()->findOrFail($url);
@@ -150,7 +150,7 @@ class UrlController extends Controller
             ->with('success', 'Link updated.');
     }
 
-    public function toggleStatus(Request $request, int $url)
+    public function toggleStatus(Request $request, string $url)
     {
         $project = $request->get('project');
         $model = $project->urls()->findOrFail($url);
@@ -163,7 +163,7 @@ class UrlController extends Controller
         return back()->with('success', 'Status updated.');
     }
 
-    public function destroy(Request $request, int $url)
+    public function destroy(Request $request, string $url)
     {
         $project = $request->get('project');
         $project->urls()->findOrFail($url)->delete();

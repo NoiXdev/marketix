@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class ProjectMemberController extends Controller
 {
-    public function store(Request $request, int $project)
+    public function store(Request $request, string $project)
     {
         $model = Project::findOrFail($project);
         $data = $request->validate([
@@ -25,7 +25,7 @@ class ProjectMemberController extends Controller
         return back()->with('success', 'Member assigned.');
     }
 
-    public function update(Request $request, int $project, int $user)
+    public function update(Request $request, string $project, string $user)
     {
         // Intentionally no last-admin guard here — super admins are the recovery
         // path for projects that have lost all admins. See TeamController for the
@@ -38,7 +38,7 @@ class ProjectMemberController extends Controller
         return back()->with('success', 'Member updated.');
     }
 
-    public function destroy(int $project, int $user)
+    public function destroy(string $project, string $user)
     {
         // Intentionally no last-admin guard here — super admins are the recovery
         // path for projects that have lost all admins. See TeamController for the

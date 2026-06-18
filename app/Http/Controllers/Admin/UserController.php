@@ -53,7 +53,7 @@ class UserController extends Controller
         return redirect()->route('app.admin.users.index')->with('success', 'User created.');
     }
 
-    public function edit(int $user)
+    public function edit(string $user)
     {
         $model = User::findOrFail($user);
 
@@ -67,7 +67,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(UserRequest $request, int $user)
+    public function update(UserRequest $request, string $user)
     {
         $model = User::findOrFail($user);
         $data = $request->validated();
@@ -88,7 +88,7 @@ class UserController extends Controller
         return redirect()->route('app.admin.users.index')->with('success', 'User updated.');
     }
 
-    public function destroy(Request $request, int $user)
+    public function destroy(Request $request, string $user)
     {
         if ($user === $request->user()->id) {
             return back()->with('error', 'You cannot delete your own account.');

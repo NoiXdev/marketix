@@ -25,7 +25,7 @@ class ReportController extends Controller
             ->download();
     }
 
-    public function downloadLink(Request $request, int $url)
+    public function downloadLink(Request $request, string $url)
     {
         $project = $request->get('project');
         $model = Url::where('project_id', $project->id)->findOrFail($url);

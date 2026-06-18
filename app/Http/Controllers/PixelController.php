@@ -41,7 +41,7 @@ class PixelController extends Controller
             ->with('success', 'Pixel created.');
     }
 
-    public function edit(Request $request, int $pixel)
+    public function edit(Request $request, string $pixel)
     {
         $project = $request->get('project');
         $model = $project->pixels()->findOrFail($pixel);
@@ -57,7 +57,7 @@ class PixelController extends Controller
         ]);
     }
 
-    public function update(PixelRequest $request, int $pixel)
+    public function update(PixelRequest $request, string $pixel)
     {
         $project = $request->get('project');
         $model = $project->pixels()->findOrFail($pixel);
@@ -68,7 +68,7 @@ class PixelController extends Controller
             ->with('success', 'Pixel updated.');
     }
 
-    public function destroy(Request $request, int $pixel)
+    public function destroy(Request $request, string $pixel)
     {
         $project = $request->get('project');
         $project->pixels()->findOrFail($pixel)->delete();

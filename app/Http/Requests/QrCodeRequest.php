@@ -45,13 +45,13 @@ class QrCodeRequest extends FormRequest
                 // Attach mode: reuse an existing project link instead of
                 // creating one. domain_id/slug are display-only and ignored.
                 $rules['url_id'] = [
-                    'integer',
+                    'ulid',
                     Rule::exists('urls', 'id')->where('project_id', $project->id),
                 ];
             } else {
                 $ignoreUrlId = $project->qrCodes()->find($this->route('qrCode'))?->url_id;
 
-                $rules['domain_id'] = ['required', 'integer', Rule::exists('domains', 'id')->where('project_id', $project->id)];
+                $rules['domain_id'] = ['required', 'ulid', Rule::exists('domains', 'id')->where('project_id', $project->id)];
                 $rules['slug'] = [
                     'required', 'string', 'max:255', 'alpha_dash',
                     Rule::unique('urls', 'slug')
