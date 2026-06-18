@@ -31,11 +31,13 @@ class MailSettingsOverrideTest extends TestCase
         // Drop the settings table to simulate an un-migrated/fresh DB.
         Schema::drop('settings');
 
-        $originalDefault = config('mail.default');
+        // Set a sentinel value to assert boot() leaves config untouched
+        // when the settings table is missing.
+        config(['mail.default' => 'sentinel-value']);
 
         // Must not throw — falls back to .env/config defaults.
         (new MailSettingsServiceProvider($this->app))->boot();
 
-        $this->assertSame($originalDefault, config('mail.default'));
+        $this->assertSame('sentinel-value', config('mail.default'));
     }
 }
