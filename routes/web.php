@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PixelController;
 use App\Http\Controllers\ProfileController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\TwoFactorPasskeyController;
 use App\Http\Controllers\UrlController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +45,8 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/auth/login', [AuthController::class, 'login'])->name('app.auth.login');
         Route::get('/auth/two-factor-challenge', [TwoFactorChallengeController::class, 'show'])->name('app.auth.two-factor.show');
         Route::post('/auth/two-factor-challenge', [TwoFactorChallengeController::class, 'store'])->name('app.auth.two-factor.store');
+        Route::get('/auth/two-factor-challenge/passkey/options', [TwoFactorPasskeyController::class, 'options'])->name('app.auth.two-factor.passkey-options');
+        Route::post('/auth/two-factor-challenge/passkey', [TwoFactorPasskeyController::class, 'verify'])->name('app.auth.two-factor.passkey');
         Route::get('/auth/forgot-password', [PasswordResetController::class, 'showForgot'])->name('app.auth.show-forgot');
         Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])->name('app.auth.forgot');
         Route::get('/auth/reset-password/{token}', [PasswordResetController::class, 'showReset'])->name('app.auth.show-reset');
@@ -58,6 +62,7 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/profile/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('app.profile.two-factor.confirm');
         Route::delete('/profile/two-factor', [TwoFactorController::class, 'disable'])->name('app.profile.two-factor.disable');
         Route::post('/profile/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('app.profile.two-factor.recovery-codes');
+        Route::patch('/user/passkeys/{passkey}/name', [PasskeyManagementController::class, 'rename'])->name('app.passkeys.rename');
     });
 
     // Project tenant routes

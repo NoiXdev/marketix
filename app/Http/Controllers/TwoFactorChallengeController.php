@@ -22,8 +22,7 @@ class TwoFactorChallengeController extends Controller
         }
 
         return inertia('Auth/TwoFactorChallenge', [
-            // Flipped to the real check in Task 6, once the passkey trait is wired (Task 5).
-            'hasPasskeys' => false,
+            'hasPasskeys' => $user->hasPasskeysEnabled(),
         ]);
     }
 
