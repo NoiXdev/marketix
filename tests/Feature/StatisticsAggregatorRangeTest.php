@@ -6,9 +6,9 @@ use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Project;
 use App\Models\Statistic;
 use App\Services\StatisticsAggregator;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
-use Carbon\CarbonImmutable;
 use Tests\TestCase;
 
 class StatisticsAggregatorRangeTest extends TestCase
@@ -34,7 +34,7 @@ class StatisticsAggregatorRangeTest extends TestCase
         // Outside the range — must be excluded.
         Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-10 10:00:00', 'ip' => '9.9.9.9']);
 
-        $stats = new StatisticsAggregator();
+        $stats = new StatisticsAggregator;
         $rows = $stats->clicksByDayBetween(
             $project->id,
             null,
@@ -54,7 +54,7 @@ class StatisticsAggregatorRangeTest extends TestCase
         Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-02 10:00:00']);
         Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-20 10:00:00']);
 
-        $stats = new StatisticsAggregator();
+        $stats = new StatisticsAggregator;
 
         $this->assertSame(1, $stats->totalClicks(
             $project->id,
