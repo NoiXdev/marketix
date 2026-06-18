@@ -28,7 +28,6 @@ class TeamController extends Controller
             ]),
             'invitations' => $project->invitations()
                 ->whereNull('accepted_at')
-                ->where('expires_at', '>', now())
                 ->latest()
                 ->get()
                 ->map(fn ($i) => [
@@ -36,6 +35,8 @@ class TeamController extends Controller
                     'email' => $i->email,
                     'role' => $i->role->value,
                     'expires_at' => $i->expires_at->toIso8601String(),
+                    'expired' => $i->isExpired(),
+                    'can_resend' => $i->canResend(),
                 ]),
         ]);
     }
@@ -49,17 +50,13 @@ class TeamController extends Controller
         // Replace any existing pending invite for this email.
         $project->invitations()->where('email', $data['email'])->whereNull('accepted_at')->delete();
 
-        $token = Str::random(40);
-
-        $invitation = $project->invitations()->create([
+        $invitation = $project->invitations()->make([
             'email' => $data['email'],
             'role' => $data['role'],
-            'token' => ProjectInvitation::hashToken($token),
             'invited_by' => $request->user()->id,
-            'expires_at' => now()->addDays(7),
         ]);
 
-        Mail::to($data['email'])->queue(new ProjectInvitationMail($invitation, $token));
+        $this->sendInvitation($invitation);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Invitation sent.');
@@ -74,6 +71,23 @@ class TeamController extends Controller
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Invitation revoked.');
+    }
+
+    public function resendInvitation(Request $request, string $invitation)
+    {
+        /** @var Project $project */
+        $project = $request->get('project');
+
+        $invite = $project->invitations()->whereNull('accepted_at')->findOrFail($invitation);
+
+        if (! $invite->canResend()) {
+            return back()->with('error', 'Please wait a moment before resending this invitation.');
+        }
+
+        $this->sendInvitation($invite);
+
+        return redirect()->route('app.project.team.index', ['project' => $project->id])
+            ->with('success', 'Invitation resent.');
     }
 
     public function updateMember(Request $request, string $user)
@@ -109,6 +123,19 @@ class TeamController extends Controller
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Member removed.');
+    }
+
+    private function sendInvitation(ProjectInvitation $invitation): void
+    {
+        $token = Str::random(40);
+
+        $invitation->forceFill([
+            'token' => ProjectInvitation::hashToken($token),
+            'expires_at' => now()->addDays(7),
+            'last_sent_at' => now(),
+        ])->save();
+
+        Mail::to($invitation->email)->queue(new ProjectInvitationMail($invitation, $token));
     }
 
     private function isLastAdmin(Project $project, string $userId): bool
