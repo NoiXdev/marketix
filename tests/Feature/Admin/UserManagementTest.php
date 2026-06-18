@@ -132,4 +132,28 @@ class UserManagementTest extends TestCase
                 ->component('Admin/Users/Edit')
                 ->where('user.force_password_change', true));
     }
+
+    public function test_admin_can_send_password_reset_link(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $admin = $this->superAdmin();
+        $target = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->post(route('app.admin.users.send-password-reset', ['user' => $target->id]))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => $target->email]);
+    }
+
+    public function test_send_password_reset_requires_super_admin(): void
+    {
+        $target = User::factory()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->post(route('app.admin.users.send-password-reset', ['user' => $target->id]))
+            ->assertForbidden();
+    }
 }
