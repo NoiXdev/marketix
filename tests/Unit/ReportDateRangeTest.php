@@ -67,6 +67,27 @@ class ReportDateRangeTest extends TestCase
         );
     }
 
+    public function test_custom_rejects_span_exceeding_366_days(): void
+    {
+        // 2024-06-01 → 2025-07-03 = 398 calendar days (clearly > 366)
+        $this->expectException(\InvalidArgumentException::class);
+        ReportDateRange::custom(
+            CarbonImmutable::parse('2024-06-01'),
+            CarbonImmutable::parse('2025-07-03'),
+        );
+    }
+
+    public function test_custom_allows_span_within_366_days(): void
+    {
+        // 2025-06-19 → 2026-06-18 = 365 calendar days (within the limit, end == test-now)
+        $range = ReportDateRange::custom(
+            CarbonImmutable::parse('2025-06-19'),
+            CarbonImmutable::parse('2026-06-18'),
+        );
+
+        $this->assertSame(365, $range->days());
+    }
+
     public function test_from_request_falls_back_to_preset_30(): void
     {
         $this->assertSame('Last 30 days', ReportDateRange::fromRequest([])->label());
