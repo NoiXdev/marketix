@@ -1,7 +1,6 @@
 @extends('reports.layout')
 
 @section('body')
-    <h2>Link report</h2>
     <h2>Overview</h2>
     <div class="kpis">
         <div class="kpi"><div class="value">{{ number_format($totalClicks) }}</div><div class="label">Total clicks</div></div>
