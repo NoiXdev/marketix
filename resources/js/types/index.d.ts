@@ -11,11 +11,23 @@ export interface Project {
   locked: boolean;
 }
 
+export interface DomainCheckDetails {
+  dns?: { domain_ips?: string[]; app_ips?: string[]; error?: string };
+  ssl?: { expires_at?: number; names?: string[]; error?: string };
+  reachable?: { status?: number; error?: string };
+}
+
 export interface Domain {
   id: string;
   name: string;
   redirect_root: string | null;
   redirect_not_found: string | null;
+  status: 'healthy' | 'error' | 'pending';
+  dns_ok: boolean | null;
+  reachable_ok: boolean | null;
+  ssl_ok: boolean | null;
+  check_details: DomainCheckDetails | null;
+  last_checked_at: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -2,14 +2,38 @@ import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { Domain, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
+import StatusPills from '@/Pages/Domains/Partials/StatusPills';
+import { Globe, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-export default function DomainsIndex({ domains }: { domains: Domain[] }) {
+export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain: string }) {
   const { project, flash } = usePage<PageProps>().props;
 
   async function destroy(domain: Domain) {
     if (!(await confirmDelete({ title: 'Delete domain?', text: `Delete "${domain.name}"? This cannot be undone.` }))) return;
     router.delete(route('app.project.domains.destroy', { project: project!.id, domain: domain.id }));
+  }
+
+  const [checking, setChecking] = useState<string | null>(null);
+
+  function check(domain: Domain) {
+    setChecking(domain.id);
+    router.post(
+      route('app.project.domains.check', { project: project!.id, domain: domain.id }),
+      {},
+      { preserveScroll: true, onFinish: () => setChecking(null) },
+    );
+  }
+
+  function relativeTime(iso: string | null): string {
+    if (!iso) return 'never checked';
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.round(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.round(hrs / 24)}d ago`;
   }
 
   return (
@@ -67,6 +91,9 @@ export default function DomainsIndex({ domains }: { domains: Domain[] }) {
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     404 redirect
                   </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Status
+                  </th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -91,7 +118,21 @@ export default function DomainsIndex({ domains }: { domains: Domain[] }) {
                       )}
                     </td>
                     <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        <StatusPills domain={domain} />
+                        <span className="text-xs text-slate-400 dark:text-slate-500">{relativeTime(domain.last_checked_at)}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          onClick={() => check(domain)}
+                          disabled={checking === domain.id}
+                          className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                          title="Check status"
+                        >
+                          <RefreshCw className={`h-4 w-4 ${checking === domain.id ? 'animate-spin' : ''}`} />
+                        </button>
                         <Link
                           href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })}
                           className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
