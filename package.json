@@ -37,6 +37,7 @@
         "vite": "^7.2.4"
     },
     "dependencies": {
+        "chart.js": "^4.5.1",
         "lucide-react": "^1.20.0",
         "puppeteer": "^25.1.0",
         "qr-code-styling": "^1.9.2",
