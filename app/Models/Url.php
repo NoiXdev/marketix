@@ -7,6 +7,7 @@ use App\Enums\UrlStatus;
 use App\Observers\UrlObserver;
 use Database\Factories\UrlFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,7 +21,7 @@ class Url extends Model
     /** @use HasFactory<UrlFactory> */
     use HasFactory;
 
-    use SoftDeletes;
+    use HasUlids, SoftDeletes;
 
     protected $fillable = [
         'project_id',

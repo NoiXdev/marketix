@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\DomainObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy([DomainObserver::class])]
 class Domain extends Model
 {
-    use SoftDeletes;
+    use HasUlids, SoftDeletes;
 
     protected $fillable = [
         'project_id',
