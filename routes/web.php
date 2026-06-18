@@ -24,6 +24,11 @@ use App\Http\Controllers\UrlController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
 
+// Public marker used by the domain reachability check to confirm the
+// Traefik -> app path resolves to this application.
+Route::get('/.well-known/marketix', fn () => response()->json(['app' => 'marketix']))
+    ->name('marketix.signature');
+
 Route::group(['domain' => config('app.domain')], function () {
     // Root redirect
     Route::get('/', function () {
