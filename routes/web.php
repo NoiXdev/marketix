@@ -140,6 +140,7 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('app.admin.users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('app.admin.users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('app.admin.users.destroy');
+        Route::post('/users/{user}/send-password-reset', [UserController::class, 'sendPasswordReset'])->name('app.admin.users.send-password-reset');
 
         Route::get('/projects', [ProjectController::class, 'index'])->name('app.admin.projects.index');
         Route::get('/projects/create', [ProjectController::class, 'create'])->name('app.admin.projects.create');

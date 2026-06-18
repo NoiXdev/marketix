@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
@@ -102,5 +103,18 @@ class UserController extends Controller
         $model->delete();
 
         return redirect()->route('app.admin.users.index')->with('success', 'User deleted.');
+    }
+
+    public function sendPasswordReset(string $user)
+    {
+        $model = User::findOrFail($user);
+
+        $status = Password::sendResetLink(['email' => $model->email]);
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with('success', 'Password reset link sent.');
+        }
+
+        return back()->with('error', __($status));
     }
 }
