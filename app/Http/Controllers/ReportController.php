@@ -7,6 +7,7 @@ use App\Reports\ReportDataService;
 use App\Reports\ReportDateRange;
 use Illuminate\Http\Request;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ReportController extends Controller
 {
@@ -42,7 +43,7 @@ class ReportController extends Controller
         try {
             return ReportDateRange::fromRequest($request->only(['range', 'from', 'to']));
         } catch (\InvalidArgumentException $e) {
-            abort(422, $e->getMessage());
+            throw new HttpException(422, $e->getMessage());
         }
     }
 

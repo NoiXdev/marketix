@@ -17,15 +17,9 @@ class StatisticFactory extends Factory
 
     public function definition(): array
     {
-        // url_id is NOT NULL — create a minimal URL with required dependencies
-        // so standalone factory calls (e.g. `for($project)->create()`) work.
-        // Callers that supply a real Url should use forUrl() to override both
-        // project_id and url_id together.
-        $url = $this->createMinimalUrl();
-
         return [
-            'project_id' => $url->project_id,
-            'url_id' => $url->id,
+            // project_id and url_id are filled lazily in configure() below,
+            // only when the caller has not already supplied them.
             'ip' => $this->faker->ipv4(),
             'country' => $this->faker->country(),
             'city' => $this->faker->city(),
@@ -35,6 +29,22 @@ class StatisticFactory extends Factory
             'browser' => $this->faker->randomElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
             'os' => $this->faker->randomElement(['Windows', 'macOS', 'Linux', 'Android', 'iOS']),
         ];
+    }
+
+    /**
+     * Fill project_id / url_id lazily — only when the caller has not already
+     * supplied them (via forUrl(), forProject(), or direct state overrides).
+     * This prevents orphan Project+Domain+URL creation on every factory call.
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (Statistic $statistic) {
+            if ($statistic->project_id === null || $statistic->url_id === null) {
+                $url = $this->createMinimalUrl();
+                $statistic->project_id = $url->project_id;
+                $statistic->url_id = $url->id;
+            }
+        });
     }
 
     /**
