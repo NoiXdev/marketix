@@ -46,4 +46,39 @@ class PasskeyWiringTest extends TestCase
     {
         $this->assertSame([], config('passkeys.management_middleware'));
     }
+
+    public function test_challenge_passkey_options_requires_pending_session(): void
+    {
+        $this->getJson(route('app.auth.two-factor.passkey-options'))->assertStatus(409);
+    }
+
+    public function test_rename_updates_owned_passkey(): void
+    {
+        $user = User::factory()->create();
+        $passkey = $user->passkeys()->create([
+            'name' => 'Old',
+            'credential_id' => 'cred-rename',
+            'credential' => ['aaguid' => '00000000-0000-0000-0000-000000000000'],
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('app.passkeys.rename', ['passkey' => $passkey->id]), ['name' => 'New Name'])
+            ->assertRedirect();
+
+        $this->assertSame('New Name', $passkey->fresh()->name);
+    }
+
+    public function test_rename_forbidden_for_other_users_passkey(): void
+    {
+        $owner = User::factory()->create();
+        $passkey = $owner->passkeys()->create([
+            'name' => 'Theirs',
+            'credential_id' => 'cred-other',
+            'credential' => ['aaguid' => '00000000-0000-0000-0000-000000000000'],
+        ]);
+
+        $this->actingAs(User::factory()->create())
+            ->patch(route('app.passkeys.rename', ['passkey' => $passkey->id]), ['name' => 'Hijack'])
+            ->assertForbidden();
+    }
 }
