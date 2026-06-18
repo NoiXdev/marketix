@@ -116,7 +116,7 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
                           onClick={() => resend(inv)}
                           disabled={!inv.can_resend}
                           title={inv.can_resend ? 'Resend invitation' : 'Recently sent — try again shortly'}
-                          className="mr-1 rounded p-1.5 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-indigo-900/20"
+                          className="mr-1 rounded p-1.5 text-slate-400 enabled:hover:bg-indigo-50 enabled:hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-indigo-900/20"
                         >
                           <Send className="h-4 w-4" />
                         </button>
