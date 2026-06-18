@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Statistic;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -57,22 +58,61 @@ class StatisticsAggregator
     }
 
     /**
+     * Daily total and unique clicks across an inclusive [start, end] day span,
+     * zero-filled for a continuous x-axis.
+     *
+     * @return list<array{date: string, clicks: int, unique: int}>
+     */
+    public function clicksByDayBetween(int $projectId, ?int $urlId, CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        $startDay = $start->startOfDay();
+        $endDay = $end->startOfDay();
+        $days = $startDay->diffInDays($endDay) + 1;
+
+        $rows = $this->base($projectId, $urlId)
+            ->whereBetween('created_at', [$start->startOfDay(), $end->endOfDay()])
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as clicks'),
+                DB::raw('COUNT(DISTINCT ip) as unique_clicks'),
+            )
+            ->groupBy('date')
+            ->get()
+            ->keyBy('date');
+
+        $out = [];
+        for ($i = 0; $i < $days; $i++) {
+            $date = $startDay->addDays($i)->format('Y-m-d');
+            $row = $rows->get($date);
+            $out[] = [
+                'date' => $date,
+                'clicks' => (int) ($row->clicks ?? 0),
+                'unique' => (int) ($row->unique_clicks ?? 0),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Total clicks, optionally restricted to a trailing window.
      */
-    public function totalClicks(int $projectId, ?int $urlId, ?Carbon $since = null): int
+    public function totalClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
             ->count();
     }
 
     /**
      * Distinct-IP clicks, optionally restricted to a trailing window.
      */
-    public function uniqueClicks(int $projectId, ?int $urlId, ?Carbon $since = null): int
+    public function uniqueClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
             ->distinct('ip')
             ->count('ip');
     }
@@ -83,7 +123,7 @@ class StatisticsAggregator
      *
      * @return Collection<int, \stdClass>
      */
-    public function breakdown(int $projectId, ?int $urlId, string $column, ?Carbon $since = null, int $limit = 8): Collection
+    public function breakdown(int $projectId, ?int $urlId, string $column, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 8): Collection
     {
         $allowed = ['country', 'city', 'browser', 'os', 'domain'];
         if (! in_array($column, $allowed, true)) {
@@ -92,6 +132,7 @@ class StatisticsAggregator
 
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
             ->whereNotNull($column)
             ->where($column, '!=', '')
             ->select($column, DB::raw('COUNT(*) as count'))
@@ -106,10 +147,11 @@ class StatisticsAggregator
      *
      * @return Collection<int, Statistic>
      */
-    public function recentClicks(int $projectId, ?int $urlId, ?Carbon $since = null, int $limit = 50): Collection
+    public function recentClicks(int $projectId, ?int $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 50): Collection
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
             ->latest()
             ->limit($limit)
             ->get(['id', 'country', 'city', 'browser', 'os', 'domain', 'created_at']);
