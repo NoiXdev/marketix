@@ -1,3 +1,4 @@
+import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -203,6 +204,7 @@ export default function LinksShow({
                 <Pencil className="h-4 w-4" />
                 Edit
               </Link>
+              <ReportDownloadButton projectId={project!.id} urlId={link.id} />
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
@@ -105,21 +106,24 @@ export default function StatisticsIndex({
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Click analytics for this project</p>
           </div>
 
-          {/* Range selector */}
-          <div className="flex rounded-lg border border-slate-200 bg-white text-sm dark:border-slate-700 dark:bg-slate-900">
-            {[7, 30, 90].map((d) => (
-              <button
-                key={d}
-                onClick={() => setDays(d)}
-                className={`px-3 py-1.5 first:rounded-l-lg last:rounded-r-lg transition-colors ${
-                  days === d
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
-                }`}
-              >
-                {d}d
-              </button>
-            ))}
+          {/* Range selector + Download PDF */}
+          <div className="flex items-center gap-3">
+            <div className="flex rounded-lg border border-slate-200 bg-white text-sm dark:border-slate-700 dark:bg-slate-900">
+              {[7, 30, 90].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDays(d)}
+                  className={`px-3 py-1.5 first:rounded-l-lg last:rounded-r-lg transition-colors ${
+                    days === d
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  {d}d
+                </button>
+              ))}
+            </div>
+            <ReportDownloadButton projectId={project!.id} />
           </div>
         </div>
 
