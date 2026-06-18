@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\MailerController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserProjectController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
@@ -141,6 +142,10 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::put('/users/{user}', [UserController::class, 'update'])->name('app.admin.users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('app.admin.users.destroy');
         Route::post('/users/{user}/send-password-reset', [UserController::class, 'sendPasswordReset'])->name('app.admin.users.send-password-reset');
+
+        Route::post('/users/{user}/projects', [UserProjectController::class, 'store'])->name('app.admin.users.projects.store');
+        Route::patch('/users/{user}/projects/{project}', [UserProjectController::class, 'update'])->name('app.admin.users.projects.update');
+        Route::delete('/users/{user}/projects/{project}', [UserProjectController::class, 'destroy'])->name('app.admin.users.projects.destroy');
 
         Route::get('/projects', [ProjectController::class, 'index'])->name('app.admin.projects.index');
         Route::get('/projects/create', [ProjectController::class, 'create'])->name('app.admin.projects.create');
