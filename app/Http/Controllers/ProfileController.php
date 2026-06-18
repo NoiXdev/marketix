@@ -11,11 +11,20 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        $pending = $user->two_factor_secret && ! $user->hasTwoFactorEnabled();
+
         return inertia('Profile/Edit', [
             'user' => [
                 'name' => $user->name,
                 'email' => $user->email,
             ],
+            'twoFactorEnabled' => $user->hasTwoFactorEnabled(),
+            'twoFactorPending' => (bool) $pending,
+            'twoFactorSetup' => $pending ? [
+                'secretKey' => $user->two_factor_secret,
+                'qrCode' => app(\App\Support\TwoFactor::class)->qrCodeDataUri($user->email, $user->two_factor_secret),
+            ] : null,
+            'recoveryCodes' => $request->session()->get('recoveryCodes'),
         ]);
     }
 
