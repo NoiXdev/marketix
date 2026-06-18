@@ -81,6 +81,44 @@ class StatisticFactory extends Factory
     }
 
     /**
+     * Bind the statistic to a given project, creating a URL within that
+     * project so both project_id and url_id are internally consistent.
+     *
+     * Use this instead of ->for($project) so that url_id is never left
+     * pointing at a URL that belongs to a different project.
+     */
+    public function forProject(Project $project): static
+    {
+        return $this->state(function () use ($project) {
+            $user = User::factory()->create();
+            $domain = Domain::create([
+                'project_id' => $project->id,
+                'name' => $this->faker->unique()->domainName(),
+            ]);
+
+            $url = Url::create([
+                'project_id' => $project->id,
+                'domain_id' => $domain->id,
+                'user_id' => $user->id,
+                'slug' => $this->faker->unique()->slug(2),
+                'url' => $this->faker->url(),
+                'type' => RedirectType::cases()[0],
+                'status' => UrlStatus::ACTIVATED,
+                'archived' => false,
+                'targeting_geo' => [],
+                'targeting_device' => [],
+                'targeting_language' => [],
+                'targeting_ab' => [],
+            ]);
+
+            return [
+                'project_id' => $project->id,
+                'url_id' => $url->id,
+            ];
+        });
+    }
+
+    /**
      * Pin the visitor country (handy for seeding dashboard breakdowns).
      */
     public function country(string $country): static
