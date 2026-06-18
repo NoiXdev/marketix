@@ -3,8 +3,9 @@ import { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
+import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
 
-export default function DomainsCreate() {
+export default function DomainsCreate({ appDomain }: { appDomain: string }) {
   const { project } = usePage<PageProps>().props;
 
   const { data, setData, post, processing, errors } = useForm({
@@ -30,6 +31,10 @@ export default function DomainsCreate() {
             Back to domains
           </Link>
           <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">Add domain</h1>
+        </div>
+
+        <div className="max-w-lg">
+          <DnsInfoBox appDomain={appDomain} />
         </div>
 
         <div className="max-w-lg rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">

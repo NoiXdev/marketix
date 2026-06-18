@@ -1,10 +1,12 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Domain, PageProps } from '@/types';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
+import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
+import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 
-export default function DomainsEdit({ domain }: { domain: Domain }) {
+export default function DomainsEdit({ domain, appDomain }: { domain: Domain; appDomain: string }) {
   const { project } = usePage<PageProps>().props;
 
   const { data, setData, put, processing, errors } = useForm({
@@ -17,6 +19,17 @@ export default function DomainsEdit({ domain }: { domain: Domain }) {
     e.preventDefault();
     put(route('app.project.domains.update', { project: project!.id, domain: domain.id }));
   };
+
+  const [checking, setChecking] = useState(false);
+
+  function check() {
+    setChecking(true);
+    router.post(
+      route('app.project.domains.check', { project: project!.id, domain: domain.id }),
+      {},
+      { preserveScroll: true, onFinish: () => setChecking(false) },
+    );
+  }
 
   return (
     <AppLayout title="Edit domain">
@@ -32,6 +45,34 @@ export default function DomainsEdit({ domain }: { domain: Domain }) {
           <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">
             Edit <span className="text-indigo-600 dark:text-indigo-400">{domain.name}</span>
           </h1>
+        </div>
+
+        <div className="mb-6 max-w-lg">
+          <DnsInfoBox appDomain={appDomain} />
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Domain status</h2>
+              <button
+                type="button"
+                onClick={check}
+                disabled={checking}
+                className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
+                Check now
+              </button>
+            </div>
+            <StatusPills domain={domain} />
+            <dl className="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+              {domain.check_details?.dns?.domain_ips && (
+                <div>Resolves to: {domain.check_details.dns.domain_ips.join(', ') || '—'}</div>
+              )}
+              {domain.check_details?.ssl?.error && <div>SSL: {domain.check_details.ssl.error}</div>}
+              {domain.check_details?.reachable?.error && <div>Reachable: {domain.check_details.reachable.error}</div>}
+              {domain.last_checked_at && <div>Last checked: {new Date(domain.last_checked_at).toLocaleString()}</div>}
+            </dl>
+          </div>
         </div>
 
         <div className="max-w-lg rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
