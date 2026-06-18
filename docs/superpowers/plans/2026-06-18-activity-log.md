@@ -139,7 +139,11 @@ class Activity extends SpatieActivity
             'event' => $this->event,
             'subject_type' => $this->subject_type ? class_basename($this->subject_type) : null,
             'causer' => $this->causer ? ['id' => $this->causer->id, 'name' => $this->causer->name] : null,
-            'properties' => $this->properties->toArray(),
+            // Spatie v5: attribute diffs (old → new) live in `attribute_changes`,
+            // shaped ['attributes' => [...], 'old' => [...]]. `properties` holds
+            // only manual custom data (role, email, ip, …).
+            'changes' => $this->attribute_changes?->toArray() ?? [],
+            'properties' => $this->properties?->toArray() ?? [],
             'created_at' => $this->created_at->toISOString(),
         ];
     }
@@ -219,7 +223,9 @@ git commit -m "feat(activity-log): install spatie activitylog with project_id co
 
 **Interfaces:**
 - Consumes: `App\Models\Activity` (Task 1).
-- Produces: trait `App\Models\Concerns\SetsActivityProject` providing `tapActivity(Activity $activity, string $eventName): void` (sets `project_id` from `resolveActivityProjectId()` and redacts `$activitySensitiveAttributes`) and `resolveActivityProjectId(): ?string` (defaults to `$this->project_id`). Consuming models may override `resolveActivityProjectId()` and declare `protected array $activitySensitiveAttributes`.
+- Produces: trait `App\Models\Concerns\SetsActivityProject` providing `beforeActivityLogged(Activity $activity, string $eventName): void` (the **Spatie v5** subject hook — sets `project_id` from `resolveActivityProjectId()` and redacts `$activitySensitiveAttributes` in the `attribute_changes` bag, defensively also `properties`) and `resolveActivityProjectId(): ?string` (defaults to `$this->project_id`). Consuming models may override `resolveActivityProjectId()` and declare `protected array $activitySensitiveAttributes`.
+
+> **Spatie v5 note (verified against vendor 5.0.0):** the subject hook is `beforeActivityLogged($activity, $event)` (NOT v4's `tapActivity`), and attribute diffs are stored in the `attribute_changes` column (shape `['attributes' => …, 'old' => …]`), NOT in `properties`. This task was implemented to v5; Tasks 3/4/10 below assert against `attribute_changes` accordingly.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -409,7 +415,8 @@ class UrlLoggingTest extends TestCase
         $url->update(['slug' => 'new-slug']);
 
         $activity = Activity::query()->where('subject_id', $url->id)->where('event', 'updated')->latest('id')->first();
-        $attrs = $activity->properties->toArray()['attributes'];
+        // Spatie v5: diffs live in attribute_changes, not properties.
+        $attrs = $activity->attribute_changes->toArray()['attributes'];
 
         $this->assertSame('new-slug', $attrs['slug']);
         $this->assertArrayNotHasKey('updated_at', $attrs);
@@ -425,10 +432,10 @@ class UrlLoggingTest extends TestCase
         $url->update(['password' => 'super-secret']);
 
         $activity = Activity::query()->where('subject_id', $url->id)->where('event', 'updated')->latest('id')->first();
-        $attrs = $activity->properties->toArray()['attributes'];
+        $attrs = $activity->attribute_changes->toArray()['attributes'];
 
         $this->assertSame('••••', $attrs['password']);
-        $this->assertStringNotContainsString('super-secret', json_encode($activity->properties->toArray()));
+        $this->assertStringNotContainsString('super-secret', json_encode($activity->attribute_changes->toArray()));
     }
 
     public function test_ab_targeting_is_logged(): void
@@ -440,7 +447,7 @@ class UrlLoggingTest extends TestCase
 
         $activity = Activity::query()->where('subject_id', $url->id)->where('event', 'updated')->latest('id')->first();
 
-        $this->assertArrayHasKey('targeting_ab', $activity->properties->toArray()['attributes']);
+        $this->assertArrayHasKey('targeting_ab', $activity->attribute_changes->toArray()['attributes']);
     }
 }
 ```
@@ -542,7 +549,8 @@ class ContentModelLoggingTest extends TestCase
         $domain->update(['dns_ok' => true, 'last_checked_at' => now()]);
 
         $editActivity = Activity::query()->where('subject_id', $domain->id)->where('event', 'updated')->latest('id')->first();
-        $attrs = $editActivity->properties->toArray()['attributes'];
+        // Spatie v5: diffs live in attribute_changes, not properties.
+        $attrs = $editActivity->attribute_changes->toArray()['attributes'];
 
         $this->assertSame('domain', $editActivity->log_name);
         $this->assertSame($project->id, $editActivity->project_id);
@@ -1410,6 +1418,9 @@ export interface ActivityEntry {
   event: string | null;
   subject_type: string | null;
   causer: { id: string; name: string } | null;
+  // Spatie v5 attribute diffs (old → new) from the attribute_changes column.
+  changes: { attributes?: Record<string, unknown>; old?: Record<string, unknown> };
+  // Manual custom data (role, email, ip, …) from the properties column.
   properties: Record<string, unknown>;
   created_at: string;
 }
@@ -1929,9 +1940,9 @@ import { router } from '@inertiajs/react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
-function Diff({ properties }: { properties: Record<string, unknown> }) {
-  const attrs = (properties.attributes ?? {}) as Record<string, unknown>;
-  const old = (properties.old ?? {}) as Record<string, unknown>;
+function Diff({ changes }: { changes: ActivityEntry['changes'] }) {
+  const attrs = (changes.attributes ?? {}) as Record<string, unknown>;
+  const old = (changes.old ?? {}) as Record<string, unknown>;
   const keys = Object.keys(attrs);
 
   if (keys.length === 0) {
@@ -1982,7 +1993,7 @@ export default function ActivityHistory({ history }: { history?: ActivityEntry[]
                     <span className="font-medium">{a.causer?.name ?? 'System'}</span> {a.description}{' '}
                     <span className="text-xs text-slate-400">{new Date(a.created_at).toLocaleString()}</span>
                   </p>
-                  <Diff properties={a.properties} />
+                  <Diff changes={a.changes} />
                 </li>
               ))}
             </ul>
