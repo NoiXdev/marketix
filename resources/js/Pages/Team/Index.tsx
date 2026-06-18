@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps, ProjectInvitation, ProjectMember } from '@/types';
 import { router, useForm, usePage } from '@inertiajs/react';
 import { Mail, Trash2, UserPlus } from 'lucide-react';
@@ -12,7 +13,8 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
     invite.post(route('app.project.team.invitations.store', { project: project!.id }), { onSuccess: () => invite.reset() });
   }
 
-  function revoke(invitation: ProjectInvitation) {
+  async function revoke(invitation: ProjectInvitation) {
+    if (!(await confirmDelete({ title: 'Revoke invitation?', text: `Revoke the invitation for ${invitation.email}?`, confirmText: 'Revoke' }))) return;
     router.delete(route('app.project.team.invitations.destroy', { project: project!.id, invitation: invitation.id }));
   }
 
@@ -20,8 +22,8 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
     router.patch(route('app.project.team.members.update', { project: project!.id, user: member.id }), { role });
   }
 
-  function removeMember(member: ProjectMember) {
-    if (!confirm(`Remove ${member.name}?`)) return;
+  async function removeMember(member: ProjectMember) {
+    if (!(await confirmDelete({ title: 'Remove member?', text: `Remove ${member.name}?`, confirmText: 'Remove' }))) return;
     router.delete(route('app.project.team.members.destroy', { project: project!.id, user: member.id }));
   }
 

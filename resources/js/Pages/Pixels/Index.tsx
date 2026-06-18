@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps, Pixel } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Zap } from 'lucide-react';
@@ -29,8 +30,8 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
 
   const providerLabel = (value: string) => providers.find((p) => p.value === value)?.label ?? value;
 
-  function destroy(pixel: Pixel) {
-    if (!confirm(`Delete pixel "${pixel.name}"? This cannot be undone.`)) return;
+  async function destroy(pixel: Pixel) {
+    if (!(await confirmDelete({ title: 'Delete pixel?', text: `Delete pixel "${pixel.name}"? This cannot be undone.` }))) return;
     router.delete(route('app.project.pixels.destroy', { project: project!.id, pixel: pixel.id }));
   }
 

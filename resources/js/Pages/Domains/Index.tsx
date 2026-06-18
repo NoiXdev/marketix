@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { Domain, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
@@ -6,8 +7,8 @@ import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
 export default function DomainsIndex({ domains }: { domains: Domain[] }) {
   const { project, flash } = usePage<PageProps>().props;
 
-  function destroy(domain: Domain) {
-    if (!confirm(`Delete "${domain.name}"? This cannot be undone.`)) return;
+  async function destroy(domain: Domain) {
+    if (!(await confirmDelete({ title: 'Delete domain?', text: `Delete "${domain.name}"? This cannot be undone.` }))) return;
     router.delete(route('app.project.domains.destroy', { project: project!.id, domain: domain.id }));
   }
 
