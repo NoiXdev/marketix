@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, FolderKanban, Link2, Mail, Users } from 'lucide-react';
+import { Activity, ArrowLeft, FolderKanban, Link2, Mail, Users } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { PageProps } from '@/types';
 
@@ -42,6 +42,21 @@ export default function AdminSidebar() {
               </li>
             );
           })}
+
+          {/* Horizon is a separate Blade-rendered dashboard, so it needs a full-page anchor, not an Inertia Link. */}
+          <li>
+            <a
+              href="/horizon"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                url.startsWith('/horizon')
+                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white'
+              }`}
+            >
+              <Activity className="h-4 w-4 shrink-0" />
+              Horizon
+            </a>
+          </li>
         </ul>
       </nav>
 
