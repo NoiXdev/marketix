@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pixel_url', function (Blueprint $table) {
-            $table->foreignId('pixel_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('url_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('pixel_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('url_id')->constrained()->cascadeOnDelete();
             $table->primary(['pixel_id', 'url_id']);
         });
     }

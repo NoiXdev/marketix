@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('qr_codes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained('projects');
+            $table->ulid('id')->primary();
+            $table->foreignUlid('project_id')->constrained('projects');
             $table->string('name');
             $table->string('type', 30)->default('link');
             $table->boolean('is_dynamic')->default(true);

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('qr_codes', function (Blueprint $table) {
-            $table->foreignId('url_id')->nullable()->after('project_id')
+            $table->foreignUlid('url_id')->nullable()->after('project_id')
                 ->constrained('urls')->nullOnDelete();
         });
 
