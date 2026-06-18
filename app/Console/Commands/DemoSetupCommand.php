@@ -79,8 +79,8 @@ class DemoSetupCommand extends Command
     private function generateDomains(): void
     {
         $domains = [
-            ['project_id' => 1, 'name' => $this->isDDEV() ? 'project-a-marketix.ddev.site' : 'project-a.example.com', 'redirect_root' => 'https://google.com/search?q=Root', 'redirect_not_found' => 'https://google.com/search?q=NotFound'],
-            ['project_id' => 2, 'name' => $this->isDDEV() ? 'project-b-marketix.ddev.site' : 'project-b.example.com', 'redirect_root' => 'https://google.com/search?q=Root', 'redirect_not_found' => 'https://google.com/search?q=NotFound'],
+            ['project_id' => $this->projectByName('Project 1')->id, 'name' => $this->isDDEV() ? 'project-a-marketix.ddev.site' : 'project-a.example.com', 'redirect_root' => 'https://google.com/search?q=Root', 'redirect_not_found' => 'https://google.com/search?q=NotFound'],
+            ['project_id' => $this->projectByName('Project 2')->id, 'name' => $this->isDDEV() ? 'project-b-marketix.ddev.site' : 'project-b.example.com', 'redirect_root' => 'https://google.com/search?q=Root', 'redirect_not_found' => 'https://google.com/search?q=NotFound'],
         ];
 
         collect($domains)->each(function ($domain) {
@@ -90,8 +90,11 @@ class DemoSetupCommand extends Command
 
     private function generateUrls(): void
     {
-        Url::factory(20)->named(1, 1)->create();
-        Url::factory(20)->named(2, 2)->create();
+        $projectA = $this->projectByName('Project 1');
+        $projectB = $this->projectByName('Project 2');
+
+        Url::factory(20)->named($projectA->id, $projectA->domains()->value('id'))->create();
+        Url::factory(20)->named($projectB->id, $projectB->domains()->value('id'))->create();
     }
 
     /**
@@ -100,6 +103,11 @@ class DemoSetupCommand extends Command
     private function isDDEV(): bool
     {
         return (bool) env('IS_DDEV_PROJECT');
+    }
+
+    private function projectByName(string $name): Project
+    {
+        return Project::where('name', $name)->firstOrFail();
     }
 
     private function getOwnerOneUser(): User
