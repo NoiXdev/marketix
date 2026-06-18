@@ -17,6 +17,7 @@ class MailSettingsTest extends TestCase
 
         $this->assertSame(config('mail.from.address'), $settings->from_address);
         $this->assertSame(config('mail.default'), $settings->default_mailer);
+        $this->assertIsInt($settings->smtp_port);
     }
 
     public function test_secret_properties_are_encrypted_at_rest(): void
