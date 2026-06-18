@@ -8,6 +8,7 @@ use InvalidArgumentException;
 class ReportDateRange
 {
     private const PRESETS = [7, 30, 90];
+
     private const MAX_SPAN_DAYS = 366;
 
     private function __construct(

@@ -11,8 +11,8 @@ use App\Models\Url;
 use App\Models\User;
 use App\Reports\ReportDataService;
 use App\Reports\ReportDateRange;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Carbon\CarbonImmutable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
