@@ -1,5 +1,7 @@
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -8,6 +10,10 @@ export default function Login({ status }: { status?: string }) {
         email: '',
         password: '',
         remember: false as boolean,
+    });
+
+    const passkey = usePasskeyVerify({
+        onSuccess: (response) => router.visit(response.redirect ?? '/'),
     });
 
     const submit: FormEventHandler = (e) => {
@@ -104,6 +110,22 @@ export default function Login({ status }: { status?: string }) {
                     Sign in
                 </button>
             </form>
+
+            {passkey.isSupported && (
+                <div className="mt-4">
+                    <button
+                        type="button"
+                        onClick={() => void passkey.verify()}
+                        disabled={passkey.isLoading}
+                        className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                        Sign in with a passkey
+                    </button>
+                    {passkey.error && (
+                        <p className="mt-1 text-xs text-red-600 dark:text-red-400">{passkey.error}</p>
+                    )}
+                </div>
+            )}
         </GuestLayout>
     );
 }

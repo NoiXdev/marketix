@@ -1,11 +1,21 @@
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 export default function TwoFactorChallenge({ hasPasskeys }: { hasPasskeys: boolean }) {
     const [useRecovery, setUseRecovery] = useState(false);
     const { data, setData, post, processing, errors } = useForm({ code: '', recovery_code: '' });
+
+    const passkey = usePasskeyVerify({
+        routes: {
+            options: route('app.auth.two-factor.passkey-options'),
+            submit: route('app.auth.two-factor.passkey'),
+        },
+        onSuccess: (response) => router.visit(response.redirect ?? '/'),
+    });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -70,6 +80,20 @@ export default function TwoFactorChallenge({ hasPasskeys }: { hasPasskeys: boole
                 >
                     {useRecovery ? 'Use an authentication code' : 'Use a recovery code'}
                 </button>
+
+                {hasPasskeys && passkey.isSupported && (
+                    <button
+                        type="button"
+                        onClick={() => void passkey.verify()}
+                        disabled={passkey.isLoading}
+                        className="w-full rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                    >
+                        Use a passkey
+                    </button>
+                )}
+                {hasPasskeys && passkey.error && (
+                    <p className="text-xs text-red-600 dark:text-red-400">{passkey.error}</p>
+                )}
             </form>
         </GuestLayout>
     );
