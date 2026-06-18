@@ -48,6 +48,7 @@ class UserController extends Controller
         ]);
 
         $user->super_admin = (bool) ($data['super_admin'] ?? false);
+        $user->force_password_change = (bool) ($data['force_password_change'] ?? false);
         $user->save();
 
         return redirect()->route('app.admin.users.index')->with('success', 'User created.');
@@ -63,6 +64,7 @@ class UserController extends Controller
                 'name' => $model->name,
                 'email' => $model->email,
                 'super_admin' => $model->super_admin,
+                'force_password_change' => $model->force_password_change,
             ],
         ]);
     }
@@ -83,6 +85,7 @@ class UserController extends Controller
             $model->password = $data['password'];
         }
         $model->super_admin = $wantsSuperAdmin;
+        $model->force_password_change = (bool) ($data['force_password_change'] ?? false);
         $model->save();
 
         return redirect()->route('app.admin.users.index')->with('success', 'User updated.');

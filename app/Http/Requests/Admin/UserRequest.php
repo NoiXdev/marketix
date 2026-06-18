@@ -25,6 +25,7 @@ class UserRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
             'password' => [$this->isMethod('post') ? 'required' : 'nullable', 'string', 'min:8'],
             'super_admin' => ['boolean'],
+            'force_password_change' => ['boolean'],
         ];
     }
 }

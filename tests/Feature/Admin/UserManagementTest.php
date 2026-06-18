@@ -101,4 +101,35 @@ class UserManagementTest extends TestCase
 
         $this->assertNull(User::find($target->id));
     }
+
+    public function test_update_sets_force_password_change_flag(): void
+    {
+        $admin = $this->superAdmin();
+        $target = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->put(route('app.admin.users.update', ['user' => $target->id]), [
+                'name' => $target->name,
+                'email' => $target->email,
+                'force_password_change' => true,
+            ])
+            ->assertRedirect(route('app.admin.users.index'));
+
+        $this->assertTrue($target->fresh()->force_password_change);
+    }
+
+    public function test_edit_page_exposes_force_password_change(): void
+    {
+        $admin = $this->superAdmin();
+        $target = User::factory()->create();
+        $target->force_password_change = true;
+        $target->save();
+
+        $this->actingAs($admin)
+            ->get(route('app.admin.users.edit', ['user' => $target->id]))
+            ->assertOk()
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Admin/Users/Edit')
+                ->where('user.force_password_change', true));
+    }
 }
