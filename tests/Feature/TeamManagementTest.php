@@ -267,6 +267,23 @@ class TeamManagementTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_cannot_resend_invitation_from_another_project(): void
+    {
+        Mail::fake();
+        [$admin, $project] = $this->projectWithAdmin();
+        $otherProject = Project::factory()->create();
+        $invite = ProjectInvitation::factory()->create([
+            'project_id' => $otherProject->id,
+            'last_sent_at' => now()->subDay(),
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('app.project.team.invitations.resend', ['project' => $project->id, 'invitation' => $invite->id]))
+            ->assertNotFound();
+
+        Mail::assertNothingQueued();
+    }
+
     public function test_index_includes_expired_invitations_with_flags(): void
     {
         [$admin, $project] = $this->projectWithAdmin();
