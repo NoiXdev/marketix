@@ -3,12 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Mail\TestMail;
+use App\Models\User;
 use App\Settings\MailSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
-use App\Models\User;
 
 class MailerSettingsControllerTest extends TestCase
 {
@@ -42,7 +42,8 @@ class MailerSettingsControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Admin/Mailer/Edit')
                 ->where('has_postal_key', true)
-                ->missing('settings.postal_key'));
+                ->missing('settings.postal_key')
+                ->missing('settings.smtp_password'));
     }
 
     public function test_update_persists_and_preserves_blank_secret(): void

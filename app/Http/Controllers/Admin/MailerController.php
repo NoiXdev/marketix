@@ -25,8 +25,8 @@ class MailerController extends Controller
                 'smtp_username' => $settings->smtp_username,
                 'smtp_scheme' => $settings->smtp_scheme,
             ],
-            'has_postal_key' => $settings->postal_key !== '',
-            'has_smtp_password' => $settings->smtp_password !== '',
+            'has_postal_key' => ! empty($settings->postal_key),
+            'has_smtp_password' => ! empty($settings->smtp_password),
         ]);
     }
 
@@ -39,7 +39,7 @@ class MailerController extends Controller
         $settings->from_name = $data['from_name'];
         $settings->postal_url = $data['postal_url'] ?? '';
         $settings->smtp_host = $data['smtp_host'] ?? '';
-        $settings->smtp_port = (int) ($data['smtp_port'] ?? 587);
+        $settings->smtp_port = (int) ($data['smtp_port'] ?? $settings->smtp_port);
         $settings->smtp_username = $data['smtp_username'] ?? '';
         $settings->smtp_scheme = $data['smtp_scheme'] ?? '';
 
