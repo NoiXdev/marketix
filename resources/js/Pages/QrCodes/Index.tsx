@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
@@ -16,8 +17,8 @@ interface QrRow {
 export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
   const { project, flash } = usePage<PageProps>().props;
 
-  function destroy(qr: QrRow) {
-    if (!confirm(`Delete "${qr.name}"?`)) return;
+  async function destroy(qr: QrRow) {
+    if (!(await confirmDelete({ title: 'Delete QR code?', text: `Delete "${qr.name}"?` }))) return;
     router.delete(route('app.project.qrcodes.destroy', { project: project!.id, qrCode: qr.id }));
   }
 

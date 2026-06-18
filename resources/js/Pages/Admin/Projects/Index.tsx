@@ -1,4 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { ExternalLink, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
@@ -18,8 +19,8 @@ interface Paginated<T> {
 export default function AdminProjectsIndex({ projects, search }: { projects: Paginated<AdminProjectRow>; search: string }) {
   const { flash } = usePage<PageProps>().props;
 
-  function destroy(project: AdminProjectRow) {
-    if (!confirm(`Delete "${project.name}"?`)) return;
+  async function destroy(project: AdminProjectRow) {
+    if (!(await confirmDelete({ title: 'Delete project?', text: `Delete "${project.name}"?` }))) return;
     router.delete(route('app.admin.projects.destroy', { project: project.id }));
   }
 

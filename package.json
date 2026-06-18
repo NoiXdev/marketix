@@ -41,6 +41,7 @@
         "lucide-react": "^1.20.0",
         "puppeteer": "^25.1.0",
         "qr-code-styling": "^1.9.2",
-        "recharts": "^2.15.4"
+        "recharts": "^2.15.4",
+        "sweetalert2": "^11.26.25"
     }
 }

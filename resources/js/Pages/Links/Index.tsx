@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Check, Copy, ExternalLink, LinkIcon, Pencil, Plus, Power, Trash2 } from 'lucide-react';
@@ -56,8 +57,8 @@ function CopyButton({ text }: { text: string }) {
 export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
   const { project, flash } = usePage<PageProps>().props;
 
-  function destroy(url: UrlRow) {
-    if (!confirm(`Delete "${url.slug}"? This cannot be undone.`)) return;
+  async function destroy(url: UrlRow) {
+    if (!(await confirmDelete({ title: 'Delete link?', text: `Delete "${url.slug}"? This cannot be undone.` }))) return;
     router.delete(route('app.project.links.destroy', { project: project!.id, url: url.id }));
   }
 

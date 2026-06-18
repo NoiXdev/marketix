@@ -1,4 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { ProjectMember } from '@/types';
 import { Link, router, useForm } from '@inertiajs/react';
 import { ExternalLink, Trash2 } from 'lucide-react';
@@ -34,8 +35,8 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
     router.patch(route('app.admin.projects.members.update', { project: project.id, user: member.id }), { role });
   }
 
-  function removeMember(member: ProjectMember) {
-    if (!confirm(`Remove ${member.name} from this project?`)) return;
+  async function removeMember(member: ProjectMember) {
+    if (!(await confirmDelete({ title: 'Remove member?', text: `Remove ${member.name} from this project?`, confirmText: 'Remove' }))) return;
     router.delete(route('app.admin.projects.members.destroy', { project: project.id, user: member.id }));
   }
 

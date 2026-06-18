@@ -1,4 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Shield, Trash2 } from 'lucide-react';
@@ -19,8 +20,8 @@ interface Paginated<T> {
 export default function AdminUsersIndex({ users, search }: { users: Paginated<AdminUserRow>; search: string }) {
   const { flash } = usePage<PageProps>().props;
 
-  function destroy(user: AdminUserRow) {
-    if (!confirm(`Delete "${user.name}"? This cannot be undone.`)) return;
+  async function destroy(user: AdminUserRow) {
+    if (!(await confirmDelete({ title: 'Delete user?', text: `Delete "${user.name}"? This cannot be undone.` }))) return;
     router.delete(route('app.admin.users.destroy', { user: user.id }));
   }
 
