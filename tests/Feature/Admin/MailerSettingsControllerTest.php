@@ -42,6 +42,7 @@ class MailerSettingsControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Admin/Mailer/Edit')
                 ->where('has_postal_key', true)
+                ->where('has_smtp_password', false)
                 ->missing('settings.postal_key')
                 ->missing('settings.smtp_password'));
     }
@@ -112,5 +113,34 @@ class MailerSettingsControllerTest extends TestCase
             ->assertRedirect();
 
         Mail::assertSent(TestMail::class, fn ($mail) => $mail->hasTo('dest@example.com'));
+    }
+
+    public function test_has_flags_true_when_secrets_set_and_values_still_masked(): void
+    {
+        $settings = app(MailSettings::class);
+        $settings->postal_key = 'pk';
+        $settings->smtp_password = 'pw';
+        $settings->save();
+
+        $this->actingAs($this->superAdmin())
+            ->get(route('app.admin.mailer.edit'))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('has_postal_key', true)
+                ->where('has_smtp_password', true)
+                ->missing('settings.postal_key')
+                ->missing('settings.smtp_password'));
+    }
+
+    public function test_test_email_defaults_to_authenticated_user_email(): void
+    {
+        Mail::fake();
+        $admin = $this->superAdmin();
+
+        $this->actingAs($admin)
+            ->post(route('app.admin.mailer.test'), [])
+            ->assertRedirect();
+
+        Mail::assertSent(TestMail::class, fn ($mail) => $mail->hasTo($admin->email));
     }
 }
