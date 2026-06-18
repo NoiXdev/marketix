@@ -53,6 +53,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   projects: Project[];
   project?: Project;
   currentProjectRole?: ProjectRole | null;
+  version: string;
   flash: {
     success?: string;
     error?: string;

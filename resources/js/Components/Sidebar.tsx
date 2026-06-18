@@ -20,7 +20,7 @@ const navItems = [
 export default function Sidebar() {
   const { url } = usePage();
   const currentProject = usePage().props.project;
-  const { currentProjectRole, auth } = usePage<import('@/types').PageProps>().props;
+  const { currentProjectRole, auth, version } = usePage<import('@/types').PageProps>().props;
   const isProjectAdmin = auth.user.super_admin || currentProjectRole === 'admin';
 
   return (
@@ -69,6 +69,7 @@ export default function Sidebar() {
         <div className="mt-1">
           <UserMenu />
         </div>
+        <p className="mt-2 px-3 text-center text-xs text-slate-400 dark:text-slate-600">v{version}</p>
       </div>
     </aside>
   );
