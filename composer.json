@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "bacon/bacon-qr-code": "^3.1",
         "geoip2/geoip2": "^3.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.0",
@@ -14,6 +15,7 @@
         "laravel/octane": "^2.17",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
+        "pragmarx/google2fa-qrcode": "^4.0",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-pdf": "^2.12",
         "spatie/laravel-settings": "^3.9",
