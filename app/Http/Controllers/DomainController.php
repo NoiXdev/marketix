@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DomainRequest;
+use App\Jobs\CheckDomainStatusJob;
 use Illuminate\Http\Request;
 
 class DomainController extends Controller
@@ -13,12 +14,15 @@ class DomainController extends Controller
 
         return inertia('Domains/Index', [
             'domains' => $project->domains()->latest()->get(),
+            'appDomain' => config('app.domain'),
         ]);
     }
 
     public function create()
     {
-        return inertia('Domains/Create');
+        return inertia('Domains/Create', [
+            'appDomain' => config('app.domain'),
+        ]);
     }
 
     public function store(DomainRequest $request)
@@ -37,6 +41,7 @@ class DomainController extends Controller
 
         return inertia('Domains/Edit', [
             'domain' => $project->domains()->findOrFail($domain),
+            'appDomain' => config('app.domain'),
         ]);
     }
 
@@ -50,6 +55,18 @@ class DomainController extends Controller
 
         return redirect()->route('app.project.domains.index')
             ->with('success', 'Domain updated.');
+    }
+
+    public function check(Request $request, string $domain)
+    {
+        $project = $request->get('project');
+
+        $model = $project->domains()->findOrFail($domain);
+
+        CheckDomainStatusJob::dispatchSync($model);
+
+        return redirect()->route('app.project.domains.index')
+            ->with('success', 'Domain status refreshed.');
     }
 
     public function destroy(Request $request, string $domain)
