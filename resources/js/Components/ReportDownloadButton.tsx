@@ -1,7 +1,7 @@
 import { Download } from 'lucide-react';
 import { useState } from 'react';
 
-type Props = { projectId: number; urlId?: number };
+type Props = { projectId: string; urlId?: string };
 
 export default function ReportDownloadButton({ projectId, urlId }: Props) {
   const [open, setOpen] = useState(false);

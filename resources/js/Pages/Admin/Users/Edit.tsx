@@ -2,7 +2,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { Link, useForm } from '@inertiajs/react';
 
 interface EditUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   super_admin: boolean;

@@ -5,7 +5,7 @@ import { BarChart3, Check, Copy, ExternalLink, LinkIcon, Pencil, Plus, Power, Tr
 import { useState } from 'react';
 
 interface UrlRow {
-  id: number;
+  id: string;
   slug: string;
   url: string;
   status: number;
@@ -13,7 +13,7 @@ interface UrlRow {
   clicks: number;
   expired_at: string | null;
   created_at: string;
-  domain: { id: number; name: string } | null;
+  domain: { id: string; name: string } | null;
 }
 
 function StatusBadge({ status }: { status: number }) {

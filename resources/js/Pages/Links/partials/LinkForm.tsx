@@ -24,7 +24,7 @@ export interface LinkFormData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
-  pixel_ids: number[];
+  pixel_ids: string[];
 }
 
 interface Errors {
@@ -73,7 +73,7 @@ export default function LinkForm({
   data, setData, errors, processing,
   submitLabel, cancelHref, domains, pixels, onSubmit, hasPassword,
 }: LinkFormProps) {
-  function togglePixel(id: number) {
+  function togglePixel(id: string) {
     const ids = data.pixel_ids.includes(id)
       ? data.pixel_ids.filter((x) => x !== id)
       : [...data.pixel_ids, id];

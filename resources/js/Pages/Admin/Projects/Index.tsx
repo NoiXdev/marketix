@@ -4,7 +4,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { ExternalLink, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 
 interface AdminProjectRow {
-  id: number;
+  id: string;
   name: string;
   locked: boolean;
   users_count: number;

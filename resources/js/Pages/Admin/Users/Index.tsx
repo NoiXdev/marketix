@@ -4,7 +4,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Shield, Trash2 } from 'lucide-react';
 
 interface AdminUserRow {
-  id: number;
+  id: string;
   name: string;
   email: string;
   super_admin: boolean;

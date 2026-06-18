@@ -4,13 +4,13 @@ import { Link, router, useForm } from '@inertiajs/react';
 import { ExternalLink, Trash2 } from 'lucide-react';
 
 interface EditProject {
-  id: number;
+  id: string;
   name: string;
   locked: boolean;
 }
 
 interface AssignableUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
 }

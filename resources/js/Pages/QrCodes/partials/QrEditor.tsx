@@ -10,14 +10,14 @@ export interface QrFormData {
   name: string;
   type: QrType;
   is_dynamic: boolean;
-  domain_id: number | '';
+  domain_id: string | '';
   slug: string;
   content: Record<string, string>;
   style: QrStyle;
-  url_id?: number; // attach mode: back this QR with an existing link instead of creating one
+  url_id?: string; // attach mode: back this QR with an existing link instead of creating one
 }
 
-interface Domain { id: number; name: string }
+interface Domain { id: string; name: string }
 
 interface Props {
   data: QrFormData;
@@ -151,7 +151,7 @@ export default function QrEditor({
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Domain</label>
-                      <select value={data.domain_id} onChange={e => setData('domain_id', e.target.value ? Number(e.target.value) : '')}
+                      <select value={data.domain_id} onChange={e => setData('domain_id', e.target.value)}
                         className={inp}>
                         <option value="">Select a domain…</option>
                         {domains.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
