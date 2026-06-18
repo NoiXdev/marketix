@@ -11,7 +11,7 @@ const navItems = [
 
 export default function AdminSidebar() {
   const { url } = usePage();
-  const { projects } = usePage<PageProps>().props;
+  const { projects, version } = usePage<PageProps>().props;
   const backProject = projects?.[0];
 
   return (
@@ -71,6 +71,7 @@ export default function AdminSidebar() {
           </Link>
         )}
         <UserMenu />
+        <p className="mt-2 px-3 text-center text-xs text-slate-400 dark:text-slate-600">v{version}</p>
       </div>
     </aside>
   );

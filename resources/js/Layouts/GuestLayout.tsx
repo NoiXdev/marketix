@@ -1,3 +1,5 @@
+import { PageProps } from '@/types';
+import { usePage } from '@inertiajs/react';
 import { Link2 } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 
@@ -7,6 +9,8 @@ interface GuestLayoutProps {
 }
 
 export default function GuestLayout({ children, title, description }: PropsWithChildren<GuestLayoutProps>) {
+  const { version } = usePage<PageProps>().props;
+
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Left panel — branding */}
@@ -19,6 +23,7 @@ export default function GuestLayout({ children, title, description }: PropsWithC
           <blockquote className="space-y-2">
             <p className="text-lg leading-relaxed text-slate-300">Short links, big impact. Manage all your branded links and track every click in one place.</p>
           </blockquote>
+          <p className="mt-6 text-xs text-slate-500">v{version}</p>
         </div>
       </div>
 
@@ -39,6 +44,8 @@ export default function GuestLayout({ children, title, description }: PropsWithC
           )}
 
           {children}
+
+          <p className="mt-8 text-center text-xs text-slate-400 lg:hidden dark:text-slate-600">v{version}</p>
         </div>
       </div>
     </div>
