@@ -32,4 +32,17 @@ class SchemaTest extends TestCase
         $this->assertInstanceOf(Activity::class, $activity);
         $this->assertTrue($activity->fresh()->project->is($project));
     }
+
+    public function test_to_feed_array_exposes_changes_from_attribute_changes(): void
+    {
+        $activity = activity()->log('test');
+        $activity->attribute_changes = collect(['attributes' => ['slug' => 'b'], 'old' => ['slug' => 'a']]);
+        $activity->save();
+
+        $feed = $activity->fresh()->toFeedArray();
+
+        $this->assertSame(['slug' => 'b'], $feed['changes']['attributes']);
+        $this->assertSame(['slug' => 'a'], $feed['changes']['old']);
+        $this->assertIsArray($feed['properties']);
+    }
 }
