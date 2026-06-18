@@ -19,12 +19,22 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::validate($credentials)) {
             return back()->withErrors([
                 'email' => 'These credentials do not match our records.',
             ])->onlyInput('email');
         }
 
+        $user = Auth::getProvider()->retrieveByCredentials($credentials);
+
+        if ($user->hasTwoFactorEnabled()) {
+            $request->session()->put('auth.2fa.pending_id', $user->getKey());
+            $request->session()->put('auth.2fa.remember', $request->boolean('remember'));
+
+            return redirect()->route('app.auth.two-factor.show');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         return redirect('/');
