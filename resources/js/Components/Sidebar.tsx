@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BarChart3, Globe, LayoutDashboard, Link2, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 import ProjectSwitcher from './ProjectSwitcher';
 import UserMenu from './UserMenu';
 
@@ -61,7 +62,10 @@ export default function Sidebar() {
 
       {/* Bottom section */}
       <div className="border-t border-slate-200 p-3 dark:border-slate-800">
-        <ProjectSwitcher />
+        <ThemeToggle />
+        <div className="mt-1">
+          <ProjectSwitcher />
+        </div>
         <div className="mt-1">
           <UserMenu />
         </div>
