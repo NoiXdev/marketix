@@ -1,5 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { useForm } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 
 interface MailerSettings {
   default_mailer: string;
@@ -23,6 +24,7 @@ const inputClass =
 const labelClass = 'mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300';
 
 export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_password }: Props) {
+  const { flash } = usePage<PageProps>().props;
   const { data, setData, put, processing, errors } = useForm({
     default_mailer: settings.default_mailer,
     from_address: settings.from_address,
@@ -52,6 +54,13 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
     <AdminLayout title="Mailer">
       <div className="px-8 py-8">
         <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Mailer settings</h1>
+
+        {flash?.success && (
+          <div className="mb-4 max-w-md rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
+        )}
+        {flash?.error && (
+          <div className="mb-4 max-w-md rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{flash.error}</div>
+        )}
 
         <form onSubmit={submit} className="max-w-md space-y-4">
           <div>
@@ -121,6 +130,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
               <div>
                 <label className={labelClass}>Host</label>
                 <input value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} className={inputClass} />
+                {errors.smtp_host && <p className="mt-1 text-xs text-red-600">{errors.smtp_host}</p>}
               </div>
               <div>
                 <label className={labelClass}>Port</label>
@@ -130,10 +140,12 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                   onChange={(e) => setData('smtp_port', Number(e.target.value))}
                   className={inputClass}
                 />
+                {errors.smtp_port && <p className="mt-1 text-xs text-red-600">{errors.smtp_port}</p>}
               </div>
               <div>
                 <label className={labelClass}>Username</label>
                 <input value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} className={inputClass} />
+                {errors.smtp_username && <p className="mt-1 text-xs text-red-600">{errors.smtp_username}</p>}
               </div>
               <div>
                 <label className={labelClass}>Password {has_smtp_password && '(leave blank to keep current)'}</label>
@@ -144,10 +156,12 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                   onChange={(e) => setData('smtp_password', e.target.value)}
                   className={inputClass}
                 />
+                {errors.smtp_password && <p className="mt-1 text-xs text-red-600">{errors.smtp_password}</p>}
               </div>
               <div>
                 <label className={labelClass}>Encryption scheme (e.g. tls)</label>
                 <input value={data.smtp_scheme} onChange={(e) => setData('smtp_scheme', e.target.value)} className={inputClass} />
+                {errors.smtp_scheme && <p className="mt-1 text-xs text-red-600">{errors.smtp_scheme}</p>}
               </div>
             </fieldset>
           )}
