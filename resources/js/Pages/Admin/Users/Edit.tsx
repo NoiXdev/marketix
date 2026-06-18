@@ -1,7 +1,7 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
-import { ProjectRole } from '@/types';
-import { Link, router, useForm } from '@inertiajs/react';
+import { PageProps, ProjectRole } from '@/types';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
 
 interface EditUser {
@@ -40,6 +40,7 @@ export default function AdminUsersEdit({
     force_password_change: user.force_password_change,
   });
   const attach = useForm({ project_id: '', role: 'member' });
+  const { flash } = usePage<PageProps>().props;
 
   const inputClass =
     'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
@@ -75,6 +76,13 @@ export default function AdminUsersEdit({
     <AdminLayout title="Edit user">
       <div className="px-8 py-8">
         <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Edit user</h1>
+
+        {flash?.success && (
+          <div className="mb-4 max-w-2xl rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
+        )}
+        {flash?.error && (
+          <div className="mb-4 max-w-2xl rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{flash.error}</div>
+        )}
 
         {/* Account */}
         <form onSubmit={saveAccount} className={cardClass}>
