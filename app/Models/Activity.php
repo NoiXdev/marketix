@@ -27,7 +27,11 @@ class Activity extends SpatieActivity
             'event' => $this->event,
             'subject_type' => $this->subject_type ? class_basename($this->subject_type) : null,
             'causer' => $this->causer ? ['id' => $this->causer->id, 'name' => $this->causer->name] : null,
-            'properties' => $this->properties->toArray(),
+            // Spatie v5: attribute diffs (old → new) live in `attribute_changes`,
+            // shaped ['attributes' => [...], 'old' => [...]]. `properties` holds
+            // only manual custom data (role, email, ip, …).
+            'changes' => $this->attribute_changes?->toArray() ?? [],
+            'properties' => $this->properties?->toArray() ?? [],
             'created_at' => $this->created_at->toISOString(),
         ];
     }
