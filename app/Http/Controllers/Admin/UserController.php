@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -59,6 +60,23 @@ class UserController extends Controller
     {
         $model = User::findOrFail($user);
 
+        $memberships = $model->projects()
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Project $p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'role' => $p->pivot->role->value,
+            ]);
+
+        $memberIds = $memberships->pluck('id');
+
+        $availableProjects = Project::query()
+            ->whereNotIn('id', $memberIds)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn (Project $p) => ['id' => $p->id, 'name' => $p->name]);
+
         return inertia('Admin/Users/Edit', [
             'user' => [
                 'id' => $model->id,
@@ -67,6 +85,8 @@ class UserController extends Controller
                 'super_admin' => $model->super_admin,
                 'force_password_change' => $model->force_password_change,
             ],
+            'memberships' => $memberships,
+            'availableProjects' => $availableProjects,
         ]);
     }
 
