@@ -20,23 +20,42 @@ class SetsActivityProjectTest extends TestCase
     {
         $model = new FakeLoggable();
         $activity = new Activity();
-        $activity->properties = collect([]);
+        $activity->attribute_changes = collect([]);
 
-        $model->tapActivity($activity, 'created');
+        $model->beforeActivityLogged($activity, 'created');
 
         $this->assertSame('proj-123', $activity->project_id);
     }
 
-    public function test_tap_redacts_sensitive_attributes_in_attributes_and_old(): void
+    public function test_tap_redacts_sensitive_attributes_in_attribute_changes(): void
     {
         $model = new FakeLoggable();
         $activity = new Activity();
+        // In spatie/laravel-activitylog v5 the dirty/old bags live here.
+        $activity->attribute_changes = collect([
+            'attributes' => ['slug' => 'abc', 'password' => 'hashed-value'],
+            'old' => ['password' => 'old-hash', 'slug' => 'old'],
+        ]);
+
+        $model->beforeActivityLogged($activity, 'updated');
+
+        $changes = $activity->attribute_changes->toArray();
+        $this->assertSame('••••', $changes['attributes']['password']);
+        $this->assertSame('••••', $changes['old']['password']);
+        $this->assertSame('abc', $changes['attributes']['slug']);
+    }
+
+    public function test_tap_redacts_sensitive_attributes_in_properties(): void
+    {
+        $model = new FakeLoggable();
+        $activity = new Activity();
+        // Defensive: secrets surfaced through custom withProperties() data.
         $activity->properties = collect([
             'attributes' => ['slug' => 'abc', 'password' => 'hashed-value'],
             'old' => ['password' => 'old-hash', 'slug' => 'old'],
         ]);
 
-        $model->tapActivity($activity, 'updated');
+        $model->beforeActivityLogged($activity, 'updated');
 
         $props = $activity->properties->toArray();
         $this->assertSame('••••', $props['attributes']['password']);
@@ -48,10 +67,10 @@ class SetsActivityProjectTest extends TestCase
     {
         $model = new FakeLoggable();
         $activity = new Activity();
-        $activity->properties = collect(['attributes' => ['password' => null]]);
+        $activity->attribute_changes = collect(['attributes' => ['password' => null]]);
 
-        $model->tapActivity($activity, 'updated');
+        $model->beforeActivityLogged($activity, 'updated');
 
-        $this->assertNull($activity->properties->toArray()['attributes']['password']);
+        $this->assertNull($activity->attribute_changes->toArray()['attributes']['password']);
     }
 }
