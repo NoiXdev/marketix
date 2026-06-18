@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\StatisticFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,7 @@ class Statistic extends Model
     /** @use HasFactory<StatisticFactory> */
     use HasFactory;
 
-    use SoftDeletes;
+    use HasUlids, SoftDeletes;
 
     protected $fillable = [
         'project_id',

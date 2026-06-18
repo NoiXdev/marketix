@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProjectRole;
 use Database\Factories\ProjectInvitationFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProjectInvitation extends Model
 {
     /** @use HasFactory<ProjectInvitationFactory> */
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected $fillable = [
         'project_id',
