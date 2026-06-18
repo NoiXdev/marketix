@@ -113,6 +113,9 @@ Route::group(['domain' => config('app.domain')], function () {
                 Route::get('/team', [TeamController::class, 'index'])->name('app.project.team.index');
                 Route::post('/team/invitations', [TeamController::class, 'storeInvitation'])->name('app.project.team.invitations.store');
                 Route::delete('/team/invitations/{invitation}', [TeamController::class, 'destroyInvitation'])->name('app.project.team.invitations.destroy');
+                Route::post('/team/invitations/{invitation}/resend', [TeamController::class, 'resendInvitation'])
+                    ->middleware('throttle:20,1')
+                    ->name('app.project.team.invitations.resend');
                 Route::patch('/team/members/{user}', [TeamController::class, 'updateMember'])->name('app.project.team.members.update');
                 Route::delete('/team/members/{user}', [TeamController::class, 'destroyMember'])->name('app.project.team.members.destroy');
             });
