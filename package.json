@@ -37,6 +37,7 @@
         "vite": "^7.2.4"
     },
     "dependencies": {
+        "@laravel/passkeys": "^0.2.0",
         "chart.js": "^4.5.1",
         "lucide-react": "^1.20.0",
         "puppeteer": "^25.1.0",

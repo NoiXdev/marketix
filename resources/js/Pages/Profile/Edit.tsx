@@ -1,4 +1,6 @@
 import ProfileLayout from '@/Layouts/ProfileLayout';
+import PasskeysSection from '@/Pages/Profile/partials/PasskeysSection';
+import TwoFactorSection from '@/Pages/Profile/partials/TwoFactorSection';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 
@@ -7,7 +9,36 @@ interface ProfileUser {
   email: string;
 }
 
-export default function ProfileEdit({ user }: { user: ProfileUser }) {
+interface Passkey {
+  id: string;
+  name: string;
+  authenticator: string | null;
+  last_used_at: string | null;
+  created_at: string | null;
+}
+
+interface TwoFactorSetup {
+  secretKey: string;
+  qrCode: string;
+}
+
+interface Props {
+  user: ProfileUser;
+  twoFactorEnabled: boolean;
+  twoFactorPending: boolean;
+  twoFactorSetup: TwoFactorSetup | null;
+  recoveryCodes: string[] | null;
+  passkeys: Passkey[];
+}
+
+export default function ProfileEdit({
+  user,
+  twoFactorEnabled,
+  twoFactorPending,
+  twoFactorSetup,
+  recoveryCodes,
+  passkeys,
+}: Props) {
   const { flash } = usePage<PageProps>().props;
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
@@ -85,6 +116,15 @@ export default function ProfileEdit({ user }: { user: ProfileUser }) {
           Save
         </button>
       </form>
+      <div className="mt-8 space-y-6">
+        <TwoFactorSection
+          enabled={twoFactorEnabled}
+          pending={twoFactorPending}
+          setup={twoFactorSetup}
+          recoveryCodes={recoveryCodes}
+        />
+        <PasskeysSection passkeys={passkeys} />
+      </div>
     </ProfileLayout>
   );
 }

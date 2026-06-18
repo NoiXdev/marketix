@@ -25,6 +25,13 @@ class ProfileController extends Controller
                 'qrCode' => app(\App\Support\TwoFactor::class)->qrCodeDataUri($user->email, $user->two_factor_secret),
             ] : null,
             'recoveryCodes' => $request->session()->get('recoveryCodes'),
+            'passkeys' => $user->passkeys()->latest()->get()->map(fn ($p) => [
+                'id' => (string) $p->id,
+                'name' => $p->name,
+                'authenticator' => $p->authenticator,
+                'last_used_at' => $p->last_used_at?->toDayDateTimeString(),
+                'created_at' => $p->created_at?->toDayDateTimeString(),
+            ])->all(),
         ]);
     }
 
