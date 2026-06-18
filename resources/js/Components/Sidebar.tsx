@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BarChart3, Globe, LayoutDashboard, Link2, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 import ProjectSwitcher from './ProjectSwitcher';
+import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 
 const navItems = [
