@@ -38,6 +38,10 @@ class SystemCertificateReader implements CertificateReader
 
         $parsed = openssl_x509_parse($cert);
 
+        if (! is_array($parsed)) {
+            return null;
+        }
+
         $san = [];
         if (! empty($parsed['extensions']['subjectAltName'])) {
             foreach (explode(',', $parsed['extensions']['subjectAltName']) as $entry) {

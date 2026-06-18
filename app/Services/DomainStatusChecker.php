@@ -70,7 +70,23 @@ class DomainStatusChecker
     private function checkReachable(string $host, array &$details): bool
     {
         try {
-            $response = Http::timeout(5)->get("https://{$host}/.well-known/marketix");
+            $ips = $this->dns->resolveIps($host);
+
+            if (empty($ips)) {
+                $details['reachable'] = ['error' => 'Refusing to probe private or unresolved address'];
+
+                return false;
+            }
+
+            foreach ($ips as $ip) {
+                if (! $this->isPublicIp($ip)) {
+                    $details['reachable'] = ['error' => 'Refusing to probe private or unresolved address'];
+
+                    return false;
+                }
+            }
+
+            $response = Http::timeout(5)->withOptions(['allow_redirects' => false])->get("https://{$host}/.well-known/marketix");
             $details['reachable'] = ['status' => $response->status()];
 
             return $response->ok() && $response->json('app') === 'marketix';
@@ -79,6 +95,11 @@ class DomainStatusChecker
 
             return false;
         }
+    }
+
+    private function isPublicIp(string $ip): bool
+    {
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
     }
 
     /**
@@ -93,7 +114,10 @@ class DomainStatusChecker
 
             if (str_starts_with($name, '*.')) {
                 $suffix = substr($name, 1); // ".example.com"
-                if (str_ends_with(strtolower($host), strtolower($suffix))) {
+                if (
+                    str_ends_with(strtolower($host), strtolower($suffix))
+                    && substr_count($host, '.') === substr_count($name, '.')
+                ) {
                     return true;
                 }
             }
