@@ -10,10 +10,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('urls', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained('projects');
-            $table->foreignId('domain_id')->constrained('domains');
-            $table->foreignId('user_id')->constrained('users');
+            $table->ulid('id')->primary();
+            $table->foreignUlid('project_id')->constrained('projects');
+            $table->foreignUlid('domain_id')->constrained('domains');
+            $table->foreignUlid('user_id')->constrained('users');
             $table->string('slug');
             $table->string('url');
             $table->tinyInteger('type');

@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('statistics', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_id')->constrained('projects');
-            $table->foreignId('url_id')->constrained('urls');
+            $table->ulid('id')->primary();
+            $table->foreignUlid('project_id')->constrained('projects');
+            $table->foreignUlid('url_id')->constrained('urls');
             $table->string('ip')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
