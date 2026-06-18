@@ -13,6 +13,7 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UrlController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -53,12 +54,14 @@ Route::group(['domain' => config('app.domain')], function () {
         ->group(function () {
             Route::get('/dashboard', [DashboardController::class, 'show'])->name('app.project.dashboard');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
+            Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
 
             // Links
             Route::get('/links', [UrlController::class, 'index'])->name('app.project.links.index');
             Route::get('/links/create', [UrlController::class, 'create'])->name('app.project.links.create');
             Route::post('/links', [UrlController::class, 'store'])->name('app.project.links.store');
             Route::get('/links/{url}', [UrlController::class, 'show'])->name('app.project.links.show');
+            Route::get('/links/{url}/reports/download', [ReportController::class, 'downloadLink'])->name('app.project.links.reports.download');
             Route::get('/links/{url}/edit', [UrlController::class, 'edit'])->name('app.project.links.edit');
             Route::put('/links/{url}', [UrlController::class, 'update'])->name('app.project.links.update');
             Route::patch('/links/{url}/toggle-status', [UrlController::class, 'toggleStatus'])->name('app.project.links.toggle-status');
