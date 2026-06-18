@@ -5,6 +5,9 @@ namespace Tests\Feature\Admin;
 use App\Providers\MailSettingsServiceProvider;
 use App\Settings\MailSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -42,14 +45,14 @@ class MailSettingsOverrideTest extends TestCase
         // can observe 'log' is by calling refresh() to reload from DB.
         // Mutating $settings->default_mailer directly (the old approach) updated
         // the shared singleton too, so the test passed even without refresh().
-        \Illuminate\Support\Facades\DB::table('settings')
+        DB::table('settings')
             ->where('group', 'mail')
             ->where('name', 'default_mailer')
             ->update(['payload' => json_encode('log')]);
 
-        $this->app['events']->dispatch(new \Illuminate\Queue\Events\JobProcessing(
+        $this->app['events']->dispatch(new JobProcessing(
             'database',
-            new \Illuminate\Queue\Jobs\SyncJob($this->app, '{}', 'sync', 'default'),
+            new SyncJob($this->app, '{}', 'sync', 'default'),
         ));
 
         // Can only pass if applyMailSettings() called refresh() — the shared
