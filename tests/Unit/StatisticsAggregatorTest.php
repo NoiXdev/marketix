@@ -107,7 +107,7 @@ class StatisticsAggregatorTest extends TestCase
         Statistic::factory()->forUrl($url)->create(['city' => 'New', 'created_at' => now()]);
 
         $aggregator = new StatisticsAggregator;
-        $rows = $aggregator->recentClicks($url->project_id, $url->id, null, 1);
+        $rows = $aggregator->recentClicks($url->project_id, $url->id, null, null, 1);
 
         $this->assertCount(1, $rows);
         $this->assertSame('New', $rows[0]->city);
