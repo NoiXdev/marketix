@@ -34,4 +34,13 @@ class VersionShareTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('version', $expected));
     }
+
+    public function test_inertia_shares_version_on_guest_auth_pages(): void
+    {
+        $expected = json_decode(file_get_contents(base_path('package.json')))->version;
+
+        $this->get(route('app.auth.show-login'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('version', $expected));
+    }
 }
