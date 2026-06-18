@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Providers\MailSettingsServiceProvider;
 use App\Settings\MailSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class MailSettingsOverrideTest extends TestCase
@@ -23,5 +24,18 @@ class MailSettingsOverrideTest extends TestCase
 
         $this->assertSame('smtp', config('mail.default'));
         $this->assertSame('mail.example.test', config('mail.mailers.smtp.host'));
+    }
+
+    public function test_boot_is_silent_noop_when_settings_table_missing(): void
+    {
+        // Drop the settings table to simulate an un-migrated/fresh DB.
+        Schema::drop('settings');
+
+        $originalDefault = config('mail.default');
+
+        // Must not throw — falls back to .env/config defaults.
+        (new MailSettingsServiceProvider($this->app))->boot();
+
+        $this->assertSame($originalDefault, config('mail.default'));
     }
 }
