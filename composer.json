@@ -16,7 +16,9 @@
         "laravel/tinker": "^3.0",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-pdf": "^2.12",
+        "spatie/laravel-settings": "^3.9",
         "symfony/yaml": "^8.1",
+        "synergitech/laravel-postal": "^5.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
