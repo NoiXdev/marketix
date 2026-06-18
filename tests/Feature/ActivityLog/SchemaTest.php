@@ -6,7 +6,6 @@ use App\Models\Activity;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Spatie\Activitylog\ActivitylogServiceProvider;
 use Tests\TestCase;
 
 class SchemaTest extends TestCase
