@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MailerController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\UserController;
@@ -123,6 +124,10 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/projects/{project}/members', [ProjectMemberController::class, 'store'])->name('app.admin.projects.members.store');
         Route::patch('/projects/{project}/members/{user}', [ProjectMemberController::class, 'update'])->name('app.admin.projects.members.update');
         Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'destroy'])->name('app.admin.projects.members.destroy');
+
+        Route::get('/mailer', [MailerController::class, 'edit'])->name('app.admin.mailer.edit');
+        Route::put('/mailer', [MailerController::class, 'update'])->name('app.admin.mailer.update');
+        Route::post('/mailer/test', [MailerController::class, 'test'])->name('app.admin.mailer.test');
     });
 });
 
