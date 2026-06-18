@@ -148,6 +148,33 @@ class UserManagementTest extends TestCase
         $this->assertDatabaseHas('password_reset_tokens', ['email' => $target->email]);
     }
 
+    public function test_send_password_reset_builds_a_valid_reset_url(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $admin = $this->superAdmin();
+        $target = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->post(route('app.admin.users.send-password-reset', ['user' => $target->id]))
+            ->assertSessionHas('success');
+
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            $target,
+            \Illuminate\Auth\Notifications\ResetPassword::class,
+            function (\Illuminate\Auth\Notifications\ResetPassword $notification) use ($target) {
+                // Rendering the mail builds the reset URL. Without a registered
+                // ResetPassword::createUrlUsing callback this throws
+                // RouteNotFoundException (route [password.reset] not defined),
+                // which is the production bug this test guards against.
+                $url = $notification->toMail($target)->actionUrl;
+
+                return str_contains($url, '/auth/reset-password/')
+                    && str_contains($url, 'email=');
+            }
+        );
+    }
+
     public function test_send_password_reset_requires_super_admin(): void
     {
         $target = User::factory()->create();
