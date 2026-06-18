@@ -44,6 +44,8 @@ export interface ProjectInvitation {
   email: string;
   role: ProjectRole;
   expires_at: string;
+  expired: boolean;
+  can_resend: boolean;
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
