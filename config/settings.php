@@ -61,7 +61,7 @@ return [
      * additional prefix.
      */
     'cache' => [
-        'enabled' => (bool)env('SETTINGS_CACHE_ENABLED', false),
+        'enabled' => (bool) env('SETTINGS_CACHE_ENABLED', false),
         'store' => null,
         'prefix' => null,
         'ttl' => null,
@@ -88,9 +88,7 @@ return [
      * The package will look for settings in these paths and automatically
      * register them.
      */
-    'auto_discover_settings' => [
-        app_path('Settings'),
-    ],
+    'auto_discover_settings' => [],
 
     /*
      * Automatically discovered settings classes can be cached, so they don't
