@@ -37,17 +37,23 @@ class MailSettingsOverrideTest extends TestCase
 
         $this->assertSame('smtp', config('mail.default'));
 
-        // Change the persisted value after the first apply. Under Octane/queue
-        // the container persists, so a stale cached singleton would still
-        // report 'smtp'. The re-apply must read the fresh value.
-        $settings->default_mailer = 'log';
-        $settings->save();
+        // Mutate ONLY the persisted DB row — the shared in-memory $settings
+        // object still holds 'smtp'. This means the only way applyMailSettings()
+        // can observe 'log' is by calling refresh() to reload from DB.
+        // Mutating $settings->default_mailer directly (the old approach) updated
+        // the shared singleton too, so the test passed even without refresh().
+        \Illuminate\Support\Facades\DB::table('settings')
+            ->where('group', 'mail')
+            ->where('name', 'default_mailer')
+            ->update(['payload' => json_encode('log')]);
 
         $this->app['events']->dispatch(new \Illuminate\Queue\Events\JobProcessing(
             'database',
             new \Illuminate\Queue\Jobs\SyncJob($this->app, '{}', 'sync', 'default'),
         ));
 
+        // Can only pass if applyMailSettings() called refresh() — the shared
+        // in-memory object still reports 'smtp'.
         $this->assertSame('log', config('mail.default'));
     }
 
