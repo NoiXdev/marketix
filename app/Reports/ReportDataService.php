@@ -59,7 +59,7 @@ class ReportDataService
     /**
      * @return array<string,list<array{label:string,count:int}>>
      */
-    private function breakdowns(int $projectId, ?int $urlId, ReportDateRange $range): array
+    private function breakdowns(string $projectId, ?string $urlId, ReportDateRange $range): array
     {
         $out = [];
         foreach (['country', 'city', 'browser', 'os', 'domain'] as $column) {
@@ -75,7 +75,7 @@ class ReportDataService
     /**
      * @return list<array{slug:string,domain:string,clicks:int}>
      */
-    private function topLinks(int $projectId, ReportDateRange $range): array
+    private function topLinks(string $projectId, ReportDateRange $range): array
     {
         return Statistic::where('statistics.project_id', $projectId)
             ->whereBetween('statistics.created_at', [$range->start(), $range->end()])

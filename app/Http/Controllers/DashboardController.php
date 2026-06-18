@@ -31,7 +31,7 @@ class DashboardController extends Controller
      *
      * @return list<array{date: string, clicks: int, unique: int}>
      */
-    private function clicksByDay(int $projectId, int $days): array
+    private function clicksByDay(string $projectId, int $days): array
     {
         $since = now()->subDays($days - 1)->startOfDay();
 

@@ -31,7 +31,7 @@ class DomainController extends Controller
             ->with('success', 'Domain created.');
     }
 
-    public function edit(Request $request, int $domain)
+    public function edit(Request $request, string $domain)
     {
         $project = $request->get('project');
 
@@ -40,7 +40,7 @@ class DomainController extends Controller
         ]);
     }
 
-    public function update(DomainRequest $request, int $domain)
+    public function update(DomainRequest $request, string $domain)
     {
         $project = $request->get('project');
 
@@ -52,7 +52,7 @@ class DomainController extends Controller
             ->with('success', 'Domain updated.');
     }
 
-    public function destroy(Request $request, int $domain)
+    public function destroy(Request $request, string $domain)
     {
         $project = $request->get('project');
 

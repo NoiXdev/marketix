@@ -42,7 +42,7 @@ class ProjectController extends Controller
         return redirect()->route('app.admin.projects.index')->with('success', 'Project created.');
     }
 
-    public function edit(int $project)
+    public function edit(string $project)
     {
         $model = Project::findOrFail($project);
         $memberIds = $model->users()->pluck('users.id');
@@ -59,7 +59,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function update(ProjectRequest $request, int $project)
+    public function update(ProjectRequest $request, string $project)
     {
         $model = Project::findOrFail($project);
         $model->update($request->validated());
@@ -67,7 +67,7 @@ class ProjectController extends Controller
         return redirect()->route('app.admin.projects.index')->with('success', 'Project updated.');
     }
 
-    public function destroy(int $project)
+    public function destroy(string $project)
     {
         Project::findOrFail($project)->delete();
 
