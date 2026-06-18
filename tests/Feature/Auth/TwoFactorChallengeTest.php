@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Support\TwoFactor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use PragmaRX\Google2FAQRCode\Google2FA;
 use Tests\TestCase;
 
@@ -80,5 +81,24 @@ class TwoFactorChallengeTest extends TestCase
         $this->post(route('app.auth.two-factor.store'), ['recovery_code' => 'AAAAA-AAAAA'])->assertRedirect('/');
         $this->assertAuthenticatedAs($user);
         $this->assertCount(0, $user->refresh()->two_factor_recovery_codes);
+    }
+
+    public function test_two_factor_challenge_is_rate_limited_after_six_attempts(): void
+    {
+        RateLimiter::clear('throttle:6,1');
+
+        [$user] = $this->userWithTwoFactor();
+        $this->post(route('app.auth.login'), ['email' => $user->email, 'password' => 'password']);
+
+        // Submit 6 wrong codes — all should fail with validation errors (not 429)
+        for ($i = 1; $i <= 6; $i++) {
+            $response = $this->post(route('app.auth.two-factor.store'), ['code' => '000000']);
+            $response->assertStatus(302); // redirect back with errors
+            $this->assertGuest();
+        }
+
+        // 7th attempt must be rate-limited
+        $response = $this->post(route('app.auth.two-factor.store'), ['code' => '000000']);
+        $response->assertStatus(429);
     }
 }

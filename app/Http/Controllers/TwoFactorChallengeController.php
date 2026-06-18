@@ -18,6 +18,8 @@ class TwoFactorChallengeController extends Controller
         $user = $this->pendingUser($request);
 
         if (! $user) {
+            $request->session()->forget(['auth.2fa.pending_id', 'auth.2fa.remember']);
+
             return redirect()->route('app.auth.show-login');
         }
 
@@ -31,6 +33,8 @@ class TwoFactorChallengeController extends Controller
         $user = $this->pendingUser($request);
 
         if (! $user) {
+            $request->session()->forget(['auth.2fa.pending_id', 'auth.2fa.remember']);
+
             return redirect()->route('app.auth.show-login');
         }
 
