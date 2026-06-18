@@ -6,8 +6,8 @@ import LinkForm, { LinkFormData } from './partials/LinkForm';
 import { AbVariant, GeoRule, DeviceRule, LanguageRule } from './partials/TargetingSection';
 
 interface UrlData {
-  id: number;
-  domain_id: number;
+  id: string;
+  domain_id: string;
   slug: string;
   url: string;
   type: number;
@@ -20,7 +20,7 @@ interface UrlData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
-  pixel_ids: number[];
+  pixel_ids: string[];
 }
 
 export default function LinksEdit({

@@ -5,8 +5,8 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
-interface Domain { id: number; name: string }
-interface AttachUrl { id: number; domain_id: number; slug: string; domain_name: string | null; target: string }
+interface Domain { id: string; name: string }
+interface AttachUrl { id: string; domain_id: string; slug: string; domain_name: string | null; target: string }
 
 export default function QrCodesCreate({
   defaultStyle, domains, attachUrl,

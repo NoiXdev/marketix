@@ -1,18 +1,18 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   super_admin: boolean;
 }
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   locked: boolean;
 }
 
 export interface Domain {
-  id: number;
+  id: string;
   name: string;
   redirect_root: string | null;
   redirect_not_found: string | null;
@@ -21,7 +21,7 @@ export interface Domain {
 }
 
 export interface Pixel {
-  id: number;
+  id: string;
   provider: string;
   name: string;
   tag: string;
@@ -33,14 +33,14 @@ export type PixelOption = Pick<Pixel, 'id' | 'name' | 'provider'>;
 export type ProjectRole = 'admin' | 'member';
 
 export interface ProjectMember {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: ProjectRole;
 }
 
 export interface ProjectInvitation {
-  id: number;
+  id: string;
   email: string;
   role: ProjectRole;
   expires_at: string;

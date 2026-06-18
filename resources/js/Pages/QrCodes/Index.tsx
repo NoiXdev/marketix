@@ -4,7 +4,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
 
 interface QrRow {
-  id: number;
+  id: string;
   name: string;
   type: string;
   is_dynamic: boolean;

@@ -29,7 +29,7 @@ import {
 interface DayClicks { date: string; clicks: number; unique: number }
 interface BreakdownRow { count: number; [key: string]: string | number }
 interface RecentClick {
-  id: number;
+  id: string;
   country: string | null;
   city: string | null;
   browser: string | null;
@@ -38,7 +38,7 @@ interface RecentClick {
   created_at: string;
 }
 interface LinkDetail {
-  id: number;
+  id: string;
   slug: string;
   url: string;
   type: number;
@@ -49,7 +49,7 @@ interface LinkDetail {
   expired_at: string | null;
   created_at: string;
   has_qr_code: boolean;
-  domain: { id: number; name: string } | null;
+  domain: { id: string; name: string } | null;
 }
 
 interface Props {

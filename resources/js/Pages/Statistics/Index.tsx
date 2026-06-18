@@ -5,7 +5,7 @@ import { router, usePage } from '@inertiajs/react';
 import { BarChart3, Globe, Monitor, MousePointerClick } from 'lucide-react';
 
 interface DayClicks { date: string; clicks: number }
-interface TopLink { id: number; slug: string; domain_name: string; clicks: number }
+interface TopLink { id: string; slug: string; domain_name: string; clicks: number }
 interface BreakdownRow { [key: string]: string | number; count: number }
 
 interface Props {

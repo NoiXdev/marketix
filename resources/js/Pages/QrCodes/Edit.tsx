@@ -5,16 +5,16 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
-interface Domain { id: number; name: string }
+interface Domain { id: string; name: string }
 
 interface QrData {
-  id: number;
+  id: string;
   name: string;
   type: QrType;
   is_dynamic: boolean;
   content: Record<string, string>;
   style: QrStyle;
-  domain_id: number | null;
+  domain_id: string | null;
   slug: string | null;
   dynamic_url: string | null;
 }
