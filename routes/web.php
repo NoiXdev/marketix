@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PixelController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RedirectController;
@@ -47,6 +48,8 @@ Route::group(['domain' => config('app.domain')], function () {
     // Auth-only routes
     Route::middleware('auth')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout'])->name('app.auth.logout');
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('app.profile.edit');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('app.profile.update');
     });
 
     // Project tenant routes
