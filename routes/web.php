@@ -16,6 +16,7 @@ use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\UrlController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,10 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/auth/logout', [AuthController::class, 'logout'])->name('app.auth.logout');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('app.profile.edit');
         Route::put('/profile', [ProfileController::class, 'update'])->name('app.profile.update');
+        Route::post('/profile/two-factor', [TwoFactorController::class, 'enable'])->name('app.profile.two-factor.enable');
+        Route::post('/profile/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('app.profile.two-factor.confirm');
+        Route::delete('/profile/two-factor', [TwoFactorController::class, 'disable'])->name('app.profile.two-factor.disable');
+        Route::post('/profile/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('app.profile.two-factor.recovery-codes');
     });
 
     // Project tenant routes
