@@ -3,18 +3,15 @@
 namespace Tests\Feature;
 
 use App\Reports\ReportData;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ReportTemplateRenderTest extends TestCase
 {
-    use RefreshDatabase;
-
     private function sampleData(string $scope): ReportData
     {
         return new ReportData(
             scope: $scope,
-            title: 'Statistics report — Acme',
+            title: $scope === 'link' ? 'Link report — /go' : 'Statistics report — Acme',
             subtitle: 'Acme',
             rangeLabel: 'Last 30 days',
             generatedAt: '18 Jun 2026, 12:00',
@@ -32,7 +29,7 @@ class ReportTemplateRenderTest extends TestCase
         $html = view('reports.project', $this->sampleData('project')->toArray())->render();
 
         $this->assertStringContainsString('Statistics report — Acme', $html);
-        $this->assertStringContainsString('42', $html);
+        $this->assertStringContainsString('42</div>', $html);
         $this->assertStringContainsString('Germany', $html);
         $this->assertStringContainsString('id="clicksChart"', $html);
         $this->assertStringContainsString('go', $html);
