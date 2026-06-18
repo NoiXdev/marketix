@@ -96,6 +96,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/domains/{domain}/edit', [DomainController::class, 'edit'])->name('app.project.domains.edit');
             Route::put('/domains/{domain}', [DomainController::class, 'update'])->name('app.project.domains.update');
             Route::delete('/domains/{domain}', [DomainController::class, 'destroy'])->name('app.project.domains.destroy');
+            Route::post('/domains/{domain}/check', [DomainController::class, 'check'])->name('app.project.domains.check');
 
             // QR Codes
             Route::get('/qr-codes', [QrCodeController::class, 'index'])->name('app.project.qrcodes.index');
