@@ -9,13 +9,13 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\ForcePasswordChangeController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PixelController;
-use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RedirectController;
@@ -34,23 +34,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/marketix', fn () => response()->json(['app' => 'marketix']))
     ->name('marketix.signature');
 
-// Root dispatcher: guests → login; one project → straight in;
-// zero or many → the project chooser.
-Route::get('/', function () {
-    if (! auth()->check()) {
-        return redirect()->route('app.auth.show-login');
-    }
-
-    $projects = auth()->user()->accessibleProjects()->get();
-
-    if ($projects->count() === 1) {
-        return redirect()->route('app.project.dashboard', $projects->first());
-    }
-
-    return redirect()->route('app.projects.choose');
-});
-
 Route::group(['domain' => config('app.domain')], function () {
+    // Root dispatcher: guests → login; one project → straight in;
+    // zero or many → the project chooser.
+    Route::get('/', function () {
+        if (! auth()->check()) {
+            return redirect()->route('app.auth.show-login');
+        }
+
+        $projects = auth()->user()->accessibleProjects()->get();
+
+        if ($projects->count() === 1) {
+            return redirect()->route('app.project.dashboard', $projects->first());
+        }
+
+        return redirect()->route('app.projects.choose');
+    })->name('app.root');
 
     // Guest-only routes
     Route::middleware('guest')->group(function () {
