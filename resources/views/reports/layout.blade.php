@@ -26,7 +26,13 @@
 </head>
 <body>
     <div class="cover">
-        <div class="brand">Marketix</div>
+        <div class="brand">
+            @if(!empty($brandEmailLogoUrl))
+                <img src="{{ $brandEmailLogoUrl }}" alt="{{ config('app.name') }}" style="max-height:48px">
+            @else
+                {{ config('app.name') }}
+            @endif
+        </div>
         <h1>{{ $title }}</h1>
         <div class="meta">{{ $subtitle }}</div>
         <div class="meta">{{ $rangeLabel }} · generated {{ $generatedAt }}</div>

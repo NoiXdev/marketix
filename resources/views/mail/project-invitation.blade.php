@@ -1,7 +1,10 @@
 <x-mail::message>
+@if(!empty($brandEmailLogoUrl))
+<img src="{{ $brandEmailLogoUrl }}" alt="{{ config('app.name') }}" style="max-height:40px;margin-bottom:16px">
+@endif
 # You're invited
 
-You've been invited to join **{{ $projectName }}** on Marketix.
+You've been invited to join **{{ $projectName }}** on {{ config('app.name') }}.
 
 <x-mail::button :url="$acceptUrl">
 Accept invitation

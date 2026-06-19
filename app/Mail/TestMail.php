@@ -15,7 +15,7 @@ class TestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Marketix test email',
+            subject: config('app.name').' test email',
         );
     }
 
