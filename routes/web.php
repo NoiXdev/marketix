@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\ForcePasswordChangeController;
 use App\Http\Controllers\InvitationController;
@@ -74,6 +75,7 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::patch('/user/passkeys/{passkey}/name', [PasskeyManagementController::class, 'rename'])->name('app.passkeys.rename');
         Route::get('/password/change', [ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
         Route::put('/password/change', [ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
+        Route::get('/projects', [ProjectChooserController::class, 'index'])->name('app.projects.choose');
     });
 
     // Project tenant routes
