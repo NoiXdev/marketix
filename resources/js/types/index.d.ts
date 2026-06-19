@@ -60,6 +60,20 @@ export interface ProjectInvitation {
   can_resend: boolean;
 }
 
+export interface ActivityEntry {
+  id: number;
+  log_name: string;
+  description: string;
+  event: string | null;
+  subject_type: string | null;
+  causer: { id: string; name: string } | null;
+  // Spatie v5 attribute diffs (old → new) from the attribute_changes column.
+  changes: { attributes?: Record<string, unknown>; old?: Record<string, unknown> };
+  // Manual custom data (role, email, ip, …) from the properties column.
+  properties: Record<string, unknown>;
+  created_at: string;
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
