@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\SetsActivityProject;
 use App\Observers\DomainObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -9,11 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 #[ObservedBy([DomainObserver::class])]
 class Domain extends Model
 {
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory, HasUlids, LogsActivity, SetsActivityProject, SoftDeletes;
 
     protected $fillable = [
         'project_id',
@@ -36,6 +39,20 @@ class Domain extends Model
     ];
 
     protected $appends = ['status'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('domain')
+            ->logOnly(['name', 'redirect_root', 'redirect_not_found'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
+    }
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        return $eventName;
+    }
 
     public function project(): BelongsTo
     {
