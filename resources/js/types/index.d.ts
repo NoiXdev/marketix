@@ -83,6 +83,12 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   project?: Project;
   currentProjectRole?: ProjectRole | null;
   version: string;
+  branding: {
+    appName: string;
+    logoLight: string | null;
+    logoDark: string | null;
+    favicon: string | null;
+  };
   flash: {
     success?: string;
     error?: string;
