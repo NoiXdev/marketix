@@ -53,6 +53,9 @@ class StorageSettingsTest extends TestCase
         $this->assertSame('my-bucket', config('filesystems.disks.s3.bucket'));
         $this->assertSame('https://r2.example.com', config('filesystems.disks.s3.endpoint'));
         $this->assertTrue(config('filesystems.disks.s3.use_path_style_endpoint'));
+        $this->assertSame('KEY', config('filesystems.disks.s3.key'));
+        $this->assertSame('SECRET', config('filesystems.disks.s3.secret'));
+        $this->assertSame('eu-central-1', config('filesystems.disks.s3.region'));
     }
 
     public function test_local_driver_leaves_default_unchanged(): void
