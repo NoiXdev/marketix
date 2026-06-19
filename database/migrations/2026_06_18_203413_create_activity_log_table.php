@@ -12,9 +12,12 @@ return new class extends Migration
             $table->id();
             $table->string('log_name')->nullable()->index();
             $table->text('description');
-            $table->nullableMorphs('subject', 'subject');
+            // All subjects (Url/Domain/QrCode/Pixel/Project) and causers (User)
+            // use ULID keys, so the morph id columns must be ULID, not the
+            // bigint default — otherwise MariaDB truncates the inserted ULID.
+            $table->nullableUlidMorphs('subject', 'subject');
             $table->string('event')->nullable();
-            $table->nullableMorphs('causer', 'causer');
+            $table->nullableUlidMorphs('causer', 'causer');
             $table->json('attribute_changes')->nullable();
             $table->json('properties')->nullable();
             $table->timestamps();
