@@ -45,18 +45,20 @@ export default function QrCodesEdit({ qrCode, domains, history }: { qrCode: QrDa
             Edit <span className="text-indigo-600 dark:text-indigo-400">{qrCode.name}</span>
           </h1>
         </div>
-        <QrEditor
-          data={data}
-          setData={setData}
-          errors={errors as Record<string, string>}
-          processing={processing}
-          submitLabel="Save changes"
-          cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
-          domains={domains}
-          dynamicUrl={qrCode.dynamic_url ?? undefined}
-          onSubmit={e => { e.preventDefault(); put(route('app.project.qrcodes.update', { project: project!.id, qrCode: qrCode.id })); }}
-        />
-        <ActivityHistory history={history} />
+        <div className="space-y-4">
+          <QrEditor
+            data={data}
+            setData={setData}
+            errors={errors as Record<string, string>}
+            processing={processing}
+            submitLabel="Save changes"
+            cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
+            domains={domains}
+            dynamicUrl={qrCode.dynamic_url ?? undefined}
+            onSubmit={e => { e.preventDefault(); put(route('app.project.qrcodes.update', { project: project!.id, qrCode: qrCode.id })); }}
+          />
+          <ActivityHistory history={history} />
+        </div>
       </div>
     </AppLayout>
   );
