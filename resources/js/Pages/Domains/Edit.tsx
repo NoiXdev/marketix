@@ -1,12 +1,13 @@
+import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
-import { Domain, PageProps } from '@/types';
+import { ActivityEntry, Domain, PageProps } from '@/types';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
 import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 
-export default function DomainsEdit({ domain, appDomain }: { domain: Domain; appDomain: string }) {
+export default function DomainsEdit({ domain, appDomain, history }: { domain: Domain; appDomain: string; history?: ActivityEntry[] }) {
   const { project } = usePage<PageProps>().props;
 
   const { data, setData, put, processing, errors } = useForm({
@@ -141,6 +142,10 @@ export default function DomainsEdit({ domain, appDomain }: { domain: Domain; app
               </Link>
             </div>
           </form>
+        </div>
+
+        <div className="mb-6 max-w-lg">
+          <ActivityHistory history={history} />
         </div>
       </div>
     </AppLayout>

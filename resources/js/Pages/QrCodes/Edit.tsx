@@ -1,6 +1,7 @@
+import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
 import { QrStyle, QrType } from '@/data/qrTypes';
-import { PageProps } from '@/types';
+import { ActivityEntry, PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
@@ -19,7 +20,7 @@ interface QrData {
   dynamic_url: string | null;
 }
 
-export default function QrCodesEdit({ qrCode, domains }: { qrCode: QrData; domains: Domain[] }) {
+export default function QrCodesEdit({ qrCode, domains, history }: { qrCode: QrData; domains: Domain[]; history?: ActivityEntry[] }) {
   const { project } = usePage<PageProps>().props;
 
   const { data, setData, put, processing, errors } = useForm<QrFormData>({
@@ -55,6 +56,7 @@ export default function QrCodesEdit({ qrCode, domains }: { qrCode: QrData; domai
           dynamicUrl={qrCode.dynamic_url ?? undefined}
           onSubmit={e => { e.preventDefault(); put(route('app.project.qrcodes.update', { project: project!.id, qrCode: qrCode.id })); }}
         />
+        <ActivityHistory history={history} />
       </div>
     </AppLayout>
   );

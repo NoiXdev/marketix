@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PixelProvider;
 use App\Http\Requests\PixelRequest;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PixelController extends Controller
 {
@@ -54,6 +55,9 @@ class PixelController extends Controller
                 'tag' => $model->tag,
             ],
             'providers' => PixelProvider::options(),
+            'history' => Inertia::optional(
+                fn () => $model->activitiesAsSubject()->with('causer')->latest('id')->limit(50)->get()->map->toFeedArray()
+            ),
         ]);
     }
 
