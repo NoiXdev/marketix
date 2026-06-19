@@ -206,6 +206,15 @@ per the project's test-domain memory.
 - All php/composer/npm commands run via DDEV (`ddev composer test`, `ddev npm run build`).
 - Frontend gate is `ddev npm run build` (lint is broken — ESLint 9 `--ignore-path`).
 
+## Dependencies
+
+- The `s3` disk driver requires the **`league/flysystem-aws-s3-v3`** Composer
+  package at runtime (Laravel ships only the config block, not the adapter).
+  Without it, building an S3 disk throws
+  `Class "League\Flysystem\AwsS3V3\PortableVisibilityConverter" not found`.
+  Added as a project dependency so the Test-connection button and S3 uploads
+  work.
+
 ## Risks / notes
 
 - Overriding the global `filesystems.default` could affect any code that assumes

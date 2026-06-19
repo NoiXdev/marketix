@@ -16,6 +16,7 @@
         "laravel/passkeys": "^0.2.1",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "pragmarx/google2fa-qrcode": "^4.0",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-activitylog": "^5.0",
