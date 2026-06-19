@@ -1,5 +1,6 @@
 <?php
 
+use App\Settings\BrandingSettings;
 use App\Settings\MailSettings;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
@@ -16,7 +17,7 @@ return [
      */
     'settings' => [
         MailSettings::class,
-        \App\Settings\BrandingSettings::class,
+        BrandingSettings::class,
     ],
 
     /*

@@ -27,6 +27,7 @@ class BrandingShareTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('branding.appName', 'Acme Links')
                 ->where('branding.logoLight', null)
+                ->where('branding.logoDark', null)
                 ->where('branding.favicon', null));
     }
 }

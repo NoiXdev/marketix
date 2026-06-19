@@ -57,7 +57,7 @@ export default function AdminBrandingEdit(props: Props) {
     { field: 'logo_light', remove: 'remove_logo_light', label: 'Logo (light mode)', hint: 'Shown on light backgrounds.' },
     { field: 'logo_dark', remove: 'remove_logo_dark', label: 'Logo (dark mode)', hint: 'Shown on dark backgrounds.' },
     { field: 'logo_email', remove: 'remove_logo_email', label: 'Email / PDF logo', hint: 'Used in emails and PDF reports.' },
-    { field: 'favicon', remove: 'remove_favicon', label: 'Favicon', hint: '.ico, .png or .svg.' },
+    { field: 'favicon', remove: 'remove_favicon', label: 'Favicon', hint: '.ico, .png, .jpg.' },
   ];
 
   return (
@@ -93,7 +93,7 @@ export default function AdminBrandingEdit(props: Props) {
               )}
               <input
                 type="file"
-                accept={field === 'favicon' ? '.ico,.png,.svg,image/*' : 'image/*'}
+                accept={field === 'favicon' ? '.ico,.png,.jpg,.jpeg' : 'image/*'}
                 onChange={(e) => setData(field, e.target.files?.[0] ?? null)}
                 className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-indigo-700 dark:text-slate-400 dark:file:bg-indigo-900/30 dark:file:text-indigo-300"
               />

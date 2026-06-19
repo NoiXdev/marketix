@@ -23,7 +23,8 @@ class BrandingSettingsRequest extends FormRequest
             'logo_light' => ['nullable', 'image', 'max:2048'],
             'logo_dark' => ['nullable', 'image', 'max:2048'],
             'logo_email' => ['nullable', 'image', 'max:2048'],
-            'favicon' => ['nullable', 'file', 'mimes:ico,png,svg,jpg,jpeg', 'max:2048'],
+            // SVG intentionally excluded — it can carry script; favicons are raster/ico.
+            'favicon' => ['nullable', 'file', 'mimes:ico,png,jpg,jpeg', 'max:2048'],
 
             'remove_logo_light' => ['nullable', 'boolean'],
             'remove_logo_dark' => ['nullable', 'boolean'],
