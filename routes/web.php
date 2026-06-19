@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityController as AdminActivityController;
 use App\Http\Controllers\Admin\MailerController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectMemberController;
@@ -163,6 +164,8 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/mailer', [MailerController::class, 'edit'])->name('app.admin.mailer.edit');
         Route::put('/mailer', [MailerController::class, 'update'])->name('app.admin.mailer.update');
         Route::post('/mailer/test', [MailerController::class, 'test'])->name('app.admin.mailer.test');
+
+        Route::get('/activity', [AdminActivityController::class, 'index'])->name('app.admin.activity.index');
     });
 });
 
