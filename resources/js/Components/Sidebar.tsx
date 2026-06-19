@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Globe, History, LayoutDashboard, Link2, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import { BarChart3, Globe, History, LayoutDashboard, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import Brand from './Brand';
 import ProjectSwitcher from './ProjectSwitcher';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
@@ -27,9 +28,8 @@ export default function Sidebar() {
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-        <Link2 className="h-5 w-5 text-indigo-600" />
-        <span className="text-sm font-semibold text-slate-900 dark:text-white">Marketix</span>
+      <div className="flex h-14 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+        <Brand />
       </div>
 
       {/* Navigation */}

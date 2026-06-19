@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Activity, ArrowLeft, FolderKanban, Link2, Mail, ScrollText, Users } from 'lucide-react';
+import { Activity, ArrowLeft, FolderKanban, Mail, ScrollText, Users } from 'lucide-react';
+import Brand from './Brand';
 import UserMenu from './UserMenu';
 import { PageProps } from '@/types';
 
@@ -17,9 +18,8 @@ export default function AdminSidebar() {
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex h-14 items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-        <Link2 className="h-5 w-5 text-indigo-600" />
-        <span className="text-sm font-semibold text-slate-900 dark:text-white">Marketix Admin</span>
+      <div className="flex h-14 items-center border-b border-slate-200 px-4 dark:border-slate-800">
+        <Brand suffix="Admin" />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">

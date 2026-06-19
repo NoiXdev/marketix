@@ -1,6 +1,6 @@
+import Brand from '@/Components/Brand';
 import { PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { Link2 } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 
 interface GuestLayoutProps {
@@ -15,10 +15,12 @@ export default function GuestLayout({ children, title, description }: PropsWithC
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Left panel — branding */}
       <div className="hidden flex-col justify-between bg-slate-900 p-10 text-white lg:flex lg:w-96 xl:w-[480px]">
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          <Link2 className="h-5 w-5 text-indigo-400" />
-          <span>Marketix</span>
-        </div>
+        <Brand
+          forceLogo="dark"
+          className="flex items-center gap-2 text-lg font-semibold"
+          iconClassName="h-5 w-5 text-indigo-400"
+          textClassName="text-lg font-semibold text-white"
+        />
         <div>
           <blockquote className="space-y-2">
             <p className="text-lg leading-relaxed text-slate-300">Short links, big impact. Manage all your branded links and track every click in one place.</p>
@@ -31,10 +33,11 @@ export default function GuestLayout({ children, title, description }: PropsWithC
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-8">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
-          <div className="mb-8 flex items-center gap-2 text-lg font-semibold text-slate-900 lg:hidden dark:text-white">
-            <Link2 className="h-5 w-5 text-indigo-500" />
-            <span>Marketix</span>
-          </div>
+          <Brand
+            className="mb-8 flex items-center gap-2 text-lg font-semibold text-slate-900 lg:hidden dark:text-white"
+            iconClassName="h-5 w-5 text-indigo-500"
+            textClassName="text-lg font-semibold"
+          />
 
           {(title || description) && (
             <div className="mb-8">
