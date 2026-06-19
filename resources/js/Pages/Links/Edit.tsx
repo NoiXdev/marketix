@@ -1,5 +1,6 @@
+import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
-import { Domain, PageProps, PixelOption } from '@/types';
+import { ActivityEntry, Domain, PageProps, PixelOption } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import LinkForm, { LinkFormData } from './partials/LinkForm';
@@ -27,10 +28,12 @@ export default function LinksEdit({
   url,
   domains,
   pixels,
+  history,
 }: {
   url: UrlData;
   domains: Pick<Domain, 'id' | 'name'>[];
   pixels: PixelOption[];
+  history?: ActivityEntry[];
 }) {
   const { project } = usePage<PageProps>().props;
 
@@ -65,7 +68,7 @@ export default function LinksEdit({
           </h1>
         </div>
 
-        <div className="max-w-2xl">
+        <div className="max-w-2xl space-y-4">
           <LinkForm
             data={data}
             setData={setData}
@@ -81,6 +84,7 @@ export default function LinksEdit({
               put(route('app.project.links.update', { project: project!.id, url: url.id }));
             }}
           />
+          <ActivityHistory history={history} />
         </div>
       </div>
     </AppLayout>

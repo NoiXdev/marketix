@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Support\QrTarget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class QrCodeController extends Controller
 {
@@ -133,6 +134,9 @@ class QrCodeController extends Controller
                     : null,
             ],
             'domains' => $project->domains()->get(['id', 'name']),
+            'history' => Inertia::optional(
+                fn () => $model->activitiesAsSubject()->with('causer')->latest('id')->limit(50)->get()->map->toFeedArray()
+            ),
         ]);
     }
 

@@ -6,6 +6,7 @@ use App\Enums\UrlStatus;
 use App\Http\Requests\UrlRequest;
 use App\Services\StatisticsAggregator;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UrlController extends Controller
 {
@@ -128,6 +129,9 @@ class UrlController extends Controller
             ],
             'domains' => $project->domains()->get(['id', 'name']),
             'pixels' => $project->pixels()->get(['id', 'name', 'provider']),
+            'history' => Inertia::optional(
+                fn () => $model->activitiesAsSubject()->with('causer')->latest('id')->limit(50)->get()->map->toFeedArray()
+            ),
         ]);
     }
 

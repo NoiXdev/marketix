@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DomainRequest;
 use App\Jobs\CheckDomainStatusJob;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DomainController extends Controller
 {
@@ -38,10 +39,14 @@ class DomainController extends Controller
     public function edit(Request $request, string $domain)
     {
         $project = $request->get('project');
+        $model = $project->domains()->findOrFail($domain);
 
         return inertia('Domains/Edit', [
-            'domain' => $project->domains()->findOrFail($domain),
+            'domain' => $model,
             'appDomain' => config('app.domain'),
+            'history' => Inertia::optional(
+                fn () => $model->activitiesAsSubject()->with('causer')->latest('id')->limit(50)->get()->map->toFeedArray()
+            ),
         ]);
     }
 

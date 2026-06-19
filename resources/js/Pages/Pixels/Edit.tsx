@@ -1,5 +1,6 @@
+import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
-import { PageProps, Pixel } from '@/types';
+import { ActivityEntry, PageProps, Pixel } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 
@@ -14,9 +15,11 @@ const inputCls =
 export default function PixelsEdit({
   pixel,
   providers,
+  history,
 }: {
   pixel: Pick<Pixel, 'id' | 'provider' | 'name' | 'tag'>;
   providers: ProviderOption[];
+  history?: ActivityEntry[];
 }) {
   const { project } = usePage<PageProps>().props;
 
@@ -42,7 +45,7 @@ export default function PixelsEdit({
           </h1>
         </div>
 
-        <div className="max-w-lg">
+        <div className="max-w-lg space-y-4">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -129,6 +132,7 @@ export default function PixelsEdit({
               </Link>
             </div>
           </form>
+          <ActivityHistory history={history} />
         </div>
       </div>
     </AppLayout>
