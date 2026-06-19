@@ -19,6 +19,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportSettingsController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
@@ -83,6 +84,8 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/dashboard', [DashboardController::class, 'show'])->name('app.project.dashboard');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
+            Route::get('/settings/notifications', [ReportSettingsController::class, 'show'])->name('app.project.settings.notifications');
+            Route::put('/settings/notifications', [ReportSettingsController::class, 'update'])->name('app.project.settings.notifications.update');
             Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
 
             // Links
