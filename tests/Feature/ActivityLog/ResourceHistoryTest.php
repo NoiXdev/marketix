@@ -42,6 +42,7 @@ class ResourceHistoryTest extends TestCase
         $history = $response->json('props.history');
 
         $this->assertNotNull($history);
+        $this->assertNotEmpty($history, 'Expected at least one history entry for the target URL');
         $this->assertTrue(
             collect($history)->every(fn ($a) => $a['subject_type'] === 'Url'),
             'Expected all history entries to have subject_type === Url'
