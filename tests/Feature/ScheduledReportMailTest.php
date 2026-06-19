@@ -13,6 +13,14 @@ class ScheduledReportMailTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Route::get('/project/{project}/settings/notifications', fn () => '')
+            ->name('app.project.settings.notifications');
+        $this->app['router']->getRoutes()->refreshNameLookups();
+    }
+
     private function payload(): array
     {
         return [
@@ -39,18 +47,6 @@ class ScheduledReportMailTest extends TestCase
 
     public function test_rendered_body_shows_totals_and_top_links(): void
     {
-        // Register the route the footer links to so route() resolves during render.
-        // Manually add to the router's collection to ensure it's visible.
-        $route = Route::get('/project/{project}/settings/notifications', fn () => '')
-            ->name('app.project.settings.notifications');
-
-        // Explicitly add the route to the router if it wasn't added by the above call
-        $router = app('router');
-        $collection = $router->getRoutes();
-        if (!isset($collection->getRoutesByName()['app.project.settings.notifications'])) {
-            $collection->add($route);
-        }
-
         $project = Project::factory()->create(['name' => 'Acme']);
         $mail = new ScheduledReportMail($project, ReportFrequency::Daily, '18 Jun 2026', $this->payload());
 

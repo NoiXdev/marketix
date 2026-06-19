@@ -5,6 +5,9 @@
         if ($c['isNew']) {
             return 'new';
         }
+        if ($c['percent'] === null) {
+            return '—';
+        }
         $arrow = $c['percent'] > 0 ? '▲' : ($c['percent'] < 0 ? '▼' : '');
         return trim($arrow.' '.$c['percent'].'%');
     };
