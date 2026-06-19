@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\Statistic;
@@ -12,18 +11,11 @@ use App\Models\Url;
 use App\Models\User;
 use App\Services\StatisticsAggregator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class StatisticsAggregatorTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     /**
      * @return array{0: Project, 1: User}

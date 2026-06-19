@@ -3,25 +3,14 @@
 namespace Tests\Feature\ActivityLog;
 
 use App\Enums\PixelProvider;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Activity;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class ContentModelLoggingTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Creating a Domain dispatches RegenerateTraefikConfigJob, which writes
-        // to a host path absent in CI. Fake only that job so it never runs.
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     public function test_domain_logs_editable_fields_and_ignores_health_churn(): void
     {

@@ -4,27 +4,18 @@ namespace Tests\Feature;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\Statistic;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class DashboardClicksChartTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     /**
      * Create a user that belongs to a fresh project, plus a URL in that

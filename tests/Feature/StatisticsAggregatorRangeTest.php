@@ -2,27 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Project;
 use App\Models\Statistic;
 use App\Services\StatisticsAggregator;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class StatisticsAggregatorRangeTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // DomainObserver dispatches this on creation; it writes a Traefik
-        // config file to disk, which we don't want in tests.
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     public function test_clicks_by_day_between_zero_fills_and_bounds(): void
     {

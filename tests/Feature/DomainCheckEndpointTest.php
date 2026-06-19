@@ -2,28 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\DomainStatusChecker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class DomainCheckEndpointTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Creating a Domain triggers RegenerateTraefikConfigJob, which writes to
-        // a host path that doesn't exist in CI. Fake only that job so it never
-        // runs; the check endpoint's CheckDomainStatusJob still runs and persists.
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     private function fakeChecker(): void
     {

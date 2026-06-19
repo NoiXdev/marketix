@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\QrCode;
@@ -10,19 +9,11 @@ use App\Models\Url;
 use App\Models\User;
 use App\Services\GeoIpService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class QrCodeBackingLinkTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // DomainObserver dispatches a Traefik-config job that writes to disk.
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     /**
      * @return array{0: User, 1: Project, 2: Domain}
