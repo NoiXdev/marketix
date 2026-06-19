@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps, Pixel } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Zap } from 'lucide-react';
@@ -83,8 +84,19 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {pixels.map((pixel) => (
-                  <tr key={pixel.id} className="group">
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{pixel.name}</td>
+                  <tr
+                    key={pixel.id}
+                    onClick={rowLink(route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id }))}
+                    className={`group ${ROW_LINK_CLASS}`}
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                      <Link
+                        href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        {pixel.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${PROVIDER_COLORS[pixel.provider] ?? 'bg-slate-100 text-slate-600'}`}>
                         {providerLabel(pixel.provider)}

@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
@@ -66,8 +67,19 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {qrCodes.map(qr => (
-                  <tr key={qr.id} className="group">
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{qr.name}</td>
+                  <tr
+                    key={qr.id}
+                    onClick={rowLink(route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id }))}
+                    className={`group ${ROW_LINK_CLASS}`}
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                      <Link
+                        href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        {qr.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3 capitalize text-slate-600 dark:text-slate-400">{qr.type.replace('_', ' ')}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
