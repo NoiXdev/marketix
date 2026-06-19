@@ -64,8 +64,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
 
         <form onSubmit={submit} className="max-w-md space-y-4">
           <div>
-            <label className={labelClass}>Active mailer</label>
+            <label htmlFor="default_mailer" className={labelClass}>Active mailer</label>
             <select
+              id="default_mailer"
               value={data.default_mailer}
               onChange={(e) => setData('default_mailer', e.target.value)}
               className={inputClass}
@@ -78,8 +79,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           </div>
 
           <div>
-            <label className={labelClass}>From address</label>
+            <label htmlFor="from_address" className={labelClass}>From address</label>
             <input
+              id="from_address"
               type="email"
               value={data.from_address}
               onChange={(e) => setData('from_address', e.target.value)}
@@ -89,8 +91,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           </div>
 
           <div>
-            <label className={labelClass}>From name</label>
+            <label htmlFor="from_name" className={labelClass}>From name</label>
             <input
+              id="from_name"
               value={data.from_name}
               onChange={(e) => setData('from_name', e.target.value)}
               className={inputClass}
@@ -102,8 +105,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
             <fieldset className="space-y-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
               <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-300">Postal</legend>
               <div>
-                <label className={labelClass}>Postal server URL</label>
+                <label htmlFor="postal_url" className={labelClass}>Postal server URL</label>
                 <input
+                  id="postal_url"
                   value={data.postal_url}
                   onChange={(e) => setData('postal_url', e.target.value)}
                   className={inputClass}
@@ -111,8 +115,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                 {errors.postal_url && <p className="mt-1 text-xs text-red-600">{errors.postal_url}</p>}
               </div>
               <div>
-                <label className={labelClass}>API key {has_postal_key && '(leave blank to keep current)'}</label>
+                <label htmlFor="postal_key" className={labelClass}>API key {has_postal_key && '(leave blank to keep current)'}</label>
                 <input
+                  id="postal_key"
                   type="password"
                   placeholder={has_postal_key ? '•••••••• set' : ''}
                   value={data.postal_key}
@@ -128,13 +133,14 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
             <fieldset className="space-y-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
               <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-300">SMTP</legend>
               <div>
-                <label className={labelClass}>Host</label>
-                <input value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} className={inputClass} />
+                <label htmlFor="smtp_host" className={labelClass}>Host</label>
+                <input id="smtp_host" value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} className={inputClass} />
                 {errors.smtp_host && <p className="mt-1 text-xs text-red-600">{errors.smtp_host}</p>}
               </div>
               <div>
-                <label className={labelClass}>Port</label>
+                <label htmlFor="smtp_port" className={labelClass}>Port</label>
                 <input
+                  id="smtp_port"
                   type="number"
                   value={data.smtp_port}
                   onChange={(e) => setData('smtp_port', Number(e.target.value))}
@@ -143,13 +149,14 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                 {errors.smtp_port && <p className="mt-1 text-xs text-red-600">{errors.smtp_port}</p>}
               </div>
               <div>
-                <label className={labelClass}>Username</label>
-                <input value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} className={inputClass} />
+                <label htmlFor="smtp_username" className={labelClass}>Username</label>
+                <input id="smtp_username" value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} className={inputClass} />
                 {errors.smtp_username && <p className="mt-1 text-xs text-red-600">{errors.smtp_username}</p>}
               </div>
               <div>
-                <label className={labelClass}>Password {has_smtp_password && '(leave blank to keep current)'}</label>
+                <label htmlFor="smtp_password" className={labelClass}>Password {has_smtp_password && '(leave blank to keep current)'}</label>
                 <input
+                  id="smtp_password"
                   type="password"
                   placeholder={has_smtp_password ? '•••••••• set' : ''}
                   value={data.smtp_password}
@@ -159,8 +166,8 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                 {errors.smtp_password && <p className="mt-1 text-xs text-red-600">{errors.smtp_password}</p>}
               </div>
               <div>
-                <label className={labelClass}>Encryption scheme (e.g. tls)</label>
-                <input value={data.smtp_scheme} onChange={(e) => setData('smtp_scheme', e.target.value)} className={inputClass} />
+                <label htmlFor="smtp_scheme" className={labelClass}>Encryption scheme (e.g. tls)</label>
+                <input id="smtp_scheme" value={data.smtp_scheme} onChange={(e) => setData('smtp_scheme', e.target.value)} className={inputClass} />
                 {errors.smtp_scheme && <p className="mt-1 text-xs text-red-600">{errors.smtp_scheme}</p>}
               </div>
             </fieldset>
@@ -177,8 +184,9 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
         <form onSubmit={sendTest} className="mt-8 max-w-md space-y-3 border-t border-slate-200 pt-6 dark:border-slate-700">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Send test email</h2>
           <div>
-            <label className={labelClass}>Recipient (defaults to your address)</label>
+            <label htmlFor="test_email" className={labelClass}>Recipient (defaults to your address)</label>
             <input
+              id="test_email"
               type="email"
               value={testForm.data.test_email}
               onChange={(e) => testForm.setData('test_email', e.target.value)}
