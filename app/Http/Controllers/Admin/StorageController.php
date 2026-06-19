@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorageSettingsRequest;
+use App\Http\Requests\Admin\StorageTestRequest;
 use App\Settings\StorageSettings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -31,15 +32,18 @@ class StorageController extends Controller
         $data = $request->validated();
 
         $settings->driver = $data['driver'];
-        $settings->s3_key = $data['s3_key'] ?? '';
-        $settings->s3_region = $data['s3_region'] ?? '';
-        $settings->s3_bucket = $data['s3_bucket'] ?? '';
-        $settings->s3_endpoint = $data['s3_endpoint'] ?? '';
-        $settings->s3_use_path_style = (bool) ($data['s3_use_path_style'] ?? false);
 
-        // Only overwrite the secret when a new value is supplied (mask behaviour).
-        if (! empty($data['s3_secret'])) {
-            $settings->s3_secret = $data['s3_secret'];
+        if ($data['driver'] === 's3') {
+            $settings->s3_key = $data['s3_key'] ?? '';
+            $settings->s3_region = $data['s3_region'] ?? '';
+            $settings->s3_bucket = $data['s3_bucket'] ?? '';
+            $settings->s3_endpoint = $data['s3_endpoint'] ?? '';
+            $settings->s3_use_path_style = (bool) ($data['s3_use_path_style'] ?? false);
+
+            // Only overwrite the secret when a new value is supplied (mask behaviour).
+            if (! empty($data['s3_secret'])) {
+                $settings->s3_secret = $data['s3_secret'];
+            }
         }
 
         $settings->save();
@@ -47,7 +51,7 @@ class StorageController extends Controller
         return redirect()->route('app.admin.storage.edit')->with('success', 'Storage settings saved.');
     }
 
-    public function test(StorageSettingsRequest $request)
+    public function test(StorageTestRequest $request)
     {
         $data = $request->validated();
 

@@ -125,4 +125,35 @@ class StorageControllerTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('error');
     }
+
+    public function test_test_connection_with_incomplete_s3_returns_error_flash_not_422(): void
+    {
+        $this->actingAs($this->superAdmin())
+            ->post(route('app.admin.storage.test'), ['driver' => 's3'])
+            ->assertRedirect()
+            ->assertSessionHas('error')
+            ->assertSessionMissing('errors');
+    }
+
+    public function test_switching_to_local_preserves_stored_s3_config(): void
+    {
+        $settings = app(StorageSettings::class);
+        $settings->driver = 's3';
+        $settings->s3_key = 'AKIA123';
+        $settings->s3_region = 'eu-central-1';
+        $settings->s3_bucket = 'my-bucket';
+        $settings->s3_secret = 'my-secret';
+        $settings->save();
+
+        $this->actingAs($this->superAdmin())
+            ->put(route('app.admin.storage.update'), ['driver' => 'local'])
+            ->assertRedirect(route('app.admin.storage.edit'));
+
+        $fresh = app(StorageSettings::class);
+        $this->assertSame('local', $fresh->driver);
+        $this->assertSame('AKIA123', $fresh->s3_key);
+        $this->assertSame('eu-central-1', $fresh->s3_region);
+        $this->assertSame('my-bucket', $fresh->s3_bucket);
+        $this->assertSame('my-secret', $fresh->s3_secret);
+    }
 }
