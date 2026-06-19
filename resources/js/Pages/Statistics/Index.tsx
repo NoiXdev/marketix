@@ -1,7 +1,8 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
 import { PageProps } from '@/types';
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { BarChart3, Globe, Monitor, MousePointerClick } from 'lucide-react';
 
 interface DayClicks { date: string; clicks: number }
@@ -169,9 +170,18 @@ export default function StatisticsIndex({
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {topLinks.map((link) => (
-                  <tr key={link.id}>
+                  <tr
+                    key={link.id}
+                    onClick={rowLink(route('app.project.links.show', { project: project!.id, url: link.id }))}
+                    className={ROW_LINK_CLASS}
+                  >
                     <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-300">
-                      <span className="text-slate-400">{link.domain_name}/</span>{link.slug}
+                      <Link
+                        href={route('app.project.links.show', { project: project!.id, url: link.id })}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        <span className="text-slate-400">{link.domain_name}/</span>{link.slug}
+                      </Link>
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 dark:text-slate-400">
                       {link.clicks.toLocaleString()}
