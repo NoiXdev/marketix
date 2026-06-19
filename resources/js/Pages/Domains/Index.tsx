@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { Domain, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import StatusPills from '@/Pages/Domains/Partials/StatusPills';
@@ -99,9 +100,18 @@ export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {domains.map((domain) => (
-                  <tr key={domain.id} className="group">
+                  <tr
+                    key={domain.id}
+                    onClick={rowLink(route('app.project.domains.edit', { project: project!.id, domain: domain.id }))}
+                    className={`group ${ROW_LINK_CLASS}`}
+                  >
                     <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                      {domain.name}
+                      <Link
+                        href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })}
+                        className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                      >
+                        {domain.name}
+                      </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {domain.redirect_root ? (
