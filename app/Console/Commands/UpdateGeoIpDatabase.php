@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class UpdateGeoIpDatabase extends Command
 {
-    protected $signature = 'geoip:update';
+    protected $signature = 'marketix:geoip:update';
 
     protected $description = 'Download the MaxMind GeoLite2-City database';
 
