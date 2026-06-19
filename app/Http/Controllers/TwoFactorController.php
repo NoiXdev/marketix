@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityRecorder;
 use App\Support\TwoFactor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -48,6 +49,8 @@ class TwoFactorController extends Controller
             'two_factor_confirmed_at' => now(),
         ])->save();
 
+        ActivityRecorder::security('two_factor_enabled', $user);
+
         return redirect()->route('app.profile.edit')->with('recoveryCodes', $plain);
     }
 
@@ -55,11 +58,14 @@ class TwoFactorController extends Controller
     {
         $request->validate(['current_password' => ['required', 'current_password']]);
 
-        $request->user()->forceFill([
+        $user = $request->user();
+        $user->forceFill([
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ])->save();
+
+        ActivityRecorder::security('two_factor_disabled', $user);
 
         return redirect()->route('app.profile.edit');
     }

@@ -6,10 +6,12 @@ use App\Services\CertificateReader;
 use App\Services\DnsResolver;
 use App\Services\SystemCertificateReader;
 use App\Services\SystemDnsResolver;
+use App\Support\ActivityRecorder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passkeys\Passkey;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,5 +41,17 @@ class AppServiceProvider extends ServiceProvider
             'token' => $token,
             'email' => $notifiable->getEmailForPasswordReset(),
         ]));
+
+        Passkey::created(function (Passkey $passkey) {
+            if ($passkey->user) {
+                ActivityRecorder::security('passkey_added', $passkey->user, ['passkey' => $passkey->name]);
+            }
+        });
+
+        Passkey::deleted(function (Passkey $passkey) {
+            if ($passkey->user) {
+                ActivityRecorder::security('passkey_removed', $passkey->user, ['passkey' => $passkey->name]);
+            }
+        });
     }
 }

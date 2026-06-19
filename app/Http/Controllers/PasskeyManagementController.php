@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityRecorder;
 use Illuminate\Http\Request;
 use Laravel\Passkeys\Passkey;
 
@@ -14,6 +15,8 @@ class PasskeyManagementController extends Controller
         $validated = $request->validate(['name' => ['required', 'string', 'max:255']]);
 
         $passkey->update(['name' => $validated['name']]);
+
+        ActivityRecorder::security('passkey_renamed', $request->user(), ['passkey' => $validated['name']]);
 
         return back()->with('status', 'passkey-renamed');
     }

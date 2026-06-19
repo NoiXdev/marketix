@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,6 +37,8 @@ class AuthController extends Controller
 
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
+
+        ActivityRecorder::security('login', $user);
 
         return redirect('/');
     }
