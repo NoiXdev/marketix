@@ -72,6 +72,7 @@ export interface ActivityEntry {
   // Manual custom data (role, email, ip, …) from the properties column.
   properties: Record<string, unknown>;
   created_at: string;
+  project?: { id: string; name: string } | null;
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {

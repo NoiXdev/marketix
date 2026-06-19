@@ -28,7 +28,7 @@ function describe(a: ActivityEntry): string {
   return verb;
 }
 
-export default function ActivityFeed({ activities }: { activities: ActivityEntry[] }) {
+export default function ActivityFeed({ activities, showProject = false }: { activities: ActivityEntry[]; showProject?: boolean }) {
   if (activities.length === 0) {
     return <p className="py-12 text-center text-sm text-slate-400">No activity yet.</p>;
   }
@@ -47,6 +47,9 @@ export default function ActivityFeed({ activities }: { activities: ActivityEntry
             </p>
             <p className="text-xs text-slate-400">
               <span className="rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-800">{a.log_name}</span>{' '}
+              {showProject && a.project && (
+                <span className="rounded bg-slate-100 px-1.5 py-0.5 dark:bg-slate-800">{a.project.name}</span>
+              )}{showProject && a.project && ' '}
               {new Date(a.created_at).toLocaleString()}
             </p>
           </div>
