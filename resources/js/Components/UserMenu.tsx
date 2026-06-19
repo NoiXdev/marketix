@@ -12,7 +12,7 @@ function initials(name: string): string {
         .toUpperCase();
 }
 
-export default function UserMenu() {
+export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'down' } = {}) {
     const { auth } = usePage<PageProps>().props;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export default function UserMenu() {
                         className="fixed inset-0 z-10"
                         onClick={() => setOpen(false)}
                     />
-                    <div className="absolute bottom-full left-0 z-20 mb-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                    <div className={`absolute left-0 z-20 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800 ${direction === 'down' ? 'top-full mt-1' : 'bottom-full mb-1'}`}>
                         <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-700">
                             <p className="text-xs font-medium text-slate-900 dark:text-white">
                                 {auth.user.name}
