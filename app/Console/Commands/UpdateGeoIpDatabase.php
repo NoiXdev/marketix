@@ -21,6 +21,11 @@ class UpdateGeoIpDatabase extends Command
             return self::FAILURE;
         }
 
+        // PharData loads the archive into memory; the GeoLite2-City tarball is
+        // ~60MB and exhausts the default 128M limit, which kills extraction with
+        // an uncatchable fatal error. Raise the limit for this command only.
+        ini_set('memory_limit', '512M');
+
         $this->info('Downloading GeoLite2-City database…');
 
         $downloadUrl = sprintf(
@@ -48,7 +53,7 @@ class UpdateGeoIpDatabase extends Command
         try {
             $phar = new \PharData($tmpFile);
             $phar->extractTo($extractDir, null, true);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error("Extraction failed: {$e->getMessage()}");
             @unlink($tmpFile);
 
