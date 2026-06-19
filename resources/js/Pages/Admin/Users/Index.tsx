@@ -1,5 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Shield, Trash2 } from 'lucide-react';
@@ -73,12 +74,19 @@ export default function AdminUsersIndex({ users, search }: { users: Paginated<Ad
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {users.data.map((user) => (
-                <tr key={user.id} className="group">
+                <tr
+                  key={user.id}
+                  onClick={rowLink(route('app.admin.users.edit', { user: user.id }))}
+                  className={`group ${ROW_LINK_CLASS}`}
+                >
                   <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                    <span className="flex items-center gap-2">
+                    <Link
+                      href={route('app.admin.users.edit', { user: user.id })}
+                      className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    >
                       {user.name}
                       {user.super_admin && <Shield className="h-3.5 w-3.5 text-indigo-500" />}
-                    </span>
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{user.email}</td>
                   <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{user.projects_count}</td>
