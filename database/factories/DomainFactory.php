@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Domain;
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class DomainFactory extends Factory
     public function definition(): array
     {
         return [
-            'project_id' => \App\Models\Project::factory(),
+            'project_id' => Project::factory(),
             'name' => fake()->unique()->domainName(),
             'redirect_root' => null,
             'redirect_not_found' => null,

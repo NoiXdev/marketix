@@ -14,7 +14,8 @@ class DomainStatusCheckerTest extends TestCase
 {
     private function resolver(array $map): DnsResolver
     {
-        return new class($map) implements DnsResolver {
+        return new class($map) implements DnsResolver
+        {
             public function __construct(private array $map) {}
 
             public function resolveIps(string $host): array
@@ -26,7 +27,8 @@ class DomainStatusCheckerTest extends TestCase
 
     private function certReader(?array $cert): CertificateReader
     {
-        return new class($cert) implements CertificateReader {
+        return new class($cert) implements CertificateReader
+        {
             public function __construct(private ?array $cert) {}
 
             public function read(string $host, int $port = 443): ?array
@@ -188,7 +190,8 @@ class DomainStatusCheckerTest extends TestCase
         config(['app.domain' => 'app.test']);
         Http::fake(['*' => Http::response(['app' => 'marketix'], 200)]);
 
-        $throwingResolver = new class implements DnsResolver {
+        $throwingResolver = new class implements DnsResolver
+        {
             public function resolveIps(string $host): array
             {
                 throw new \RuntimeException('DNS lookup failed');

@@ -11,6 +11,7 @@ class FakeLoggable
     use SetsActivityProject;
 
     public ?string $project_id = 'proj-123';
+
     protected array $activitySensitiveAttributes = ['password'];
 }
 
@@ -18,8 +19,8 @@ class SetsActivityProjectTest extends TestCase
 {
     public function test_tap_sets_project_id_from_resolver(): void
     {
-        $model = new FakeLoggable();
-        $activity = new Activity();
+        $model = new FakeLoggable;
+        $activity = new Activity;
         $activity->attribute_changes = collect([]);
 
         $model->beforeActivityLogged($activity, 'created');
@@ -29,8 +30,8 @@ class SetsActivityProjectTest extends TestCase
 
     public function test_tap_redacts_sensitive_attributes_in_attribute_changes(): void
     {
-        $model = new FakeLoggable();
-        $activity = new Activity();
+        $model = new FakeLoggable;
+        $activity = new Activity;
         // In spatie/laravel-activitylog v5 the dirty/old bags live here.
         $activity->attribute_changes = collect([
             'attributes' => ['slug' => 'abc', 'password' => 'hashed-value'],
@@ -47,8 +48,8 @@ class SetsActivityProjectTest extends TestCase
 
     public function test_tap_redacts_sensitive_attributes_in_properties(): void
     {
-        $model = new FakeLoggable();
-        $activity = new Activity();
+        $model = new FakeLoggable;
+        $activity = new Activity;
         // Defensive: secrets surfaced through custom withProperties() data.
         $activity->properties = collect([
             'attributes' => ['slug' => 'abc', 'password' => 'hashed-value'],
@@ -65,8 +66,8 @@ class SetsActivityProjectTest extends TestCase
 
     public function test_tap_leaves_null_sensitive_values_untouched(): void
     {
-        $model = new FakeLoggable();
-        $activity = new Activity();
+        $model = new FakeLoggable;
+        $activity = new Activity;
         $activity->attribute_changes = collect(['attributes' => ['password' => null]]);
 
         $model->beforeActivityLogged($activity, 'updated');

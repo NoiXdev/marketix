@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Support\TwoFactor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia;
@@ -107,7 +108,7 @@ class TwoFactorManagementTest extends TestCase
 
     private function enableTwoFactor(User $user): void
     {
-        $secret = (new \App\Support\TwoFactor(new Google2FA))->generateSecret();
+        $secret = (new TwoFactor(new Google2FA))->generateSecret();
         $user->forceFill([
             'two_factor_secret' => $secret,
             'two_factor_recovery_codes' => array_map(fn ($c) => Hash::make($c), ['AAAAA-AAAAA', 'BBBBB-BBBBB']),

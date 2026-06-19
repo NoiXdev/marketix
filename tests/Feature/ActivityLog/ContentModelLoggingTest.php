@@ -4,7 +4,6 @@ namespace Tests\Feature\ActivityLog;
 
 use App\Enums\PixelProvider;
 use App\Models\Activity;
-use App\Models\Domain;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

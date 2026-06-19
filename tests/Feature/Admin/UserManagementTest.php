@@ -3,7 +3,9 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -128,14 +130,14 @@ class UserManagementTest extends TestCase
         $this->actingAs($admin)
             ->get(route('app.admin.users.edit', ['user' => $target->id]))
             ->assertOk()
-            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+            ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Admin/Users/Edit')
                 ->where('user.force_password_change', true));
     }
 
     public function test_admin_can_send_password_reset_link(): void
     {
-        \Illuminate\Support\Facades\Notification::fake();
+        Notification::fake();
 
         $admin = $this->superAdmin();
         $target = User::factory()->create();
@@ -150,7 +152,7 @@ class UserManagementTest extends TestCase
 
     public function test_send_password_reset_builds_a_valid_reset_url(): void
     {
-        \Illuminate\Support\Facades\Notification::fake();
+        Notification::fake();
 
         $admin = $this->superAdmin();
         $target = User::factory()->create();
@@ -159,10 +161,10 @@ class UserManagementTest extends TestCase
             ->post(route('app.admin.users.send-password-reset', ['user' => $target->id]))
             ->assertSessionHas('success');
 
-        \Illuminate\Support\Facades\Notification::assertSentTo(
+        Notification::assertSentTo(
             $target,
-            \Illuminate\Auth\Notifications\ResetPassword::class,
-            function (\Illuminate\Auth\Notifications\ResetPassword $notification) use ($target) {
+            ResetPassword::class,
+            function (ResetPassword $notification) use ($target) {
                 // Rendering the mail builds the reset URL. Without a registered
                 // ResetPassword::createUrlUsing callback this throws
                 // RouteNotFoundException (route [password.reset] not defined),

@@ -15,7 +15,8 @@ class DomainCheckEndpointTest extends TestCase
 
     private function fakeChecker(): void
     {
-        $this->app->instance(DomainStatusChecker::class, new class extends DomainStatusChecker {
+        $this->app->instance(DomainStatusChecker::class, new class extends DomainStatusChecker
+        {
             public function __construct() {}
 
             public function check(Domain $domain): array
