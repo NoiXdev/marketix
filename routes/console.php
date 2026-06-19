@@ -11,6 +11,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('geoip:update')->daily();
+Schedule::command('activitylog:clean')->daily();
 
 Schedule::call(function () {
     Domain::query()->each(fn (Domain $domain) => CheckDomainStatusJob::dispatch($domain));
