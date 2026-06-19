@@ -16,6 +16,7 @@ return [
      */
     'settings' => [
         MailSettings::class,
+        \App\Settings\BrandingSettings::class,
     ],
 
     /*
