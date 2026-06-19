@@ -1,5 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { ExternalLink, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
@@ -58,12 +59,19 @@ export default function AdminProjectsIndex({ projects, search }: { projects: Pag
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {projects.data.map((project) => (
-                <tr key={project.id} className="group">
+                <tr
+                  key={project.id}
+                  onClick={rowLink(route('app.admin.projects.edit', { project: project.id }))}
+                  className={`group ${ROW_LINK_CLASS}`}
+                >
                   <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                    <span className="flex items-center gap-2">
+                    <Link
+                      href={route('app.admin.projects.edit', { project: project.id })}
+                      className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    >
                       {project.name}
                       {project.locked && <Lock className="h-3.5 w-3.5 text-amber-500" />}
-                    </span>
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{project.users_count}</td>
                   <td className="px-4 py-3">
