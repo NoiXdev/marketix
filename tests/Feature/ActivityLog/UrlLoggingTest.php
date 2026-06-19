@@ -2,15 +2,26 @@
 
 namespace Tests\Feature\ActivityLog;
 
+use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Activity;
 use App\Models\Project;
 use App\Models\Url;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class UrlLoggingTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creating a Domain dispatches RegenerateTraefikConfigJob, which writes
+        // to a host path absent in CI. Fake only that job so it never runs.
+        Queue::fake([RegenerateTraefikConfigJob::class]);
+    }
 
     public function test_creating_a_url_logs_a_tagged_activity(): void
     {

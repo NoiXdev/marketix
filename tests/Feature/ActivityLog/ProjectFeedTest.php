@@ -3,16 +3,27 @@
 namespace Tests\Feature\ActivityLog;
 
 use App\Enums\ProjectRole;
+use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Project;
 use App\Models\Url;
 use App\Models\User;
 use App\Support\ActivityRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class ProjectFeedTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creating a Domain dispatches RegenerateTraefikConfigJob, which writes
+        // to a host path absent in CI. Fake only that job so it never runs.
+        Queue::fake([RegenerateTraefikConfigJob::class]);
+    }
 
     public function test_member_sees_only_their_project_activity_and_no_security_events(): void
     {

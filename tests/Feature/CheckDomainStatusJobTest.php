@@ -3,15 +3,27 @@
 namespace Tests\Feature;
 
 use App\Jobs\CheckDomainStatusJob;
+use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Services\DomainStatusChecker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class CheckDomainStatusJobTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creating a Domain triggers RegenerateTraefikConfigJob, which writes to
+        // a host path that doesn't exist in CI. Fake only that job so it never
+        // runs; the job under test is executed directly via handle().
+        Queue::fake([RegenerateTraefikConfigJob::class]);
+    }
 
     public function test_job_persists_checker_results(): void
     {
