@@ -3,26 +3,15 @@
 namespace Tests\Feature\ActivityLog;
 
 use App\Enums\ProjectRole;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Project;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class ResourceHistoryTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Creating a Domain dispatches RegenerateTraefikConfigJob, which writes
-        // to a host path absent in CI. Fake only that job so it never runs.
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     public function test_url_edit_history_partial_returns_only_that_subjects_activity(): void
     {

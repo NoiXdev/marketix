@@ -4,26 +4,18 @@ namespace Tests\Feature;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\QrCode;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class AttachQrToLinkTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     /**
      * @return array{0: User, 1: Project, 2: Domain}

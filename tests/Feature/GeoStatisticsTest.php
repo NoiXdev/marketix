@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
-use App\Jobs\RegenerateTraefikConfigJob;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\Statistic;
@@ -12,22 +11,11 @@ use App\Models\Url;
 use App\Models\User;
 use App\Services\GeoIpService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class GeoStatisticsTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // DomainObserver dispatches this on creation; it writes a Traefik
-        // config file to disk, which we don't want in tests. The stat job is
-        // left alone so it still runs synchronously (QUEUE_CONNECTION=sync).
-        Queue::fake([RegenerateTraefikConfigJob::class]);
-    }
 
     /**
      * Force the GeoIP lookup to resolve to a fixed location regardless of the
