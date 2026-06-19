@@ -1,7 +1,8 @@
+import Brand from '@/Components/Brand';
 import UserMenu from '@/Components/UserMenu';
 import { PageProps, ProjectRole } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Link2, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface ChooserProject {
@@ -38,10 +39,11 @@ export default function ChooseProject({ projects }: ChooseProjectProps) {
 
             {/* Top strip */}
             <header className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
-                    <Link2 className="h-5 w-5 text-indigo-500" />
-                    <span>Marketix</span>
-                </div>
+                <Brand
+                  className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white"
+                  iconClassName="h-5 w-5 text-indigo-500"
+                  textClassName="text-lg font-semibold"
+                />
                 <div className="w-56">
                     <UserMenu direction="down" />
                 </div>
