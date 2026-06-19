@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Globe, History, LayoutDashboard, Link2, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import { BarChart3, Globe, History, LayoutDashboard, Link2, LinkIcon, Mail, QrCode, Users, Zap } from 'lucide-react';
 import ProjectSwitcher from './ProjectSwitcher';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
@@ -16,6 +16,7 @@ const navItems = [
   { label: 'Pixels',     icon: Zap,             routeName: 'app.project.pixels.index' },
   { label: 'Statistics', icon: BarChart3,       routeName: 'app.project.statistics' },
   { label: 'Activity',   icon: History,         routeName: 'app.project.activity.index' },
+  { label: 'Email reports', icon: Mail,        routeName: 'app.project.settings.notifications' },
 ];
 
 export default function Sidebar() {
