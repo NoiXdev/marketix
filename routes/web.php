@@ -34,20 +34,23 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/marketix', fn () => response()->json(['app' => 'marketix']))
     ->name('marketix.signature');
 
-Route::group(['domain' => config('app.domain')], function () {
-    // Root redirect
-    Route::get('/', function () {
-        if (auth()->check()) {
-            $project = auth()->user()->accessibleProjects()->first();
-            if ($project) {
-                return redirect()->route('app.project.dashboard', $project);
-            }
-
-            abort(403, 'Your account is not assigned to a project yet.');
-        }
-
+// Root dispatcher: guests → login; one project → straight in;
+// zero or many → the project chooser.
+Route::get('/', function () {
+    if (! auth()->check()) {
         return redirect()->route('app.auth.show-login');
-    });
+    }
+
+    $projects = auth()->user()->accessibleProjects()->get();
+
+    if ($projects->count() === 1) {
+        return redirect()->route('app.project.dashboard', $projects->first());
+    }
+
+    return redirect()->route('app.projects.choose');
+});
+
+Route::group(['domain' => config('app.domain')], function () {
 
     // Guest-only routes
     Route::middleware('guest')->group(function () {
