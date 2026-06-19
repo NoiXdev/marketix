@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
 
 class DemoSetupCommand extends Command
 {
-    protected $signature = 'demo:setup {--force}';
+    protected $signature = 'marketix:demo:setup {--force}';
 
     protected $description = 'Command description';
 
