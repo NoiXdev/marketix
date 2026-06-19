@@ -34,22 +34,23 @@ use Illuminate\Support\Facades\Route;
 Route::get('/.well-known/marketix', fn () => response()->json(['app' => 'marketix']))
     ->name('marketix.signature');
 
+// Root dispatcher: guests → login; one project → straight in;
+// zero or many → the project chooser.
+Route::get('/', function () {
+    if (! auth()->check()) {
+        return redirect()->route('app.auth.show-login');
+    }
+
+    $projects = auth()->user()->accessibleProjects()->get();
+
+    if ($projects->count() === 1) {
+        return redirect()->route('app.project.dashboard', $projects->first());
+    }
+
+    return redirect()->route('app.projects.choose');
+});
+
 Route::group(['domain' => config('app.domain')], function () {
-    // Root dispatcher: guests → login; one project → straight in;
-    // zero or many → the project chooser.
-    Route::get('/', function () {
-        if (! auth()->check()) {
-            return redirect()->route('app.auth.show-login');
-        }
-
-        $projects = auth()->user()->accessibleProjects()->get();
-
-        if ($projects->count() === 1) {
-            return redirect()->route('app.project.dashboard', $projects->first());
-        }
-
-        return redirect()->route('app.projects.choose');
-    })->name('app.root');
 
     // Guest-only routes
     Route::middleware('guest')->group(function () {
