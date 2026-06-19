@@ -53,7 +53,7 @@ export default function AdminActivityIndex({
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white px-5 dark:border-slate-800 dark:bg-slate-900">
-          <ActivityFeed activities={activities.data} />
+          <ActivityFeed activities={activities.data} showProject />
         </div>
 
         <div className="mt-4 flex flex-wrap gap-1">

@@ -17,7 +17,7 @@ class ActivityRecorder
         ?Model $causer = null,
         ?Model $subject = null,
         array $properties = [],
-    ): Activity {
+    ): ?Activity {
         $logger = activity($logName)->withProperties($properties);
 
         if ($subject) {
@@ -28,8 +28,12 @@ class ActivityRecorder
             $logger->causedBy($causer);
         }
 
-        /** @var Activity $activity */
         $activity = $logger->log($description);
+
+        if ($activity === null) {
+            return null;
+        }
+
         $activity->project_id = $projectId;
         $activity->save();
 
@@ -39,7 +43,7 @@ class ActivityRecorder
     /**
      * Record a global security event (project_id is always null).
      */
-    public static function security(string $description, Model $causer, array $properties = []): Activity
+    public static function security(string $description, Model $causer, array $properties = []): ?Activity
     {
         $properties = array_merge([
             'ip' => request()->ip(),
