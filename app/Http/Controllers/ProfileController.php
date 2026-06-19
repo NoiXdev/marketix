@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Support\ActivityRecorder;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -40,6 +41,8 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->password = $request->validated()['password'];
         $user->save();
+
+        ActivityRecorder::security('password_changed', $user);
 
         return redirect()
             ->route('app.profile.edit')
