@@ -58,4 +58,16 @@ class ReportPeriodTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         ReportPeriod::for(ReportFrequency::Off, $this->now);
     }
+
+    public function test_weekly_on_a_sunday_anchor_still_targets_the_previous_full_week(): void
+    {
+        // 2026-06-21 is a Sunday.
+        $period = ReportPeriod::for(ReportFrequency::Weekly, CarbonImmutable::parse('2026-06-21 08:00:00'));
+
+        // The most-recently-completed Mon–Sun week before the 21st is Jun 8–14.
+        $this->assertSame('2026-06-08 00:00:00', $period->current()->start()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-14 23:59:59', $period->current()->end()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-01 00:00:00', $period->previous()->start()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-07 23:59:59', $period->previous()->end()->format('Y-m-d H:i:s'));
+    }
 }

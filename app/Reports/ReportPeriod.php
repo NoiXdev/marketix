@@ -61,7 +61,7 @@ class ReportPeriod
 
     private static function weekly(CarbonImmutable $now): self
     {
-        $currentStart = $now->subWeek()->startOfWeek(CarbonInterface::MONDAY);
+        $currentStart = $now->startOfWeek(CarbonInterface::MONDAY)->subWeek();
         $currentEnd = $currentStart->endOfWeek(CarbonInterface::SUNDAY);
         $previousStart = $currentStart->subWeek();
         $previousEnd = $previousStart->endOfWeek(CarbonInterface::SUNDAY);
@@ -78,7 +78,7 @@ class ReportPeriod
     {
         $currentStart = $now->subMonthNoOverflow()->startOfMonth();
         $currentEnd = $currentStart->endOfMonth();
-        $previousStart = $currentStart->subMonthNoOverflow()->startOfMonth();
+        $previousStart = $currentStart->subMonthNoOverflow();
         $previousEnd = $previousStart->endOfMonth();
 
         return new self(
