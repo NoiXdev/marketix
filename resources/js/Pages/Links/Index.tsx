@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Check, Copy, ExternalLink, LinkIcon, Pencil, Plus, Power, Trash2 } from 'lucide-react';
@@ -132,7 +133,11 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
                     : url.slug;
 
                   return (
-                    <tr key={url.id} className="group">
+                    <tr
+                      key={url.id}
+                      onClick={rowLink(route('app.project.links.show', { project: project!.id, url: url.id }))}
+                      className={`group ${ROW_LINK_CLASS}`}
+                    >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 font-medium text-slate-900 dark:text-white">
                           <Link
