@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Activity, ArrowLeft, FolderKanban, Mail, ScrollText, Users } from 'lucide-react';
+import { Activity, ArrowLeft, FolderKanban, Mail, Palette, ScrollText, Users } from 'lucide-react';
 import Brand from './Brand';
 import UserMenu from './UserMenu';
 import { PageProps } from '@/types';
@@ -8,6 +8,7 @@ const navItems = [
   { label: 'Users', icon: Users, routeName: 'app.admin.users.index' },
   { label: 'Projects', icon: FolderKanban, routeName: 'app.admin.projects.index' },
   { label: 'Mailer', icon: Mail, routeName: 'app.admin.mailer.edit' },
+  { label: 'Branding', icon: Palette, routeName: 'app.admin.branding.edit' },
   { label: 'Activity', icon: ScrollText, routeName: 'app.admin.activity.index' },
 ];
 
