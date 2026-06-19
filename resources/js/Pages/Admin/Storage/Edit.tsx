@@ -58,8 +58,9 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
 
         <form onSubmit={submit} className="max-w-md space-y-4">
           <div>
-            <label className={labelClass}>Storage backend</label>
+            <label htmlFor="driver" className={labelClass}>Storage backend</label>
             <select
+              id="driver"
               value={data.driver}
               onChange={(e) => setData('driver', e.target.value)}
               className={inputClass}
@@ -80,13 +81,14 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
             <fieldset className="space-y-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
               <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-300">S3-compatible</legend>
               <div>
-                <label className={labelClass}>Access key ID</label>
-                <input value={data.s3_key} onChange={(e) => setData('s3_key', e.target.value)} className={inputClass} />
+                <label htmlFor="s3_key" className={labelClass}>Access key ID</label>
+                <input id="s3_key" value={data.s3_key} onChange={(e) => setData('s3_key', e.target.value)} className={inputClass} />
                 {errors.s3_key && <p className="mt-1 text-xs text-red-600">{errors.s3_key}</p>}
               </div>
               <div>
-                <label className={labelClass}>Secret access key {has_s3_secret && '(leave blank to keep current)'}</label>
+                <label htmlFor="s3_secret" className={labelClass}>Secret access key {has_s3_secret && '(leave blank to keep current)'}</label>
                 <input
+                  id="s3_secret"
                   type="password"
                   placeholder={has_s3_secret ? '•••••••• set' : ''}
                   value={data.s3_secret}
@@ -96,18 +98,19 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
                 {errors.s3_secret && <p className="mt-1 text-xs text-red-600">{errors.s3_secret}</p>}
               </div>
               <div>
-                <label className={labelClass}>Region</label>
-                <input value={data.s3_region} onChange={(e) => setData('s3_region', e.target.value)} className={inputClass} />
+                <label htmlFor="s3_region" className={labelClass}>Region</label>
+                <input id="s3_region" value={data.s3_region} onChange={(e) => setData('s3_region', e.target.value)} className={inputClass} />
                 {errors.s3_region && <p className="mt-1 text-xs text-red-600">{errors.s3_region}</p>}
               </div>
               <div>
-                <label className={labelClass}>Bucket</label>
-                <input value={data.s3_bucket} onChange={(e) => setData('s3_bucket', e.target.value)} className={inputClass} />
+                <label htmlFor="s3_bucket" className={labelClass}>Bucket</label>
+                <input id="s3_bucket" value={data.s3_bucket} onChange={(e) => setData('s3_bucket', e.target.value)} className={inputClass} />
                 {errors.s3_bucket && <p className="mt-1 text-xs text-red-600">{errors.s3_bucket}</p>}
               </div>
               <div>
-                <label className={labelClass}>Endpoint</label>
+                <label htmlFor="s3_endpoint" className={labelClass}>Endpoint</label>
                 <input
+                  id="s3_endpoint"
                   value={data.s3_endpoint}
                   onChange={(e) => setData('s3_endpoint', e.target.value)}
                   className={inputClass}
