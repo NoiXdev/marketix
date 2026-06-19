@@ -74,7 +74,7 @@ class ProjectChooserTest extends TestCase
 
     public function test_root_redirects_guest_to_login(): void
     {
-        $this->get(route('app.root'))->assertRedirect(route('app.auth.show-login'));
+        $this->get('/')->assertRedirect(route('app.auth.show-login'));
     }
 
     public function test_root_redirects_single_project_user_to_dashboard(): void
@@ -84,7 +84,7 @@ class ProjectChooserTest extends TestCase
         $project->users()->attach($user, ['role' => ProjectRole::Member->value, 'active' => true]);
 
         $this->actingAs($user)
-            ->get(route('app.root'))
+            ->get('/')
             ->assertRedirect(route('app.project.dashboard', ['project' => $project->id]));
     }
 
@@ -97,7 +97,7 @@ class ProjectChooserTest extends TestCase
         $b->users()->attach($user, ['role' => ProjectRole::Member->value, 'active' => true]);
 
         $this->actingAs($user)
-            ->get(route('app.root'))
+            ->get('/')
             ->assertRedirect(route('app.projects.choose'));
     }
 
@@ -106,7 +106,7 @@ class ProjectChooserTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->get(route('app.root'))
+            ->get('/')
             ->assertRedirect(route('app.projects.choose'));
     }
 }
