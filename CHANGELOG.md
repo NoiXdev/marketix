@@ -1,4 +1,11 @@
-## [1.1.0](https://github.com/NoiXdev/marketix/compare/v1.0.3...v) (2026-06-19)
+## [1.1.1](https://github.com/NoiXdev/marketix/compare/v1.1.0...v) (2026-06-19)
+
+
+### Bug Fixes
+
+* **geoip:** raise memory limit so database extraction doesn't fail ([70a816d](https://github.com/NoiXdev/marketix/commit/70a816df6e39657eb72d815adb94ff5ee080d3ad))
+
+## [1.1.0](https://github.com/NoiXdev/marketix/compare/v1.0.3...v1.1.0) (2026-06-19)
 
 
 ### Features
