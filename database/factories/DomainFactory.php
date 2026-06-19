@@ -18,6 +18,7 @@ class DomainFactory extends Factory
     public function definition(): array
     {
         return [
+            'project_id' => \App\Models\Project::factory(),
             'name' => fake()->unique()->domainName(),
             'redirect_root' => null,
             'redirect_not_found' => null,
