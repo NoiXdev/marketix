@@ -43,7 +43,7 @@ export default function ChooseProject({ projects }: ChooseProjectProps) {
                     <span>Marketix</span>
                 </div>
                 <div className="w-56">
-                    <UserMenu />
+                    <UserMenu direction="down" />
                 </div>
             </header>
 
