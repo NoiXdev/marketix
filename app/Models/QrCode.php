@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\SetsActivityProject;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class QrCode extends Model
 {
-    use HasUlids, SoftDeletes;
+    use HasUlids, LogsActivity, SetsActivityProject, SoftDeletes;
 
     protected $fillable = [
         'project_id',
@@ -29,6 +32,20 @@ class QrCode extends Model
             'content' => 'array',
             'style' => 'array',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('qrcode')
+            ->logOnly(['name', 'type', 'is_dynamic', 'content', 'style'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
+    }
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        return $eventName;
     }
 
     public function project(): BelongsTo
