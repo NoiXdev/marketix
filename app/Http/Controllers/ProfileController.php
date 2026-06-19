@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Support\ActivityRecorder;
+use App\Support\TwoFactor;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -23,7 +24,7 @@ class ProfileController extends Controller
             'twoFactorPending' => (bool) $pending,
             'twoFactorSetup' => $pending ? [
                 'secretKey' => $user->two_factor_secret,
-                'qrCode' => app(\App\Support\TwoFactor::class)->qrCodeDataUri($user->email, $user->two_factor_secret),
+                'qrCode' => app(TwoFactor::class)->qrCodeDataUri($user->email, $user->two_factor_secret),
             ] : null,
             'recoveryCodes' => $request->session()->get('recoveryCodes'),
             'passkeys' => $user->passkeys()->latest()->get()->map(fn ($p) => [

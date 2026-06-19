@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureProjectAdmin;
 use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\ForcePasswordChange;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,8 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // App is only reachable through the Docker reverse proxy, so trust any
         // proxy and read the forwarded headers — otherwise $request->ip() returns
         // the proxy's internal Docker IP instead of the real client IP.
-        $middleware->trustProxies(at: '*', headers:
-            Request::HEADER_X_FORWARDED_FOR |
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR |
             Request::HEADER_X_FORWARDED_HOST |
             Request::HEADER_X_FORWARDED_PORT |
             Request::HEADER_X_FORWARDED_PROTO
@@ -29,7 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            \App\Http\Middleware\ForcePasswordChange::class,
+            ForcePasswordChange::class,
         ]);
 
         $middleware->redirectGuestsTo('/auth/login');

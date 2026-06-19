@@ -15,7 +15,8 @@ class CheckDomainStatusJobTest extends TestCase
 
     public function test_job_persists_checker_results(): void
     {
-        $this->app->instance(DomainStatusChecker::class, new class extends DomainStatusChecker {
+        $this->app->instance(DomainStatusChecker::class, new class extends DomainStatusChecker
+        {
             public function __construct() {}
 
             public function check(Domain $domain): array

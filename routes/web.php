@@ -1,15 +1,16 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\ActivityController as AdminActivityController;
 use App\Http\Controllers\Admin\MailerController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
-use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
+use App\Http\Controllers\ForcePasswordChangeController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
@@ -71,8 +72,8 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::delete('/profile/two-factor', [TwoFactorController::class, 'disable'])->name('app.profile.two-factor.disable');
         Route::post('/profile/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('app.profile.two-factor.recovery-codes');
         Route::patch('/user/passkeys/{passkey}/name', [PasskeyManagementController::class, 'rename'])->name('app.passkeys.rename');
-        Route::get('/password/change', [\App\Http\Controllers\ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
-        Route::put('/password/change', [\App\Http\Controllers\ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
+        Route::get('/password/change', [ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
+        Route::put('/password/change', [ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
     });
 
     // Project tenant routes

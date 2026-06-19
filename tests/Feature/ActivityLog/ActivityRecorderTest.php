@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\ActivityLog;
 
-use App\Models\Activity;
 use App\Models\Project;
 use App\Models\User;
 use App\Support\ActivityRecorder;
