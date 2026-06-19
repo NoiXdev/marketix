@@ -92,6 +92,25 @@ class BrandingControllerTest extends TestCase
         Storage::disk()->assertMissing('branding/old.png');
     }
 
+    public function test_svg_logo_is_accepted_and_stored(): void
+    {
+        Storage::fake();
+
+        $svg = '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="200" height="60"><rect width="200" height="60" fill="#4f46e5"/></svg>';
+
+        $this->actingAs($this->superAdmin())
+            ->post(route('app.admin.branding.update'), [
+                'app_name' => 'Acme',
+                'logo_light' => UploadedFile::fake()->createWithContent('marketix-logo.svg', $svg),
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $path = app(BrandingSettings::class)->logo_light_path;
+        $this->assertNotNull($path);
+        Storage::disk()->assertExists($path);
+    }
+
     public function test_invalid_logo_upload_is_rejected(): void
     {
         $this->actingAs($this->superAdmin())
