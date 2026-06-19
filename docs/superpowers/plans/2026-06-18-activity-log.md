@@ -1253,19 +1253,19 @@ In the `boot()` method, add:
 
 ```php
         Passkey::created(function (Passkey $passkey) {
-            if ($passkey->authenticatable) {
-                ActivityRecorder::security('passkey_added', $passkey->authenticatable, ['passkey' => $passkey->name]);
+            if ($passkey->user) {
+                ActivityRecorder::security('passkey_added', $passkey->user, ['passkey' => $passkey->name]);
             }
         });
 
         Passkey::deleted(function (Passkey $passkey) {
-            if ($passkey->authenticatable) {
-                ActivityRecorder::security('passkey_removed', $passkey->authenticatable, ['passkey' => $passkey->name]);
+            if ($passkey->user) {
+                ActivityRecorder::security('passkey_removed', $passkey->user, ['passkey' => $passkey->name]);
             }
         });
 ```
 
-> If the Passkey model exposes the owner under a different relation name than `authenticatable`, adjust to match (check `vendor/laravel/passkeys/src/Passkey.php`). The relation is the morphTo to the user.
+> Verified against `vendor/laravel/passkeys/src/Passkey.php` (laravel/passkeys 0.2): the owner relation is `user()` (a `belongsTo` on `user_id`), NOT `authenticatable`. Passkeys are persisted via `$user->passkeys()->create(...)` (Eloquent `create`), so the `created` model event fires. Deletion logging fires only if a passkey is removed via Eloquent `delete()`.
 
 - [ ] **Step 10: Run test to verify it passes**
 
