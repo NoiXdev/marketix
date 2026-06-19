@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProjectInvitation;
 use App\Models\User;
+use App\Support\ActivityRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -78,6 +79,10 @@ class InvitationController extends Controller
         ]);
 
         $invitation->update(['accepted_at' => now()]);
+
+        ActivityRecorder::project('invitation', 'invitation_accepted', $invitation->project_id, $user, $invitation->project, [
+            'email' => $invitation->email,
+        ]);
 
         Auth::login($user);
 

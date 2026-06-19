@@ -7,6 +7,7 @@ use App\Http\Requests\InvitationRequest;
 use App\Mail\ProjectInvitationMail;
 use App\Models\Project;
 use App\Models\ProjectInvitation;
+use App\Support\ActivityRecorder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -58,6 +59,11 @@ class TeamController extends Controller
 
         $this->sendInvitation($invitation);
 
+        ActivityRecorder::project('invitation', 'invitation_sent', $project->id, $request->user(), $project, [
+            'email' => $data['email'],
+            'role' => $data['role'],
+        ]);
+
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Invitation sent.');
     }
@@ -67,7 +73,11 @@ class TeamController extends Controller
         /** @var Project $project */
         $project = $request->get('project');
 
-        $project->invitations()->findOrFail($invitation)->delete();
+        $invite = $project->invitations()->findOrFail($invitation);
+        ActivityRecorder::project('invitation', 'invitation_revoked', $project->id, $request->user(), $project, [
+            'email' => $invite->email,
+        ]);
+        $invite->delete();
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Invitation revoked.');
@@ -86,6 +96,10 @@ class TeamController extends Controller
 
         $this->sendInvitation($invite);
 
+        ActivityRecorder::project('invitation', 'invitation_resent', $project->id, $request->user(), $project, [
+            'email' => $invite->email,
+        ]);
+
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Invitation resent.');
     }
@@ -101,6 +115,11 @@ class TeamController extends Controller
         }
 
         $project->users()->updateExistingPivot($user, ['role' => $data['role']]);
+
+        ActivityRecorder::project('membership', 'role_changed', $project->id, $request->user(), $project, [
+            'user_id' => $user,
+            'role' => $data['role'],
+        ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Member updated.');
@@ -120,6 +139,10 @@ class TeamController extends Controller
         }
 
         $project->users()->detach($user);
+
+        ActivityRecorder::project('membership', 'member_removed', $project->id, $request->user(), $project, [
+            'user_id' => $user,
+        ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
             ->with('success', 'Member removed.');
