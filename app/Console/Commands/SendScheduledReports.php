@@ -44,14 +44,20 @@ class SendScheduledReports extends Command
                 continue;
             }
 
-            $payload = $assembler->build($project, $period);
+            try {
+                $payload = $assembler->build($project, $period);
 
-            $users = User::whereIn('id', $group->pluck('user_id'))->get();
-            foreach ($users as $user) {
-                Mail::to($user->email)->queue(
-                    new ScheduledReportMail($project, $cadence, $period->label(), $payload)
-                );
-                $queued++;
+                $users = User::whereIn('id', $group->pluck('user_id'))->get();
+                foreach ($users as $user) {
+                    Mail::to($user->email)->queue(
+                        new ScheduledReportMail($project, $cadence, $period->label(), $payload)
+                    );
+                    $queued++;
+                }
+            } catch (\Throwable $e) {
+                report($e);
+                $this->error("Failed to send reports for project {$projectId}: {$e->getMessage()}");
+                continue;
             }
         }
 

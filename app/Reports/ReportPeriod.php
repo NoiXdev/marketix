@@ -7,6 +7,9 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use InvalidArgumentException;
 
+// All periods this produces are PREVIOUS full calendar windows, so their
+// end is always in the past. ReportDateRange::custom() rejects a future
+// end — do not introduce a "current period" window without revisiting that.
 class ReportPeriod
 {
     private function __construct(

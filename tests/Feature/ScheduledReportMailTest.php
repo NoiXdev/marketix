@@ -55,5 +55,6 @@ class ScheduledReportMailTest extends TestCase
         $this->assertStringContainsString('42', $rendered);   // total clicks
         $this->assertStringContainsString('Germany', $rendered);
         $this->assertStringContainsString('acme.test/go', $rendered);
+        $this->assertStringContainsString('2026-06-18', $rendered); // daily series
     }
 }

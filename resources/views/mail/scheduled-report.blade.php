@@ -61,6 +61,18 @@ Statistics for **{{ $periodLabel }}**.
 </x-mail::table>
 @endif
 
+@if (count($timeSeries) > 0)
+## Clicks per day
+
+<x-mail::table>
+| Day | Clicks | Unique |
+|:----|-------:|-------:|
+@foreach ($timeSeries as $day)
+| {{ $day['date'] }} | {{ $day['clicks'] }} | {{ $day['unique'] }} |
+@endforeach
+</x-mail::table>
+@endif
+
 <x-mail::button :url="$settingsUrl">
 Manage report settings
 </x-mail::button>
