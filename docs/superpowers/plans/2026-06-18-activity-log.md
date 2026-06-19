@@ -463,8 +463,8 @@ In `app/Models/Url.php`, add imports and trait usage. Add to the `use` import bl
 
 ```php
 use App\Models\Concerns\SetsActivityProject;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 ```
 
 Change the trait line `use HasUlids, SoftDeletes;` to:
@@ -487,7 +487,7 @@ Add these members to the class body (e.g. directly above `protected function cas
                 'targeting_geo', 'targeting_device', 'targeting_language', 'targeting_ab',
             ])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function getDescriptionForEvent(string $eventName): string
@@ -603,8 +603,8 @@ In `app/Models/Domain.php` add to imports:
 
 ```php
 use App\Models\Concerns\SetsActivityProject;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 ```
 
 Change `use HasFactory, HasUlids, SoftDeletes;` to:
@@ -622,7 +622,7 @@ Add to the class body:
             ->useLogName('domain')
             ->logOnly(['name', 'redirect_root', 'redirect_not_found'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function getDescriptionForEvent(string $eventName): string
@@ -637,8 +637,8 @@ In `app/Models/QrCode.php` add imports:
 
 ```php
 use App\Models\Concerns\SetsActivityProject;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 ```
 
 Change `use HasUlids, SoftDeletes;` to:
@@ -656,7 +656,7 @@ Add to the class body:
             ->useLogName('qrcode')
             ->logOnly(['name', 'type', 'is_dynamic', 'content', 'style'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function getDescriptionForEvent(string $eventName): string
@@ -671,8 +671,8 @@ In `app/Models/Pixel.php` add imports:
 
 ```php
 use App\Models\Concerns\SetsActivityProject;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 ```
 
 Change `use HasUlids;` to:
@@ -690,7 +690,7 @@ Add to the class body:
             ->useLogName('pixel')
             ->logOnly(['provider', 'name', 'tag'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function getDescriptionForEvent(string $eventName): string
@@ -705,8 +705,8 @@ In `app/Models/Project.php` add imports:
 
 ```php
 use App\Models\Concerns\SetsActivityProject;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 ```
 
 Change `use HasFactory, HasUlids, SoftDeletes;` to:
@@ -724,7 +724,7 @@ Add to the class body:
             ->useLogName('project')
             ->logOnly(['name', 'locked'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontLogEmptyChanges();
     }
 
     public function getDescriptionForEvent(string $eventName): string
