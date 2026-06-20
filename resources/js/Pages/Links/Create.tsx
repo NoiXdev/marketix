@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { useTranslation } from '@/lib/i18n';
 import { Domain, PageProps, PixelOption } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
@@ -12,6 +13,7 @@ export default function LinksCreate({
   pixels: PixelOption[];
 }) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   const { data, setData, post, processing, errors } = useForm<LinkFormData>({
     domain_id:          domains[0]?.id.toString() ?? '',
@@ -29,7 +31,7 @@ export default function LinksCreate({
   });
 
   return (
-    <AppLayout title="Create link">
+    <AppLayout title={t('links.create')}>
       <div className="px-8 py-8">
         <div className="mb-6">
           <Link
@@ -37,9 +39,9 @@ export default function LinksCreate({
             className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to links
+            {t('links.back')}
           </Link>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">Create link</h1>
+          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">{t('links.create')}</h1>
         </div>
 
         <div className="max-w-2xl">
@@ -48,7 +50,7 @@ export default function LinksCreate({
             setData={setData}
             errors={errors}
             processing={processing}
-            submitLabel="Create link"
+            submitLabel={t('links.create')}
             cancelHref={route('app.project.links.index', { project: project!.id })}
             domains={domains}
             pixels={pixels}
