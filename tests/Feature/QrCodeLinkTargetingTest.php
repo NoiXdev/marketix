@@ -115,6 +115,33 @@ class QrCodeLinkTargetingTest extends TestCase
         $this->assertSame('de', $url->targeting_language[0]['language']);
     }
 
+    public function test_attach_mode_edits_settings_on_the_shared_link(): void
+    {
+        [$user, $project, $domain] = $this->tenant();
+
+        $this->actingAs($user);
+
+        // An existing standalone link, no QR yet.
+        $link = $project->urls()->create([
+            'domain_id' => $domain->id,
+            'slug' => 'shared',
+            'url' => 'https://example.com/shared',
+            'type' => \App\Enums\RedirectType::REDIRECT,
+            'status' => \App\Enums\UrlStatus::ACTIVATED,
+        ]);
+
+        $this->actingAs($user)->postJson(
+            route('app.project.qrcodes.store', ['project' => $project->id]),
+            $this->payload([
+                'url_id' => $link->id,
+                'targeting_device' => [['device' => 'Android', 'url' => 'https://example.com/android']],
+            ]),
+            ['X-Inertia' => 'true'],
+        )->assertSessionHasNoErrors();
+
+        $this->assertSame('Android', $link->fresh()->targeting_device[0]['device']);
+    }
+
     public function test_restoring_a_version_leaves_link_targeting_untouched(): void
     {
         [$user, $project, $domain] = $this->tenant();

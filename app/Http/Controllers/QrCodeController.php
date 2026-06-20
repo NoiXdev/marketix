@@ -55,7 +55,7 @@ class QrCodeController extends Controller
 
         $attachUrl = null;
         if ($linkId = $request->query('link')) {
-            $link = $project->urls()->with(['domain', 'qrCode'])->findOrFail($linkId);
+            $link = $project->urls()->with(['domain', 'qrCode', 'pixels'])->findOrFail($linkId);
 
             // Already has a QR — send the user to that QR instead of attaching a second.
             if ($link->qrCode !== null) {
@@ -70,6 +70,14 @@ class QrCodeController extends Controller
                 'slug' => $link->slug,
                 'domain_name' => $link->domain?->name,
                 'target' => $link->url,
+                'status' => $link->status->value,
+                'has_password' => filled($link->password),
+                'expired_at' => $link->expired_at?->format('Y-m-d\TH:i'),
+                'targeting_geo' => $link->targeting_geo ?? [],
+                'targeting_device' => $link->targeting_device ?? [],
+                'targeting_language' => $link->targeting_language ?? [],
+                'targeting_ab' => $link->targeting_ab ?? [],
+                'pixel_ids' => $link->pixels()->pluck('pixels.id')->toArray(),
             ];
         }
 
@@ -77,6 +85,7 @@ class QrCodeController extends Controller
             'defaultStyle' => $this->defaultStyle,
             'domains' => $project->domains()->get(['id', 'name']),
             'attachUrl' => $attachUrl,
+            'pixels' => $project->pixels()->get(['id', 'name', 'provider']),
         ]);
     }
 
@@ -128,7 +137,7 @@ class QrCodeController extends Controller
     public function edit(Request $request, string $qrCode)
     {
         $project = $request->get('project');
-        $model = $project->qrCodes()->with('url.domain')->findOrFail($qrCode);
+        $model = $project->qrCodes()->with('url.domain', 'url.pixels')->findOrFail($qrCode);
 
         return inertia('QrCodes/Edit', [
             'qrCode' => [
@@ -143,8 +152,17 @@ class QrCodeController extends Controller
                 'dynamic_url' => $model->url && $model->url->domain
                     ? 'https://'.$model->url->domain->name.'/'.$model->url->slug
                     : null,
+                'status' => $model->url?->status->value,
+                'has_password' => $model->url ? filled($model->url->password) : false,
+                'expired_at' => $model->url?->expired_at?->format('Y-m-d\TH:i'),
+                'targeting_geo' => $model->url?->targeting_geo ?? [],
+                'targeting_device' => $model->url?->targeting_device ?? [],
+                'targeting_language' => $model->url?->targeting_language ?? [],
+                'targeting_ab' => $model->url?->targeting_ab ?? [],
+                'pixel_ids' => $model->url ? $model->url->pixels->pluck('id')->toArray() : [],
             ],
             'domains' => $project->domains()->get(['id', 'name']),
+            'pixels' => $project->pixels()->get(['id', 'name', 'provider']),
             'versions' => Inertia::optional(
                 fn () => $model->versions()->with('creator')->orderByDesc('version')->limit(50)->get()->map(fn ($v) => [
                     'version' => $v->version,
