@@ -7,7 +7,8 @@
     "scripts": {
         "build": "tsc && vite build",
         "dev": "vite",
-        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix"
+        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix",
+        "test:js": "vitest run"
     },
     "devDependencies": {
         "@headlessui/react": "^2.2.7",
@@ -34,7 +35,8 @@
         "react-dom": "^19.2.7",
         "tailwindcss": "^4.1.6",
         "typescript": "^5.8.3",
-        "vite": "^7.2.4"
+        "vite": "^7.2.4",
+        "vitest": "^4.1.9"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0",
