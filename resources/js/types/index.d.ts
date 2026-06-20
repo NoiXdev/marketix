@@ -94,4 +94,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     error?: string;
     warning?: string;
   };
+  locale: string;
+  availableLocales: { code: string; label: string }[];
+  translations: Record<string, unknown>;
 };
