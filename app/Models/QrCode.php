@@ -6,6 +6,7 @@ use App\Models\Concerns\SetsActivityProject;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -56,6 +57,11 @@ class QrCode extends Model
     public function url(): BelongsTo
     {
         return $this->belongsTo(Url::class);
+    }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(QrCodeVersion::class);
     }
 
     /**
