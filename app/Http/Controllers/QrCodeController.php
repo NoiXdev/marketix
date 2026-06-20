@@ -278,6 +278,11 @@ class QrCodeController extends Controller
      */
     private function recordVersion(QrCode $model): void
     {
+        // Force a fresh load: after a dynamic→static transition persist() has
+        // soft-deleted the backing Url and set url_id = null, but the in-memory
+        // relation cache still holds the trashed Url. loadMissing() would be a
+        // no-op on a cached relation, so unset it first to guarantee a clean read.
+        $model->unsetRelation('url');
         $model->loadMissing('url');
         $next = (int) $model->versions()->max('version') + 1;
 
@@ -288,8 +293,10 @@ class QrCodeController extends Controller
             'is_dynamic' => $model->is_dynamic,
             'content' => $model->content,
             'style' => $model->style,
-            'domain_id' => $model->url?->domain_id,
-            'slug' => $model->url?->slug,
+            // domain_id/slug only exist when there is a (non-deleted) backing link.
+            // When url_id is null (static QR), both must be null regardless of cache.
+            'domain_id' => $model->url_id ? $model->url?->domain_id : null,
+            'slug'      => $model->url_id ? $model->url?->slug : null,
             'created_by' => Auth::id(),
         ]);
     }
