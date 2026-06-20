@@ -39,6 +39,7 @@ export function qrTypeTrackable(config: QrTypeConfig, isDynamic: boolean): boole
 // ── Content → QR string ───────────────────────────────────────────────────
 
 function buildVCard(c: Record<string, string>): string {
+  const extra = (c.extra || '').split('\n').map(s => s.trim()).filter(Boolean);
   return [
     'BEGIN:VCARD', 'VERSION:3.0',
     c.name       ? `FN:${c.name}`          : '',
@@ -47,6 +48,7 @@ function buildVCard(c: Record<string, string>): string {
     c.email      ? `EMAIL:${c.email}`      : '',
     c.url        ? `URL:${c.url}`          : '',
     c.address    ? `ADR:;;${c.address};;;` : '',
+    ...extra,
     'END:VCARD',
   ].filter(Boolean).join('\n');
 }
