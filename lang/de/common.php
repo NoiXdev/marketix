@@ -4,7 +4,7 @@ return [
     'nav' => [
         'dashboard' => 'Dashboard',
         'links' => 'Links',
-        'domains' => 'Domains',
+        'domains' => 'Domänen',
         'qrcodes' => 'QR-Codes',
         'pixels' => 'Pixel',
         'statistics' => 'Statistiken',
