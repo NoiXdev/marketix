@@ -27,6 +27,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\TwoFactorPasskeyController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\UrlController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,8 @@ Route::group(['domain' => config('app.domain')], function () {
 
         return redirect()->route('app.projects.choose');
     })->name('app.root');
+
+    Route::post('/locale', [LocaleController::class, 'update'])->name('app.locale.update');
 
     // Guest-only routes
     Route::middleware('guest')->group(function () {
