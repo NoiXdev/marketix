@@ -139,8 +139,15 @@ class QrCodeController extends Controller
                     : null,
             ],
             'domains' => $project->domains()->get(['id', 'name']),
-            'history' => Inertia::optional(
-                fn () => $model->activitiesAsSubject()->with('causer')->latest('id')->limit(50)->get()->map->toFeedArray()
+            'versions' => Inertia::optional(
+                fn () => $model->versions()->with('creator')->orderByDesc('version')->limit(50)->get()->map(fn ($v) => [
+                    'version' => $v->version,
+                    'name' => $v->name,
+                    'type' => $v->type,
+                    'is_dynamic' => $v->is_dynamic,
+                    'created_at' => $v->created_at->toISOString(),
+                    'created_by_name' => $v->creator?->name,
+                ])
             ),
         ]);
     }
