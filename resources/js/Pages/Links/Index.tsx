@@ -63,7 +63,7 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
   const { t } = useTranslation();
 
   async function destroy(url: UrlRow) {
-    if (!(await confirmDelete({ title: 'Delete link?', text: `Delete "${url.slug}"? This cannot be undone.` }))) return;
+    if (!(await confirmDelete({ title: t('links.delete.title'), text: t('links.delete.confirm', { slug: url.slug }) }))) return;
     router.delete(route('app.project.links.destroy', { project: project!.id, url: url.id }));
   }
 
@@ -78,7 +78,9 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('links.title')}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('links.subtitle')}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {t('links.subtitle')} · {t('links.count', { count: urls.length })}
+            </p>
           </div>
           <Link
             href={route('app.project.links.create', { project: project!.id })}

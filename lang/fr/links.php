@@ -29,12 +29,16 @@ return [
         'copied' => 'Copié !',
     ],
 
+    'delete' => [
+        'title'   => 'Supprimer le lien ?',
+        'confirm' => 'Supprimer « :slug » ? Cette action est irréversible.',
+    ],
+
     'actions' => [
         'view_stats' => 'Voir les statistiques',
         'activate'   => 'Activer',
         'deactivate' => 'Désactiver',
         'create_qr'  => 'Créer un QR code',
-        'edit'       => 'Modifier',
     ],
 
     'form' => [
@@ -75,7 +79,6 @@ return [
         'ab' => [
             'title'       => 'Tests A/B',
             'description' => 'Répartissez le trafic sur plusieurs URL de destination. Le lien par défaut est toujours inclus. Le ciblage géographique, par appareil et par langue est prioritaire sur la rotation A/B.',
-            'add'         => 'Ajouter',
             'default'     => 'Par défaut',
             'enter_url'   => 'Entrez l\'URL de destination ci-dessus',
             'auto_weight' => 'Poids automatique : :weight',
@@ -86,7 +89,6 @@ return [
 
     'show' => [
         'page_title'       => 'Lien · :slug',
-        'edit'             => 'Modifier',
         'created'          => 'Créé le :date',
         'qr_code'          => 'QR code',
         'no_data'          => 'Aucune donnée pour le moment',

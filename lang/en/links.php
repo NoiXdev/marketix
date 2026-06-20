@@ -29,12 +29,16 @@ return [
         'copied' => 'Copied!',
     ],
 
+    'delete' => [
+        'title'   => 'Delete link?',
+        'confirm' => 'Delete ":slug"? This cannot be undone.',
+    ],
+
     'actions' => [
         'view_stats' => 'View stats',
         'activate'   => 'Activate',
         'deactivate' => 'Deactivate',
         'create_qr'  => 'Create QR code',
-        'edit'       => 'Edit',
     ],
 
     'form' => [
@@ -75,7 +79,6 @@ return [
         'ab' => [
             'title'       => 'A/B Testing',
             'description' => 'Rotate traffic across multiple destination URLs. The default link is always included. Geo, device, and language targeting take priority over A/B rotation.',
-            'add'         => 'Add',
             'default'     => 'Default',
             'enter_url'   => 'Enter destination URL above',
             'auto_weight' => 'Auto weight: :weight',
@@ -86,7 +89,6 @@ return [
 
     'show' => [
         'page_title'      => 'Link · :slug',
-        'edit'            => 'Edit',
         'created'         => 'Created :date',
         'qr_code'         => 'QR code',
         'no_data'         => 'No data yet',
