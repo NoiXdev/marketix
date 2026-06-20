@@ -120,6 +120,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::post('/qr-codes', [QrCodeController::class, 'store'])->name('app.project.qrcodes.store');
             Route::get('/qr-codes/{qrCode}/edit', [QrCodeController::class, 'edit'])->name('app.project.qrcodes.edit');
             Route::put('/qr-codes/{qrCode}', [QrCodeController::class, 'update'])->name('app.project.qrcodes.update');
+            Route::post('/qr-codes/{qrCode}/versions/{version}/restore', [QrCodeController::class, 'restore'])->name('app.project.qrcodes.versions.restore');
             Route::delete('/qr-codes/{qrCode}', [QrCodeController::class, 'destroy'])->name('app.project.qrcodes.destroy');
 
             // Pixels

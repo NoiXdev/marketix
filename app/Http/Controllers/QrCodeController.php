@@ -7,6 +7,7 @@ use App\Enums\UrlStatus;
 use App\Http\Requests\QrCodeRequest;
 use App\Models\Project;
 use App\Models\QrCode;
+use App\Models\Url;
 use App\Support\QrTarget;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -159,6 +160,45 @@ class QrCodeController extends Controller
             ->with('success', 'QR code updated.');
     }
 
+    public function restore(Request $request, string $qrCode, string $version)
+    {
+        $project = $request->get('project');
+        $model = $project->qrCodes()->findOrFail($qrCode);
+        $snapshot = $model->versions()->where('version', $version)->firstOrFail();
+
+        $data = [
+            'name' => $snapshot->name,
+            'type' => $snapshot->type,
+            'is_dynamic' => $snapshot->is_dynamic,
+            'content' => $snapshot->content,
+            'style' => $snapshot->style,
+            'domain_id' => $snapshot->domain_id,
+            'slug' => $snapshot->slug,
+        ];
+
+        // Restoring to dynamic must not collide with another link's slug on that domain.
+        if ($snapshot->is_dynamic) {
+            $taken = $project->urls()
+                ->where('domain_id', $snapshot->domain_id)
+                ->where('slug', $snapshot->slug)
+                ->when($model->url_id, fn ($q) => $q->where('id', '!=', $model->url_id))
+                ->exists();
+
+            if ($taken) {
+                return redirect()->back()
+                    ->with('error', "That version's short link is already in use. Free up the slug and try again.");
+            }
+        }
+
+        DB::transaction(function () use ($project, $model, $data) {
+            $this->persist($project, $model, $data);
+            $this->recordVersion($model);
+        });
+
+        return redirect()->route('app.project.qrcodes.index')
+            ->with('success', 'QR code restored.');
+    }
+
     public function destroy(Request $request, string $qrCode)
     {
         $project = $request->get('project');
@@ -195,7 +235,20 @@ class QrCodeController extends Controller
             if ($model->url_id) {
                 $model->url->update($attrs);
             } else {
-                $model->url_id = $project->urls()->create($attrs)->id;
+                // A previously owned soft-deleted URL with the same slug may
+                // still occupy the unique index. Restore it instead of inserting.
+                $existing = Url::withTrashed()
+                    ->where('domain_id', $attrs['domain_id'])
+                    ->where('slug', $attrs['slug'])
+                    ->first();
+
+                if ($existing && $existing->trashed()) {
+                    $existing->restore();
+                    $existing->update($attrs);
+                    $model->url_id = $existing->id;
+                } else {
+                    $model->url_id = $project->urls()->create($attrs)->id;
+                }
             }
         } elseif ($model->url_id) {
             // Switched dynamic → static: the backing link is no longer needed.
