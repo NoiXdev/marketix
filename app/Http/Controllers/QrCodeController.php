@@ -6,7 +6,9 @@ use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
 use App\Http\Requests\QrCodeRequest;
 use App\Models\Project;
+use App\Models\QrCode;
 use App\Support\QrTarget;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -100,7 +102,7 @@ class QrCodeController extends Controller
                 }
             }
 
-            $project->qrCodes()->create([
+            $qr = $project->qrCodes()->create([
                 'url_id' => $urlId,
                 'name' => $data['name'],
                 'type' => $data['type'],
@@ -108,6 +110,8 @@ class QrCodeController extends Controller
                 'content' => $data['content'],
                 'style' => $data['style'],
             ]);
+
+            $this->recordVersion($qr);
         });
 
         return redirect()->route('app.project.qrcodes.index')
@@ -147,34 +151,8 @@ class QrCodeController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($project, $model, $data) {
-            if ($data['is_dynamic']) {
-                $attrs = [
-                    'domain_id' => $data['domain_id'],
-                    'slug' => $data['slug'],
-                    'url' => $this->backingTarget($project, $data),
-                    'type' => RedirectType::REDIRECT,
-                    'status' => UrlStatus::ACTIVATED,
-                ];
-
-                if ($model->url_id) {
-                    $model->url->update($attrs);
-                } else {
-                    $model->url_id = $project->urls()->create($attrs)->id;
-                }
-            } elseif ($model->url_id) {
-                // Switched dynamic → static: the backing link is no longer needed.
-                $model->url->delete();
-                $model->url_id = null;
-            }
-
-            $model->update([
-                'url_id' => $model->url_id,
-                'name' => $data['name'],
-                'type' => $data['type'],
-                'is_dynamic' => $data['is_dynamic'],
-                'content' => $data['content'],
-                'style' => $data['style'],
-            ]);
+            $this->persist($project, $model, $data);
+            $this->recordVersion($model);
         });
 
         return redirect()->route('app.project.qrcodes.index')
@@ -196,6 +174,65 @@ class QrCodeController extends Controller
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
+
+    /**
+     * Apply a full QR state to the model and sync its backing short link.
+     * $data keys: name, type, is_dynamic, content, style, and (when dynamic) domain_id, slug.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function persist(Project $project, QrCode $model, array $data): void
+    {
+        if ($data['is_dynamic']) {
+            $attrs = [
+                'domain_id' => $data['domain_id'],
+                'slug' => $data['slug'],
+                'url' => $this->backingTarget($project, $data),
+                'type' => RedirectType::REDIRECT,
+                'status' => UrlStatus::ACTIVATED,
+            ];
+
+            if ($model->url_id) {
+                $model->url->update($attrs);
+            } else {
+                $model->url_id = $project->urls()->create($attrs)->id;
+            }
+        } elseif ($model->url_id) {
+            // Switched dynamic → static: the backing link is no longer needed.
+            $model->url->delete();
+            $model->url_id = null;
+        }
+
+        $model->update([
+            'url_id' => $model->url_id,
+            'name' => $data['name'],
+            'type' => $data['type'],
+            'is_dynamic' => $data['is_dynamic'],
+            'content' => $data['content'],
+            'style' => $data['style'],
+        ]);
+    }
+
+    /**
+     * Append an immutable snapshot of the QR's current persisted state.
+     */
+    private function recordVersion(QrCode $model): void
+    {
+        $model->loadMissing('url');
+        $next = (int) $model->versions()->max('version') + 1;
+
+        $model->versions()->create([
+            'version' => $next,
+            'name' => $model->name,
+            'type' => $model->type,
+            'is_dynamic' => $model->is_dynamic,
+            'content' => $model->content,
+            'style' => $model->style,
+            'domain_id' => $model->url?->domain_id,
+            'slug' => $model->url?->slug,
+            'created_by' => Auth::id(),
+        ]);
+    }
 
     /**
      * The URI the backing short link redirects to. vCard QRs are served as a
