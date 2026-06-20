@@ -1,4 +1,8 @@
 import { QrType } from '@/data/qrTypes';
+import { useTranslation } from '@/lib/i18n';
+import { ParsedVCard, extraSummary, mergeVCardIntoContent, parseVCards } from '@/lib/vcard';
+import { Upload, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 
 const inp = 'block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white';
 const sel = inp;
@@ -15,6 +19,89 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</label>
       {hint && <p className="text-xs text-slate-400 dark:text-slate-500">{hint}</p>}
       <div className="mt-1">{children}</div>
+    </div>
+  );
+}
+
+function VCardImport({ content, onChange }: {
+  content: Record<string, string>;
+  onChange: (content: Record<string, string>) => void;
+}) {
+  const { t } = useTranslation();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [drag, setDrag] = useState(false);
+  const [error, setError] = useState('');
+  const [choices, setChoices] = useState<ParsedVCard[]>([]);
+
+  function handleFiles(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    setError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      const cards = parseVCards(String(reader.result));
+      if (cards.length === 0) { setError(t('qr.vcard.error')); setChoices([]); return; }
+      if (cards.length === 1) { onChange(mergeVCardIntoContent(content, cards[0])); setChoices([]); return; }
+      setChoices(cards);
+    };
+    reader.readAsText(file);
+  }
+
+  function pick(card: ParsedVCard) {
+    onChange(mergeVCardIntoContent(content, card));
+    setChoices([]);
+  }
+
+  const summary = extraSummary(content.extra);
+
+  return (
+    <div className="space-y-2">
+      <div
+        onDragOver={e => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={e => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
+        onClick={() => fileRef.current?.click()}
+        className={`flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed py-6 text-slate-400 transition-colors ${
+          drag
+            ? 'border-indigo-400 text-indigo-500'
+            : 'border-slate-300 hover:border-indigo-400 hover:text-indigo-500 dark:border-slate-700'
+        }`}
+      >
+        <Upload className="h-5 w-5" />
+        <span className="text-xs">{t('qr.vcard.drop')}</span>
+      </div>
+      <input ref={fileRef} type="file" accept=".vcf,text/vcard,text/x-vcard" className="hidden"
+        onChange={e => handleFiles(e.target.files)} />
+
+      {error && <p className="text-xs text-red-600">{error}</p>}
+
+      {choices.length > 0 && (
+        <div className="rounded-lg border border-slate-200 p-2 dark:border-slate-700">
+          <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
+            {t('qr.vcard.pick', { count: choices.length })}
+          </p>
+          <div className="space-y-1">
+            {choices.map((c, i) => (
+              <button key={i} type="button" onClick={() => pick(c)}
+                className="block w-full rounded-md px-3 py-1.5 text-left text-sm text-slate-700 hover:bg-indigo-50 dark:text-slate-300 dark:hover:bg-indigo-900/20">
+                {c.displayName}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {summary.count > 0 && (
+        <div className="flex items-center justify-between rounded-md bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800">
+          <span className="text-slate-500 dark:text-slate-400">
+            {t('qr.vcard.extras', { count: summary.count, fields: summary.names.join(', ') })}
+          </span>
+          <button type="button" onClick={() => onChange({ ...content, extra: '' })}
+            className="flex shrink-0 items-center gap-1 text-red-500 hover:text-red-700">
+            <X className="h-3.5 w-3.5" /> {t('qr.vcard.clear')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -76,6 +163,7 @@ export default function QrContentForm({ type, content, onChange }: Props) {
     case 'vcard':
       return (
         <div className="space-y-4">
+          <VCardImport content={content} onChange={onChange} />
           <Field label="Full name"><input type="text" value={v('name')} onChange={e => set('name', e.target.value)} placeholder="Jane Doe" className={inp} /></Field>
           <Field label="Organisation"><input type="text" value={v('org')} onChange={e => set('org', e.target.value)} placeholder="Acme Corp" className={inp} /></Field>
           <Field label="Phone"><input type="tel" value={v('phone')} onChange={e => set('phone', e.target.value)} placeholder="+49 123 456789" className={inp} /></Field>
