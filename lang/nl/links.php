@@ -29,12 +29,16 @@ return [
         'copied' => 'Gekopieerd!',
     ],
 
+    'delete' => [
+        'title'   => 'Link verwijderen?',
+        'confirm' => '":slug" verwijderen? Dit kan niet ongedaan worden gemaakt.',
+    ],
+
     'actions' => [
         'view_stats' => 'Statistieken bekijken',
         'activate'   => 'Activeren',
         'deactivate' => 'Deactiveren',
         'create_qr'  => 'QR-code aanmaken',
-        'edit'       => 'Bewerken',
     ],
 
     'form' => [
@@ -75,7 +79,6 @@ return [
         'ab' => [
             'title'       => 'A/B-testen',
             'description' => 'Verdeel verkeer over meerdere bestemmings-URLs. De standaardlink is altijd inbegrepen. Geo-, apparaat- en taaltargeting hebben voorrang op A/B-rotatie.',
-            'add'         => 'Toevoegen',
             'default'     => 'Standaard',
             'enter_url'   => 'Voer hierboven een bestemmings-URL in',
             'auto_weight' => 'Automatisch gewicht: :weight',
@@ -86,7 +89,6 @@ return [
 
     'show' => [
         'page_title'       => 'Link · :slug',
-        'edit'             => 'Bewerken',
         'created'          => 'Aangemaakt op :date',
         'qr_code'          => 'QR-code',
         'no_data'          => 'Nog geen gegevens',

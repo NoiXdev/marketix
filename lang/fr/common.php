@@ -28,5 +28,6 @@ return [
         'confirm' => 'Confirmer',
         'close' => 'Fermer',
         'search' => 'Rechercher',
+        'add' => 'Ajouter',
     ],
 ];

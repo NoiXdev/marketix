@@ -29,12 +29,16 @@ return [
         'copied' => 'Kopiert!',
     ],
 
+    'delete' => [
+        'title'   => 'Link löschen?',
+        'confirm' => '":slug" löschen? Dies kann nicht rückgängig gemacht werden.',
+    ],
+
     'actions' => [
         'view_stats' => 'Statistiken ansehen',
         'activate'   => 'Aktivieren',
         'deactivate' => 'Deaktivieren',
         'create_qr'  => 'QR-Code erstellen',
-        'edit'       => 'Bearbeiten',
     ],
 
     'form' => [
@@ -75,7 +79,6 @@ return [
         'ab' => [
             'title'       => 'A/B-Tests',
             'description' => 'Verteilen Sie Traffic auf mehrere Ziel-URLs. Der Standard-Link ist immer enthalten. Geo-, Geräte- und Sprach-Targeting haben Vorrang vor der A/B-Rotation.',
-            'add'         => 'Hinzufügen',
             'default'     => 'Standard',
             'enter_url'   => 'Geben Sie oben die Ziel-URL ein',
             'auto_weight' => 'Automatische Gewichtung: :weight',
@@ -86,7 +89,6 @@ return [
 
     'show' => [
         'page_title'       => 'Link · :slug',
-        'edit'             => 'Bearbeiten',
         'created'          => 'Erstellt am :date',
         'qr_code'          => 'QR-Code',
         'no_data'          => 'Noch keine Daten',
