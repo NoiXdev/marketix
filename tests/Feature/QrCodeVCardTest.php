@@ -65,4 +65,20 @@ class QrCodeVCardTest extends TestCase
         $qr = QrCode::firstOrFail();
         $this->assertSame('TITLE:CTO', $qr->content['extra']);
     }
+
+    public function test_store_rejects_a_non_string_vcard_extra(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $project->users()->attach($user->id, ['role' => 'member']);
+
+        $this->actingAs($user)->post(
+            route('app.project.qrcodes.store', ['project' => $project->id]),
+            [
+                'name' => 'Card', 'type' => 'vcard', 'is_dynamic' => false,
+                'content' => ['name' => 'Jane', 'extra' => ['invalid' => 'array']],
+                'style' => $this->style,
+            ],
+        )->assertSessionHasErrors('content.extra');
+    }
 }

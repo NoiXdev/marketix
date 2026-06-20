@@ -25,6 +25,8 @@ class QrCodeRequest extends FormRequest
             'type' => ['required', 'string', 'max:30'],
             'is_dynamic' => ['required', 'boolean'],
             'content' => ['required', 'array'],
+            'content.*' => ['nullable'],
+            'content.extra' => ['nullable', 'string'],
             'style' => ['required', 'array'],
             'style.foreground' => ['required', 'string'],
             'style.background' => ['required', 'string'],
@@ -67,14 +69,6 @@ class QrCodeRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
-            // vCard extras must be a string if present
-            if ($this->input('type') === 'vcard' && $this->filled('content.extra')) {
-                $extra = $this->input('content.extra');
-                if (! is_string($extra)) {
-                    $validator->errors()->add('content.extra', 'The extra must be a string.');
-                }
-            }
-
             // Every dynamic type except vCard must resolve to a non-empty
             // redirect target (vCard is served as a file, not redirected).
             if ($this->boolean('is_dynamic') && $this->input('type') !== 'vcard') {
