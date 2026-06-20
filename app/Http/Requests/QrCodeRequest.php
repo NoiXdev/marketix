@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UrlStatus;
 use App\Support\QrTarget;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -61,6 +62,14 @@ class QrCodeRequest extends FormRequest
                         ->ignore($ignoreUrlId),
                 ];
             }
+
+            // Link settings apply to the backing Url in both attach and
+            // create modes. status is nullable here (defaulted server-side);
+            // the standalone Links form requires it.
+            $rules['status'] = ['nullable', 'integer', Rule::in(array_column(UrlStatus::cases(), 'value'))];
+            $rules['password'] = ['nullable', 'string', 'max:255'];
+            $rules['expired_at'] = ['nullable', 'date'];
+            $rules = array_merge($rules, \App\Http\Requests\UrlRequest::targetingRules());
         }
 
         return $rules;
