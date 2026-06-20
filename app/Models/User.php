@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ProjectRole;
+use App\Notifications\ResetPasswordNotification;
 use App\Pivot\ProjectUser;
 use App\Support\Locales;
 use Database\Factories\UserFactory;
@@ -73,6 +74,11 @@ class User extends Authenticatable implements PasskeyUser, HasLocalePreference
     public function preferredLocale(): ?string
     {
         return $this->locale ?? Locales::default();
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     protected function casts(): array
