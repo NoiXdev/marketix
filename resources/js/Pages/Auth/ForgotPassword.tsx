@@ -1,9 +1,11 @@
 import GuestLayout from '@/Layouts/GuestLayout';
+import { useTranslation } from '@/lib/i18n';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
@@ -15,10 +17,10 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     return (
         <GuestLayout
-            title="Reset your password"
-            description="Enter your email and we'll send you a reset link"
+            title={t('auth.forgot.title')}
+            description={t('auth.forgot.description')}
         >
-            <Head title="Forgot Password" />
+            <Head title={t('auth.forgot.head')} />
 
             {status && (
                 <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
@@ -32,7 +34,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         htmlFor="email"
                         className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
-                        Email
+                        {t('auth.forgot.email')}
                     </label>
                     <input
                         id="email"
@@ -56,7 +58,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     className="flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60"
                 >
                     {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Send reset link
+                    {t('auth.forgot.submit')}
                 </button>
             </form>
 
@@ -65,7 +67,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     href={route('app.auth.show-login')}
                     className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
                 >
-                    Back to sign in
+                    {t('auth.forgot.back')}
                 </Link>
             </p>
         </GuestLayout>

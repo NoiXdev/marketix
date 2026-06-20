@@ -1,10 +1,12 @@
 import GuestLayout from '@/Layouts/GuestLayout';
+import { useTranslation } from '@/lib/i18n';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 export default function Login({ status }: { status?: string }) {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
@@ -21,15 +23,15 @@ export default function Login({ status }: { status?: string }) {
   };
 
   return (
-    <GuestLayout title="Welcome back" description="Sign in to your account">
-      <Head title="Login" />
+    <GuestLayout title={t('auth.login.title')} description={t('auth.login.description')}>
+      <Head title={t('auth.login.head')} />
 
       {status && <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{status}</div>}
 
       <form onSubmit={submit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Email
+            {t('auth.login.email')}
           </label>
           <input
             id="email"
@@ -46,10 +48,10 @@ export default function Login({ status }: { status?: string }) {
         <div>
           <div className="flex items-center justify-between">
             <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Password
+              {t('auth.login.password')}
             </label>
             <Link href={route('app.auth.show-forgot')} className="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-              Forgot password?
+              {t('auth.login.forgot')}
             </Link>
           </div>
           <input
@@ -72,7 +74,7 @@ export default function Login({ status }: { status?: string }) {
             className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           <label htmlFor="remember" className="text-sm text-slate-600 dark:text-slate-400">
-            Remember me
+            {t('auth.login.remember')}
           </label>
         </div>
 
@@ -82,7 +84,7 @@ export default function Login({ status }: { status?: string }) {
           className="flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60"
         >
           {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-          Sign in
+          {t('auth.login.submit')}
         </button>
       </form>
 
@@ -94,7 +96,7 @@ export default function Login({ status }: { status?: string }) {
             disabled={passkey.isLoading}
             className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
           >
-            Sign in with a passkey
+            {t('auth.login.passkey')}
           </button>
           {passkey.error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{passkey.error}</p>}
         </div>
