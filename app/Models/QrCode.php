@@ -72,6 +72,10 @@ class QrCode extends Model
     {
         $c = $this->content;
 
+        $extra = Collection::make(explode("\n", (string) ($c['extra'] ?? '')))
+            ->map(fn (string $line) => trim($line))
+            ->filter();
+
         return Collection::make([
             'BEGIN:VCARD', 'VERSION:3.0',
             ! empty($c['name']) ? 'FN:'.$c['name'] : null,
@@ -80,7 +84,10 @@ class QrCode extends Model
             ! empty($c['email']) ? 'EMAIL:'.$c['email'] : null,
             ! empty($c['url']) ? 'URL:'.$c['url'] : null,
             ! empty($c['address']) ? 'ADR:;;'.$c['address'].';;;' : null,
-            'END:VCARD',
-        ])->filter()->implode("\r\n");
+        ])
+            ->filter()
+            ->concat($extra)
+            ->push('END:VCARD')
+            ->implode("\r\n");
     }
 }
