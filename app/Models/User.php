@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enums\ProjectRole;
 use App\Pivot\ProjectUser;
+use App\Support\Locales;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,9 +19,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'locale'])]
 #[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'])]
-class User extends Authenticatable implements PasskeyUser
+class User extends Authenticatable implements PasskeyUser, HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUlids, Notifiable, PasskeyAuthenticatable;
@@ -66,6 +68,11 @@ class User extends Authenticatable implements PasskeyUser
     public function hasTwoFactorEnabled(): bool
     {
         return ! is_null($this->two_factor_confirmed_at);
+    }
+
+    public function preferredLocale(): ?string
+    {
+        return $this->locale ?? Locales::default();
     }
 
     protected function casts(): array
