@@ -29,16 +29,19 @@ data richer than our six fields so the saved contact stays complete.
 ## Data model
 
 **No migration.** Extras are stored inside the existing `content` JSON column
-under a new key:
+under a new key, as a **newline-joined string** so the frontend's
+`Record<string, string>` content type stays intact (no type churn):
 
 ```
-content.extra: string[]
-// raw vCard property lines we did not map, e.g.
-// ["BDAY:1990-01-01", "TITLE:CTO", "TEL;TYPE=HOME:+49 30 0000"]
+content.extra: string   // raw vCard property lines we did not map, one per line, e.g.
+                        // "BDAY:1990-01-01\nTITLE:CTO\nTEL;TYPE=HOME:+49 30 0000"
 ```
 
-Version snapshots (`qr_code_versions`), the form request, and persistence all
-already round-trip `content` as JSON, so extras travel with the QR for free.
+The in-memory parser result still exposes extras as a `string[]`
+(`ParsedVCard.extra`); they are joined with `\n` only when merged into
+`content`, and split again on output. Version snapshots (`qr_code_versions`),
+the form request, and persistence all already round-trip `content` as JSON, so
+extras travel with the QR for free.
 
 ## Components
 
@@ -106,8 +109,7 @@ and the served `.vcf` stay byte-aligned.
 Add:
 
 ```php
-'content.extra'   => ['nullable', 'array'],
-'content.extra.*' => ['string'],
+'content.extra' => ['nullable', 'string'],
 ```
 
 vCard is already exempt from redirect-target validation
