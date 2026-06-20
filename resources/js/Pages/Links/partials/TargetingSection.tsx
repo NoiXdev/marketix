@@ -87,7 +87,7 @@ export function GeoTargeting({ rules, onChange }: GeoProps) {
       title={t('links.targeting.geo.title')}
       description={t('links.targeting.geo.description')}
       onAdd={add}
-      addLabel={t('links.targeting.ab.add')}
+      addLabel={t('common.actions.add')}
     >
       {rules.map((rule, i) => {
         const subdivisions = SUBDIVISIONS[rule.country] ?? [];
@@ -157,7 +157,7 @@ export function DeviceTargeting({ rules, onChange }: DeviceProps) {
       title={t('links.targeting.device.title')}
       description={t('links.targeting.device.description')}
       onAdd={add}
-      addLabel={t('links.targeting.ab.add')}
+      addLabel={t('common.actions.add')}
     >
       {rules.map((rule, i) => (
         <div key={i} className="border-t border-slate-100 px-5 py-4 dark:border-slate-800">
@@ -219,7 +219,7 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
       title={t('links.targeting.ab.title')}
       description={t('links.targeting.ab.description')}
       onAdd={add}
-      addLabel={t('links.targeting.ab.add')}
+      addLabel={t('common.actions.add')}
     >
       {/* Default URL row — non-editable */}
       <div className="border-t border-slate-100 px-5 py-3 dark:border-slate-800">
@@ -315,7 +315,7 @@ export function LanguageTargeting({ rules, onChange }: LanguageProps) {
       title={t('links.targeting.language.title')}
       description={t('links.targeting.language.description')}
       onAdd={add}
-      addLabel={t('links.targeting.ab.add')}
+      addLabel={t('common.actions.add')}
     >
       {rules.map((rule, i) => (
         <div key={i} className="border-t border-slate-100 px-5 py-4 dark:border-slate-800">
