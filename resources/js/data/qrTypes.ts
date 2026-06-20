@@ -17,14 +17,14 @@ export const QR_TYPES: QrTypeConfig[] = [
   { value: 'wifi',   label: 'WiFi',         category: 'static', icon: '📶', defaultContent: { ssid: '', password: '', encryption: 'WPA', hidden: 'false' } },
   { value: 'vcard',  label: 'vCard',        category: 'both',   icon: '👤', defaultContent: { name: '', phone: '', email: '', org: '', url: '', address: '' } },
   { value: 'event',  label: 'Event',        category: 'static', icon: '📅', defaultContent: { title: '', start: '', end: '', location: '', description: '' } },
-  // ── Dynamic ────────────────────────────────────────────────────────────
-  { value: 'link',        label: 'Link',           category: 'dynamic', icon: '🔗', defaultContent: { url: '' } },
-  { value: 'email',       label: 'Email',          category: 'dynamic', icon: '📧', defaultContent: { email: '', subject: '', body: '' } },
-  { value: 'phone',       label: 'Phone',          category: 'dynamic', icon: '📞', defaultContent: { phone: '' } },
-  { value: 'application', label: 'Application',    category: 'dynamic', icon: '📱', defaultContent: { url_ios: '', url_android: '', url_fallback: '' } },
-  { value: 'file',        label: 'File',           category: 'dynamic', icon: '📄', defaultContent: { file_url: '' } },
-  { value: 'whatsapp',    label: 'WhatsApp',       category: 'dynamic', icon: '🟢', defaultContent: { phone: '', message: '' } },
-  { value: 'crypto',      label: 'Cryptocurrency', category: 'dynamic', icon: '₿',  defaultContent: { currency: 'BTC', address: '', amount: '', label: '' } },
+  // ── Dynamic (also usable as static / no-tracking) ────────────────────────
+  { value: 'link',        label: 'Link',           category: 'both', icon: '🔗', defaultContent: { url: '' } },
+  { value: 'email',       label: 'Email',          category: 'both', icon: '📧', defaultContent: { email: '', subject: '', body: '' } },
+  { value: 'phone',       label: 'Phone',          category: 'both', icon: '📞', defaultContent: { phone: '' } },
+  { value: 'application', label: 'Application',    category: 'both', icon: '📱', defaultContent: { url_ios: '', url_android: '', url_fallback: '' } },
+  { value: 'file',        label: 'File',           category: 'both', icon: '📄', defaultContent: { file_url: '' } },
+  { value: 'whatsapp',    label: 'WhatsApp',       category: 'both', icon: '🟢', defaultContent: { phone: '', message: '' } },
+  { value: 'crypto',      label: 'Cryptocurrency', category: 'both', icon: '₿',  defaultContent: { currency: 'BTC', address: '', amount: '', label: '' } },
 ];
 
 export const STATIC_TYPES  = QR_TYPES.filter(t => t.category === 'static' || t.category === 'both');
