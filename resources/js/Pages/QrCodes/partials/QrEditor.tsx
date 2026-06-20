@@ -1,6 +1,9 @@
 import { DYNAMIC_TYPES, DEFAULT_STYLE, STATIC_TYPES, QrStyle, QrType, buildQrContent, qrTypeTrackable } from '@/data/qrTypes';
+import LinkAdvancedFields, { LinkAdvancedData } from '@/Pages/Links/partials/LinkAdvancedFields';
+import { AbVariant, DeviceRule, GeoRule, LanguageRule } from '@/Pages/Links/partials/TargetingSection';
+import { PixelOption } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import QrContentForm from './QrContentForm';
 import QrPreview from './QrPreview';
@@ -15,6 +18,15 @@ export interface QrFormData {
   content: Record<string, string>;
   style: QrStyle;
   url_id?: string; // attach mode: back this QR with an existing link instead of creating one
+  // Backing-link settings (dynamic QRs only)
+  status: string;
+  password: string;
+  expired_at: string;
+  targeting_geo: GeoRule[];
+  targeting_device: DeviceRule[];
+  targeting_language: LanguageRule[];
+  targeting_ab: AbVariant[];
+  pixel_ids: string[];
 }
 
 interface Domain { id: string; name: string }
@@ -30,14 +42,17 @@ interface Props {
   domains: Domain[];
   dynamicUrl?: string; // saved short-link URL (edit page)
   attachLink?: { domainName: string; slug: string; target: string } | null; // attach mode
+  pixels: PixelOption[];
+  linkHasPassword?: boolean;
 }
 
 const inp = 'block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white';
 
 export default function QrEditor({
-  data, setData, errors, processing, submitLabel, cancelHref, onSubmit, domains, dynamicUrl, attachLink,
+  data, setData, errors, processing, submitLabel, cancelHref, onSubmit, domains, dynamicUrl, attachLink, pixels, linkHasPassword,
 }: Props) {
   const [tab, setTab] = useState<'content' | 'style'>('content');
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const typeList = data.is_dynamic ? DYNAMIC_TYPES : STATIC_TYPES;
 
@@ -65,6 +80,9 @@ export default function QrEditor({
       : dynamicUrl;
 
   const qrContent = buildQrContent(data.type, data.is_dynamic, data.content, liveDynamicUrl);
+
+  const hasBackingLink = !!attachLink || data.is_dynamic;
+  const advancedDefaultUrl = attachLink ? attachLink.target : (data.content.url || '');
 
   return (
     <form onSubmit={onSubmit}>
@@ -171,6 +189,36 @@ export default function QrEditor({
                 </div>
               )}
             </>
+          )}
+
+          {hasBackingLink && (
+            <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((o) => !o)}
+                className="flex w-full items-center justify-between px-5 py-4 text-left"
+              >
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Advanced link settings</span>
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {advancedOpen && (
+                <div className="border-t border-slate-200 p-5 dark:border-slate-800">
+                  {attachLink && (
+                    <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                      These settings belong to a shared link. Changing them affects that link everywhere it is used.
+                    </p>
+                  )}
+                  <LinkAdvancedFields
+                    data={data}
+                    setField={setData as <K extends keyof LinkAdvancedData>(key: K, value: LinkAdvancedData[K]) => void}
+                    errors={errors}
+                    pixels={pixels}
+                    defaultUrl={advancedDefaultUrl}
+                    hasPassword={linkHasPassword}
+                  />
+                </div>
+              )}
+            </div>
           )}
 
           {/* Content / Style — attach mode shows style only (destination is the existing link) */}

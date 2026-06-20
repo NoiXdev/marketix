@@ -1,19 +1,25 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { DEFAULT_STYLE, DYNAMIC_TYPES } from '@/data/qrTypes';
-import { PageProps } from '@/types';
+import { PageProps, PixelOption } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
 interface Domain { id: string; name: string }
-interface AttachUrl { id: string; domain_id: string; slug: string; domain_name: string | null; target: string }
+interface AttachUrl {
+  id: string; domain_id: string; slug: string; domain_name: string | null; target: string;
+  status: number; has_password: boolean; expired_at: string | null;
+  targeting_geo: unknown[]; targeting_device: unknown[]; targeting_language: unknown[]; targeting_ab: unknown[];
+  pixel_ids: string[];
+}
 
 export default function QrCodesCreate({
-  defaultStyle, domains, attachUrl,
+  defaultStyle, domains, attachUrl, pixels,
 }: {
   defaultStyle: Record<string, unknown>;
   domains: Domain[];
   attachUrl: AttachUrl | null;
+  pixels: PixelOption[];
 }) {
   const { project } = usePage<PageProps>().props;
   const first = DYNAMIC_TYPES[0];
@@ -25,8 +31,16 @@ export default function QrCodesCreate({
     domain_id:  attachUrl ? attachUrl.domain_id : (domains[0]?.id ?? ''),
     slug:       attachUrl ? attachUrl.slug : '',
     content:    attachUrl ? { url: attachUrl.target } : { ...first.defaultContent },
-    style:      { ...DEFAULT_STYLE, ...(defaultStyle as object) } as typeof DEFAULT_STYLE,
-    url_id:     attachUrl ? attachUrl.id : undefined,
+    style:              { ...DEFAULT_STYLE, ...(defaultStyle as object) } as typeof DEFAULT_STYLE,
+    url_id:             attachUrl ? attachUrl.id : undefined,
+    status:             attachUrl ? String(attachUrl.status) : '1',
+    password:           '',
+    expired_at:         attachUrl?.expired_at ?? '',
+    targeting_geo:      (attachUrl?.targeting_geo ?? []) as QrFormData['targeting_geo'],
+    targeting_device:   (attachUrl?.targeting_device ?? []) as QrFormData['targeting_device'],
+    targeting_language: (attachUrl?.targeting_language ?? []) as QrFormData['targeting_language'],
+    targeting_ab:       (attachUrl?.targeting_ab ?? []) as QrFormData['targeting_ab'],
+    pixel_ids:          attachUrl?.pixel_ids ?? [],
   });
 
   const title = attachUrl ? 'Create QR code for link' : 'Create QR code';
@@ -50,6 +64,8 @@ export default function QrCodesCreate({
           cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
           domains={domains}
           attachLink={attachUrl ? { domainName: attachUrl.domain_name ?? '', slug: attachUrl.slug, target: attachUrl.target } : null}
+          pixels={pixels}
+          linkHasPassword={attachUrl?.has_password ?? false}
           onSubmit={e => { e.preventDefault(); post(route('app.project.qrcodes.store', { project: project!.id })); }}
         />
       </div>
