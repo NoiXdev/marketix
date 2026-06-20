@@ -4,9 +4,9 @@ return [
     'title'      => 'Links',
     'create'     => 'Link aanmaken',
     'empty'      => 'Nog geen links',
-    'empty_hint' => 'Maak uw eerste korte link om te beginnen.',
+    'empty_hint' => 'Maak je eerste korte link om te beginnen.',
     'count'      => ':count links',
-    'subtitle'   => 'Beheer uw korte links',
+    'subtitle'   => 'Beheer je korte links',
     'back'       => 'Terug naar links',
 
     'columns' => [
