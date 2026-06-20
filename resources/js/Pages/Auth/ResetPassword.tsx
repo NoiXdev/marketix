@@ -1,4 +1,5 @@
 import GuestLayout from '@/Layouts/GuestLayout';
+import { useTranslation } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
@@ -10,6 +11,7 @@ export default function ResetPassword({
     token: string;
     email: string;
 }) {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         token,
         email,
@@ -24,10 +26,10 @@ export default function ResetPassword({
 
     return (
         <GuestLayout
-            title="Set new password"
-            description="Choose a strong password for your account"
+            title={t('auth.reset.title')}
+            description={t('auth.reset.description')}
         >
-            <Head title="Reset Password" />
+            <Head title={t('auth.reset.head')} />
 
             <form onSubmit={submit} className="space-y-4">
                 <div>
@@ -35,7 +37,7 @@ export default function ResetPassword({
                         htmlFor="email"
                         className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
-                        Email
+                        {t('auth.reset.email')}
                     </label>
                     <input
                         id="email"
@@ -51,7 +53,7 @@ export default function ResetPassword({
                         htmlFor="password"
                         className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
-                        New password
+                        {t('auth.reset.password')}
                     </label>
                     <input
                         id="password"
@@ -74,7 +76,7 @@ export default function ResetPassword({
                         htmlFor="password_confirmation"
                         className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
-                        Confirm new password
+                        {t('auth.reset.confirm')}
                     </label>
                     <input
                         id="password_confirmation"
@@ -99,7 +101,7 @@ export default function ResetPassword({
                     className="flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60"
                 >
                     {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Reset password
+                    {t('auth.reset.submit')}
                 </button>
             </form>
         </GuestLayout>
