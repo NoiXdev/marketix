@@ -1,9 +1,13 @@
-import ActivityHistory from '@/Components/ActivityHistory';
+import QrVersionsPanel, { QrVersionEntry } from '@/Components/QrVersionsPanel';
 import AppLayout from '@/Layouts/AppLayout';
 import { QrStyle, QrType } from '@/data/qrTypes';
-import { ActivityEntry, PageProps } from '@/types';
+import { confirmAction } from '@/lib/confirm';
+import { useTranslation } from '@/lib/i18n';
+import { isRiskyEdit, QrEditState } from '@/lib/qrRisk';
+import { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { FormEvent } from 'react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
 interface Domain { id: string; name: string }
@@ -20,8 +24,9 @@ interface QrData {
   dynamic_url: string | null;
 }
 
-export default function QrCodesEdit({ qrCode, domains, history }: { qrCode: QrData; domains: Domain[]; history?: ActivityEntry[] }) {
+export default function QrCodesEdit({ qrCode, domains, versions }: { qrCode: QrData; domains: Domain[]; versions?: QrVersionEntry[] }) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   const { data, setData, put, processing, errors } = useForm<QrFormData>({
     name:       qrCode.name,
@@ -32,6 +37,38 @@ export default function QrCodesEdit({ qrCode, domains, history }: { qrCode: QrDa
     content:    qrCode.content,
     style:      qrCode.style,
   });
+
+  const original: QrEditState = {
+    type: qrCode.type,
+    is_dynamic: qrCode.is_dynamic,
+    domain_id: qrCode.domain_id ?? '',
+    slug: qrCode.slug ?? '',
+    content: qrCode.content,
+    style: qrCode.style,
+  };
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    const next: QrEditState = {
+      type: data.type,
+      is_dynamic: data.is_dynamic,
+      domain_id: data.domain_id,
+      slug: data.slug,
+      content: data.content,
+      style: data.style,
+    };
+
+    if (isRiskyEdit(original, next)) {
+      const ok = await confirmAction({
+        title: t('qr.edit.confirm.title'),
+        text: t('qr.edit.confirm.text'),
+        confirmText: t('qr.edit.confirm.button'),
+      });
+      if (!ok) return;
+    }
+
+    put(route('app.project.qrcodes.update', { project: project!.id, qrCode: qrCode.id }));
+  }
 
   return (
     <AppLayout title="Edit QR code">
@@ -55,9 +92,9 @@ export default function QrCodesEdit({ qrCode, domains, history }: { qrCode: QrDa
             cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
             domains={domains}
             dynamicUrl={qrCode.dynamic_url ?? undefined}
-            onSubmit={e => { e.preventDefault(); put(route('app.project.qrcodes.update', { project: project!.id, qrCode: qrCode.id })); }}
+            onSubmit={submit}
           />
-          <ActivityHistory history={history} />
+          <QrVersionsPanel qrId={qrCode.id} versions={versions} />
         </div>
       </div>
     </AppLayout>

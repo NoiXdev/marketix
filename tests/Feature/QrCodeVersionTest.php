@@ -171,6 +171,35 @@ class QrCodeVersionTest extends TestCase
         $this->assertDatabaseHas('urls', ['slug' => 'promo', 'url' => 'https://example.com/a']);
     }
 
+    public function test_edit_page_exposes_versions(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $project->users()->attach($user->id, ['role' => 'member']);
+
+        $style = [
+            'foreground' => '#000000', 'background' => '#ffffff',
+            'dot_style' => 'square', 'corner_square_style' => 'square',
+            'corner_dot_style' => 'square', 'logo_type' => 'none',
+            'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+        ];
+        $this->actingAs($user)->postJson(
+            route('app.project.qrcodes.store', ['project' => $project->id]),
+            ['name' => 'My QR', 'type' => 'text', 'is_dynamic' => false, 'content' => ['text' => 'hi'], 'style' => $style],
+            ['X-Inertia' => 'true'],
+        );
+        $qr = QrCode::firstOrFail();
+
+        $version = file_exists($manifest = public_path('build/manifest.json'))
+            ? hash_file('xxh128', $manifest)
+            : '';
+
+        $this->actingAs($user)->get(
+            route('app.project.qrcodes.edit', ['project' => $project->id, 'qrCode' => $qr->id]),
+            ['X-Inertia' => 'true', 'X-Inertia-Partial-Data' => 'versions', 'X-Inertia-Partial-Component' => 'QrCodes/Edit', 'X-Inertia-Version' => $version],
+        )->assertOk()->assertJsonPath('props.versions.0.version', 1);
+    }
+
     public function test_cannot_restore_another_projects_qr_version(): void
     {
         $user = User::factory()->create();
