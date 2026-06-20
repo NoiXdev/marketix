@@ -2,6 +2,7 @@ import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { LogOut, Shield, User } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { useTranslation } from '@/lib/i18n';
 
 function initials(name: string): string {
     return name
@@ -16,6 +17,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
     const { auth } = usePage<PageProps>().props;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const { t } = useTranslation();
 
     return (
         <div className="relative" ref={ref}>
@@ -54,7 +56,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                                 onClick={() => setOpen(false)}
                             >
                                 <Shield className="h-4 w-4 text-slate-400" />
-                                Admin
+                                {t('common.user_menu.admin')}
                             </Link>
                         )}
                         <Link
@@ -63,7 +65,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                             onClick={() => setOpen(false)}
                         >
                             <User className="h-4 w-4 text-slate-400" />
-                            Profile
+                            {t('common.user_menu.profile')}
                         </Link>
                         <Link
                             href={route('app.auth.logout')}
@@ -73,7 +75,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                             onClick={() => setOpen(false)}
                         >
                             <LogOut className="h-4 w-4 text-slate-400" />
-                            Log out
+                            {t('common.user_menu.logout')}
                         </Link>
                     </div>
                 </>

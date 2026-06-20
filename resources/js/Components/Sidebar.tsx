@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BarChart3, Globe, History, LayoutDashboard, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 import Brand from './Brand';
 import LocaleSwitcher from './LocaleSwitcher';
 import ProjectSwitcher from './ProjectSwitcher';
@@ -7,17 +8,13 @@ import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 
 const navItems = [
-  {
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    routeName: 'app.project.dashboard',
-  },
-  { label: 'Links',      icon: LinkIcon,        routeName: 'app.project.links.index' },
-  { label: 'Domains',    icon: Globe,           routeName: 'app.project.domains.index' },
-  { label: 'QR Codes',   icon: QrCode,          routeName: 'app.project.qrcodes.index' },
-  { label: 'Pixels',     icon: Zap,             routeName: 'app.project.pixels.index' },
-  { label: 'Statistics', icon: BarChart3,       routeName: 'app.project.statistics' },
-  { label: 'Activity',   icon: History,         routeName: 'app.project.activity.index' },
+  { key: 'dashboard',  icon: LayoutDashboard, routeName: 'app.project.dashboard' },
+  { key: 'links',      icon: LinkIcon,        routeName: 'app.project.links.index' },
+  { key: 'domains',    icon: Globe,           routeName: 'app.project.domains.index' },
+  { key: 'qrcodes',    icon: QrCode,          routeName: 'app.project.qrcodes.index' },
+  { key: 'pixels',     icon: Zap,             routeName: 'app.project.pixels.index' },
+  { key: 'statistics', icon: BarChart3,       routeName: 'app.project.statistics' },
+  { key: 'activity',   icon: History,         routeName: 'app.project.activity.index' },
 ];
 
 export default function Sidebar() {
@@ -25,6 +22,7 @@ export default function Sidebar() {
   const currentProject = usePage().props.project;
   const { currentProjectRole, auth, version } = usePage<import('@/types').PageProps>().props;
   const isProjectAdmin = auth.user.super_admin || currentProjectRole === 'admin';
+  const { t } = useTranslation();
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -38,13 +36,13 @@ export default function Sidebar() {
         <ul className="space-y-0.5">
           {[
             ...navItems,
-            ...(isProjectAdmin ? [{ label: 'Team', icon: Users, routeName: 'app.project.team.index' }] : []),
-          ].map(({ label, icon: Icon, routeName }) => {
+            ...(isProjectAdmin ? [{ key: 'team', icon: Users, routeName: 'app.project.team.index' }] : []),
+          ].map(({ key, icon: Icon, routeName }) => {
             const href = routeName ? route(routeName, { project: currentProject?.id }) : '#';
             const isActive = routeName ? url.startsWith('/' + href.replace(/^https?:\/\/[^/]+\//, '')) : false;
 
             return (
-              <li key={label}>
+              <li key={key}>
                 <Link
                   href={href}
                   className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -54,7 +52,7 @@ export default function Sidebar() {
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {label}
+                  {t(`common.nav.${key}`)}
                 </Link>
               </li>
             );
