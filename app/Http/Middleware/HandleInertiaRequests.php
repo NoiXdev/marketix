@@ -3,7 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Settings\BrandingSettings;
+use App\Support\Locales;
+use App\Support\Translations;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -31,6 +34,9 @@ class HandleInertiaRequests extends Middleware
                 'warning' => fn () => $request->session()->get('warning'),
             ],
             'branding' => $this->branding(),
+            'locale' => App::getLocale(),
+            'availableLocales' => Locales::all(),
+            'translations' => fn () => Translations::forLocale(App::getLocale()),
         ];
     }
 
