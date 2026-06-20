@@ -1,5 +1,6 @@
 import { COUNTRIES, SUBDIVISIONS } from '@/data/countries';
 import { LANGUAGES } from '@/data/languages';
+import { useTranslation } from '@/lib/i18n';
 import { FlaskConical, Globe, Monitor, Plus, Trash2, Type } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -23,10 +24,11 @@ interface SectionProps {
   title: string;
   description: string;
   onAdd: () => void;
+  addLabel: string;
   children: React.ReactNode;
 }
 
-function Section({ icon, title, description, onAdd, children }: SectionProps) {
+function Section({ icon, title, description, onAdd, addLabel, children }: SectionProps) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800">
@@ -40,7 +42,7 @@ function Section({ icon, title, description, onAdd, children }: SectionProps) {
           className="inline-flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
         >
           <Plus className="h-3.5 w-3.5" />
-          Add
+          {addLabel}
         </button>
       </div>
       <p className="px-5 py-3 text-xs text-slate-500 dark:text-slate-400">{description}</p>
@@ -71,6 +73,7 @@ interface GeoProps {
 }
 
 export function GeoTargeting({ rules, onChange }: GeoProps) {
+  const { t } = useTranslation();
   const add = () => onChange([...rules, { country: 'US', state: '', url: '' }]);
 
   const update = (i: number, patch: Partial<GeoRule>) =>
@@ -81,9 +84,10 @@ export function GeoTargeting({ rules, onChange }: GeoProps) {
   return (
     <Section
       icon={<Globe className="h-4 w-4" />}
-      title="Geo Targeting"
-      description="Redirect visitors to a different URL based on their country or state/region."
+      title={t('links.targeting.geo.title')}
+      description={t('links.targeting.geo.description')}
       onAdd={add}
+      addLabel={t('links.targeting.ab.add')}
     >
       {rules.map((rule, i) => {
         const subdivisions = SUBDIVISIONS[rule.country] ?? [];
@@ -108,7 +112,7 @@ export function GeoTargeting({ rules, onChange }: GeoProps) {
                 disabled={subdivisions.length === 0}
                 className={sel + ' flex-1 disabled:opacity-50'}
               >
-                <option value="">All regions</option>
+                <option value="">{t('links.targeting.geo.all_regions')}</option>
                 {subdivisions.map((s) => (
                   <option key={s.code} value={s.code}>{s.name}</option>
                 ))}
@@ -139,6 +143,7 @@ interface DeviceProps {
 }
 
 export function DeviceTargeting({ rules, onChange }: DeviceProps) {
+  const { t } = useTranslation();
   const add = () => onChange([...rules, { device: 'Windows', url: '' }]);
 
   const update = (i: number, patch: Partial<DeviceRule>) =>
@@ -149,9 +154,10 @@ export function DeviceTargeting({ rules, onChange }: DeviceProps) {
   return (
     <Section
       icon={<Monitor className="h-4 w-4" />}
-      title="Device Targeting"
-      description="Redirect visitors to a different URL based on their operating system or device."
+      title={t('links.targeting.device.title')}
+      description={t('links.targeting.device.description')}
       onAdd={add}
+      addLabel={t('links.targeting.ab.add')}
     >
       {rules.map((rule, i) => (
         <div key={i} className="border-t border-slate-100 px-5 py-4 dark:border-slate-800">
@@ -189,6 +195,7 @@ interface AbProps {
 }
 
 export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
+  const { t } = useTranslation();
   const add = () => onChange([...variants, { url: '', weight: '' }]);
 
   const update = (i: number, patch: Partial<AbVariant>) =>
@@ -209,18 +216,19 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
   return (
     <Section
       icon={<FlaskConical className="h-4 w-4" />}
-      title="A/B Testing"
-      description="Rotate traffic across multiple destination URLs. The default link is always included. Geo, device, and language targeting take priority over A/B rotation."
+      title={t('links.targeting.ab.title')}
+      description={t('links.targeting.ab.description')}
       onAdd={add}
+      addLabel={t('links.targeting.ab.add')}
     >
       {/* Default URL row — non-editable */}
       <div className="border-t border-slate-100 px-5 py-3 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-            Default
+            {t('links.targeting.ab.default')}
           </span>
           <span className="flex-1 truncate text-sm text-slate-500 dark:text-slate-400">
-            {defaultUrl || <span className="italic">Enter destination URL above</span>}
+            {defaultUrl || <span className="italic">{t('links.targeting.ab.enter_url')}</span>}
           </span>
           <span className="shrink-0 rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
             {displayWeight('')}
@@ -258,7 +266,7 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
           </div>
           {variant.weight === '' && (
             <p className="mt-1 text-xs text-slate-400">
-              Auto weight: {displayWeight(variant.weight)}
+              {t('links.targeting.ab.auto_weight', { weight: displayWeight(variant.weight) })}
             </p>
           )}
         </div>
@@ -267,8 +275,17 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
       {n > 1 && (
         <div className="border-t border-slate-100 px-5 py-2.5 dark:border-slate-800">
           <p className="text-xs text-slate-400">
-            {n} variants · total explicit weight: {explicitSum.toFixed(0)}%
-            {autoCount > 0 && ` · ${autoCount} auto-weighted`}
+            {autoCount > 0
+              ? t('links.targeting.ab.summary_auto', {
+                  variants: String(n),
+                  total: explicitSum.toFixed(0),
+                  auto: String(autoCount),
+                })
+              : t('links.targeting.ab.summary', {
+                  variants: String(n),
+                  total: explicitSum.toFixed(0),
+                })
+            }
           </p>
         </div>
       )}
@@ -284,6 +301,7 @@ interface LanguageProps {
 }
 
 export function LanguageTargeting({ rules, onChange }: LanguageProps) {
+  const { t } = useTranslation();
   const add = () => onChange([...rules, { language: 'en', url: '' }]);
 
   const update = (i: number, patch: Partial<LanguageRule>) =>
@@ -294,9 +312,10 @@ export function LanguageTargeting({ rules, onChange }: LanguageProps) {
   return (
     <Section
       icon={<Type className="h-4 w-4" />}
-      title="Language Targeting"
-      description="Redirect visitors to a different URL based on their browser language."
+      title={t('links.targeting.language.title')}
+      description={t('links.targeting.language.description')}
       onAdd={add}
+      addLabel={t('links.targeting.ab.add')}
     >
       {rules.map((rule, i) => (
         <div key={i} className="border-t border-slate-100 px-5 py-4 dark:border-slate-800">

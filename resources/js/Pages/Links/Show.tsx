@@ -1,5 +1,6 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
+import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
@@ -67,6 +68,7 @@ interface Props {
 }
 
 function CopyButton({ text }: { text: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   function copy() {
     navigator.clipboard.writeText(text).then(() => {
@@ -77,7 +79,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      title={copied ? 'Copied!' : 'Copy short link'}
+      title={copied ? t('links.copy.copied') : t('links.copy.idle')}
       className={`rounded p-1.5 transition-colors ${
         copied
           ? 'text-green-500'
@@ -98,6 +100,7 @@ function BreakdownChart({
   rows: BreakdownRow[];
   labelKey: string;
 }) {
+  const { t } = useTranslation();
   const data = rows.map((r) => ({ label: String(r[labelKey] || '—'), count: r.count as number }));
   return (
     <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -105,7 +108,7 @@ function BreakdownChart({
         <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h2>
       </div>
       {data.length === 0 ? (
-        <p className="px-4 py-6 text-center text-sm text-slate-400">No data yet</p>
+        <p className="px-4 py-6 text-center text-sm text-slate-400">{t('links.show.no_data')}</p>
       ) : (
         <div className="p-3" style={{ height: Math.max(data.length * 34 + 16, 80) }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -136,6 +139,7 @@ export default function LinksShow({
   topCountries, topCities, topBrowsers, topOs, topReferrers, recentClicks,
 }: Props) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   const shortUrl = link.domain ? `https://${link.domain.name}/${link.slug}` : link.slug;
 
@@ -148,14 +152,14 @@ export default function LinksShow({
   }
 
   const summaryCards = [
-    { label: 'Clicks (all time)', value: link.clicks.toLocaleString(), icon: BarChart3, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400' },
-    { label: 'Unique (all time)', value: link.unique_clicks.toLocaleString(), icon: MousePointerClick, color: 'text-violet-600 bg-violet-50 dark:bg-violet-900/20 dark:text-violet-400' },
-    { label: `Clicks (last ${days}d)`, value: rangeClicks.toLocaleString(), icon: Calendar, color: 'text-sky-600 bg-sky-50 dark:bg-sky-900/20 dark:text-sky-400' },
-    { label: `Unique (last ${days}d)`, value: rangeUnique.toLocaleString(), icon: Calendar, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400' },
+    { label: t('links.show.cards.clicks_alltime'), value: link.clicks.toLocaleString(), icon: BarChart3, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400' },
+    { label: t('links.show.cards.unique_alltime'), value: link.unique_clicks.toLocaleString(), icon: MousePointerClick, color: 'text-violet-600 bg-violet-50 dark:bg-violet-900/20 dark:text-violet-400' },
+    { label: t('links.show.cards.clicks_range', { days: String(days) }), value: rangeClicks.toLocaleString(), icon: Calendar, color: 'text-sky-600 bg-sky-50 dark:bg-sky-900/20 dark:text-sky-400' },
+    { label: t('links.show.cards.unique_range', { days: String(days) }), value: rangeUnique.toLocaleString(), icon: Calendar, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400' },
   ];
 
   return (
-    <AppLayout title={`Link · ${link.slug}`}>
+    <AppLayout title={t('links.show.page_title', { slug: link.slug })}>
       <div className="px-8 py-8">
         {/* Header / detail card */}
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
@@ -166,9 +170,9 @@ export default function LinksShow({
                 <span className="truncate">{link.slug}</span>
                 <CopyButton text={shortUrl} />
                 {link.status === 1 ? (
-                  <span className="ml-2 inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">Active</span>
+                  <span className="ml-2 inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">{t('links.status.active')}</span>
                 ) : (
-                  <span className="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">Inactive</span>
+                  <span className="ml-2 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">{t('links.status.inactive')}</span>
                 )}
               </div>
               <a
@@ -182,9 +186,9 @@ export default function LinksShow({
               </a>
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
                 <span>{link.type_label}</span>
-                <span>Created {new Date(link.created_at).toLocaleDateString()}</span>
-                {link.expired_at && <span className="text-amber-500">Expires {new Date(link.expired_at).toLocaleDateString()}</span>}
-                {link.has_qr_code && <span className="inline-flex items-center gap-1"><QrCodeIcon className="h-3.5 w-3.5" /> QR code</span>}
+                <span>{t('links.show.created', { date: new Date(link.created_at).toLocaleDateString() })}</span>
+                {link.expired_at && <span className="text-amber-500">{t('links.expires', { date: new Date(link.expired_at).toLocaleDateString() })}</span>}
+                {link.has_qr_code && <span className="inline-flex items-center gap-1"><QrCodeIcon className="h-3.5 w-3.5" /> {t('links.show.qr_code')}</span>}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -194,7 +198,7 @@ export default function LinksShow({
                   className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   <QrCodeIcon className="h-4 w-4" />
-                  Create QR code
+                  {t('links.actions.create_qr')}
                 </Link>
               )}
               <Link
@@ -202,7 +206,7 @@ export default function LinksShow({
                 className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <Pencil className="h-4 w-4" />
-                Edit
+                {t('common.actions.edit')}
               </Link>
               <ReportDownloadButton projectId={project!.id} urlId={link.id} />
             </div>
@@ -244,7 +248,7 @@ export default function LinksShow({
         {/* Clicks over time */}
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
           <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Clicks over time <span className="font-normal text-slate-400">— last {days} days</span>
+            {t('links.show.clicks_over_time')} <span className="font-normal text-slate-400">{t('links.show.last_days', { days: String(days) })}</span>
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -268,30 +272,30 @@ export default function LinksShow({
 
         {/* Breakdowns */}
         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <BreakdownChart title="Countries" rows={topCountries} labelKey="country" />
-          <BreakdownChart title="Cities" rows={topCities} labelKey="city" />
-          <BreakdownChart title="Browsers" rows={topBrowsers} labelKey="browser" />
-          <BreakdownChart title="Operating systems" rows={topOs} labelKey="os" />
-          <BreakdownChart title="Referrers" rows={topReferrers} labelKey="domain" />
+          <BreakdownChart title={t('links.show.breakdown.countries')} rows={topCountries} labelKey="country" />
+          <BreakdownChart title={t('links.show.breakdown.cities')} rows={topCities} labelKey="city" />
+          <BreakdownChart title={t('links.show.breakdown.browsers')} rows={topBrowsers} labelKey="browser" />
+          <BreakdownChart title={t('links.show.breakdown.os')} rows={topOs} labelKey="os" />
+          <BreakdownChart title={t('links.show.breakdown.referrers')} rows={topReferrers} labelKey="domain" />
         </div>
 
         {/* Recent clicks */}
         <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
             <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Recent clicks <span className="font-normal text-slate-400">— last {days} days</span>
+              {t('links.show.recent_clicks')} <span className="font-normal text-slate-400">{t('links.show.last_days', { days: String(days) })}</span>
             </h2>
           </div>
           {recentClicks.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-slate-400">No clicks yet</p>
+            <p className="px-4 py-6 text-center text-sm text-slate-400">{t('links.show.no_clicks')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">When</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Location</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Device</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Referrer</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{t('links.show.columns.when')}</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{t('links.show.columns.location')}</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{t('links.show.columns.device')}</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">{t('links.show.columns.referrer')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">

@@ -1,3 +1,4 @@
+import { useTranslation } from '@/lib/i18n';
 import { Domain, PixelOption } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Loader2, Zap } from 'lucide-react';
@@ -73,6 +74,8 @@ export default function LinkForm({
   data, setData, errors, processing,
   submitLabel, cancelHref, domains, pixels, onSubmit, hasPassword,
 }: LinkFormProps) {
+  const { t } = useTranslation();
+
   function togglePixel(id: string) {
     const ids = data.pixel_ids.includes(id)
       ? data.pixel_ids.filter((x) => x !== id)
@@ -91,7 +94,7 @@ export default function LinkForm({
       {errorMessages.length > 0 && (
         <div className="rounded-xl border border-red-300 bg-red-50 p-4 dark:border-red-800/60 dark:bg-red-900/20">
           <p className="text-sm font-semibold text-red-700 dark:text-red-300">
-            Couldn’t save — please fix the following:
+            {t('links.form.save_error_title')}
           </p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-red-600 dark:text-red-400">
             {errorMessages.map((msg, i) => (
@@ -103,13 +106,13 @@ export default function LinkForm({
 
       {/* ── Domain + Slug ── */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">Link settings</h2>
+        <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">{t('links.form.section_settings')}</h2>
         <div className="space-y-4">
 
           <div className="flex gap-3">
             <div className="w-48 shrink-0">
               <label htmlFor="domain_id" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Domain <span className="text-red-500">*</span>
+                {t('links.form.domain')} <span className="text-red-500">*</span>
               </label>
               <select
                 id="domain_id"
@@ -117,7 +120,7 @@ export default function LinkForm({
                 onChange={(e) => setData('domain_id', e.target.value)}
                 className={inputCls}
               >
-                <option value="">Select domain</option>
+                <option value="">{t('links.form.domain_select')}</option>
                 {domains.map((d) => (
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
@@ -127,14 +130,14 @@ export default function LinkForm({
 
             <div className="flex-1">
               <label htmlFor="slug" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Slug <span className="text-red-500">*</span>
+                {t('links.form.slug')} <span className="text-red-500">*</span>
               </label>
               <input
                 id="slug"
                 type="text"
                 value={data.slug}
                 onChange={(e) => setData('slug', e.target.value)}
-                placeholder="my-link"
+                placeholder={t('links.form.slug_placeholder')}
                 className={inputCls}
               />
               {errors.slug && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.slug}</p>}
@@ -143,14 +146,14 @@ export default function LinkForm({
 
           <div>
             <label htmlFor="url" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Destination URL <span className="text-red-500">*</span>
+              {t('links.form.target')} <span className="text-red-500">*</span>
             </label>
             <input
               id="url"
               type="url"
               value={data.url}
               onChange={(e) => setData('url', e.target.value)}
-              placeholder="https://example.com/my-long-url"
+              placeholder={t('links.form.target_placeholder')}
               className={inputCls}
             />
             {errors.url && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.url}</p>}
@@ -158,28 +161,28 @@ export default function LinkForm({
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label htmlFor="status" className="block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
+              <label htmlFor="status" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{t('links.form.status')}</label>
               <select
                 id="status"
                 value={data.status}
                 onChange={(e) => setData('status', e.target.value)}
                 className={inputCls}
               >
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
+                <option value="1">{t('links.status.active')}</option>
+                <option value="0">{t('links.status.inactive')}</option>
               </select>
             </div>
 
             <div className="flex-1">
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Password
+                {t('links.form.password')}
               </label>
               <input
                 id="password"
                 type="text"
                 value={data.password}
                 onChange={(e) => setData('password', e.target.value)}
-                placeholder={hasPassword ? 'Leave blank to keep current password' : 'optional'}
+                placeholder={hasPassword ? t('links.form.password_placeholder_existing') : t('links.form.password_placeholder')}
                 className={inputCls}
               />
               {errors.password && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
@@ -187,7 +190,7 @@ export default function LinkForm({
 
             <div className="flex-1">
               <label htmlFor="expired_at" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Expires at
+                {t('links.form.expires_at')}
               </label>
               <input
                 id="expired_at"
@@ -232,10 +235,10 @@ export default function LinkForm({
         <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
           <div className="mb-4 flex items-center gap-2">
             <Zap className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tracking Pixels</h2>
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('links.pixels.section')}</h2>
           </div>
           <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-            Select pixels to fire before redirecting. The redirect will be delayed by 2 seconds to allow pixels to load.
+            {t('links.pixels.description')}
           </p>
           <div className="space-y-2">
             {pixels.map((pixel) => {
@@ -282,7 +285,7 @@ export default function LinkForm({
           href={cancelHref}
           className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
         >
-          Cancel
+          {t('common.actions.cancel')}
         </Link>
       </div>
     </form>
