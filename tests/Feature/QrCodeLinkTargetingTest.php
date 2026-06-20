@@ -130,12 +130,12 @@ class QrCodeLinkTargetingTest extends TestCase
         )->assertSessionHasNoErrors();
         $qr = QrCode::firstOrFail();
 
-        // v2: edit the QR name (creates a second version).
+        // v2: edit the QR name and change geo targeting to DE (creates a second version).
         $this->actingAs($user)->putJson(
             route('app.project.qrcodes.update', ['project' => $project->id, 'qrCode' => $qr->id]),
             $this->payload([
                 'name' => 'Renamed', 'domain_id' => $domain->id, 'slug' => 'promo',
-                'targeting_geo' => [['country' => 'US', 'state' => '', 'url' => 'https://example.com/us']],
+                'targeting_geo' => [['country' => 'DE', 'state' => '', 'url' => 'https://example.com/de']],
             ]),
             ['X-Inertia' => 'true'],
         )->assertSessionHasNoErrors();
@@ -145,8 +145,8 @@ class QrCodeLinkTargetingTest extends TestCase
             route('app.project.qrcodes.versions.restore', ['project' => $project->id, 'qrCode' => $qr->id, 'version' => 1]),
         )->assertSessionHasNoErrors();
 
-        // The link's geo targeting is still present (restore does not clear it).
+        // The link's geo targeting reflects the latest edit (DE) and is untouched by the QR version restore.
         $url = $qr->fresh()->url;
-        $this->assertSame('US', $url->targeting_geo[0]['country']);
+        $this->assertSame('DE', $url->targeting_geo[0]['country']);
     }
 }
