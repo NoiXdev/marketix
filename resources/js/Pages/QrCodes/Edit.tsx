@@ -4,7 +4,7 @@ import { QrStyle, QrType } from '@/data/qrTypes';
 import { confirmAction } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { isRiskyEdit, QrEditState } from '@/lib/qrRisk';
-import { PageProps } from '@/types';
+import { PageProps, PixelOption } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { FormEvent } from 'react';
@@ -22,9 +22,17 @@ interface QrData {
   domain_id: string | null;
   slug: string | null;
   dynamic_url: string | null;
+  status: number | null;
+  has_password: boolean;
+  expired_at: string | null;
+  targeting_geo: unknown[];
+  targeting_device: unknown[];
+  targeting_language: unknown[];
+  targeting_ab: unknown[];
+  pixel_ids: string[];
 }
 
-export default function QrCodesEdit({ qrCode, domains, versions }: { qrCode: QrData; domains: Domain[]; versions?: QrVersionEntry[] }) {
+export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrCode: QrData; domains: Domain[]; versions?: QrVersionEntry[]; pixels: PixelOption[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
@@ -34,8 +42,16 @@ export default function QrCodesEdit({ qrCode, domains, versions }: { qrCode: QrD
     is_dynamic: qrCode.is_dynamic,
     domain_id:  qrCode.domain_id ?? (domains[0]?.id ?? ''),
     slug:       qrCode.slug ?? '',
-    content:    qrCode.content,
-    style:      qrCode.style,
+    content:            qrCode.content,
+    style:              qrCode.style,
+    status:             qrCode.status != null ? String(qrCode.status) : '1',
+    password:           '',
+    expired_at:         qrCode.expired_at ?? '',
+    targeting_geo:      (qrCode.targeting_geo ?? []) as QrFormData['targeting_geo'],
+    targeting_device:   (qrCode.targeting_device ?? []) as QrFormData['targeting_device'],
+    targeting_language: (qrCode.targeting_language ?? []) as QrFormData['targeting_language'],
+    targeting_ab:       (qrCode.targeting_ab ?? []) as QrFormData['targeting_ab'],
+    pixel_ids:          qrCode.pixel_ids ?? [],
   });
 
   const original: QrEditState = {
@@ -92,6 +108,8 @@ export default function QrCodesEdit({ qrCode, domains, versions }: { qrCode: QrD
             cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
             domains={domains}
             dynamicUrl={qrCode.dynamic_url ?? undefined}
+            pixels={pixels}
+            linkHasPassword={qrCode.has_password}
             onSubmit={submit}
           />
           <QrVersionsPanel qrId={qrCode.id} versions={versions} />
