@@ -23,4 +23,12 @@ return [
             'button' => 'Restore',
         ],
     ],
+
+    'vcard' => [
+        'drop'   => 'Drop a .vcf file here, or click to upload',
+        'error'  => "Couldn't read a contact from that file",
+        'pick'   => 'This file has :count contacts — pick one',
+        'extras' => 'Extra fields kept from file (:count): :fields',
+        'clear'  => 'Clear extras',
+    ],
 ];

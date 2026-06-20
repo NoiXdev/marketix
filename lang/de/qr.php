@@ -23,4 +23,12 @@ return [
             'button' => 'Wiederherstellen',
         ],
     ],
+
+    'vcard' => [
+        'drop'   => '.vcf-Datei hierher ziehen oder zum Hochladen klicken',
+        'error'  => 'Aus dieser Datei konnte kein Kontakt gelesen werden',
+        'pick'   => 'Diese Datei enthält :count Kontakte – bitte einen auswählen',
+        'extras' => 'Aus der Datei übernommene Zusatzfelder (:count): :fields',
+        'clear'  => 'Zusatzfelder entfernen',
+    ],
 ];
