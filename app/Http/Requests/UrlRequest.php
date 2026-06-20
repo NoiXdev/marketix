@@ -25,7 +25,7 @@ class UrlRequest extends FormRequest
         $project = $this->input('project');
         $ignoreId = $this->route('url'); // null on store, the URL id on update
 
-        return [
+        return array_merge([
             'domain_id' => ['required', 'ulid', Rule::exists('domains', 'id')->where('project_id', $project->id)],
             'slug' => [
                 'required', 'string', 'max:255', 'alpha_dash',
@@ -38,8 +38,17 @@ class UrlRequest extends FormRequest
             'status' => ['required', 'integer', Rule::in(array_column(UrlStatus::cases(), 'value'))],
             'password' => ['nullable', 'string', 'max:255'],
             'expired_at' => ['nullable', 'date'],
+        ], self::targetingRules());
+    }
 
-            // Targeting
+    /**
+     * Targeting validation rules, shared with QrCodeRequest so the two cannot drift.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    public static function targetingRules(): array
+    {
+        return [
             'targeting_geo' => ['nullable', 'array'],
             'targeting_geo.*.country' => ['required_with:targeting_geo', 'string', 'size:2'],
             'targeting_geo.*.state' => ['nullable', 'string', 'max:10'],

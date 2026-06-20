@@ -10,6 +10,8 @@ use Inertia\Inertia;
 
 class UrlController extends Controller
 {
+    use \App\Http\Controllers\Concerns\InteractsWithUrlSettings;
+
     public function index(Request $request)
     {
         $project = $request->get('project');
@@ -97,7 +99,7 @@ class UrlController extends Controller
         $pixelIds = $request->input('pixel_ids', []);
 
         $url = $project->urls()->create($validated);
-        $url->pixels()->sync($pixelIds);
+        $this->syncUrlPixels($url, $pixelIds);
 
         return redirect()->route('app.project.links.index')
             ->with('success', 'Link created.');
@@ -142,13 +144,10 @@ class UrlController extends Controller
         $validated = $request->validated();
         $pixelIds = $request->input('pixel_ids', []);
 
-        // Write-only password: a blank field means "keep the current password".
-        if (blank($validated['password'] ?? null)) {
-            unset($validated['password']);
-        }
+        $validated = $this->dropBlankPassword($validated);
 
         $model->update($validated);
-        $model->pixels()->sync($pixelIds);
+        $this->syncUrlPixels($model, $pixelIds);
 
         return redirect()->route('app.project.links.index')
             ->with('success', 'Link updated.');
