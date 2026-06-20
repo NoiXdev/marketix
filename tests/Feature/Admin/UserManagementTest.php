@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -163,8 +164,8 @@ class UserManagementTest extends TestCase
 
         Notification::assertSentTo(
             $target,
-            ResetPassword::class,
-            function (ResetPassword $notification) use ($target) {
+            ResetPasswordNotification::class,
+            function (ResetPasswordNotification $notification) use ($target) {
                 // Rendering the mail builds the reset URL. Without a registered
                 // ResetPassword::createUrlUsing callback this throws
                 // RouteNotFoundException (route [password.reset] not defined),
