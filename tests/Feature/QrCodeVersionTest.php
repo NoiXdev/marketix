@@ -200,6 +200,52 @@ class QrCodeVersionTest extends TestCase
         )->assertOk()->assertJsonPath('props.versions.0.version', 1);
     }
 
+    public function test_dynamic_to_static_version_has_null_domain_and_slug(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $project->users()->attach($user->id, ['role' => 'member']);
+        $domain = Domain::create(['project_id' => $project->id, 'name' => 'links.test']);
+
+        $style = [
+            'foreground' => '#000000', 'background' => '#ffffff',
+            'dot_style' => 'square', 'corner_square_style' => 'square',
+            'corner_dot_style' => 'square', 'logo_type' => 'none',
+            'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+        ];
+
+        // v1: dynamic QR — version row must record domain_id and slug.
+        $this->actingAs($user)->postJson(
+            route('app.project.qrcodes.store', ['project' => $project->id]),
+            ['name' => 'Dyn', 'type' => 'link', 'is_dynamic' => true, 'domain_id' => $domain->id, 'slug' => 'abc123', 'content' => ['url' => 'https://example.com/a'], 'style' => $style],
+            ['X-Inertia' => 'true'],
+        )->assertSessionHasNoErrors();
+
+        $qr = QrCode::firstOrFail();
+        $this->assertDatabaseHas('qr_code_versions', [
+            'qr_code_id' => $qr->id,
+            'version' => 1,
+            'is_dynamic' => true,
+            'domain_id' => $domain->id,
+            'slug' => 'abc123',
+        ]);
+
+        // v2: switch to static — version row MUST have null domain_id and null slug.
+        $this->actingAs($user)->putJson(
+            route('app.project.qrcodes.update', ['project' => $project->id, 'qrCode' => $qr->id]),
+            ['name' => 'Dyn', 'type' => 'text', 'is_dynamic' => false, 'content' => ['text' => 'hello'], 'style' => $style],
+            ['X-Inertia' => 'true'],
+        )->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('qr_code_versions', [
+            'qr_code_id' => $qr->id,
+            'version' => 2,
+            'is_dynamic' => false,
+            'domain_id' => null,
+            'slug' => null,
+        ]);
+    }
+
     public function test_cannot_restore_another_projects_qr_version(): void
     {
         $user = User::factory()->create();
