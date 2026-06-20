@@ -303,4 +303,24 @@ class QrCodeBackingLinkTest extends TestCase
 
         $this->assertDatabaseHas('statistics', ['url_id' => $urlId, 'country' => 'Germany']);
     }
+
+    public function test_static_qr_for_a_redirect_type_creates_no_backing_url(): void
+    {
+        [$user, $project] = $this->tenant();
+
+        foreach ([
+            ['type' => 'email', 'content' => ['email' => 'hi@example.com']],
+            ['type' => 'whatsapp', 'content' => ['phone' => '+4912345', 'message' => 'hi']],
+        ] as $case) {
+            $this->actingAs($user)->postJson(
+                route('app.project.qrcodes.store', ['project' => $project->id]),
+                $this->payload(['name' => 'Static '.$case['type'], 'is_dynamic' => false] + $case),
+                ['X-Inertia' => 'true'],
+            )->assertSessionHasNoErrors();
+        }
+
+        $this->assertDatabaseCount('urls', 0);
+        $this->assertDatabaseHas('qr_codes', ['name' => 'Static email', 'is_dynamic' => false, 'url_id' => null]);
+        $this->assertDatabaseHas('qr_codes', ['name' => 'Static whatsapp', 'is_dynamic' => false, 'url_id' => null]);
+    }
 }
