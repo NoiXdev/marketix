@@ -23,4 +23,12 @@ return [
             'button' => 'Herstellen',
         ],
     ],
+
+    'vcard' => [
+        'drop'   => 'Sleep een .vcf-bestand hierheen of klik om te uploaden',
+        'error'  => 'Kon geen contact uit dit bestand lezen',
+        'pick'   => 'Dit bestand bevat :count contacten — kies er één',
+        'extras' => 'Extra velden uit bestand bewaard (:count): :fields',
+        'clear'  => 'Extra velden wissen',
+    ],
 ];

@@ -23,4 +23,12 @@ return [
             'button' => 'Restaurer',
         ],
     ],
+
+    'vcard' => [
+        'drop'   => "Déposez un fichier .vcf ici, ou cliquez pour l'importer",
+        'error'  => 'Impossible de lire un contact dans ce fichier',
+        'pick'   => 'Ce fichier contient :count contacts — choisissez-en un',
+        'extras' => 'Champs supplémentaires conservés du fichier (:count) : :fields',
+        'clear'  => 'Effacer les extras',
+    ],
 ];
