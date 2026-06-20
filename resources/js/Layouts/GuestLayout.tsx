@@ -1,4 +1,5 @@
 import Brand from '@/Components/Brand';
+import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import { PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
@@ -47,6 +48,10 @@ export default function GuestLayout({ children, title, description }: PropsWithC
           )}
 
           {children}
+
+          <div className="mt-6 flex justify-center">
+            <LocaleSwitcher />
+          </div>
 
           <p className="mt-8 text-center text-xs text-slate-400 lg:hidden dark:text-slate-600">v{version}</p>
         </div>
