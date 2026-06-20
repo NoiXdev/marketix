@@ -16,6 +16,7 @@ use Inertia\Inertia;
 
 class QrCodeController extends Controller
 {
+    use \App\Http\Controllers\Concerns\InteractsWithUrlSettings;
     // ── Default style applied to new QR codes ─────────────────────────────
     private array $defaultStyle = [
         'foreground' => '#000000',
@@ -83,23 +84,28 @@ class QrCodeController extends Controller
     {
         $project = $request->get('project');
         $data = $request->validated();
+        $pixelIds = $request->input('pixel_ids', []);
 
-        DB::transaction(function () use ($project, $data) {
+        DB::transaction(function () use ($project, $data, $pixelIds) {
             $urlId = null;
 
             if ($data['is_dynamic']) {
                 if (! empty($data['url_id'])) {
-                    // Attach mode: reuse the existing link as-is. Do not create
-                    // a new Url and do not modify the existing one.
-                    $urlId = $data['url_id'];
+                    // Attach mode (editable): apply settings to the shared link.
+                    $url = $project->urls()->findOrFail($data['url_id']);
+                    $url->update($this->linkSettingAttributes($data));
+                    $this->syncUrlPixels($url, $pixelIds);
+                    $urlId = $url->id;
                 } else {
-                    $urlId = $project->urls()->create([
+                    $url = $project->urls()->create(array_merge([
                         'domain_id' => $data['domain_id'],
                         'slug' => $data['slug'],
                         'url' => $this->backingTarget($project, $data),
                         'type' => RedirectType::REDIRECT,
                         'status' => UrlStatus::ACTIVATED,
-                    ])->id;
+                    ], $this->linkSettingAttributes($data)));
+                    $this->syncUrlPixels($url, $pixelIds);
+                    $urlId = $url->id;
                 }
             }
 
@@ -157,9 +163,22 @@ class QrCodeController extends Controller
         $project = $request->get('project');
         $model = $project->qrCodes()->findOrFail($qrCode);
         $data = $request->validated();
+        $pixelIds = $request->input('pixel_ids', []);
 
-        DB::transaction(function () use ($project, $model, $data) {
+        DB::transaction(function () use ($project, $model, $data, $pixelIds) {
             $this->persist($project, $model, $data);
+
+            // Layer the user's link settings onto the backing Url. persist()
+            // has already created/updated it and set url_id; restore() does
+            // NOT call this path, so versioned restores never touch settings.
+            if ($model->is_dynamic && $model->url_id) {
+                $url = $project->urls()->find($model->url_id);
+                if ($url) {
+                    $url->update($this->linkSettingAttributes($data));
+                    $this->syncUrlPixels($url, $pixelIds);
+                }
+            }
+
             $this->recordVersion($model);
         });
 
