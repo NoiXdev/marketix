@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UrlStatus;
+use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\UrlRequest;
 use App\Models\Statistic;
 use App\Services\StatisticsAggregator;
@@ -12,7 +13,7 @@ use Inertia\Inertia;
 
 class UrlController extends Controller
 {
-    use \App\Http\Controllers\Concerns\InteractsWithUrlSettings;
+    use InteractsWithUrlSettings;
 
     public function index(Request $request)
     {
