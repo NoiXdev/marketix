@@ -34,6 +34,13 @@ return [
         'confirm' => 'Supprimer « :slug » ? Cette action est irréversible.',
     ],
 
+    'reset_stats' => [
+        'button'   => 'Réinitialiser les statistiques',
+        'title'    => 'Réinitialiser les statistiques ?',
+        'confirm'  => 'Cela supprime définitivement toutes les statistiques de clics pour « :slug » et est irréversible. Saisissez le slug du lien pour confirmer.',
+        'mismatch' => 'Veuillez saisir « :slug » pour confirmer.',
+    ],
+
     'actions' => [
         'view_stats' => 'Voir les statistiques',
         'activate'   => 'Activer',

@@ -34,6 +34,13 @@ return [
         'confirm' => '":slug" verwijderen? Dit kan niet ongedaan worden gemaakt.',
     ],
 
+    'reset_stats' => [
+        'button'   => 'Statistieken resetten',
+        'title'    => 'Statistieken resetten?',
+        'confirm'  => 'Hiermee worden alle klikstatistieken voor ":slug" permanent verwijderd en dit kan niet ongedaan worden gemaakt. Typ de link-slug om te bevestigen.',
+        'mismatch' => 'Typ ":slug" om te bevestigen.',
+    ],
+
     'actions' => [
         'view_stats' => 'Statistieken bekijken',
         'activate'   => 'Activeren',
