@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Providers\BrandingServiceProvider;
 use App\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,7 +18,7 @@ class BrandingHeadTest extends TestCase
         $settings->save();
 
         // Re-apply now that the value is saved (provider runs at boot, before save).
-        (new \App\Providers\BrandingServiceProvider($this->app))->bootForTesting();
+        (new BrandingServiceProvider($this->app))->bootForTesting();
 
         $this->assertSame('Acme Links', config('app.name'));
 

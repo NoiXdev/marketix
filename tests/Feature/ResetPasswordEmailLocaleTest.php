@@ -21,6 +21,7 @@ class ResetPasswordEmailLocaleTest extends TestCase
 
         Notification::assertSentTo($user, ResetPasswordNotification::class, function ($notification, $channels, $notifiable) {
             $mail = $notification->toMail($notifiable);
+
             // Subject reflects the German catalog.
             return $mail->subject === 'Passwort zurücksetzen';
         });

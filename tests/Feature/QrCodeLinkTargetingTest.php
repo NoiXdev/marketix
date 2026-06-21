@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Enums\RedirectType;
+use App\Enums\UrlStatus;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\QrCode;
@@ -126,8 +128,8 @@ class QrCodeLinkTargetingTest extends TestCase
             'domain_id' => $domain->id,
             'slug' => 'shared',
             'url' => 'https://example.com/shared',
-            'type' => \App\Enums\RedirectType::REDIRECT,
-            'status' => \App\Enums\UrlStatus::ACTIVATED,
+            'type' => RedirectType::REDIRECT,
+            'status' => UrlStatus::ACTIVATED,
         ]);
 
         $this->actingAs($user)->postJson(

@@ -69,7 +69,7 @@ class QrCodeRequest extends FormRequest
             $rules['status'] = ['nullable', 'integer', Rule::in(array_column(UrlStatus::cases(), 'value'))];
             $rules['password'] = ['nullable', 'string', 'max:255'];
             $rules['expired_at'] = ['nullable', 'date'];
-            $rules = array_merge($rules, \App\Http\Requests\UrlRequest::targetingRules());
+            $rules = array_merge($rules, UrlRequest::targetingRules());
         }
 
         return $rules;

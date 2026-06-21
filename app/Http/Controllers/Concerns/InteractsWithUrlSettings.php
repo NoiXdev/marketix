@@ -17,13 +17,13 @@ trait InteractsWithUrlSettings
     protected function linkSettingAttributes(array $data): array
     {
         return $this->dropBlankPassword([
-            'status'             => $data['status'] ?? UrlStatus::ACTIVATED->value,
-            'password'           => $data['password'] ?? null,
-            'expired_at'         => $data['expired_at'] ?? null,
-            'targeting_geo'      => $data['targeting_geo'] ?? null,
-            'targeting_device'   => $data['targeting_device'] ?? null,
+            'status' => $data['status'] ?? UrlStatus::ACTIVATED->value,
+            'password' => $data['password'] ?? null,
+            'expired_at' => $data['expired_at'] ?? null,
+            'targeting_geo' => $data['targeting_geo'] ?? null,
+            'targeting_device' => $data['targeting_device'] ?? null,
             'targeting_language' => $data['targeting_language'] ?? null,
-            'targeting_ab'       => $data['targeting_ab'] ?? null,
+            'targeting_ab' => $data['targeting_ab'] ?? null,
         ]);
     }
 
