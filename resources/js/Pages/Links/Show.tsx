@@ -1,5 +1,6 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -12,6 +13,7 @@ import {
   MousePointerClick,
   Pencil,
   QrCode as QrCodeIcon,
+  RotateCcw,
 } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -151,6 +153,18 @@ export default function LinksShow({
     );
   }
 
+  async function resetStats() {
+    const ok = await confirmTyped({
+      title: t('links.reset_stats.title'),
+      text: t('links.reset_stats.confirm', { slug: link.slug }),
+      match: link.slug,
+      confirmText: t('links.reset_stats.button'),
+      mismatchText: t('links.reset_stats.mismatch', { slug: link.slug }),
+    });
+    if (!ok) return;
+    router.delete(route('app.project.links.stats.reset', { project: project!.id, url: link.id }));
+  }
+
   const summaryCards = [
     { label: t('links.show.cards.clicks_alltime'), value: link.clicks.toLocaleString(), icon: BarChart3, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400' },
     { label: t('links.show.cards.unique_alltime'), value: link.unique_clicks.toLocaleString(), icon: MousePointerClick, color: 'text-violet-600 bg-violet-50 dark:bg-violet-900/20 dark:text-violet-400' },
@@ -209,6 +223,13 @@ export default function LinksShow({
                 {t('common.actions.edit')}
               </Link>
               <ReportDownloadButton projectId={project!.id} urlId={link.id} />
+              <button
+                onClick={resetStats}
+                className="inline-flex items-center gap-2 rounded-md border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-900/20"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t('links.reset_stats.button')}
+              </button>
             </div>
           </div>
         </div>

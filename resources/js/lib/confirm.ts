@@ -83,3 +83,59 @@ export async function confirmAction(opts: ConfirmActionOptions = {}): Promise<bo
 
     return result.isConfirmed;
 }
+
+type ConfirmTypedOptions = {
+    /** Dialog heading. */
+    title?: string;
+    /** Body text — names the entity and notes irreversibility. */
+    text?: string;
+    /** The exact string the user must type to enable confirmation. */
+    match: string;
+    /** Label for the confirm button. Defaults to 'Confirm'. */
+    confirmText?: string;
+    /** Validation message shown when the typed value does not match. */
+    mismatchText?: string;
+};
+
+/**
+ * Themed destructive confirmation that requires the user to type an exact
+ * string (e.g. the entity's slug) before confirming. Resolves to `true` only
+ * when confirmed with a matching value.
+ */
+export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> {
+    const isDark = resolveIsDark(getStoredTheme());
+
+    const result = await Swal.fire({
+        title: opts.title ?? 'Are you sure?',
+        text: opts.text,
+        icon: 'warning',
+        iconColor: '#ef4444',
+        input: 'text',
+        inputPlaceholder: opts.match,
+        inputAttributes: { autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off' },
+        showCancelButton: true,
+        confirmButtonText: opts.confirmText ?? 'Confirm',
+        cancelButtonText: 'Cancel',
+        focusCancel: false,
+        reverseButtons: true,
+        buttonsStyling: false,
+        background: isDark ? '#1e293b' : '#ffffff',
+        color: isDark ? '#e2e8f0' : '#0f172a',
+        preConfirm: (value: string) => {
+            if (value !== opts.match) {
+                Swal.showValidationMessage(opts.mismatchText ?? `Please type "${opts.match}" to confirm.`);
+                return false;
+            }
+            return true;
+        },
+        customClass: {
+            popup: 'rounded-xl',
+            confirmButton:
+                'inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
+            cancelButton:
+                'mr-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
+        },
+    });
+
+    return result.isConfirmed;
+}
