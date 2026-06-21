@@ -104,6 +104,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::put('/links/{url}', [UrlController::class, 'update'])->name('app.project.links.update');
             Route::patch('/links/{url}/toggle-status', [UrlController::class, 'toggleStatus'])->name('app.project.links.toggle-status');
             Route::delete('/links/{url}', [UrlController::class, 'destroy'])->name('app.project.links.destroy');
+            Route::delete('/links/{url}/stats', [UrlController::class, 'resetStats'])->name('app.project.links.stats.reset');
 
             // Domains
             Route::get('/domains', [DomainController::class, 'index'])->name('app.project.domains.index');
