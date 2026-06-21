@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\UrlStatus;
 use App\Http\Requests\UrlRequest;
+use App\Models\Statistic;
 use App\Services\StatisticsAggregator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UrlController extends Controller
@@ -173,5 +175,24 @@ class UrlController extends Controller
 
         return redirect()->route('app.project.links.index')
             ->with('success', 'Link deleted.');
+    }
+
+    public function resetStats(Request $request, string $url)
+    {
+        $project = $request->get('project');
+        $model = $project->urls()->findOrFail($url);
+
+        DB::transaction(function () use ($model, $request) {
+            Statistic::where('url_id', $model->id)->forceDelete();
+            $model->update(['clicks' => 0, 'unique_clicks' => 0]);
+
+            activity('url')
+                ->performedOn($model)
+                ->causedBy($request->user())
+                ->event('stats_reset')
+                ->log('Stats reset');
+        });
+
+        return back()->with('success', 'Statistics reset.');
     }
 }
