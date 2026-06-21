@@ -38,6 +38,11 @@ RUN apt-get update \
         git \
         unzip \
         curl \
+    # linux-libc-dev (kernel headers) is pulled in as a build-time dependency
+    # but is not needed at runtime. Purge it so the image isn't flagged for
+    # kernel CVEs that don't apply to a PHP container (Trivy scan gate).
+    && (apt-get purge -y linux-libc-dev || true) \
+    && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
