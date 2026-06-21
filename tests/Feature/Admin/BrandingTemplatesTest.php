@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Mail\TestMail;
 use App\Reports\ReportData;
 use App\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,7 +27,8 @@ class BrandingTemplatesTest extends TestCase
         $this->setBrand('Acme Links');
 
         // Render via a real Mailable so the mail:: component namespace is registered.
-        $mailable = new class ('Demo', 'https://example.com/invitations/abc') extends Mailable {
+        $mailable = new class('Demo', 'https://example.com/invitations/abc') extends Mailable
+        {
             public function __construct(
                 private string $projectName,
                 private string $acceptUrl,

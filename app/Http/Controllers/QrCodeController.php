@@ -4,19 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
+use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\QrCodeRequest;
 use App\Models\Project;
 use App\Models\QrCode;
 use App\Models\Url;
 use App\Support\QrTarget;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class QrCodeController extends Controller
 {
-    use \App\Http\Controllers\Concerns\InteractsWithUrlSettings;
+    use InteractsWithUrlSettings;
+
     // ── Default style applied to new QR codes ─────────────────────────────
     private array $defaultStyle = [
         'foreground' => '#000000',
@@ -333,7 +335,7 @@ class QrCodeController extends Controller
             // domain_id/slug only exist when there is a (non-deleted) backing link.
             // When url_id is null (static QR), both must be null regardless of cache.
             'domain_id' => $model->url_id ? $model->url?->domain_id : null,
-            'slug'      => $model->url_id ? $model->url?->slug : null,
+            'slug' => $model->url_id ? $model->url?->slug : null,
             'created_by' => Auth::id(),
         ]);
     }

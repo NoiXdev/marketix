@@ -29,10 +29,10 @@ class QrCodeVCardTest extends TestCase
 
         $out = $qr->vCardString();
 
-        $this->assertStringContainsString("FN:Jane Doe", $out);
-        $this->assertStringContainsString("TITLE:CTO", $out);
-        $this->assertStringContainsString("TEL;TYPE=HOME:+49 30 2", $out);
-        $this->assertStringEndsWith("END:VCARD", $out);
+        $this->assertStringContainsString('FN:Jane Doe', $out);
+        $this->assertStringContainsString('TITLE:CTO', $out);
+        $this->assertStringContainsString('TEL;TYPE=HOME:+49 30 2', $out);
+        $this->assertStringEndsWith('END:VCARD', $out);
         // extras come after the mapped fields
         $this->assertGreaterThan(strpos($out, 'FN:'), strpos($out, 'TITLE:CTO'));
     }
@@ -56,7 +56,7 @@ class QrCodeVCardTest extends TestCase
             route('app.project.qrcodes.store', ['project' => $project->id]),
             [
                 'name' => 'Card', 'type' => 'vcard', 'is_dynamic' => false,
-                'content' => ['name' => 'Jane', 'extra' => "TITLE:CTO"],
+                'content' => ['name' => 'Jane', 'extra' => 'TITLE:CTO'],
                 'style' => $this->style,
             ],
             ['X-Inertia' => 'true'],
