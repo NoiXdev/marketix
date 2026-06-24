@@ -30,7 +30,7 @@ export default function ProjectSwitcher() {
           {/* Backdrop */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           {/* Dropdown */}
-          <div className="absolute bottom-full left-0 z-20 mb-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+          <div className="absolute top-full left-0 z-20 mb-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
             <p className="px-3 py-1.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">Projects</p>
             {projects.map((p) => (
               <button
