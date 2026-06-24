@@ -1,8 +1,7 @@
+import SidebarBottom from '@/Components/SidebarBottom';
 import { Link, usePage } from '@inertiajs/react';
 import { Activity, ArrowLeft, FolderKanban, HardDrive, Mail, Palette, ScrollText, Users } from 'lucide-react';
 import Brand from './Brand';
-import UserMenu from './UserMenu';
-import { PageProps } from '@/types';
 
 const navItems = [
   { label: 'Users', icon: Users, routeName: 'app.admin.users.index' },
@@ -15,13 +14,21 @@ const navItems = [
 
 export default function AdminSidebar() {
   const { url } = usePage();
-  const { projects, version } = usePage<PageProps>().props;
-  const backProject = projects?.[0];
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <div className="flex h-14 items-center border-b border-slate-200 px-4 dark:border-slate-800">
         <Brand suffix="Admin" />
+      </div>
+
+      <div className="mt-1 border-b border-slate-200 px-2 dark:border-slate-800">
+        <Link
+          href={route('app.projects.choose')}
+          className="mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4 shrink-0" />
+          Back to app
+        </Link>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -64,17 +71,7 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="border-t border-slate-200 p-3 dark:border-slate-800">
-        {backProject && (
-          <Link
-            href={route('app.project.dashboard', { project: backProject.id })}
-            className="mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4 shrink-0" />
-            Back to app
-          </Link>
-        )}
-        <UserMenu />
-        <p className="mt-2 px-3 text-center text-xs text-slate-400 dark:text-slate-600">v{version}</p>
+        <SidebarBottom />
       </div>
     </aside>
   );
