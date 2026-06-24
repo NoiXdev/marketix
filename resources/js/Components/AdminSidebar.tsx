@@ -71,7 +71,7 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="border-t border-slate-200 p-3 dark:border-slate-800">
-        <SidebarBottom />
+        <SidebarBottom docsUrl="https://docs.noix.dev/marketix/admin/introduction/" />
       </div>
     </aside>
   );

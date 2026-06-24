@@ -1,8 +1,8 @@
 import ThemeToggle from '@/Components/ThemeToggle';
 import { Link, usePage } from '@inertiajs/react';
-import { LucideLogOut, Shield } from 'lucide-react';
+import { BookOpen, LucideLogOut, Shield } from 'lucide-react';
 
-export default function SidebarBottom() {
+export default function SidebarBottom({ docsUrl }: { docsUrl: string }) {
   const { auth, version } = usePage().props;
 
   function initials(name: string): string {
@@ -34,6 +34,16 @@ export default function SidebarBottom() {
 
       <div className="flex justify-between px-3">
         <ThemeToggle />
+        <a
+          className="cursor-pointer rounded-lg border p-1 dark:bg-indigo-900 dark:hover:bg-indigo-700"
+          href={docsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Documentation"
+          title="Documentation"
+        >
+          <BookOpen className="h-5 w-5 dark:text-slate-400" />
+        </a>
         {auth.user.super_admin && (
           <Link className="cursor-pointer rounded-lg border p-1 dark:bg-indigo-900 dark:hover:bg-indigo-700" href={route('app.admin.users.index')}>
             <Shield className="h-5 w-5 dark:text-slate-400" />

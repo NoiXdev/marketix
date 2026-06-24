@@ -65,7 +65,7 @@ export default function Sidebar() {
         <div className="mt-1">
           <LocaleSwitcher />
         </div>
-        <SidebarBottom />
+        <SidebarBottom docsUrl="https://docs.noix.dev/marketix/user/getting-started/" />
       </div>
     </aside>
   );
