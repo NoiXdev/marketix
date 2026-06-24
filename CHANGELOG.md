@@ -1,4 +1,12 @@
-## [1.2.0](https://github.com/NoiXdev/marketix/compare/v1.1.1...v) (2026-06-21)
+## [1.3.0](https://github.com/NoiXdev/marketix/compare/v1.2.0...v) (2026-06-24)
+
+
+### Features
+
+* add documentation link to sidebar ([fe289fe](https://github.com/NoiXdev/marketix/commit/fe289fedc8cc18899307a12ae611b6156d8c6739))
+* addjust sidebar bottom ([14604dc](https://github.com/NoiXdev/marketix/commit/14604dcc5dbd638bce602c0e267cf08c7d9f4e4b))
+
+## [1.2.0](https://github.com/NoiXdev/marketix/compare/v1.1.1...v1.2.0) (2026-06-21)
 
 
 ### Features
