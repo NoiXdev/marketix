@@ -44,7 +44,7 @@ class RecordClickStatisticJobTest extends TestCase
             'UA/1.0',
             null,
             'en',
-            ['country' => 'Germany', 'city' => 'Berlin'],
+            ['country' => 'Germany', 'city' => 'Berlin', 'country_code' => 'DE'],
         ))->handle();
     }
 
@@ -99,6 +99,46 @@ class RecordClickStatisticJobTest extends TestCase
         $this->assertDatabaseHas('statistics', [
             'url_id' => $url->id,
             'country_code' => 'DE',
+        ]);
+    }
+
+    public function test_persists_country_code_from_geo(): void
+    {
+        $url = $this->makeUrl();
+
+        (new RecordClickStatisticJob(
+            $url->id,
+            $url->project_id,
+            'hash-geo',
+            'UA/1.0',
+            null,
+            'en',
+            ['country' => 'Germany', 'city' => 'Berlin', 'country_code' => 'DE'],
+        ))->handle();
+
+        $this->assertDatabaseHas('statistics', [
+            'url_id' => $url->id,
+            'country_code' => 'DE',
+        ]);
+    }
+
+    public function test_country_code_null_when_absent_from_geo(): void
+    {
+        $url = $this->makeUrl();
+
+        (new RecordClickStatisticJob(
+            $url->id,
+            $url->project_id,
+            'hash-nogeo',
+            'UA/1.0',
+            null,
+            'en',
+            ['country' => null, 'city' => null],
+        ))->handle();
+
+        $this->assertDatabaseHas('statistics', [
+            'url_id' => $url->id,
+            'country_code' => null,
         ]);
     }
 }
