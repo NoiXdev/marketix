@@ -38,6 +38,7 @@ class StatisticsController extends Controller
             'clicksByDay' => $stats->clicksByDay($project->id, null, $days),
             'topLinks' => $topLinks,
             'topCountries' => $stats->breakdown($project->id, null, 'country'),
+            'clicksByCountry' => $stats->breakdownByCountryCode($project->id, null),
             'topBrowsers' => $stats->breakdown($project->id, null, 'browser'),
             'topOs' => $stats->breakdown($project->id, null, 'os'),
             'topReferrers' => $stats->breakdown($project->id, null, 'domain'),

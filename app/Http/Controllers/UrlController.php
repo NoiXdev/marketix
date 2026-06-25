@@ -77,6 +77,7 @@ class UrlController extends Controller
             'rangeUnique' => $stats->uniqueClicks($project->id, $model->id, $since),
             'clicksByDay' => $stats->clicksByDay($project->id, $model->id, $days),
             'topCountries' => $stats->breakdown($project->id, $model->id, 'country', $since),
+            'clicksByCountry' => $stats->breakdownByCountryCode($project->id, $model->id, $since),
             'topCities' => $stats->breakdown($project->id, $model->id, 'city', $since),
             'topBrowsers' => $stats->breakdown($project->id, $model->id, 'browser', $since),
             'topOs' => $stats->breakdown($project->id, $model->id, 'os', $since),
