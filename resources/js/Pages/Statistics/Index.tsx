@@ -1,4 +1,5 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
+import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import AppLayout from '@/Layouts/AppLayout';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -16,6 +17,7 @@ interface Props {
   clicksByDay: DayClicks[];
   topLinks: TopLink[];
   topCountries: (BreakdownRow & { country: string })[];
+  clicksByCountry: CountryDatum[];
   topBrowsers: (BreakdownRow & { browser: string })[];
   topOs: (BreakdownRow & { os: string })[];
   topReferrers: (BreakdownRow & { domain: string })[];
@@ -84,6 +86,7 @@ function BreakdownTable({ title, rows, labelKey }: { title: string; rows: Breakd
 export default function StatisticsIndex({
   days, totalClicks, uniqueClicks, clicksByDay,
   topLinks, topCountries, topBrowsers, topOs, topReferrers,
+  clicksByCountry,
 }: Props) {
   const { project } = usePage<PageProps>().props;
 
@@ -191,6 +194,11 @@ export default function StatisticsIndex({
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* Clicks by country map */}
+        <div className="mb-6">
+          <WorldMap data={clicksByCountry} />
         </div>
 
         {/* Breakdown grids */}

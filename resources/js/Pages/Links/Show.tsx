@@ -1,4 +1,5 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
+import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
@@ -62,6 +63,7 @@ interface Props {
   rangeUnique: number;
   clicksByDay: DayClicks[];
   topCountries: (BreakdownRow & { country: string })[];
+  clicksByCountry: CountryDatum[];
   topCities: (BreakdownRow & { city: string })[];
   topBrowsers: (BreakdownRow & { browser: string })[];
   topOs: (BreakdownRow & { os: string })[];
@@ -139,6 +141,7 @@ function BreakdownChart({
 export default function LinksShow({
   link, days, rangeClicks, rangeUnique, clicksByDay,
   topCountries, topCities, topBrowsers, topOs, topReferrers, recentClicks,
+  clicksByCountry,
 }: Props) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
@@ -289,6 +292,11 @@ export default function LinksShow({
               </AreaChart>
             </ResponsiveContainer>
           </div>
+        </div>
+
+        {/* Clicks by country map */}
+        <div className="mb-6">
+          <WorldMap data={clicksByCountry} />
         </div>
 
         {/* Breakdowns */}
