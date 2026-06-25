@@ -26,7 +26,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Daily total and unique (distinct-IP) clicks over the trailing window,
+     * Daily total and unique (distinct-visitor_hash) clicks over the trailing window,
      * with zero-clicks days filled in so the chart has a continuous x-axis.
      *
      * @return list<array{date: string, clicks: int, unique: int}>
@@ -40,7 +40,7 @@ class DashboardController extends Controller
             ->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as clicks'),
-                DB::raw('COUNT(DISTINCT ip) as unique_clicks'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as unique_clicks'),
             )
             ->groupBy('date')
             ->get()

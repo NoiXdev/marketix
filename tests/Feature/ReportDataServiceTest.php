@@ -62,8 +62,8 @@ class ReportDataServiceTest extends TestCase
         $project = Project::factory()->create(['name' => 'Acme']);
         $url = $this->createUrl($project, 'go');
 
-        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'ip' => '1.1.1.1', 'country' => 'Germany', 'browser' => 'Chrome']);
-        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'ip' => '2.2.2.2', 'country' => 'Germany', 'browser' => 'Firefox']);
+        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '1.1.1.1'), 'country' => 'Germany', 'browser' => 'Chrome']);
+        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '2.2.2.2'), 'country' => 'Germany', 'browser' => 'Firefox']);
 
         $data = app(ReportDataService::class)->forProject($project, ReportDateRange::preset(30));
 
@@ -104,8 +104,8 @@ class ReportDataServiceTest extends TestCase
             'targeting_ab' => [],
         ]);
 
-        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'ip' => '1.1.1.1']);
-        Statistic::factory()->forUrl($other)->create(['created_at' => now(), 'ip' => '3.3.3.3']);
+        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '1.1.1.1')]);
+        Statistic::factory()->forUrl($other)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '3.3.3.3')]);
 
         $data = app(ReportDataService::class)->forUrl($url, ReportDateRange::preset(7));
 

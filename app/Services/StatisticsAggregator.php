@@ -22,7 +22,7 @@ class StatisticsAggregator
     }
 
     /**
-     * Daily total and unique (distinct-IP) clicks over the trailing window,
+     * Daily total and unique (distinct-visitor_hash) clicks over the trailing window,
      * zero-filled so the chart has a continuous x-axis.
      *
      * @return list<array{date: string, clicks: int, unique: int}>
@@ -37,7 +37,7 @@ class StatisticsAggregator
             ->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as clicks'),
-                DB::raw('COUNT(DISTINCT ip) as unique_clicks'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as unique_clicks'),
             )
             ->groupBy('date')
             ->get()
@@ -74,7 +74,7 @@ class StatisticsAggregator
             ->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as clicks'),
-                DB::raw('COUNT(DISTINCT ip) as unique_clicks'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as unique_clicks'),
             )
             ->groupBy('date')
             ->get()

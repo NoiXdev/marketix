@@ -17,11 +17,11 @@ class StatisticsAggregatorRangeTest extends TestCase
     {
         $project = Project::factory()->create();
 
-        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-02 10:00:00', 'ip' => '1.1.1.1']);
-        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-02 11:00:00', 'ip' => '1.1.1.1']);
-        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-03 10:00:00', 'ip' => '2.2.2.2']);
+        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-02 10:00:00', 'visitor_hash' => hash('sha256', '1.1.1.1')]);
+        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-02 11:00:00', 'visitor_hash' => hash('sha256', '1.1.1.1')]);
+        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-03 10:00:00', 'visitor_hash' => hash('sha256', '2.2.2.2')]);
         // Outside the range — must be excluded.
-        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-10 10:00:00', 'ip' => '9.9.9.9']);
+        Statistic::factory()->forProject($project)->create(['created_at' => '2026-04-10 10:00:00', 'visitor_hash' => hash('sha256', '9.9.9.9')]);
 
         $stats = new StatisticsAggregator;
         $rows = $stats->clicksByDayBetween(

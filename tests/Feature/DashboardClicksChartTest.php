@@ -48,7 +48,7 @@ class DashboardClicksChartTest extends TestCase
     private function seedClick(Url $url, string $ip, \DateTimeInterface $at): void
     {
         Statistic::factory()->forUrl($url)->create([
-            'ip' => $ip,
+            'visitor_hash' => hash('sha256', $ip),
             'created_at' => $at,
             'updated_at' => $at,
         ]);
