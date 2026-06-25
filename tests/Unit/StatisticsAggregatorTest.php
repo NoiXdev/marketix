@@ -56,9 +56,9 @@ class StatisticsAggregatorTest extends TestCase
     {
         $url = $this->makeUrl();
 
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1', 'created_at' => now()]);
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1', 'created_at' => now()]);
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.2', 'created_at' => now()]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'created_at' => now()]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'created_at' => now()]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.2'), 'created_at' => now()]);
 
         $aggregator = new StatisticsAggregator;
         $byDay = $aggregator->clicksByDay($url->project_id, $url->id, 7);
@@ -111,14 +111,14 @@ class StatisticsAggregatorTest extends TestCase
         $url = $this->makeUrlInProject($project, $user, 'a');
         $other = $this->makeUrlInProject($project, $user, 'b');
 
-        // url: 3 clicks today from 2 distinct IPs.
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1', 'created_at' => now()]);
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1', 'created_at' => now()]);
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.2', 'created_at' => now()]);
+        // url: 3 clicks today from 2 distinct visitor_hashes.
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'created_at' => now()]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'created_at' => now()]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.2'), 'created_at' => now()]);
         // url: 1 old click (40 days ago, outside a 7-day window).
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.9', 'created_at' => now()->subDays(40)]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.9'), 'created_at' => now()->subDays(40)]);
         // other url in same project: must NOT leak into url-scoped totals.
-        Statistic::factory()->forUrl($other)->create(['ip' => '10.0.0.3', 'created_at' => now()]);
+        Statistic::factory()->forUrl($other)->create(['visitor_hash' => hash('sha256', '10.0.0.3'), 'created_at' => now()]);
 
         $agg = new StatisticsAggregator;
 

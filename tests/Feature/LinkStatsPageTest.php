@@ -53,8 +53,8 @@ class LinkStatsPageTest extends TestCase
     {
         [$user, $project, $url] = $this->makeProjectWithUrl();
 
-        Statistic::factory()->forUrl($url)->country('Germany')->create(['ip' => '10.0.0.1', 'browser' => 'Chrome']);
-        Statistic::factory()->forUrl($url)->country('Germany')->create(['ip' => '10.0.0.2', 'browser' => 'Chrome']);
+        Statistic::factory()->forUrl($url)->country('Germany')->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'browser' => 'Chrome']);
+        Statistic::factory()->forUrl($url)->country('Germany')->create(['visitor_hash' => hash('sha256', '10.0.0.2'), 'browser' => 'Chrome']);
 
         $this->actingAs($user)
             ->get(route('app.project.links.show', ['project' => $project->id, 'url' => $url->id]).'?days=7')
@@ -91,9 +91,9 @@ class LinkStatsPageTest extends TestCase
             'archived' => false,
         ]);
 
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1']);
-        Statistic::factory()->forUrl($other)->create(['ip' => '10.0.0.2']);
-        Statistic::factory()->forUrl($other)->create(['ip' => '10.0.0.3']);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1')]);
+        Statistic::factory()->forUrl($other)->create(['visitor_hash' => hash('sha256', '10.0.0.2')]);
+        Statistic::factory()->forUrl($other)->create(['visitor_hash' => hash('sha256', '10.0.0.3')]);
 
         $this->actingAs($user)
             ->get(route('app.project.links.show', ['project' => $project->id, 'url' => $url->id]))

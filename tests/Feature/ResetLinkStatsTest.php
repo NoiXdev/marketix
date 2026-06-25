@@ -47,8 +47,8 @@ class ResetLinkStatsTest extends TestCase
     {
         [$user, $project, $url] = $this->makeProjectWithUrl();
 
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1']);
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.2']);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1')]);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.2')]);
 
         $this->actingAs($user)
             ->delete(route('app.project.links.stats.reset', ['project' => $project->id, 'url' => $url->id]))
@@ -65,7 +65,7 @@ class ResetLinkStatsTest extends TestCase
     public function test_it_records_a_stats_reset_activity_entry(): void
     {
         [$user, $project, $url] = $this->makeProjectWithUrl();
-        Statistic::factory()->forUrl($url)->create(['ip' => '10.0.0.1']);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1')]);
 
         $this->actingAs($user)
             ->delete(route('app.project.links.stats.reset', ['project' => $project->id, 'url' => $url->id]));
