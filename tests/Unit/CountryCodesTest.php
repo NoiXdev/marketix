@@ -12,6 +12,8 @@ class CountryCodesTest extends TestCase
         $this->assertSame('DE', CountryCodes::toAlpha2('Germany'));
         $this->assertSame('US', CountryCodes::toAlpha2('United States'));
         $this->assertSame('FR', CountryCodes::toAlpha2('France'));
+        $this->assertSame('GB', CountryCodes::toAlpha2('United Kingdom'));
+        $this->assertSame('RU', CountryCodes::toAlpha2('Russia'));
     }
 
     public function test_is_case_insensitive(): void
