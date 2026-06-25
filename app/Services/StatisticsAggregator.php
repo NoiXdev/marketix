@@ -143,6 +143,31 @@ class StatisticsAggregator
     }
 
     /**
+     * Click counts grouped by ISO country_code, with a representative country
+     * name per code, ordered by count desc. Excludes rows without a code.
+     * The high default limit returns every country so the choropleth is complete.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function breakdownByCountryCode(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 250): Collection
+    {
+        return $this->base($projectId, $urlId)
+            ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
+            ->whereNotNull('country_code')
+            ->where('country_code', '!=', '')
+            ->select(
+                'country_code',
+                DB::raw('MAX(country) as country'),
+                DB::raw('COUNT(*) as count'),
+            )
+            ->groupBy('country_code')
+            ->orderByDesc('count')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * The most recent individual clicks, latest first.
      *
      * @return Collection<int, Statistic>
