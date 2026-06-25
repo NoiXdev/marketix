@@ -20,7 +20,7 @@ class StatisticFactory extends Factory
         return [
             // project_id and url_id are filled lazily in configure() below,
             // only when the caller has not already supplied them.
-            'ip' => $this->faker->ipv4(),
+            'visitor_hash' => hash('sha256', $this->faker->uuid()),
             'country' => $this->faker->country(),
             'city' => $this->faker->city(),
             'language' => $this->faker->languageCode(),
