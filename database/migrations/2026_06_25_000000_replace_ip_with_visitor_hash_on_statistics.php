@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('statistics', function (Blueprint $table) {
             $table->string('visitor_hash')->nullable()->after('url_id');
-            $table->index('visitor_hash');
+            $table->index(['url_id', 'visitor_hash', 'created_at'], 'statistics_url_visitor_hash_created_index');
         });
 
         // Drop the compound index that references ip before dropping the column.
@@ -28,7 +28,8 @@ return new class extends Migration
         });
 
         Schema::table('statistics', function (Blueprint $table) {
-            $table->dropIndex(['visitor_hash']);
+            $table->index(['url_id', 'ip', 'created_at'], 'statistics_url_ip_created_index');
+            $table->dropIndex('statistics_url_visitor_hash_created_index');
             $table->dropColumn('visitor_hash');
         });
     }
