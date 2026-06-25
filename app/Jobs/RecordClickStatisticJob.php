@@ -27,7 +27,7 @@ class RecordClickStatisticJob implements ShouldQueue
     public function __construct(
         private string $urlId,
         private string $projectId,
-        private ?string $ip,
+        private string $visitorHash,
         private string $userAgent,
         private ?string $referer,
         private ?string $language,
@@ -37,14 +37,14 @@ class RecordClickStatisticJob implements ShouldQueue
     public function handle(): void
     {
         $isUnique = ! Statistic::where('url_id', $this->urlId)
-            ->where('ip', $this->ip)
-            ->where('created_at', '>=', now()->subDay())
+            ->where('visitor_hash', $this->visitorHash)
+            ->where('created_at', '>=', now()->startOfDay())
             ->exists();
 
         Statistic::create([
             'project_id' => $this->projectId,
             'url_id' => $this->urlId,
-            'ip' => $this->ip,
+            'visitor_hash' => $this->visitorHash,
             'country' => $this->geo['country'] ?? null,
             'city' => $this->geo['city'] ?? null,
             'language' => $this->language,
