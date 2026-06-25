@@ -27,4 +27,15 @@ class CountryCodesTest extends TestCase
         $this->assertNull(CountryCodes::toAlpha2(null));
         $this->assertNull(CountryCodes::toAlpha2(''));
     }
+
+    public function test_resolves_common_alias_names(): void
+    {
+        $this->assertSame('CZ', CountryCodes::toAlpha2('Czech Republic'));
+        $this->assertSame('TR', CountryCodes::toAlpha2('Turkey'));
+        $this->assertSame('HK', CountryCodes::toAlpha2('Hong Kong'));
+        $this->assertSame('MO', CountryCodes::toAlpha2('Macao'));
+        $this->assertSame('CI', CountryCodes::toAlpha2('Ivory Coast'));
+        $this->assertSame('MM', CountryCodes::toAlpha2('Myanmar'));
+        $this->assertSame('CD', CountryCodes::toAlpha2('Democratic Republic of the Congo'));
+    }
 }

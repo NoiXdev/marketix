@@ -27,6 +27,33 @@ class CountryCodes
         'MI', 'PC', 'PU', 'PZ', 'WK', 'CT',
     ];
 
+    /**
+     * Common alternative / older / colloquial country names (as emitted by
+     * GeoLite2 and similar sources) that ICU's canonical English names don't
+     * match. Keyed by lowercased name → canonical alpha-2. This is a short
+     * list of known divergences, not a full country table — names ICU already
+     * resolves are not repeated here.
+     */
+    private const ALIASES = [
+        'czech republic' => 'CZ',
+        'turkey' => 'TR',
+        'hong kong' => 'HK',
+        'macao' => 'MO',
+        'macau' => 'MO',
+        'ivory coast' => 'CI',
+        'myanmar' => 'MM',
+        'burma' => 'MM',
+        'swaziland' => 'SZ',
+        'the netherlands' => 'NL',
+        'democratic republic of the congo' => 'CD',
+        'republic of the congo' => 'CG',
+        'east timor' => 'TL',
+        'palestine' => 'PS',
+        'vatican' => 'VA',
+        'south korea' => 'KR',
+        'north korea' => 'KP',
+    ];
+
     /** @var array<string, string>|null name(lower) => alpha-2 */
     private static ?array $map = null;
 
@@ -74,6 +101,8 @@ class CountryCodes
             }
         }
 
-        return self::$map = $map;
+        // Aliases add names ICU doesn't resolve; existing canonical entries win
+        // on key collisions (array union keeps the left operand).
+        return self::$map = $map + self::ALIASES;
     }
 }
