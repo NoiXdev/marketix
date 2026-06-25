@@ -22,6 +22,7 @@ class StatisticFactory extends Factory
             // only when the caller has not already supplied them.
             'visitor_hash' => hash('sha256', $this->faker->uuid()),
             'country' => $this->faker->country(),
+            'country_code' => $this->faker->countryCode(),
             'city' => $this->faker->city(),
             'language' => $this->faker->languageCode(),
             'domain' => $this->faker->domainName(),
@@ -135,6 +136,16 @@ class StatisticFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'country' => $country,
+        ]);
+    }
+
+    /**
+     * Pin the visitor country code (ISO 3166-1 alpha-2) for map breakdowns.
+     */
+    public function countryCode(string $code): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'country_code' => $code,
         ]);
     }
 }

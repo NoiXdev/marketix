@@ -21,6 +21,7 @@ class Statistic extends Model
         'url_id',
         'visitor_hash',
         'country',
+        'country_code',
         'city',
         'language',
         'domain',

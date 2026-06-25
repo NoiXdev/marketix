@@ -83,4 +83,22 @@ class RecordClickStatisticJobTest extends TestCase
 
         $this->assertSame(2, $url->fresh()->unique_clicks);
     }
+
+    public function test_country_code_column_is_persistable(): void
+    {
+        $url = $this->makeUrl();
+
+        \App\Models\Statistic::create([
+            'project_id' => $url->project_id,
+            'url_id' => $url->id,
+            'visitor_hash' => 'hash-cc',
+            'country' => 'Germany',
+            'country_code' => 'DE',
+        ]);
+
+        $this->assertDatabaseHas('statistics', [
+            'url_id' => $url->id,
+            'country_code' => 'DE',
+        ]);
+    }
 }
