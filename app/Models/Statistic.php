@@ -19,7 +19,7 @@ class Statistic extends Model
     protected $fillable = [
         'project_id',
         'url_id',
-        'ip',
+        'visitor_hash',
         'country',
         'city',
         'language',
