@@ -106,15 +106,15 @@ class StatisticsAggregator
     }
 
     /**
-     * Distinct-IP clicks, optionally restricted to a trailing window.
+     * Distinct-visitor clicks, optionally restricted to a trailing window.
      */
     public function uniqueClicks(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null): int
     {
         return $this->base($projectId, $urlId)
             ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
             ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
-            ->distinct('ip')
-            ->count('ip');
+            ->distinct('visitor_hash')
+            ->count('visitor_hash');
     }
 
     /**
