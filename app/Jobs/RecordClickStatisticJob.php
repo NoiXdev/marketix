@@ -46,6 +46,7 @@ class RecordClickStatisticJob implements ShouldQueue
             'url_id' => $this->urlId,
             'visitor_hash' => $this->visitorHash,
             'country' => $this->geo['country'] ?? null,
+            'country_code' => $this->geo['country_code'] ?? null,
             'city' => $this->geo['city'] ?? null,
             'language' => $this->language,
             'domain' => $this->referer ? parse_url($this->referer, PHP_URL_HOST) : null,
