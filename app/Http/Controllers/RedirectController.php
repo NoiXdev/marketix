@@ -9,6 +9,7 @@ use App\Models\QrCode;
 use App\Models\Url;
 use App\Services\GeoIpService;
 use App\Support\UserAgent;
+use App\Support\VisitorHash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -232,11 +233,13 @@ class RedirectController extends Controller
 
     private function dispatchStat(Request $request, Url $url, array $geo): void
     {
+        $userAgent = $request->userAgent() ?? '';
+
         RecordClickStatisticJob::dispatch(
             $url->id,
             $url->project_id,
-            $request->ip(),
-            $request->userAgent() ?? '',
+            VisitorHash::for($request->ip(), $userAgent),
+            $userAgent,
             $request->header('Referer') ?: null,
             substr($request->header('Accept-Language', ''), 0, 2) ?: null,
             $geo,
