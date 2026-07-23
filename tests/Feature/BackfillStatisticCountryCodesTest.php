@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Enums\RedirectType;
+use App\Enums\UrlStatus;
+use App\Models\Domain;
+use App\Models\Project;
 use App\Models\Statistic;
 use App\Models\Url;
 use App\Models\User;
-use App\Models\Project;
-use App\Models\Domain;
-use App\Enums\RedirectType;
-use App\Enums\UrlStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;

@@ -88,7 +88,7 @@ class RecordClickStatisticJobTest extends TestCase
     {
         $url = $this->makeUrl();
 
-        \App\Models\Statistic::create([
+        Statistic::create([
             'project_id' => $url->project_id,
             'url_id' => $url->id,
             'visitor_hash' => 'hash-cc',
