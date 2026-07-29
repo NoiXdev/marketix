@@ -45,10 +45,10 @@
         "chart.js": "^4.5.1",
         "d3-geo": "^3.1.1",
         "i18n-iso-countries": "^7.14.0",
-        "lucide-react": "^1.26.0",
-        "puppeteer": "^25.3.0",
+        "lucide-react": "^1.27.0",
+        "puppeteer": "^25.4.0",
         "qr-code-styling": "^1.9.2",
-        "recharts": "^3.10.0",
+        "recharts": "^3.10.1",
         "sweetalert2": "^11.26.25",
         "topojson-client": "^3.1.0",
         "world-atlas": "^2.0.2"
