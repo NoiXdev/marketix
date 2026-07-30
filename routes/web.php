@@ -65,9 +65,13 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/auth/two-factor-challenge/passkey/options', [TwoFactorPasskeyController::class, 'options'])->middleware('throttle:6,1')->name('app.auth.two-factor.passkey-options');
         Route::post('/auth/two-factor-challenge/passkey', [TwoFactorPasskeyController::class, 'verify'])->middleware('throttle:6,1')->name('app.auth.two-factor.passkey');
         Route::get('/auth/forgot-password', [PasswordResetController::class, 'showForgot'])->name('app.auth.show-forgot');
-        Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])->name('app.auth.forgot');
+        Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendLink'])
+            ->middleware('throttle:5,1')
+            ->name('app.auth.forgot');
         Route::get('/auth/reset-password/{token}', [PasswordResetController::class, 'showReset'])->name('app.auth.show-reset');
-        Route::post('/auth/reset-password', [PasswordResetController::class, 'reset'])->name('app.auth.reset');
+        Route::post('/auth/reset-password', [PasswordResetController::class, 'reset'])
+            ->middleware('throttle:5,1')
+            ->name('app.auth.reset');
     });
 
     // Auth-only routes
