@@ -18,6 +18,7 @@ class StatisticsAggregator
     {
         return Statistic::query()
             ->where('project_id', $projectId)
+            ->where('is_bot', false)
             ->when($urlId !== null, fn (Builder $q) => $q->where('url_id', $urlId));
     }
 

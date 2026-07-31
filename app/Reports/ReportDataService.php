@@ -78,6 +78,7 @@ class ReportDataService
     private function topLinks(string $projectId, ReportDateRange $range): array
     {
         return Statistic::where('statistics.project_id', $projectId)
+            ->where('statistics.is_bot', false)
             ->whereBetween('statistics.created_at', [$range->start(), $range->end()])
             ->join('urls', 'statistics.url_id', '=', 'urls.id')
             ->join('domains', 'urls.domain_id', '=', 'domains.id')
