@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Statistic;
 use App\Models\Url;
+use App\Support\CrawlerDetector;
 use App\Support\UserAgent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,6 +37,8 @@ class RecordClickStatisticJob implements ShouldQueue
 
     public function handle(): void
     {
+        $isBot = CrawlerDetector::isBot($this->userAgent);
+
         $isUnique = ! Statistic::where('url_id', $this->urlId)
             ->where('visitor_hash', $this->visitorHash)
             ->where('created_at', '>=', now()->startOfDay())
@@ -53,12 +56,16 @@ class RecordClickStatisticJob implements ShouldQueue
             'referer' => $this->referer,
             'browser' => UserAgent::browser($this->userAgent),
             'os' => UserAgent::os($this->userAgent),
+            'is_bot' => $isBot,
         ]);
 
-        // Atomic DB-side increments — avoids the read-modify-write race of $model->increment().
-        Url::whereKey($this->urlId)->increment('clicks');
-        if ($isUnique) {
-            Url::whereKey($this->urlId)->increment('unique_clicks');
+        // Bots are recorded but never counted toward click totals.
+        if (! $isBot) {
+            // Atomic DB-side increments — avoids the read-modify-write race of $model->increment().
+            Url::whereKey($this->urlId)->increment('clicks');
+            if ($isUnique) {
+                Url::whereKey($this->urlId)->increment('unique_clicks');
+            }
         }
     }
 }
