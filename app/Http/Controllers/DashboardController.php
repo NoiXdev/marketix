@@ -36,6 +36,7 @@ class DashboardController extends Controller
         $since = now()->subDays($days - 1)->startOfDay();
 
         $rows = Statistic::where('project_id', $projectId)
+            ->where('is_bot', false)
             ->where('created_at', '>=', $since)
             ->select(
                 DB::raw('DATE(created_at) as date'),

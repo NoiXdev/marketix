@@ -18,6 +18,7 @@ class StatisticsController extends Controller
         // Top links is a project-wide join (urls + domains), not part of the
         // per-link aggregator, so it stays here.
         $topLinks = Statistic::where('statistics.project_id', $project->id)
+            ->where('statistics.is_bot', false)
             ->join('urls', 'statistics.url_id', '=', 'urls.id')
             ->join('domains', 'urls.domain_id', '=', 'domains.id')
             ->select(
