@@ -28,7 +28,15 @@ class Statistic extends Model
         'referer',
         'browser',
         'os',
+        'is_bot',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_bot' => 'boolean',
+        ];
+    }
 
     public function project(): BelongsTo
     {
