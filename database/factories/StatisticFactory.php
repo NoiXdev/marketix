@@ -29,6 +29,7 @@ class StatisticFactory extends Factory
             'referer' => $this->faker->url(),
             'browser' => $this->faker->randomElement(['Chrome', 'Firefox', 'Safari', 'Edge']),
             'os' => $this->faker->randomElement(['Windows', 'macOS', 'Linux', 'Android', 'iOS']),
+            'is_bot' => false,
         ];
     }
 
@@ -146,6 +147,16 @@ class StatisticFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'country_code' => $code,
+        ]);
+    }
+
+    /**
+     * Mark the statistic as a bot/crawler click.
+     */
+    public function bot(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_bot' => true,
         ]);
     }
 }
