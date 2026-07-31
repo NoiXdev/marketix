@@ -141,4 +141,42 @@ class RecordClickStatisticJobTest extends TestCase
             'country_code' => null,
         ]);
     }
+
+    public function test_bot_click_is_flagged_and_does_not_increment_counters(): void
+    {
+        $url = $this->makeUrl();
+
+        (new RecordClickStatisticJob(
+            $url->id,
+            $url->project_id,
+            'hash-bot',
+            'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            null,
+            'en',
+            ['country' => 'Germany', 'city' => 'Berlin', 'country_code' => 'DE'],
+        ))->handle();
+
+        $this->assertDatabaseHas('statistics', ['url_id' => $url->id, 'is_bot' => true]);
+        $this->assertSame(0, $url->fresh()->clicks);
+        $this->assertSame(0, $url->fresh()->unique_clicks);
+    }
+
+    public function test_human_click_is_not_flagged_and_increments_counters(): void
+    {
+        $url = $this->makeUrl();
+
+        (new RecordClickStatisticJob(
+            $url->id,
+            $url->project_id,
+            'hash-human',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            null,
+            'en',
+            ['country' => 'Germany', 'city' => 'Berlin', 'country_code' => 'DE'],
+        ))->handle();
+
+        $this->assertDatabaseHas('statistics', ['url_id' => $url->id, 'is_bot' => false]);
+        $this->assertSame(1, $url->fresh()->clicks);
+        $this->assertSame(1, $url->fresh()->unique_clicks);
+    }
 }
