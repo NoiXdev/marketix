@@ -88,6 +88,27 @@ class DashboardClicksChartTest extends TestCase
         );
     }
 
+    public function test_dashboard_clicks_by_day_excludes_bot_clicks(): void
+    {
+        [$user, $project, $url] = $this->makeProjectWithUrl();
+
+        // Today: 2 human clicks + 1 bot click — the bot must not be counted.
+        $this->seedClick($url, '10.0.0.1', now());
+        $this->seedClick($url, '10.0.0.2', now());
+        Statistic::factory()->forUrl($url)->bot()->create([
+            'visitor_hash' => hash('sha256', '10.0.0.9'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($user)->get(
+            route('app.project.dashboard', ['project' => $project->id]).'?days=7'
+        )->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('clicksByDay.6.clicks', 2)
+            ->where('clicksByDay.6.unique', 2)
+        );
+    }
+
     public function test_dashboard_defaults_to_thirty_days_and_validates_window(): void
     {
         [$user, $project] = $this->makeProjectWithUrl();
