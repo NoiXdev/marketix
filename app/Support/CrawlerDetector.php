@@ -11,12 +11,20 @@ use Jaybizzle\CrawlerDetect\CrawlerDetect;
  */
 class CrawlerDetector
 {
+    /**
+     * Memoized detector. Building CrawlerDetect compiles its regex pattern
+     * lists, so under a long-lived worker (Octane) we reuse one instance
+     * across clicks instead of rebuilding it per job. isCrawler() takes the
+     * UA per call, so a single shared instance is safe.
+     */
+    private static ?CrawlerDetect $detector = null;
+
     public static function isBot(string $ua): bool
     {
         if ($ua === '') {
             return false;
         }
 
-        return (new CrawlerDetect)->isCrawler($ua);
+        return (self::$detector ??= new CrawlerDetect)->isCrawler($ua);
     }
 }

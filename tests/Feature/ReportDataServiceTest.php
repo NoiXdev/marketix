@@ -78,6 +78,22 @@ class ReportDataServiceTest extends TestCase
         $this->assertSame(2, $data->topLinks[0]['clicks']);
     }
 
+    public function test_top_links_excludes_bot_clicks(): void
+    {
+        $project = Project::factory()->create(['name' => 'Acme']);
+        $url = $this->createUrl($project, 'go');
+
+        // 2 human clicks + 1 bot click on the same link — topLinks must show 2.
+        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '1.1.1.1')]);
+        Statistic::factory()->forUrl($url)->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '2.2.2.2')]);
+        Statistic::factory()->forUrl($url)->bot()->create(['created_at' => now(), 'visitor_hash' => hash('sha256', '9.9.9.9')]);
+
+        $data = app(ReportDataService::class)->forProject($project, ReportDateRange::preset(30));
+
+        $this->assertSame('go', $data->topLinks[0]['slug']);
+        $this->assertSame(2, $data->topLinks[0]['clicks']);
+    }
+
     public function test_for_url_includes_recent_clicks_and_scopes_to_url(): void
     {
         $project = Project::factory()->create();
