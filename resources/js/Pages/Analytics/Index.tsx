@@ -65,52 +65,54 @@ export default function AnalyticsIndex({
 
   return (
     <AppLayout title={`Analytics — ${site.name}`}>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Link href={route('app.project.sites.index', { project: project!.id })} className="text-sm text-indigo-600 hover:underline">
-            ← Sites
-          </Link>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{site.name}</h1>
-          <p className="text-sm text-gray-500">{site.domain}</p>
+      <div className="px-8 py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <Link href={route('app.project.sites.index', { project: project!.id })} className="text-sm text-indigo-600 hover:underline">
+              ← Sites
+            </Link>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{site.name}</h1>
+            <p className="text-sm text-gray-500">{site.domain}</p>
+          </div>
+          <div className="flex gap-1">
+            {[1, 7, 30, 90].map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={`rounded-lg px-3 py-1.5 text-sm ${days === d ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+              >
+                {d === 1 ? 'Today' : `${d}d`}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-1">
-          {[1, 7, 30, 90].map((d) => (
-            <button
-              key={d}
-              onClick={() => setDays(d)}
-              className={`rounded-lg px-3 py-1.5 text-sm ${days === d ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
-            >
-              {d === 1 ? 'Today' : `${d}d`}
-            </button>
-          ))}
+
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+          {tile('Page views', totalPageViews)}
+          {tile('Unique visitors', uniqueVisitors)}
+          {tile('Bounce rate', `${bounceRate}%`)}
+          {tile('Avg. duration', `${Math.floor(avgDurationSeconds / 60)}m ${avgDurationSeconds % 60}s`)}
         </div>
-      </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-        {tile('Page views', totalPageViews)}
-        {tile('Unique visitors', uniqueVisitors)}
-        {tile('Bounce rate', `${bounceRate}%`)}
-        {tile('Avg. duration', `${Math.floor(avgDurationSeconds / 60)}m ${avgDurationSeconds % 60}s`)}
-      </div>
-
-      <div className="mb-6 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
-        <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Visitors over time</h3>
-        <div className="flex h-40 items-end gap-1">
-          {pageViewsByDay.map((d) => (
-            <div key={d.date} className="flex flex-1 flex-col items-center justify-end" title={`${d.date}: ${d.views} views`}>
-              <div className="w-full rounded-t bg-indigo-500" style={{ height: `${(d.views / maxViews) * 100}%` }} />
-            </div>
-          ))}
+        <div className="mb-6 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+          <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">Visitors over time</h3>
+          <div className="flex h-40 items-end gap-1">
+            {pageViewsByDay.map((d) => (
+              <div key={d.date} className="flex flex-1 flex-col items-center justify-end" title={`${d.date}: ${d.views} views`}>
+                <div className="w-full rounded-t bg-indigo-500" style={{ height: `${(d.views / maxViews) * 100}%` }} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {list('Top pages', topPaths, 'path')}
-        {list('Top referrers', topReferrers, 'referer_domain')}
-        {list('Countries', countries, 'country')}
-        {list('Browsers', browsers, 'browser')}
-        {list('Operating systems', operatingSystems, 'os')}
-        {list('Devices', devices, 'device')}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {list('Top pages', topPaths, 'path')}
+          {list('Top referrers', topReferrers, 'referer_domain')}
+          {list('Countries', countries, 'country')}
+          {list('Browsers', browsers, 'browser')}
+          {list('Operating systems', operatingSystems, 'os')}
+          {list('Devices', devices, 'device')}
+        </div>
       </div>
     </AppLayout>
   );
