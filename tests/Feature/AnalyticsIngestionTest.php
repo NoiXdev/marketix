@@ -172,4 +172,15 @@ class AnalyticsIngestionTest extends TestCase
 
         $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => 'google']);
     }
+
+    public function test_empty_string_utm_is_normalized_to_null(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $body = json_encode(['site' => $site->tracking_id, 'path' => '/lp', 'utm' => ['source' => '', 'medium' => 'cpc']]);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $body)->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => null, 'utm_medium' => 'cpc']);
+        $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => null, 'utm_medium' => 'cpc']);
+    }
 }

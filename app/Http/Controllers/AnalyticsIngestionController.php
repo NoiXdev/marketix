@@ -103,13 +103,11 @@ class AnalyticsIngestionController extends Controller
         // Path only, query string stripped for privacy.
         $path = '/'.ltrim(parse_url($data['path'], PHP_URL_PATH) ?: '/', '/');
 
-        $utm = [
-            'utm_source' => $data['utm']['source'] ?? null,
-            'utm_medium' => $data['utm']['medium'] ?? null,
-            'utm_campaign' => $data['utm']['campaign'] ?? null,
-            'utm_term' => $data['utm']['term'] ?? null,
-            'utm_content' => $data['utm']['content'] ?? null,
-        ];
+        $utm = [];
+        foreach (['source', 'medium', 'campaign', 'term', 'content'] as $k) {
+            $v = $data['utm'][$k] ?? null;
+            $utm['utm_'.$k] = ($v === '' ? null : $v);
+        }
 
         RecordPageViewJob::dispatch(
             $site->id,
