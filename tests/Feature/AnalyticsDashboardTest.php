@@ -42,6 +42,32 @@ class AnalyticsDashboardTest extends TestCase
             );
     }
 
+    public function test_dashboard_exposes_campaign_props(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $project = \App\Models\Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = \App\Models\Site::factory()->forProject($project)->create();
+
+        \App\Models\Visit::factory()->forSite($site)->create(['visitor_hash' => 'v1', 'utm_source' => 'google', 'utm_medium' => 'cpc']);
+        \App\Models\Visit::factory()->forSite($site)->create(['visitor_hash' => 'v2']); // organic
+
+        $this->actingAs($user)
+            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=30')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Analytics/Index')
+                ->where('campaignShare.total', 2)
+                ->where('campaignShare.from_campaigns', 1)
+                ->has('utmSources')
+                ->has('utmMediums')
+                ->has('utmCampaigns')
+                ->has('utmSourceMediums')
+                ->has('utmTerms')
+                ->has('utmContents')
+            );
+    }
+
     public function test_foreign_project_site_is_not_found(): void
     {
         $user = User::factory()->create();

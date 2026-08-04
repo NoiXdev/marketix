@@ -4,6 +4,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 
 type Series = { date: string; views: number; visitors: number };
 type Rank = Record<string, string | number> & { count: number };
+type CampaignRow = { value: string; sessions: number; visitors: number };
+type CampaignShare = { total: number; from_campaigns: number; percent: number };
 
 export default function AnalyticsIndex({
   site,
@@ -19,6 +21,13 @@ export default function AnalyticsIndex({
   browsers,
   operatingSystems,
   devices,
+  campaignShare,
+  utmSources,
+  utmMediums,
+  utmCampaigns,
+  utmSourceMediums,
+  utmTerms,
+  utmContents,
 }: {
   site: { id: string; name: string; domain: string };
   days: number;
@@ -33,6 +42,13 @@ export default function AnalyticsIndex({
   browsers: Rank[];
   operatingSystems: Rank[];
   devices: Rank[];
+  campaignShare: CampaignShare;
+  utmSources: CampaignRow[];
+  utmMediums: CampaignRow[];
+  utmCampaigns: CampaignRow[];
+  utmSourceMediums: CampaignRow[];
+  utmTerms: CampaignRow[];
+  utmContents: CampaignRow[];
 }) {
   const { project } = usePage<PageProps>().props;
   const maxViews = Math.max(1, ...pageViewsByDay.map((d) => d.views));
@@ -63,6 +79,24 @@ export default function AnalyticsIndex({
     </div>
   );
 
+  const campaignList = (title: string, rows: CampaignRow[]) => (
+    <div className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+      <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">{title}</h3>
+      <ul className="space-y-1">
+        {rows.map((r, i) => (
+          <li key={i} className="flex justify-between gap-2 text-sm text-gray-600 dark:text-gray-300">
+            <span className="truncate">{r.value}</span>
+            <span className="whitespace-nowrap font-medium">
+              {r.sessions}
+              <span className="ml-1 text-xs text-gray-400">({r.visitors})</span>
+            </span>
+          </li>
+        ))}
+        {rows.length === 0 && <li className="text-sm text-gray-400">No campaign data</li>}
+      </ul>
+    </div>
+  );
+
   return (
     <AppLayout title={`Analytics — ${site.name}`}>
       <div className="px-8 py-8">
@@ -87,11 +121,12 @@ export default function AnalyticsIndex({
           </div>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
           {tile('Page views', totalPageViews)}
           {tile('Unique visitors', uniqueVisitors)}
           {tile('Bounce rate', `${bounceRate}%`)}
           {tile('Avg. duration', `${Math.floor(avgDurationSeconds / 60)}m ${avgDurationSeconds % 60}s`)}
+          {tile('From campaigns', `${campaignShare.percent}%`)}
         </div>
 
         <div className="mb-6 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
@@ -112,6 +147,17 @@ export default function AnalyticsIndex({
           {list('Browsers', browsers, 'browser')}
           {list('Operating systems', operatingSystems, 'os')}
           {list('Devices', devices, 'device')}
+        </div>
+
+        <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-gray-500">Campaigns</h2>
+        <p className="mb-4 text-xs text-gray-500">Session counts, unique visitors in parentheses. First-touch attribution.</p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {campaignList('Top sources', utmSources)}
+          {campaignList('Top mediums', utmMediums)}
+          {campaignList('Top campaigns', utmCampaigns)}
+          {campaignList('Source / medium', utmSourceMediums)}
+          {campaignList('Terms', utmTerms)}
+          {campaignList('Content', utmContents)}
         </div>
       </div>
     </AppLayout>

@@ -33,6 +33,13 @@ class AnalyticsController extends Controller
             'browsers' => $agg->breakdown($model->id, 'browser', $days),
             'operatingSystems' => $agg->breakdown($model->id, 'os', $days),
             'devices' => $agg->breakdown($model->id, 'device', $days),
+            'campaignShare' => $agg->campaignShare($model->id, $days),
+            'utmSources' => $agg->utmBreakdown($model->id, 'utm_source', $days),
+            'utmMediums' => $agg->utmBreakdown($model->id, 'utm_medium', $days),
+            'utmCampaigns' => $agg->utmBreakdown($model->id, 'utm_campaign', $days),
+            'utmSourceMediums' => $agg->utmSourceMedium($model->id, $days),
+            'utmTerms' => $agg->utmBreakdown($model->id, 'utm_term', $days),
+            'utmContents' => $agg->utmBreakdown($model->id, 'utm_content', $days),
         ]);
     }
 }
