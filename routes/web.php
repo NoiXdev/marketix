@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
+use App\Http\Controllers\AnalyticsIngestionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
@@ -191,6 +192,13 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/activity', [AdminActivityController::class, 'index'])->name('app.admin.activity.index');
     });
 });
+
+// Public analytics ingestion — reachable on any customer domain (CORS via config/cors.php).
+Route::get('/a/config/{trackingId}', [AnalyticsIngestionController::class, 'config'])
+    ->name('app.analytics.config');
+Route::post('/a/event', [AnalyticsIngestionController::class, 'event'])
+    ->middleware('throttle:120,1')
+    ->name('app.analytics.event');
 
 // URL shortener — handles requests on custom short-link domains
 Route::post('/{slug}', [RedirectController::class, 'checkPassword'])
