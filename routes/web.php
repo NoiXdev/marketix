@@ -211,6 +211,9 @@ Route::get('/a/config/{trackingId}', [AnalyticsIngestionController::class, 'conf
 Route::post('/a/event', [AnalyticsIngestionController::class, 'event'])
     ->middleware('throttle:120,1')
     ->name('app.analytics.event');
+// Tracking snippet — stable URL, served with Cache-Control + ETag (see controller).
+Route::get('/mx.js', [AnalyticsIngestionController::class, 'snippet'])
+    ->name('app.analytics.snippet');
 
 // URL shortener — handles requests on custom short-link domains
 Route::post('/{slug}', [RedirectController::class, 'checkPassword'])

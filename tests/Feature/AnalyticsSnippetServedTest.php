@@ -6,9 +6,9 @@ use Tests\TestCase;
 
 class AnalyticsSnippetServedTest extends TestCase
 {
-    public function test_snippet_file_exists_and_is_self_contained(): void
+    public function test_snippet_source_exists_and_is_self_contained(): void
     {
-        $path = public_path('mx.js');
+        $path = resource_path('analytics/mx.js');
         $this->assertFileExists($path);
 
         $contents = file_get_contents($path);
@@ -21,5 +21,26 @@ class AnalyticsSnippetServedTest extends TestCase
         // no external dependencies
         $this->assertStringNotContainsString('import ', $contents);
         $this->assertStringNotContainsString('require(', $contents);
+    }
+
+    public function test_snippet_is_served_with_js_content_type_and_cache_headers(): void
+    {
+        $response = $this->get(route('app.analytics.snippet'));
+
+        $response->assertOk();
+        $this->assertStringContainsString('javascript', strtolower((string) $response->headers->get('Content-Type')));
+        $this->assertStringContainsString('max-age=3600', (string) $response->headers->get('Cache-Control'));
+        $this->assertNotEmpty($response->headers->get('ETag'));
+        $this->assertStringContainsString('data-site', $response->getContent());
+    }
+
+    public function test_snippet_returns_304_when_etag_matches(): void
+    {
+        $etag = $this->get(route('app.analytics.snippet'))->headers->get('ETag');
+        $this->assertNotEmpty($etag);
+
+        $this->withHeaders(['If-None-Match' => $etag])
+            ->get(route('app.analytics.snippet'))
+            ->assertStatus(304);
     }
 }

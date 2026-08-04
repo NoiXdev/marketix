@@ -27,6 +27,31 @@ class AnalyticsIngestionController extends Controller
         ])->header('Cache-Control', 'public, max-age=300');
     }
 
+    /**
+     * Serve the tracking snippet from a stable URL (/mx.js).
+     *
+     * Vendors (GA, Plausible, Fathom) never hash or version this URL — it lives
+     * in customer HTML we can't edit — so updates roll out via cache headers,
+     * not URL changes: a short max-age plus an ETag makes expiry a cheap 304
+     * revalidation, and stale-while-revalidate keeps it instant meanwhile.
+     * Bump the file, deploy, and every site picks it up within max-age.
+     */
+    public function snippet(Request $request): Response
+    {
+        $content = file_get_contents(resource_path('analytics/mx.js'));
+
+        $response = response($content)
+            ->header('Content-Type', 'application/javascript; charset=utf-8')
+            ->header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+
+        $response->setEtag(md5($content));
+
+        // If the client's If-None-Match matches, this swaps to 304 + empty body.
+        $response->isNotModified($request);
+
+        return $response;
+    }
+
     public function event(Request $request): Response
     {
         // The beacon is sent as Content-Type: text/plain (a CORS "simple"
