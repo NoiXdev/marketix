@@ -21,6 +21,11 @@ class AnalyticsSnippetServedTest extends TestCase
         // no external dependencies
         $this->assertStringNotContainsString('import ', $contents);
         $this->assertStringNotContainsString('require(', $contents);
+
+        // UTM capture from the landing URL query string.
+        $this->assertStringContainsString('URLSearchParams', $contents);
+        $this->assertStringContainsString('utm_', $contents);
+        $this->assertStringContainsString('payload.utm', $contents);
     }
 
     public function test_snippet_is_served_with_js_content_type_and_cache_headers(): void

@@ -35,6 +35,27 @@
     return String(Date.now()) + '-' + Math.floor(Math.random() * 1e9);
   }
 
+  function readUtm() {
+    var keys = ['source', 'medium', 'campaign', 'term', 'content'];
+    var params;
+    try {
+      params = new URLSearchParams(location.search);
+    } catch (e) {
+      return null;
+    }
+    var utm = null;
+    for (var i = 0; i < keys.length; i++) {
+      var v = params.get('utm_' + keys[i]);
+      if (v) {
+        if (!utm) utm = {};
+        utm[keys[i]] = v.slice(0, 255);
+      }
+    }
+    return utm; // null when no utm_* present
+  }
+
+  var utmParams = readUtm();
+
   function send(visitorId) {
     var payload = {
       site: site,
@@ -42,6 +63,7 @@
       referrer: document.referrer || null,
     };
     if (visitorId) payload.visitor_id = visitorId;
+    if (utmParams) payload.utm = utmParams;
 
     // Cross-origin transport, deliberately non-credentialed:
     //  - Content-Type text/plain keeps this a CORS "simple request", so the

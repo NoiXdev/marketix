@@ -68,6 +68,12 @@ class AnalyticsIngestionController extends Controller
             'path' => ['required', 'string', 'max:2048'],
             'referrer' => ['nullable', 'string', 'max:2048'],
             'visitor_id' => ['nullable', 'string', 'max:255'],
+            'utm' => ['nullable', 'array'],
+            'utm.source' => ['nullable', 'string', 'max:255'],
+            'utm.medium' => ['nullable', 'string', 'max:255'],
+            'utm.campaign' => ['nullable', 'string', 'max:255'],
+            'utm.term' => ['nullable', 'string', 'max:255'],
+            'utm.content' => ['nullable', 'string', 'max:255'],
         ]);
 
         $noop = response('', 204);
@@ -97,6 +103,14 @@ class AnalyticsIngestionController extends Controller
         // Path only, query string stripped for privacy.
         $path = '/'.ltrim(parse_url($data['path'], PHP_URL_PATH) ?: '/', '/');
 
+        $utm = [
+            'utm_source' => $data['utm']['source'] ?? null,
+            'utm_medium' => $data['utm']['medium'] ?? null,
+            'utm_campaign' => $data['utm']['campaign'] ?? null,
+            'utm_term' => $data['utm']['term'] ?? null,
+            'utm_content' => $data['utm']['content'] ?? null,
+        ];
+
         RecordPageViewJob::dispatch(
             $site->id,
             $site->project_id,
@@ -106,6 +120,7 @@ class AnalyticsIngestionController extends Controller
             $data['referrer'] ?? null,
             substr($request->header('Accept-Language', ''), 0, 2) ?: null,
             $this->geoIp->lookup($ip),
+            $utm,
         );
 
         return response('', 202);

@@ -115,4 +115,61 @@ class AnalyticsIngestionTest extends TestCase
 
         Queue::assertNotPushed(RecordPageViewJob::class);
     }
+
+    public function test_utm_is_stored_on_page_view_and_first_touch_on_visit(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $body = json_encode([
+            'site' => $site->tracking_id,
+            'path' => '/lp',
+            'utm' => ['source' => 'google', 'medium' => 'cpc', 'campaign' => 'summer'],
+        ]);
+
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $body)
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => 'google', 'utm_medium' => 'cpc', 'utm_campaign' => 'summer']);
+        $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => 'google', 'utm_medium' => 'cpc', 'utm_campaign' => 'summer']);
+    }
+
+    public function test_first_touch_utm_is_not_overwritten_within_session(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        // Same IP + UA => same daily visitor hash => same session within the window.
+        $headers = ['CONTENT_TYPE' => 'text/plain', 'REMOTE_ADDR' => '203.0.113.5', 'HTTP_USER_AGENT' => 'Mozilla/5.0 (TestAgent)'];
+
+        $first = json_encode(['site' => $site->tracking_id, 'path' => '/lp', 'utm' => ['source' => 'google', 'medium' => 'cpc']]);
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, $first)->assertStatus(202);
+
+        $second = json_encode(['site' => $site->tracking_id, 'path' => '/pricing', 'utm' => ['source' => 'newsletter', 'medium' => 'email']]);
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, $second)->assertStatus(202);
+
+        // One visit, first-touch utm preserved; two page views with their own utm.
+        $this->assertSame(1, $site->visits()->count());
+        $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => 'google', 'utm_medium' => 'cpc']);
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'path' => '/pricing', 'utm_source' => 'newsletter', 'utm_medium' => 'email']);
+    }
+
+    public function test_event_without_utm_leaves_columns_null(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $body = json_encode(['site' => $site->tracking_id, 'path' => '/lp']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $body)->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => null, 'utm_campaign' => null]);
+        $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => null, 'utm_campaign' => null]);
+    }
+
+    public function test_unknown_utm_keys_are_ignored(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $body = json_encode(['site' => $site->tracking_id, 'path' => '/lp', 'utm' => ['source' => 'google', 'evil' => 'x']]);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $body)->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => 'google']);
+    }
 }

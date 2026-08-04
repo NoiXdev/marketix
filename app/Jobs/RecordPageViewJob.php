@@ -35,6 +35,7 @@ class RecordPageViewJob implements ShouldQueue
         private ?string $referer,
         private ?string $language,
         private array $geo,
+        private array $utm = [],
     ) {}
 
     public function handle(): void
@@ -70,6 +71,11 @@ class RecordPageViewJob implements ShouldQueue
                 'device' => $device,
                 'referer_domain' => $refererDomain,
                 'is_bot' => $isBot,
+                'utm_source' => $this->utm['utm_source'] ?? null,
+                'utm_medium' => $this->utm['utm_medium'] ?? null,
+                'utm_campaign' => $this->utm['utm_campaign'] ?? null,
+                'utm_term' => $this->utm['utm_term'] ?? null,
+                'utm_content' => $this->utm['utm_content'] ?? null,
             ]);
         } else {
             $visit->update([
@@ -95,6 +101,11 @@ class RecordPageViewJob implements ShouldQueue
             'device' => $device,
             'language' => $this->language,
             'is_bot' => $isBot,
+            'utm_source' => $this->utm['utm_source'] ?? null,
+            'utm_medium' => $this->utm['utm_medium'] ?? null,
+            'utm_campaign' => $this->utm['utm_campaign'] ?? null,
+            'utm_term' => $this->utm['utm_term'] ?? null,
+            'utm_content' => $this->utm['utm_content'] ?? null,
             'created_at' => $now,
         ]);
     }
