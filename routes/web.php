@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AnalyticsIngestionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -145,6 +146,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/sites/{site}/edit', [SiteController::class, 'edit'])->name('app.project.sites.edit');
             Route::put('/sites/{site}', [SiteController::class, 'update'])->name('app.project.sites.update');
             Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
+            Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
 
             // Team (project admins only)
             Route::middleware('project_admin')->group(function () {

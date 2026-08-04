@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\AnalyticsAggregator;
+use Illuminate\Http\Request;
+
+class AnalyticsController extends Controller
+{
+    public function show(Request $request, string $site, AnalyticsAggregator $agg)
+    {
+        $project = $request->get('project');
+        $model = $project->sites()->findOrFail($site);
+
+        $days = (int) $request->input('days', 30);
+        $days = in_array($days, [1, 7, 30, 90], true) ? $days : 30;
+
+        return inertia('Analytics/Index', [
+            'site' => [
+                'id' => $model->id,
+                'name' => $model->name,
+                'domain' => $model->domain,
+            ],
+            'days' => $days,
+            'totalPageViews' => $agg->totalPageViews($model->id, $days),
+            'uniqueVisitors' => $agg->uniqueVisitors($model->id, $days),
+            'bounceRate' => $agg->bounceRate($model->id, $days),
+            'avgDurationSeconds' => $agg->avgDurationSeconds($model->id, $days),
+            'pageViewsByDay' => $agg->pageViewsByDay($model->id, $days),
+            'topPaths' => $agg->topPaths($model->id, $days),
+            'topReferrers' => $agg->topReferrers($model->id, $days),
+            'countries' => $agg->breakdown($model->id, 'country', $days),
+            'browsers' => $agg->breakdown($model->id, 'browser', $days),
+            'operatingSystems' => $agg->breakdown($model->id, 'os', $days),
+            'devices' => $agg->breakdown($model->id, 'device', $days),
+        ]);
+    }
+}
