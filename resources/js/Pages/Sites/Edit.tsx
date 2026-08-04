@@ -17,7 +17,7 @@ export default function SitesEdit({
   snippetUrl: string;
 }) {
   const { project } = usePage<PageProps>().props;
-  const { data, setData, put, processing, errors } = useForm({
+  const { data, setData, put, processing, errors, transform } = useForm({
     name: site.name,
     domain: site.domain,
     tracking_mode: site.tracking_mode,
@@ -26,6 +26,11 @@ export default function SitesEdit({
     respect_dnt: site.respect_dnt ?? false,
     retention_days: site.retention_days ?? ('' as string | number),
   });
+
+  transform((data) => ({
+    ...data,
+    retention_days: data.retention_days === '' ? null : data.retention_days,
+  }));
 
   const snippet = `<script defer data-site="${site.tracking_id}" src="${snippetUrl}"></script>`;
 
@@ -77,6 +82,21 @@ export default function SitesEdit({
         <div>
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Consent signal (optional)</label>
           <input className={inputClass} value={data.consent_signal} onChange={(e) => setData('consent_signal', e.target.value)} />
+          <p className="mt-1 text-xs text-gray-500">
+            Set window.&lt;name&gt; = true when consent is granted and dispatch a &apos;marketix:consent&apos; event on change.
+          </p>
+        </div>
+        <div>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Retention (days, optional)</label>
+          <input
+            type="number"
+            min={1}
+            className={inputClass}
+            value={data.retention_days}
+            onChange={(e) => setData('retention_days', e.target.value)}
+          />
+          <p className="mt-1 text-xs text-gray-500">Days to retain raw analytics (blank = project default 24 months).</p>
+          {errors.retention_days && <p className="mt-1 text-sm text-red-600">{errors.retention_days}</p>}
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <input type="checkbox" checked={data.respect_dnt} onChange={(e) => setData('respect_dnt', e.target.checked)} />

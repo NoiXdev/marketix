@@ -1,7 +1,7 @@
 import SidebarBottom from '@/Components/SidebarBottom';
 import { useTranslation } from '@/lib/i18n';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Globe, History, LayoutDashboard, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
+import { BarChart3, Globe, History, LayoutDashboard, LineChart, LinkIcon, QrCode, Users, Zap } from 'lucide-react';
 import Brand from './Brand';
 import LocaleSwitcher from './LocaleSwitcher';
 import ProjectSwitcher from './ProjectSwitcher';
@@ -13,6 +13,7 @@ const navItems = [
   { key: 'qrcodes', icon: QrCode, routeName: 'app.project.qrcodes.index' },
   { key: 'pixels', icon: Zap, routeName: 'app.project.pixels.index' },
   { key: 'statistics', icon: BarChart3, routeName: 'app.project.statistics' },
+  { key: 'sites', icon: LineChart, routeName: 'app.project.sites.index' },
   { key: 'activity', icon: History, routeName: 'app.project.activity.index' },
 ];
 

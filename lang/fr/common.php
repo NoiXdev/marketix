@@ -8,6 +8,7 @@ return [
         'qrcodes' => 'QR codes',
         'pixels' => 'Pixels',
         'statistics' => 'Statistiques',
+        'sites' => 'Analytics',
         'activity' => 'Activité',
         'team' => 'Équipe',
     ],

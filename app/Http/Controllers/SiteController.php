@@ -78,6 +78,9 @@ class SiteController extends Controller
 
     public function destroy(Request $request, string $site)
     {
+        // Soft delete only: raw analytics (visits/page_views) are NOT cascaded
+        // here. They are erased by the daily `analytics:prune` command once
+        // they age past the site's (or project's) retention window.
         $project = $request->get('project');
         $project->sites()->findOrFail($site)->delete();
 

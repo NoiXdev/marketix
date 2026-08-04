@@ -24,7 +24,7 @@ class AnalyticsIngestionController extends Controller
             'consent_mode' => $site->consent_mode->value,
             'consent_signal' => $site->consent_signal,
             'respect_dnt' => (bool) $site->respect_dnt,
-        ]);
+        ])->header('Cache-Control', 'public, max-age=300');
     }
 
     public function event(Request $request): Response

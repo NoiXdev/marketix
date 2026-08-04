@@ -206,6 +206,7 @@ Route::group(['domain' => config('app.domain')], function () {
 
 // Public analytics ingestion — reachable on any customer domain (CORS via config/cors.php).
 Route::get('/a/config/{trackingId}', [AnalyticsIngestionController::class, 'config'])
+    ->middleware('throttle:300,1')
     ->name('app.analytics.config');
 Route::post('/a/event', [AnalyticsIngestionController::class, 'event'])
     ->middleware('throttle:120,1')
