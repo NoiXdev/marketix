@@ -32,4 +32,21 @@ class UserAgent
             default => 'Other',
         };
     }
+
+    public static function device(string $ua): string
+    {
+        if ($ua === '') {
+            return 'Desktop';
+        }
+
+        if (preg_match('/iPad|Tablet|Nexus 7|Nexus 10|Kindle|Silk|(Android(?!.*Mobile))/i', $ua)) {
+            return 'Tablet';
+        }
+
+        if (preg_match('/Mobi|iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry|Opera Mini/i', $ua)) {
+            return 'Mobile';
+        }
+
+        return 'Desktop';
+    }
 }
