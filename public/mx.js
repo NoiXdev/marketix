@@ -43,14 +43,24 @@
     };
     if (visitorId) payload.visitor_id = visitorId;
 
-    var body = JSON.stringify(payload);
-    var url = origin + '/a/event';
-
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
-    } else {
-      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
-    }
+    // Cross-origin transport, deliberately non-credentialed:
+    //  - Content-Type text/plain keeps this a CORS "simple request", so the
+    //    browser sends it WITHOUT a preflight (faster, and no OPTIONS to fail).
+    //  - credentials 'omit' means no cookies are sent to our origin, so the
+    //    server's wildcard Access-Control-Allow-Origin '*' is valid for ANY
+    //    customer domain. (sendBeacon can't do this — it always sends in
+    //    credentials 'include' mode, which forbids the '*' wildcard.)
+    // We never need cookies on our origin: the visitor id travels in the body.
+    fetch(origin + '/a/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+      credentials: 'omit',
+      mode: 'cors',
+    }).catch(function () {
+      /* network error: drop the hit silently */
+    });
   }
 
   function consentGranted(signalName) {
@@ -104,7 +114,7 @@
     // own_banner: not selectable via the UI yet (v1.1) — no-op.
   }
 
-  fetch(origin + '/a/config/' + encodeURIComponent(site))
+  fetch(origin + '/a/config/' + encodeURIComponent(site), { credentials: 'omit', mode: 'cors' })
     .then(function (r) {
       if (!r.ok) throw new Error('config');
       return r.json();

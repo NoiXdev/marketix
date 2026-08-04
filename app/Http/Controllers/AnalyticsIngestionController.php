@@ -29,6 +29,15 @@ class AnalyticsIngestionController extends Controller
 
     public function event(Request $request): Response
     {
+        // The beacon is sent as Content-Type: text/plain (a CORS "simple"
+        // content type, so the browser skips the preflight). Laravel does not
+        // auto-parse that into the input bag, so decode the raw JSON body here.
+        // Harmless for application/json callers too (same bytes, same values).
+        $payload = json_decode($request->getContent(), true);
+        if (is_array($payload)) {
+            $request->merge($payload);
+        }
+
         $data = $request->validate([
             'site' => ['required', 'string'],
             'path' => ['required', 'string', 'max:2048'],

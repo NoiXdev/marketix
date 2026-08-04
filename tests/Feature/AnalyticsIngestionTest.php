@@ -39,6 +39,22 @@ class AnalyticsIngestionTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_event_accepts_text_plain_beacon_body(): void
+    {
+        Queue::fake([RecordPageViewJob::class]);
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        // Mirrors the snippet's real transport: a raw JSON string sent with
+        // Content-Type text/plain (CORS "simple request", no preflight).
+        $body = json_encode(['site' => $site->tracking_id, 'path' => '/pricing', 'referrer' => null]);
+
+        $this->call('POST', route('app.analytics.event'), [], [], [], [
+            'CONTENT_TYPE' => 'text/plain',
+        ], $body)->assertStatus(202);
+
+        Queue::assertPushed(RecordPageViewJob::class);
+    }
+
     public function test_cookieless_event_dispatches_job_and_returns_202(): void
     {
         Queue::fake([RecordPageViewJob::class]);
