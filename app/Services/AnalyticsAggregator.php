@@ -118,4 +118,61 @@ class AnalyticsAggregator
             ->select($column, DB::raw('COUNT(*) as count'))
             ->groupBy($column)->orderByDesc('count')->limit($limit)->get();
     }
+
+    /** @return Collection<int, \stdClass> */
+    public function utmBreakdown(string $siteId, string $column, int $days, int $limit = 8): Collection
+    {
+        $allowed = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+        if (! in_array($column, $allowed, true)) {
+            throw new \InvalidArgumentException("Unknown UTM column: {$column}");
+        }
+
+        return $this->visitBase($siteId, $days)
+            ->whereNotNull($column)->where($column, '!=', '')
+            ->select(
+                $column.' as value',
+                DB::raw('COUNT(*) as sessions'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as visitors'),
+            )
+            ->groupBy($column)->orderByDesc('sessions')->limit($limit)->get();
+    }
+
+    /** @return Collection<int, \stdClass> */
+    public function utmSourceMedium(string $siteId, int $days, int $limit = 8): Collection
+    {
+        // Driver-agnostic string concat: SQLite (tests) uses ||, MariaDB (prod) uses CONCAT.
+        $driver = DB::connection()->getDriverName();
+        $value = $driver === 'sqlite'
+            ? "utm_source || ' / ' || COALESCE(utm_medium, '(none)')"
+            : "CONCAT(utm_source, ' / ', COALESCE(utm_medium, '(none)'))";
+
+        return $this->visitBase($siteId, $days)
+            ->whereNotNull('utm_source')->where('utm_source', '!=', '')
+            ->select(
+                DB::raw("{$value} as value"),
+                DB::raw('COUNT(*) as sessions'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as visitors'),
+            )
+            ->groupBy('utm_source', 'utm_medium')->orderByDesc('sessions')->limit($limit)->get();
+    }
+
+    /** @return array{total: int, from_campaigns: int, percent: float} */
+    public function campaignShare(string $siteId, int $days): array
+    {
+        $total = $this->visitBase($siteId, $days)->count();
+
+        $fromCampaigns = $this->visitBase($siteId, $days)
+            ->where(function ($q) {
+                foreach (['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as $c) {
+                    $q->orWhereNotNull($c);
+                }
+            })
+            ->count();
+
+        return [
+            'total' => $total,
+            'from_campaigns' => $fromCampaigns,
+            'percent' => $total > 0 ? round($fromCampaigns / $total * 100, 1) : 0.0,
+        ];
+    }
 }
