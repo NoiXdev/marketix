@@ -1,4 +1,40 @@
-## [1.3.0](https://github.com/NoiXdev/marketix/compare/v1.2.0...v) (2026-06-24)
+## [1.3.1](https://github.com/NoiXdev/marketix/compare/v1.3.0...v) (2026-08-04)
+
+
+### Features
+
+* add breakdownByCountryCode aggregation ([4c100d4](https://github.com/NoiXdev/marketix/commit/4c100d4f9e38d6821fd06492c5c0c5a2f0d12105))
+* add country_code column to statistics ([8c5807a](https://github.com/NoiXdev/marketix/commit/8c5807a70784497d7f77cbdb7749a143f07a3932))
+* add CountryCodes name-to-alpha2 resolver ([d2198af](https://github.com/NoiXdev/marketix/commit/d2198af891dc5710165792fbcc7c4efeb0a9b657))
+* add CrawlerDetector wrapper over jaybizzle/crawler-detect ([bfb6166](https://github.com/NoiXdev/marketix/commit/bfb61667c172d5cc3f2f05252ffaa6cc0b01267b))
+* add is_bot column to statistics ([8be1eb7](https://github.com/NoiXdev/marketix/commit/8be1eb71406b114c257759f32a746e54fcb365d8))
+* add statistics:backfill-country-codes command ([ec40e98](https://github.com/NoiXdev/marketix/commit/ec40e9856909b69b4c37b50952f9c2e3a3150167))
+* add VisitorHash helper with rotating daily salt ([57c2ea4](https://github.com/NoiXdev/marketix/commit/57c2ea4754bcb61012e6b90aae5a766fdf850d1d))
+* add WorldMap choropleth component ([070ffb5](https://github.com/NoiXdev/marketix/commit/070ffb5173c7e42aea22fdb1bbdf1623b0236535))
+* count unique clicks by visitor_hash ([bdf8214](https://github.com/NoiXdev/marketix/commit/bdf82149ae2450e17b2e86a3c1cb9067c23789e7))
+* cover common country-name aliases in backfill resolver ([05dd076](https://github.com/NoiXdev/marketix/commit/05dd07698d29ab1873f17bb0ebf21e1b3b63de29))
+* exclude bot clicks from all statistics reads ([a251286](https://github.com/NoiXdev/marketix/commit/a2512869fe7c29d9040ad7e67d775d0174da8890))
+* expose clicksByCountry prop on statistics pages ([344547f](https://github.com/NoiXdev/marketix/commit/344547fc92dc88e901b1348a53980d63eec36014))
+* flag bot clicks and exclude them from click counters ([0844b41](https://github.com/NoiXdev/marketix/commit/0844b41ecf4bb739f1e61e3234c47c07a2828ce3))
+* hash visitor IP before dispatch so raw IP never reaches the queue ([9b3d1d2](https://github.com/NoiXdev/marketix/commit/9b3d1d23cc55723b860930174bbaa151446d50f0))
+* persist country_code when recording clicks ([5e55f58](https://github.com/NoiXdev/marketix/commit/5e55f580aa07def715f5c54abb8e6267d79db05a))
+* prune statistics older than configurable retention (default 12mo) ([bf56ced](https://github.com/NoiXdev/marketix/commit/bf56ced525fddaf2abd9615419a892f7efdd6622))
+* record visitor_hash with same-day unique de-dup ([474ffe5](https://github.com/NoiXdev/marketix/commit/474ffe56d0d252d5b99ea3635fd8bdd28916513e))
+* render clicks-by-country map on statistics pages ([224053b](https://github.com/NoiXdev/marketix/commit/224053b215df0b628460ab0db86df382a42fbed6))
+* replace statistics.ip column with indexed visitor_hash ([b1b35da](https://github.com/NoiXdev/marketix/commit/b1b35da64356542ac31210a4848edf49820543e9))
+
+
+### Bug Fixes
+
+* use compound visitor_hash index and restore down() symmetry ([55ec60f](https://github.com/NoiXdev/marketix/commit/55ec60f4604ecf42e3d117b403764640a65a924b))
+* use deprecated-code denylist for canonical country codes ([9fa5779](https://github.com/NoiXdev/marketix/commit/9fa57794b255d48f49dc8ee359bf970a6b24840c))
+
+
+### Performance Improvements
+
+* index statistics.created_at for the prune range scan ([de7f6c5](https://github.com/NoiXdev/marketix/commit/de7f6c585d4a257ede09eee8f91de8ba92e10189)), closes [#56](https://github.com/NoiXdev/marketix/issues/56)
+
+## [1.3.0](https://github.com/NoiXdev/marketix/compare/v1.2.0...v1.3.0) (2026-06-24)
 
 
 ### Features
