@@ -30,7 +30,7 @@ class SiteController extends Controller
     {
         return inertia('Sites/Create', [
             'trackingModes' => TrackingMode::options(),
-            'consentModes' => ConsentMode::options(),
+            'consentModes' => ConsentMode::selectableOptions(),
         ]);
     }
 
@@ -61,7 +61,7 @@ class SiteController extends Controller
                 'retention_days' => $model->retention_days,
             ],
             'trackingModes' => TrackingMode::options(),
-            'consentModes' => ConsentMode::options(),
+            'consentModes' => ConsentMode::selectableOptions(),
             'snippetUrl' => rtrim(config('app.url'), '/').'/mx.js',
         ]);
     }

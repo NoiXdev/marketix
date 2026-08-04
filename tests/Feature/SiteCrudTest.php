@@ -37,6 +37,38 @@ class SiteCrudTest extends TestCase
             );
     }
 
+    public function test_create_form_does_not_offer_own_banner_consent_mode(): void
+    {
+        [$user, $project] = $this->userWithProject();
+
+        $this->actingAs($user)
+            ->get(route('app.project.sites.create', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Sites/Create')
+                ->where('consentModes', fn ($modes) => collect($modes)->doesntContain('value', 'own_banner')
+                    && collect($modes)->contains('value', 'immediate')
+                    && collect($modes)->contains('value', 'third_party_signal'))
+            );
+    }
+
+    public function test_own_banner_consent_mode_is_rejected_by_validation(): void
+    {
+        [$user, $project] = $this->userWithProject();
+
+        $this->actingAs($user)
+            ->post(route('app.project.sites.store', ['project' => $project->id]), [
+                'name' => 'Shop',
+                'domain' => 'shop.example.com',
+                'tracking_mode' => 'cookie',
+                'consent_mode' => 'own_banner',
+                'respect_dnt' => false,
+            ])
+            ->assertSessionHasErrors('consent_mode');
+
+        $this->assertDatabaseMissing('sites', ['domain' => 'shop.example.com']);
+    }
+
     public function test_store_creates_a_site(): void
     {
         [$user, $project] = $this->userWithProject();
