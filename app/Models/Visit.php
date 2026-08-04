@@ -30,6 +30,11 @@ class Visit extends Model
         'os',
         'device',
         'referer_domain',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_term',
+        'utm_content',
         'is_bot',
     ];
 

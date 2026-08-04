@@ -25,6 +25,11 @@ class VisitFactory extends Factory
             'os' => 'macOS',
             'device' => 'Desktop',
             'referer_domain' => null,
+            'utm_source' => null,
+            'utm_medium' => null,
+            'utm_campaign' => null,
+            'utm_term' => null,
+            'utm_content' => null,
             'is_bot' => false,
         ];
     }
@@ -46,5 +51,17 @@ class VisitFactory extends Factory
             'site_id' => $site->id,
             'project_id' => $site->project_id,
         ]);
+    }
+
+    /** @param array<string, string|null> $utm */
+    public function withUtm(array $utm = [
+        'utm_source' => 'google',
+        'utm_medium' => 'cpc',
+        'utm_campaign' => 'summer',
+        'utm_term' => 'shoes',
+        'utm_content' => 'ad-a',
+    ]): static
+    {
+        return $this->state(fn (array $attributes) => $utm);
     }
 }

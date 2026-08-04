@@ -19,6 +19,11 @@ class PageViewFactory extends Factory
             'path' => '/'.$this->faker->slug(),
             'referer' => null,
             'referer_domain' => null,
+            'utm_source' => null,
+            'utm_medium' => null,
+            'utm_campaign' => null,
+            'utm_term' => null,
+            'utm_content' => null,
             'country' => $this->faker->country(),
             'country_code' => $this->faker->countryCode(),
             'city' => $this->faker->city(),
@@ -59,5 +64,17 @@ class PageViewFactory extends Factory
             'site_id' => $visit->site_id,
             'project_id' => $visit->project_id,
         ]);
+    }
+
+    /** @param array<string, string|null> $utm */
+    public function withUtm(array $utm = [
+        'utm_source' => 'google',
+        'utm_medium' => 'cpc',
+        'utm_campaign' => 'summer',
+        'utm_term' => 'shoes',
+        'utm_content' => 'ad-a',
+    ]): static
+    {
+        return $this->state(fn (array $attributes) => $utm);
     }
 }
