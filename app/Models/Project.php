@@ -68,6 +68,11 @@ class Project extends Model
         return $this->hasMany(Pixel::class);
     }
 
+    public function sites(): HasMany
+    {
+        return $this->hasMany(Site::class);
+    }
+
     public function invitations(): HasMany
     {
         return $this->hasMany(ProjectInvitation::class);

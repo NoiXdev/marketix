@@ -24,6 +24,7 @@ use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
@@ -136,6 +137,14 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/pixels/{pixel}/edit', [PixelController::class, 'edit'])->name('app.project.pixels.edit');
             Route::put('/pixels/{pixel}', [PixelController::class, 'update'])->name('app.project.pixels.update');
             Route::delete('/pixels/{pixel}', [PixelController::class, 'destroy'])->name('app.project.pixels.destroy');
+
+            // Sites (analytics)
+            Route::get('/sites', [SiteController::class, 'index'])->name('app.project.sites.index');
+            Route::get('/sites/create', [SiteController::class, 'create'])->name('app.project.sites.create');
+            Route::post('/sites', [SiteController::class, 'store'])->name('app.project.sites.store');
+            Route::get('/sites/{site}/edit', [SiteController::class, 'edit'])->name('app.project.sites.edit');
+            Route::put('/sites/{site}', [SiteController::class, 'update'])->name('app.project.sites.update');
+            Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
 
             // Team (project admins only)
             Route::middleware('project_admin')->group(function () {

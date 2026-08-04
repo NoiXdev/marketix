@@ -42,6 +42,19 @@ export interface Pixel {
 
 export type PixelOption = Pick<Pixel, 'id' | 'name' | 'provider'>;
 
+export interface Site {
+  id: string;
+  name: string;
+  domain: string;
+  tracking_id: string;
+  tracking_mode: string;
+  consent_mode: string;
+  consent_signal?: string | null;
+  respect_dnt?: boolean;
+  retention_days?: number | null;
+  created_at?: string;
+}
+
 export type ProjectRole = 'admin' | 'member';
 
 export interface ProjectMember {
