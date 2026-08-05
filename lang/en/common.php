@@ -27,6 +27,9 @@ return [
     'language' => [
         'label' => 'Language',
     ],
+    'projects' => [
+        'label' => 'Project',
+    ],
     'actions' => [
         'save' => 'Save',
         'cancel' => 'Cancel',

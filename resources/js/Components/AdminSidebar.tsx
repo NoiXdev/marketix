@@ -1,7 +1,16 @@
-import SidebarBottom from '@/Components/SidebarBottom';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Link, usePage } from '@inertiajs/react';
-import { Activity, ArrowLeft, FolderKanban, HardDrive, Mail, Palette, ScrollText, Users } from 'lucide-react';
+import { Activity, ArrowLeft, BookOpen, FolderKanban, HardDrive, Mail, Palette, ScrollText, Shield, LucideLogOut, Users } from 'lucide-react';
 import Brand from './Brand';
+
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
 
 const navItems = [
   { label: 'Users', icon: Users, routeName: 'app.admin.users.index' },
@@ -14,6 +23,7 @@ const navItems = [
 
 export default function AdminSidebar() {
   const { url } = usePage();
+  const { auth, version } = usePage<import('@/types').PageProps>().props;
 
   return (
     <aside className="flex h-screen w-60 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -71,7 +81,48 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="border-t border-slate-200 p-3 dark:border-slate-800">
-        <SidebarBottom docsUrl="https://docs.noix.dev/marketix/admin/introduction/" />
+        <div className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+            {initials(auth.user.name)}
+          </span>
+          <div>
+            <span className="flex-1 truncate text-left text-sm font-medium">{auth.user.name}</span>
+            <br />
+            <span className="flex-1 truncate text-left text-xs font-medium">{auth.user.email}</span>
+          </div>
+        </div>
+
+        <div className="flex justify-between px-3">
+          <ThemeToggle />
+          <a
+            className="cursor-pointer rounded-lg border border-slate-200 p-1 hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800"
+            href="https://docs.noix.dev/marketix/admin/introduction/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Documentation"
+            title="Documentation"
+          >
+            <BookOpen className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+          </a>
+          {auth.user.super_admin && (
+            <Link
+              className="cursor-pointer rounded-lg border border-slate-200 p-1 hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800"
+              href={route('app.admin.users.index')}
+            >
+              <Shield className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+            </Link>
+          )}
+          <Link
+            className="cursor-pointer rounded-lg border border-slate-200 p-1 hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800"
+            href={route('app.auth.logout')}
+            method="post"
+            as="button"
+          >
+            <LucideLogOut className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+          </Link>
+        </div>
+
+        <p className="mt-2 px-3 text-center text-xs text-slate-500 dark:text-slate-400">v{version}</p>
       </div>
     </aside>
   );

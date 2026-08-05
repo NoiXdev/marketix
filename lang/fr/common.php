@@ -27,6 +27,9 @@ return [
     'language' => [
         'label' => 'Langue',
     ],
+    'projects' => [
+        'label' => 'Projet',
+    ],
     'actions' => [
         'save' => 'Enregistrer',
         'cancel' => 'Annuler',
