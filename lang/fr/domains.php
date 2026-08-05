@@ -29,6 +29,7 @@ return [
         'back' => 'Retour aux domaines',
         'add_title' => 'Ajouter un domaine',
         'edit_title' => 'Modifier',
+        'edit_page_title' => 'Modifier le domaine',
         'name' => 'Nom de domaine',
         'name_placeholder' => 'links.exemple.com',
         'root_redirect' => 'Redirection racine',

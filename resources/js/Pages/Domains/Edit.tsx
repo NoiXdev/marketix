@@ -36,7 +36,7 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
   }
 
   return (
-    <AppLayout title={t('domains.form.edit_title')}>
+    <AppLayout title={t('domains.form.edit_page_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.domains.index', { project: project!.id })}>{t('domains.form.back')}</BackLink>
@@ -51,7 +51,7 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
           <FormSection>
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-foreground">{t('domains.form.status_title')}</h2>
-              <Button variant="secondary" onClick={check} disabled={checking} className="px-2.5 py-1.5 text-xs">
+              <Button variant="secondary" size="sm" onClick={check} disabled={checking}>
                 <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
                 {t('domains.form.check_now')}
               </Button>

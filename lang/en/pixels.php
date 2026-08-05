@@ -19,6 +19,7 @@ return [
         'back' => 'Back to pixels',
         'add_title' => 'Add pixel',
         'edit_title' => 'Edit',
+        'edit_page_title' => 'Edit pixel',
         'section' => 'Pixel settings',
         'provider' => 'Provider',
         'name' => 'Name',

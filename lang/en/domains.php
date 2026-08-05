@@ -29,6 +29,7 @@ return [
         'back' => 'Back to domains',
         'add_title' => 'Add domain',
         'edit_title' => 'Edit',
+        'edit_page_title' => 'Edit domain',
         'name' => 'Domain name',
         'name_placeholder' => 'links.example.com',
         'root_redirect' => 'Root redirect',

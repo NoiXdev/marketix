@@ -29,7 +29,7 @@ export default function PixelsEdit({
   });
 
   return (
-    <AppLayout title={t('pixels.form.edit_title')}>
+    <AppLayout title={t('pixels.form.edit_page_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.pixels.index', { project: project!.id })}>{t('pixels.form.back')}</BackLink>

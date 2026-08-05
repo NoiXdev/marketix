@@ -19,6 +19,7 @@ return [
         'back' => 'Zurück zu den Pixeln',
         'add_title' => 'Pixel hinzufügen',
         'edit_title' => 'Bearbeiten',
+        'edit_page_title' => 'Pixel bearbeiten',
         'section' => 'Pixel-Einstellungen',
         'provider' => 'Anbieter',
         'name' => 'Name',

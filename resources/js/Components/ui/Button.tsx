@@ -2,9 +2,15 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Size = 'sm' | 'md';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] disabled:pointer-events-none disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-sm)] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] disabled:pointer-events-none disabled:opacity-50';
+
+const sizes: Record<Size, string> = {
+  sm: 'px-2.5 py-1.5 text-xs',
+  md: 'px-4 py-2 text-sm',
+};
 
 const variants: Record<Variant, string> = {
   primary: 'bg-accent text-accent-foreground hover:bg-accent-hover',
@@ -16,15 +22,16 @@ const variants: Record<Variant, string> = {
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
+  size?: Size;
   loading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', className = '', loading = false, disabled, children, ...props },
+  { variant = 'primary', size = 'md', type = 'button', className = '', loading = false, disabled, children, ...props },
   ref,
 ) {
   return (
-    <button ref={ref} disabled={disabled || loading} className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <button ref={ref} type={type} disabled={disabled || loading} className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...props}>
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
       {children}
     </button>

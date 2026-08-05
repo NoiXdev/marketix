@@ -19,6 +19,7 @@ return [
         'back' => 'Terug naar pixels',
         'add_title' => 'Pixel toevoegen',
         'edit_title' => 'Bewerken',
+        'edit_page_title' => 'Pixel bewerken',
         'section' => 'Pixelinstellingen',
         'provider' => 'Aanbieder',
         'name' => 'Naam',

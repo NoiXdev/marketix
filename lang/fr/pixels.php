@@ -19,6 +19,7 @@ return [
         'back' => 'Retour aux pixels',
         'add_title' => 'Ajouter un pixel',
         'edit_title' => 'Modifier',
+        'edit_page_title' => 'Modifier le pixel',
         'section' => 'Paramètres du pixel',
         'provider' => 'Fournisseur',
         'name' => 'Nom',

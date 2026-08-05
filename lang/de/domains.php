@@ -29,6 +29,7 @@ return [
         'back' => 'Zurück zu den Domains',
         'add_title' => 'Domain hinzufügen',
         'edit_title' => 'Bearbeiten',
+        'edit_page_title' => 'Domain bearbeiten',
         'name' => 'Domainname',
         'name_placeholder' => 'links.beispiel.de',
         'root_redirect' => 'Root-Weiterleitung',

@@ -29,6 +29,7 @@ return [
         'back' => 'Terug naar domeinen',
         'add_title' => 'Domein toevoegen',
         'edit_title' => 'Bewerken',
+        'edit_page_title' => 'Domein bewerken',
         'name' => 'Domeinnaam',
         'name_placeholder' => 'links.voorbeeld.nl',
         'root_redirect' => 'Root-omleiding',
