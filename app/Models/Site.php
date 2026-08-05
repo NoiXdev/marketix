@@ -82,6 +82,11 @@ class Site extends Model
         return $this->hasMany(PageView::class);
     }
 
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
     protected function casts(): array
     {
         return [
