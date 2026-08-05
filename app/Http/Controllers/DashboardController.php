@@ -2,62 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Statistic;
+use App\Models\Activity;
+use App\Services\StatisticsAggregator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function show(Request $request)
+    public function show(Request $request, StatisticsAggregator $stats)
     {
         $project = $request->get('project');
 
         $days = (int) $request->input('days', 30);
-        $days = in_array($days, [7, 30, 90, 180, 365], true) ? $days : 30;
+        $days = in_array($days, [7, 30, 90, 365], true) ? $days : 30;
+
+        $now = now();
+        $since = $now->copy()->subDays($days - 1)->startOfDay();
+        $until = $now;
+        $prevSince = $since->copy()->subDays($days);
+        $prevUntil = $since->copy()->subSecond();
+
+        $curClicks = $stats->totalClicks($project->id, null, $since, $until);
+        $prevClicks = $stats->totalClicks($project->id, null, $prevSince, $prevUntil);
+        $curUnique = $stats->uniqueClicks($project->id, null, $since, $until);
+        $prevUnique = $stats->uniqueClicks($project->id, null, $prevSince, $prevUntil);
+
+        $linksNow = $project->urls()->count();
+        $linksBefore = $project->urls()->where('created_at', '<', $since)->count();
+        $linksPrevEnd = $project->urls()->where('created_at', '<=', $prevUntil)->count();
+        $avgCur = $linksNow > 0 ? (int) round($curClicks / $linksNow) : 0;
+        $avgPrev = $linksPrevEnd > 0 ? (int) round($prevClicks / $linksPrevEnd) : 0;
 
         return inertia('Dashboard', [
-            'urlsCount' => $project->urls()->count(),
-            'domainsCount' => $project->domains()->count(),
-            'totalClicks' => $project->urls()->sum('clicks'),
-            'totalUniqueClicks' => $project->urls()->sum('unique_clicks'),
             'days' => $days,
-            'clicksByDay' => $this->clicksByDay($project->id, $days),
+            'kpis' => [
+                'clicks' => ['value' => $curClicks, 'deltaPct' => $this->pct($curClicks, $prevClicks)],
+                'uniqueVisitors' => ['value' => $curUnique, 'deltaPct' => $this->pct($curUnique, $prevUnique)],
+                'activeLinks' => [
+                    'value' => $linksNow,
+                    'deltaPct' => $this->pct($linksNow, $linksBefore),
+                    'newInPeriod' => $project->urls()->where('created_at', '>=', $since)->count(),
+                    'domains' => $project->domains()->count(),
+                    'qrCodes' => $project->qrCodes()->count(),
+                ],
+                'avgPerLink' => ['value' => $avgCur, 'deltaPct' => $this->pct($avgCur, $avgPrev)],
+            ],
+            'clicksByDay' => $stats->clicksByDay($project->id, null, $days),
+            'topLinks' => $stats->topLinks($project->id, $since, $until, 5),
+            'topCountries' => $stats->breakdownByCountryCode($project->id, null, $since, $until, 5),
+            'recentActivity' => Activity::query()
+                ->forProject($project)
+                ->with('causer')
+                ->latest('id')
+                ->limit(6)
+                ->get()
+                ->map(fn (Activity $a) => $a->toFeedArray()),
         ]);
     }
 
-    /**
-     * Daily total and unique (distinct-visitor_hash) clicks over the trailing window,
-     * with zero-clicks days filled in so the chart has a continuous x-axis.
-     *
-     * @return list<array{date: string, clicks: int, unique: int}>
-     */
-    private function clicksByDay(string $projectId, int $days): array
+    private function pct(int $cur, int $prev): ?float
     {
-        $since = now()->subDays($days - 1)->startOfDay();
-
-        $rows = Statistic::where('project_id', $projectId)
-            ->where('is_bot', false)
-            ->where('created_at', '>=', $since)
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as clicks'),
-                DB::raw('COUNT(DISTINCT visitor_hash) as unique_clicks'),
-            )
-            ->groupBy('date')
-            ->get()
-            ->keyBy('date');
-
-        $clicksByDay = [];
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
-            $row = $rows->get($date);
-            $clicksByDay[] = [
-                'date' => $date,
-                'clicks' => (int) ($row->clicks ?? 0),
-                'unique' => (int) ($row->unique_clicks ?? 0),
-            ];
-        }
-
-        return $clicksByDay;
+        return $prev > 0 ? round(($cur - $prev) / $prev * 100, 1) : null;
     }
 }
