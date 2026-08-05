@@ -73,4 +73,13 @@ return [
         'range_year' => '1J',
         'unique' => 'Unique',
     ],
+    'report' => [
+        'download_pdf' => 'PDF herunterladen',
+        'preset' => 'Voreinstellung',
+        'custom' => 'Benutzerdefiniert',
+        'day_suffix' => 'T',
+        'from' => 'Von',
+        'to' => 'Bis',
+        'download_range' => 'Zeitraum herunterladen',
+    ],
 ];

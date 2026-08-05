@@ -73,4 +73,13 @@ return [
         'range_year' => '1 jr',
         'unique' => 'Uniek',
     ],
+    'report' => [
+        'download_pdf' => 'PDF downloaden',
+        'preset' => 'Voorinstelling',
+        'custom' => 'Aangepast',
+        'day_suffix' => 'd',
+        'from' => 'Van',
+        'to' => 'Tot',
+        'download_range' => 'Bereik downloaden',
+    ],
 ];

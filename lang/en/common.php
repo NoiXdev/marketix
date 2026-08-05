@@ -73,4 +73,13 @@ return [
         'range_year' => '1y',
         'unique' => 'Unique',
     ],
+    'report' => [
+        'download_pdf' => 'Download PDF',
+        'preset' => 'Preset',
+        'custom' => 'Custom',
+        'day_suffix' => 'd',
+        'from' => 'From',
+        'to' => 'To',
+        'download_range' => 'Download range',
+    ],
 ];

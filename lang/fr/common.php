@@ -73,4 +73,13 @@ return [
         'range_year' => '1 an',
         'unique' => 'Unique',
     ],
+    'report' => [
+        'download_pdf' => 'Télécharger le PDF',
+        'preset' => 'Préréglage',
+        'custom' => 'Personnalisé',
+        'day_suffix' => 'j',
+        'from' => 'Du',
+        'to' => 'Au',
+        'download_range' => 'Télécharger la période',
+    ],
 ];

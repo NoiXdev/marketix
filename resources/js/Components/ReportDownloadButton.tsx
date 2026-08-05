@@ -1,5 +1,7 @@
+import { Button, Input } from '@/Components/ui';
+import { useTranslation } from '@/lib/i18n';
 import { Download } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = { projectId: string; urlId?: string };
 
@@ -7,6 +9,23 @@ export default function ReportDownloadButton({ projectId, urlId }: Props) {
   const [open, setOpen] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, []);
 
   const build = (params: Record<string, string | number>) => {
     const base = { project: projectId, ...(urlId ? { url: urlId } : {}), ...params };
@@ -21,35 +40,53 @@ export default function ReportDownloadButton({ projectId, urlId }: Props) {
   };
 
   return (
-    <div className="relative">
-      <button
+    <div className="relative" ref={ref}>
+      <Button
         type="button"
+        variant="secondary"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+        aria-haspopup="true"
+        aria-expanded={open}
       >
-        <Download className="h-4 w-4" /> Download PDF
-      </button>
+        <Download className="h-4 w-4" /> {t('common.report.download_pdf')}
+      </Button>
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-700 dark:bg-slate-900">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Preset</div>
+        <div className="absolute right-0 z-20 mt-2 w-64 rounded-[var(--radius)] border border-line bg-surface p-3 shadow-[var(--shadow)]">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">
+            {t('common.report.preset')}
+          </div>
           <div className="flex gap-2">
             {[7, 30, 90].map((d) => (
-              <button key={d} type="button" onClick={() => go({ range: d })}
-                className="flex-1 rounded-lg bg-slate-100 px-2 py-1.5 text-sm hover:bg-indigo-100 dark:bg-slate-800">
-                {d}d
+              <button
+                key={d}
+                type="button"
+                onClick={() => go({ range: d })}
+                className="flex-1 rounded-[var(--radius-sm)] bg-elevated px-2 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent-soft hover:text-accent-soft-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              >
+                {d}
+                {t('common.report.day_suffix')}
               </button>
             ))}
           </div>
-          <div className="my-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Custom</div>
+          <div className="my-2 text-xs font-semibold uppercase tracking-wide text-subtle">
+            {t('common.report.custom')}
+          </div>
           <div className="flex flex-col gap-2">
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)}
-              className="rounded-lg border border-slate-200 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-800" />
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)}
-              className="rounded-lg border border-slate-200 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-800" />
-            <button type="button" disabled={!from || !to} onClick={() => go({ from, to })}
-              className="rounded-lg bg-indigo-600 px-2 py-1.5 text-sm font-medium text-white disabled:opacity-50">
-              Download range
-            </button>
+            <Input
+              type="date"
+              aria-label={t('common.report.from')}
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+            <Input
+              type="date"
+              aria-label={t('common.report.to')}
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+            <Button type="button" disabled={!from || !to} onClick={() => go({ from, to })}>
+              {t('common.report.download_range')}
+            </Button>
           </div>
         </div>
       )}
