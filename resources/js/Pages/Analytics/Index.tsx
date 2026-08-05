@@ -175,7 +175,12 @@ export default function AnalyticsIndex({
           <ul className="space-y-1">
             {topEvents.map((e, i) => (
               <li key={i} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                <span className="truncate font-mono">{e.name}</span>
+                <Link
+                  href={route('app.project.analytics.events.show', { project: project!.id, site: site.id, name: e.name })}
+                  className="truncate font-mono text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  {e.name}
+                </Link>
                 <span className="font-medium">
                   {e.count}
                   <span className="ml-1 text-xs text-gray-400">({e.visitors})</span>
