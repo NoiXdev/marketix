@@ -11,11 +11,18 @@ return [
         'sites' => 'Analytics',
         'activity' => 'Aktivität',
         'team' => 'Team',
+        'groups' => [
+            'overview' => 'Überblick',
+            'links_codes' => 'Links & Codes',
+            'insights' => 'Insights',
+            'management' => 'Verwaltung',
+        ],
     ],
     'user_menu' => [
         'admin' => 'Administration',
         'profile' => 'Profil',
         'logout' => 'Abmelden',
+        'docs' => 'Dokumentation',
     ],
     'language' => [
         'label' => 'Sprache',

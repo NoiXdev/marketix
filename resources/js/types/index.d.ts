@@ -117,4 +117,5 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   locale: string;
   availableLocales: { code: string; label: string }[];
   translations: Record<string, unknown>;
+  navCounts?: Record<string, number>;
 };
