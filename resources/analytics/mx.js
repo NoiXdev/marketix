@@ -56,6 +56,8 @@
 
   var utmParams = readUtm();
 
+  var siteConfig = null;
+
   function send(visitorId) {
     var payload = {
       site: site,
@@ -83,6 +85,62 @@
     }).catch(function () {
       /* network error: drop the hit silently */
     });
+  }
+
+  function postEvent(name, props, visitorId) {
+    var payload = { site: site, type: 'event', name: name, path: location.pathname };
+    if (props) payload.props = props;
+    if (visitorId) payload.visitor_id = visitorId;
+
+    fetch(origin + '/a/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+      credentials: 'omit',
+      mode: 'cors',
+    }).catch(function () {});
+  }
+
+  function firstPartyId() {
+    var vid = getCookie(VID_COOKIE);
+    if (!vid) {
+      vid = randomId();
+      setCookie(VID_COOKIE, vid, 365);
+    }
+    return vid;
+  }
+
+  function sendEvent(name, props) {
+    if (!siteConfig) return; // config not yet loaded (queued calls flush after load)
+    if (props) {
+      try {
+        if (JSON.stringify(props).length > 1024) props = null;
+      } catch (e) {
+        props = null;
+      }
+    }
+    if (siteConfig.tracking_mode !== 'cookie') {
+      postEvent(name, props, null);
+      return;
+    }
+    if (siteConfig.consent_mode === 'third_party_signal' && !consentGranted(siteConfig.consent_signal)) {
+      return; // no consent, no event
+    }
+    postEvent(name, props, firstPartyId());
+  }
+
+  function installMarketix() {
+    var queued = (window.marketix && window.marketix.q) || [];
+    window.marketix = function (cmd) {
+      if (cmd === 'event') {
+        var name = arguments[1];
+        if (name) sendEvent(String(name), arguments[2] || null);
+      }
+    };
+    for (var i = 0; i < queued.length; i++) {
+      window.marketix.apply(null, queued[i]);
+    }
   }
 
   function consentGranted(signalName) {
@@ -141,7 +199,11 @@
       if (!r.ok) throw new Error('config');
       return r.json();
     })
-    .then(track)
+    .then(function (config) {
+      siteConfig = config;
+      track(config);
+      installMarketix();
+    })
     .catch(function () {
       /* unknown site or network error: do nothing */
     });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TrackingMode;
+use App\Jobs\RecordEventJob;
 use App\Jobs\RecordPageViewJob;
 use App\Models\Site;
 use App\Services\GeoIpService;
@@ -63,6 +64,12 @@ class AnalyticsIngestionController extends Controller
             $request->merge($payload);
         }
 
+        // This is a JSON API consumed via fetch()/beacon, never a browser
+        // navigation — force JSON error responses so validation failures
+        // return 422 + errors instead of a redirect (the default for
+        // requests that don't send an explicit Accept: application/json).
+        $request->headers->set('Accept', 'application/json');
+
         $data = $request->validate([
             'site' => ['required', 'string'],
             'path' => ['required', 'string', 'max:2048'],
@@ -74,6 +81,9 @@ class AnalyticsIngestionController extends Controller
             'utm.campaign' => ['nullable', 'string', 'max:255'],
             'utm.term' => ['nullable', 'string', 'max:255'],
             'utm.content' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', 'in:pageview,event'],
+            'name' => ['nullable', 'required_if:type,event', 'string', 'max:255'],
+            'props' => ['nullable', 'array'],
         ]);
 
         $noop = response('', 204);
@@ -102,6 +112,26 @@ class AnalyticsIngestionController extends Controller
 
         // Path only, query string stripped for privacy.
         $path = '/'.ltrim(parse_url($data['path'], PHP_URL_PATH) ?: '/', '/');
+
+        if (($data['type'] ?? 'pageview') === 'event') {
+            $props = $data['props'] ?? null;
+            if ($props !== null && strlen((string) json_encode($props)) > 1024) {
+                return $noop; // oversized props — drop silently, don't error the page
+            }
+
+            RecordEventJob::dispatch(
+                $site->id,
+                $site->project_id,
+                $visitorHash,
+                $userAgent,
+                $data['name'],
+                $props,
+                $path,
+                $data['referrer'] ?? null,
+            );
+
+            return response('', 202);
+        }
 
         $utm = [];
         foreach (['source', 'medium', 'campaign', 'term', 'content'] as $k) {

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Jobs\RecordPageViewJob;
+use App\Models\Event;
 use App\Models\Site;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -182,5 +183,51 @@ class AnalyticsIngestionTest extends TestCase
 
         $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'utm_source' => null, 'utm_medium' => 'cpc']);
         $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => null, 'utm_medium' => 'cpc']);
+    }
+
+    public function test_event_type_records_an_event_on_the_current_session(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $headers = ['CONTENT_TYPE' => 'text/plain', 'REMOTE_ADDR' => '203.0.113.9', 'HTTP_USER_AGENT' => 'Mozilla/5.0 (TestAgent)'];
+
+        // A pageview first (opens the session), then an event in the same session.
+        $pv = json_encode(['site' => $site->tracking_id, 'path' => '/lp']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, $pv)->assertStatus(202);
+
+        $ev = json_encode(['site' => $site->tracking_id, 'type' => 'event', 'name' => 'purchase', 'props' => ['plan' => 'pro'], 'path' => '/checkout']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, $ev)->assertStatus(202);
+
+        $this->assertSame(1, $site->visits()->count()); // same session
+        $this->assertSame(1, $site->visits()->first()->pageview_count); // event did not increment
+        $this->assertDatabaseHas('events', ['site_id' => $site->id, 'name' => 'purchase', 'path' => '/checkout']);
+        $this->assertSame(['plan' => 'pro'], \App\Models\Event::where('site_id', $site->id)->first()->props);
+    }
+
+    public function test_event_without_prior_pageview_opens_visit_with_zero_pageviews(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $ev = json_encode(['site' => $site->tracking_id, 'type' => 'event', 'name' => 'signup', 'path' => '/']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $ev)->assertStatus(202);
+
+        $this->assertSame(1, $site->visits()->count());
+        $this->assertSame(0, $site->visits()->first()->pageview_count);
+        $this->assertDatabaseHas('events', ['site_id' => $site->id, 'name' => 'signup']);
+    }
+
+    public function test_event_without_name_is_422(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $ev = json_encode(['site' => $site->tracking_id, 'type' => 'event', 'path' => '/']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $ev)->assertStatus(422);
+    }
+
+    public function test_event_props_over_1kb_are_dropped_as_noop(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $big = ['blob' => str_repeat('x', 1100)];
+        $ev = json_encode(['site' => $site->tracking_id, 'type' => 'event', 'name' => 'huge', 'props' => $big, 'path' => '/']);
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $ev)->assertStatus(204);
+
+        $this->assertDatabaseMissing('events', ['site_id' => $site->id, 'name' => 'huge']);
     }
 }

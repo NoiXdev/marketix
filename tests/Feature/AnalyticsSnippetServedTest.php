@@ -26,6 +26,11 @@ class AnalyticsSnippetServedTest extends TestCase
         $this->assertStringContainsString('URLSearchParams', $contents);
         $this->assertStringContainsString('utm_', $contents);
         $this->assertStringContainsString('payload.utm', $contents);
+
+        // Custom event API
+        $this->assertStringContainsString('window.marketix', $contents);
+        $this->assertStringContainsString('marketix.q', $contents);
+        $this->assertStringContainsString("'event'", $contents);
     }
 
     public function test_snippet_is_served_with_js_content_type_and_cache_headers(): void
