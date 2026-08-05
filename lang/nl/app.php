@@ -9,4 +9,9 @@ return [
     'site_created' => 'Website aangemaakt.',
     'site_updated' => 'Website bijgewerkt.',
     'site_deleted' => 'Website verwijderd.',
+    'goal_type_event' => 'Gebeurtenis',
+    'goal_type_pageview' => 'Paginaweergave',
+    'goal_created' => 'Doel aangemaakt.',
+    'goal_updated' => 'Doel bijgewerkt.',
+    'goal_deleted' => 'Doel verwijderd.',
 ];

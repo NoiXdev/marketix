@@ -9,4 +9,9 @@ return [
     'site_created' => 'Site created.',
     'site_updated' => 'Site updated.',
     'site_deleted' => 'Site deleted.',
+    'goal_type_event' => 'Event',
+    'goal_type_pageview' => 'Page view',
+    'goal_created' => 'Goal created.',
+    'goal_updated' => 'Goal updated.',
+    'goal_deleted' => 'Goal deleted.',
 ];

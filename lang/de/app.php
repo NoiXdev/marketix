@@ -9,4 +9,9 @@ return [
     'site_created' => 'Website erstellt.',
     'site_updated' => 'Website aktualisiert.',
     'site_deleted' => 'Website gelöscht.',
+    'goal_type_event' => 'Ereignis',
+    'goal_type_pageview' => 'Seitenaufruf',
+    'goal_created' => 'Ziel erstellt.',
+    'goal_updated' => 'Ziel aktualisiert.',
+    'goal_deleted' => 'Ziel gelöscht.',
 ];
