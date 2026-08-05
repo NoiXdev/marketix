@@ -15,7 +15,7 @@ export default function AppLayout({ children, title }: PropsWithChildren<AppLayo
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-canvas text-foreground">
       {title && <Head title={title} />}
       <Sidebar />
       <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>

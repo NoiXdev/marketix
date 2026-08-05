@@ -18,11 +18,11 @@ export default function ProjectSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground"
       >
-        <FolderKanban className="h-4 w-4 shrink-0 text-slate-400" />
+        <FolderKanban className="h-4 w-4 shrink-0 text-subtle" />
         <span className="flex-1 truncate text-left">{currentProject?.name}</span>
-        <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+        <ChevronDown className="h-4 w-4 shrink-0 text-subtle" />
       </button>
 
       {open && (
@@ -30,17 +30,17 @@ export default function ProjectSwitcher() {
           {/* Backdrop */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           {/* Dropdown */}
-          <div className="absolute top-full left-0 z-20 mb-1 w-56 rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-            <p className="px-3 py-1.5 text-xs font-semibold tracking-wider text-slate-400 uppercase">Projects</p>
+          <div className="absolute top-full left-0 z-20 mb-1 w-56 rounded-md border border-line bg-surface py-1 shadow-lg">
+            <p className="px-3 py-1.5 text-xs font-semibold tracking-wider text-subtle uppercase">Projects</p>
             {projects.map((p) => (
               <button
                 key={p.id}
                 onClick={() => switchProject(p)}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground"
               >
-                <FolderKanban className="h-4 w-4 shrink-0 text-slate-400" />
+                <FolderKanban className="h-4 w-4 shrink-0 text-subtle" />
                 <span className="flex-1 truncate text-left">{p.name}</span>
-                {p.id === currentProject?.id && <Check className="h-4 w-4 text-indigo-600" />}
+                {p.id === currentProject?.id && <Check className="h-4 w-4 text-accent" />}
               </button>
             ))}
           </div>
