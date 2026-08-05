@@ -66,7 +66,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex h-screen shrink-0 flex-col border-r border-line bg-elevated transition-[width] duration-200 ${
+      className={`flex h-screen shrink-0 flex-col border-r border-line bg-elevated transition-[width] duration-200 motion-reduce:transition-none ${
         collapsed ? 'w-[72px]' : 'w-64'
       }`}
     >
@@ -84,7 +84,7 @@ export default function Sidebar() {
             collapsed ? 'mx-auto' : 'ml-auto'
           }`}
         >
-          <ChevronLeft className={`h-[15px] w-[15px] transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`} />
+          <ChevronLeft className={`h-[15px] w-[15px] transition-transform duration-200 motion-reduce:transition-none ${collapsed ? 'rotate-180' : ''}`} />
         </button>
       </div>
 
@@ -129,7 +129,7 @@ export default function Sidebar() {
                       ) : null}
                     </Link>
                     {collapsed && (
-                      <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 z-40 hidden -translate-y-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-semibold text-canvas shadow-[var(--shadow)] group-hover:block">
+                      <span className="pointer-events-none absolute left-[calc(100%+10px)] top-1/2 z-40 hidden -translate-y-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-semibold text-canvas shadow-[var(--shadow)] group-hover:block group-focus-within:block">
                         {t(`common.nav.${key}`)}
                       </span>
                     )}
