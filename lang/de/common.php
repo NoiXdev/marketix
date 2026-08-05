@@ -69,5 +69,7 @@ return [
         'qa_domain_d' => 'Eigene Domain',
         'no_data' => 'Keine Daten',
         'no_activity' => 'Noch keine Aktivität',
+        'range_days' => 'T',
+        'range_year' => '1J',
     ],
 ];

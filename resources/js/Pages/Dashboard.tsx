@@ -49,7 +49,7 @@ export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountr
             <div className="inline-flex overflow-hidden rounded-lg border border-line">
               {RANGES.map((d) => (
                 <button key={d} onClick={() => setDays(d)} className={`border-r border-line px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${days === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'}`}>
-                  {d === 365 ? '1J' : `${d}T`}
+                  {d === 365 ? t('common.dashboard.range_year') : `${d}${t('common.dashboard.range_days')}`}
                 </button>
               ))}
             </div>
@@ -65,7 +65,7 @@ export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountr
           <KpiTile label={t('common.dashboard.clicks')} value={kpis.clicks.value} deltaPct={kpis.clicks.deltaPct} icon={BarChart3} />
           <KpiTile label={t('common.dashboard.unique_visitors')} value={kpis.uniqueVisitors.value} deltaPct={kpis.uniqueVisitors.deltaPct} icon={Users} />
           <KpiTile label={t('common.dashboard.active_links')} value={kpis.activeLinks.value} deltaPct={kpis.activeLinks.deltaPct} compact={false}
-            icon={LinkIcon} subtitle={`${kpis.activeLinks.domains} ${t('common.nav.domains')} · ${kpis.activeLinks.qrCodes} ${t('common.nav.qrcodes')}`} />
+            icon={LinkIcon} subtitle={`${t('common.dashboard.new_in_period', { n: kpis.activeLinks.newInPeriod })} · ${kpis.activeLinks.domains} ${t('common.nav.domains')} · ${kpis.activeLinks.qrCodes} ${t('common.nav.qrcodes')}`} />
           <KpiTile label={t('common.dashboard.avg_per_link')} value={kpis.avgPerLink.value} deltaPct={kpis.avgPerLink.deltaPct} compact={false}
             icon={Gauge} subtitle={t('common.dashboard.bots_excluded')} />
         </div>

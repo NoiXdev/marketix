@@ -69,5 +69,7 @@ return [
         'qa_domain_d' => 'Add a domain',
         'no_data' => 'No data',
         'no_activity' => 'No activity yet',
+        'range_days' => 'd',
+        'range_year' => '1y',
     ],
 ];

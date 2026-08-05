@@ -69,5 +69,7 @@ return [
         'qa_domain_d' => 'Domein toevoegen',
         'no_data' => 'Geen gegevens',
         'no_activity' => 'Nog geen activiteit',
+        'range_days' => 'd',
+        'range_year' => '1 jr',
     ],
 ];
