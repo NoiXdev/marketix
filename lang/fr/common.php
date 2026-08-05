@@ -71,5 +71,6 @@ return [
         'no_activity' => "Aucune activité pour l'instant",
         'range_days' => 'j',
         'range_year' => '1 an',
+        'unique' => 'Unique',
     ],
 ];

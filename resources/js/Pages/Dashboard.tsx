@@ -77,7 +77,7 @@ export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountr
               <h2 className="text-sm font-semibold text-foreground">{t('common.dashboard.clicks_over_time')}</h2>
               <div className="flex gap-3 text-xs text-muted">
                 <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-accent" /> {t('common.dashboard.clicks')}</span>
-                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[color:color-mix(in_srgb,var(--accent)_40%,var(--surface))]" /> Unique</span>
+                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[color:color-mix(in_srgb,var(--accent)_40%,var(--surface))]" /> {t('common.dashboard.unique')}</span>
               </div>
             </div>
             <div className="p-4"><ClicksChart data={clicksByDay} /></div>

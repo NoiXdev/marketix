@@ -71,5 +71,6 @@ return [
         'no_activity' => 'Nog geen activiteit',
         'range_days' => 'd',
         'range_year' => '1 jr',
+        'unique' => 'Uniek',
     ],
 ];
