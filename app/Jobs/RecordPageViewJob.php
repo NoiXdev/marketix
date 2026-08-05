@@ -46,44 +46,31 @@ class RecordPageViewJob implements ShouldQueue
         $device = UserAgent::device($this->userAgent);
         $refererDomain = $this->referer ? parse_url($this->referer, PHP_URL_HOST) : null;
 
-        $now = now();
-        $windowStart = $now->copy()->subMinutes(self::SESSION_WINDOW_MINUTES);
-
-        $visit = Visit::where('site_id', $this->siteId)
-            ->where('visitor_hash', $this->visitorHash)
-            ->where('last_activity_at', '>=', $windowStart)
-            ->latest('last_activity_at')
-            ->first();
-
-        if ($visit === null) {
-            $visit = Visit::create([
-                'site_id' => $this->siteId,
-                'project_id' => $this->projectId,
-                'visitor_hash' => $this->visitorHash,
-                'started_at' => $now,
-                'last_activity_at' => $now,
-                'pageview_count' => 1,
-                'entry_path' => $this->path,
-                'exit_path' => $this->path,
+        $visit = app(\App\Support\VisitResolver::class)->resolve(
+            $this->siteId,
+            $this->projectId,
+            $this->visitorHash,
+            $isBot,
+            $this->path,
+            [
                 'country_code' => $this->geo['country_code'] ?? null,
                 'browser' => $browser,
                 'os' => $os,
                 'device' => $device,
                 'referer_domain' => $refererDomain,
-                'is_bot' => $isBot,
                 'utm_source' => $this->utm['utm_source'] ?? null,
                 'utm_medium' => $this->utm['utm_medium'] ?? null,
                 'utm_campaign' => $this->utm['utm_campaign'] ?? null,
                 'utm_term' => $this->utm['utm_term'] ?? null,
                 'utm_content' => $this->utm['utm_content'] ?? null,
-            ]);
-        } else {
-            $visit->update([
-                'last_activity_at' => $now,
-                'exit_path' => $this->path,
-                'pageview_count' => $visit->pageview_count + 1,
-            ]);
-        }
+            ],
+        );
+
+        $visit->update([
+            'last_activity_at' => now(),
+            'exit_path' => $this->path,
+            'pageview_count' => $visit->pageview_count + 1,
+        ]);
 
         PageView::create([
             'visit_id' => $visit->id,
@@ -106,7 +93,7 @@ class RecordPageViewJob implements ShouldQueue
             'utm_campaign' => $this->utm['utm_campaign'] ?? null,
             'utm_term' => $this->utm['utm_term'] ?? null,
             'utm_content' => $this->utm['utm_content'] ?? null,
-            'created_at' => $now,
+            'created_at' => now(),
         ]);
     }
 }
