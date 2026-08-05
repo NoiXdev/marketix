@@ -1,157 +1,119 @@
+import ActivityFeed, { FeedItem } from '@/Pages/Dashboard/ActivityFeed';
+import ClicksChart from '@/Pages/Dashboard/ClicksChart';
+import KpiTile from '@/Pages/Dashboard/KpiTile';
+import QuickActions from '@/Pages/Dashboard/QuickActions';
+import RankedList from '@/Pages/Dashboard/RankedList';
+import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import AppLayout from '@/Layouts/AppLayout';
-import { formatCompactNumber } from '@/lib/format';
+import { flagFromCode } from '@/lib/format';
+import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
-import { router, usePage } from '@inertiajs/react';
-import { BarChart3, Globe, LinkIcon, MousePointerClick } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { BarChart3, Gauge, LinkIcon, Plus, Users } from 'lucide-react';
 
-interface DayClicks {
-  date: string;
-  clicks: number;
-  unique: number;
-}
+type Kpi = { value: number; deltaPct: number | null };
+type ActiveLinks = Kpi & { newInPeriod: number; domains: number; qrCodes: number };
+type DayClicks = { date: string; clicks: number; unique: number };
+type TopLink = { id: string; slug: string; domain_name: string; clicks: number };
+type Country = { country_code: string; country: string; count: number };
 
-interface DashboardProps {
-  urlsCount: number;
-  domainsCount: number;
-  totalClicks: number;
-  totalUniqueClicks: number;
+interface Props {
   days: number;
+  kpis: { clicks: Kpi; uniqueVisitors: Kpi; activeLinks: ActiveLinks; avgPerLink: Kpi };
   clicksByDay: DayClicks[];
+  topLinks: TopLink[];
+  topCountries: Country[];
+  recentActivity: FeedItem[];
 }
 
-const RANGES = [7, 30, 90, 180, 365];
+const RANGES = [7, 30, 90, 365];
 
-function ClicksChart({ data }: { data: DayClicks[] }) {
-  const max = Math.max(...data.map((d) => Math.max(d.clicks, d.unique)), 1);
-
-  return (
-    <div className="flex h-40 items-end gap-px">
-      {data.map((d) => (
-        <div key={d.date} className="group relative flex flex-1 items-end justify-center gap-px">
-          <div
-            className="w-full rounded-t bg-indigo-500 transition-all group-hover:bg-indigo-600 dark:bg-indigo-600 dark:group-hover:bg-indigo-500"
-            style={{ height: `${Math.max((d.clicks / max) * 100, d.clicks > 0 ? 4 : 1)}%` }}
-          />
-          <div
-            className="w-full rounded-t bg-violet-500 transition-all group-hover:bg-violet-600 dark:bg-violet-600 dark:group-hover:bg-violet-500"
-            style={{ height: `${Math.max((d.unique / max) * 100, d.unique > 0 ? 4 : 1)}%` }}
-          />
-          {/* Tooltip */}
-          <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-slate-700">
-            <p className="text-slate-300">{d.date}</p>
-            <p className="font-semibold text-indigo-300">{d.clicks.toLocaleString()} total</p>
-            <p className="font-semibold text-violet-300">{d.unique.toLocaleString()} unique</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function Dashboard({ urlsCount, domainsCount, totalClicks, totalUniqueClicks, days, clicksByDay }: DashboardProps) {
-  const currentProject = usePage<PageProps>().props.project;
+export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountries, recentActivity }: Props) {
+  const project = usePage<PageProps>().props.project!;
+  const { t } = useTranslation();
 
   function setDays(d: number) {
-    router.get(route('app.project.dashboard', { project: currentProject!.id }), { days: d }, { preserveState: true });
+    router.get(route('app.project.dashboard', { project: project.id }), { days: d }, { preserveState: true });
   }
 
-  const stats = [
-    {
-      label: 'Links',
-      value: urlsCount,
-      icon: LinkIcon,
-      color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400',
-    },
-    {
-      label: 'Domains',
-      value: domainsCount,
-      icon: Globe,
-      color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400',
-    },
-    {
-      label: 'Total clicks',
-      value: totalClicks,
-      icon: BarChart3,
-      color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400',
-      compact: true,
-    },
-    {
-      label: 'Unique clicks',
-      value: totalUniqueClicks,
-      icon: MousePointerClick,
-      color: 'text-violet-600 bg-violet-50 dark:bg-violet-900/20 dark:text-violet-400',
-      compact: true,
-    },
-  ];
-
   return (
-    <AppLayout title="Dashboard">
+    <AppLayout title={t('common.nav.dashboard')}>
       <div className="px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{currentProject?.name}</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Overview of your project</p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map(({ label, value, icon: Icon, color, compact }) => (
-            <div key={label} className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
-                <span className={`rounded-lg p-2 ${color}`}>
-                  <Icon className="h-4 w-4" />
-                </span>
-              </div>
-              <p
-                className="mt-3 text-3xl font-bold text-slate-900 dark:text-white"
-                title={compact ? value.toLocaleString() : undefined}
-              >
-                {compact ? formatCompactNumber(value) : value.toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Clicks over time */}
-        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Clicks over time <span className="font-normal text-slate-400">— last {days} days</span>
-              </h2>
-              <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-sm bg-indigo-500 dark:bg-indigo-600" /> Total
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-sm bg-violet-500 dark:bg-violet-600" /> Unique
-                </span>
-              </div>
-            </div>
-
-            {/* Range selector */}
-            <div className="flex rounded-lg border border-slate-200 bg-white text-sm dark:border-slate-700 dark:bg-slate-900">
+        {/* Header */}
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">{project.name}</h1>
+            <p className="mt-1 text-sm text-muted">{t('common.dashboard.overview')} · {days}d</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex overflow-hidden rounded-lg border border-line">
               {RANGES.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDays(d)}
-                  className={`px-3 py-1.5 transition-colors first:rounded-l-lg last:rounded-r-lg ${
-                    days === d
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  {d}d
+                <button key={d} onClick={() => setDays(d)} className={`border-r border-line px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${days === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'}`}>
+                  {d === 365 ? '1J' : `${d}T`}
                 </button>
               ))}
             </div>
-          </div>
-
-          <ClicksChart data={clicksByDay} />
-          <div className="mt-2 flex justify-between text-xs text-slate-400">
-            <span>{clicksByDay[0]?.date}</span>
-            <span>{clicksByDay[clicksByDay.length - 1]?.date}</span>
+            <ReportDownloadButton projectId={project.id} />
+            <Link href={route('app.project.links.create', { project: project.id })} className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]">
+              <Plus className="h-4 w-4" /> {t('common.dashboard.new_link')}
+            </Link>
           </div>
         </div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+          <KpiTile label={t('common.dashboard.clicks')} value={kpis.clicks.value} deltaPct={kpis.clicks.deltaPct} icon={BarChart3} />
+          <KpiTile label={t('common.dashboard.unique_visitors')} value={kpis.uniqueVisitors.value} deltaPct={kpis.uniqueVisitors.deltaPct} icon={Users} />
+          <KpiTile label={t('common.dashboard.active_links')} value={kpis.activeLinks.value} deltaPct={kpis.activeLinks.deltaPct} compact={false}
+            icon={LinkIcon} subtitle={`${kpis.activeLinks.domains} ${t('common.nav.domains')} · ${kpis.activeLinks.qrCodes} ${t('common.nav.qrcodes')}`} />
+          <KpiTile label={t('common.dashboard.avg_per_link')} value={kpis.avgPerLink.value} deltaPct={kpis.avgPerLink.deltaPct} compact={false}
+            icon={Gauge} subtitle={t('common.dashboard.bots_excluded')} />
+        </div>
+
+        {/* Chart + Top links */}
+        <div className="mt-3.5 grid grid-cols-1 gap-3.5 lg:grid-cols-[1.6fr_1fr]">
+          <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3.5">
+              <h2 className="text-sm font-semibold text-foreground">{t('common.dashboard.clicks_over_time')}</h2>
+              <div className="flex gap-3 text-xs text-muted">
+                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-accent" /> {t('common.dashboard.clicks')}</span>
+                <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[color:color-mix(in_srgb,var(--accent)_40%,var(--surface))]" /> Unique</span>
+              </div>
+            </div>
+            <div className="p-4"><ClicksChart data={clicksByDay} /></div>
+          </section>
+          <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3.5">
+              <h2 className="text-sm font-semibold text-foreground">{t('common.dashboard.top_links')}</h2>
+              <Link href={route('app.project.links.index', { project: project.id })} className="text-[12.5px] font-semibold text-accent-soft-foreground hover:underline">{t('common.dashboard.all_links')} →</Link>
+            </div>
+            <RankedList emptyLabel={t('common.dashboard.no_data')}
+              rows={topLinks.map((l, i) => ({ key: l.id, prefix: <span className="text-xs font-bold text-subtle">{i + 1}</span>, label: `${l.domain_name}/${l.slug}`, value: Number(l.clicks) }))} />
+          </section>
+        </div>
+
+        {/* Geo + Activity */}
+        <div className="mt-3.5 grid grid-cols-1 gap-3.5 lg:grid-cols-[1.6fr_1fr]">
+          <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3.5">
+              <h2 className="text-sm font-semibold text-foreground">{t('common.dashboard.clicks_origin')}</h2>
+              <Link href={route('app.project.statistics', { project: project.id })} className="text-[12.5px] font-semibold text-accent-soft-foreground hover:underline">{t('common.dashboard.statistics')} →</Link>
+            </div>
+            <RankedList emptyLabel={t('common.dashboard.no_data')}
+              rows={topCountries.map((c) => ({ key: c.country_code || c.country, prefix: <span className="text-[15px]">{flagFromCode(c.country_code)}</span>, label: c.country ?? c.country_code, value: Number(c.count) }))} />
+          </section>
+          <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+            <div className="flex items-center justify-between border-b border-line px-4 py-3.5">
+              <h2 className="text-sm font-semibold text-foreground">{t('common.dashboard.recent_activity')}</h2>
+              <Link href={route('app.project.activity.index', { project: project.id })} className="text-[12.5px] font-semibold text-accent-soft-foreground hover:underline">{t('common.dashboard.activity')} →</Link>
+            </div>
+            <ActivityFeed items={recentActivity} emptyLabel={t('common.dashboard.no_activity')} />
+          </section>
+        </div>
+
+        {/* Quick actions */}
+        <h2 className="mb-2.5 mt-6 text-[11px] font-bold uppercase tracking-wider text-subtle">{t('common.dashboard.quick_actions')}</h2>
+        <QuickActions projectId={project.id} />
       </div>
     </AppLayout>
   );
