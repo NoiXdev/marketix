@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { Loader2 } from 'lucide-react';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
@@ -15,11 +16,17 @@ const variants: Record<Variant, string> = {
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
+  loading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', className = '', ...props },
+  { variant = 'primary', className = '', loading = false, disabled, children, ...props },
   ref,
 ) {
-  return <button ref={ref} className={`${base} ${variants[variant]} ${className}`} {...props} />;
+  return (
+    <button ref={ref} disabled={disabled || loading} className={`${base} ${variants[variant]} ${className}`} {...props}>
+      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+      {children}
+    </button>
+  );
 });

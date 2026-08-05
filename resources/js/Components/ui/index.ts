@@ -12,3 +12,6 @@ export { Flash } from './Flash';
 export { TableCard } from './TableCard';
 export { IconButton } from './IconButton';
 export { RowActions } from './RowActions';
+export { FormSection } from './FormSection';
+export { ErrorSummary } from './ErrorSummary';
+export { BackLink } from './BackLink';
