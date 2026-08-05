@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Event;
 use App\Models\PageView;
 use App\Models\Site;
 use App\Models\Visit;
@@ -19,8 +20,9 @@ class PruneAnalytics extends Command
         $defaultMonths = (int) config('analytics.retention_months', 24);
         $totalViews = 0;
         $totalVisits = 0;
+        $totalEvents = 0;
 
-        Site::withTrashed()->select('id', 'retention_days')->chunkById(200, function (Collection $sites) use ($defaultMonths, &$totalViews, &$totalVisits) {
+        Site::withTrashed()->select('id', 'retention_days')->chunkById(200, function (Collection $sites) use ($defaultMonths, &$totalViews, &$totalVisits, &$totalEvents) {
             foreach ($sites as $site) {
                 $cutoff = $site->retention_days
                     ? now()->subDays((int) $site->retention_days)->startOfDay()
@@ -39,10 +41,17 @@ class PruneAnalytics extends Command
                     ->chunkById(1000, function (Collection $rows) use (&$totalVisits) {
                         $totalVisits += Visit::whereKey($rows->modelKeys())->delete();
                     });
+
+                Event::where('site_id', $site->id)
+                    ->where('created_at', '<', $cutoff)
+                    ->select('id')
+                    ->chunkById(1000, function (Collection $rows) use (&$totalEvents) {
+                        $totalEvents += Event::whereKey($rows->modelKeys())->delete();
+                    });
             }
         });
 
-        $this->info("Pruned {$totalViews} page_views and {$totalVisits} visits.");
+        $this->info("Pruned {$totalViews} page_views, {$totalVisits} visits and {$totalEvents} events.");
 
         return self::SUCCESS;
     }

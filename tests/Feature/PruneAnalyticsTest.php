@@ -47,4 +47,18 @@ class PruneAnalyticsTest extends TestCase
 
         $this->assertSame(0, PageView::count());
     }
+
+    public function test_it_prunes_old_events(): void
+    {
+        config(['analytics.retention_months' => 24]);
+        $site = \App\Models\Site::factory()->create(['retention_days' => null]);
+        $visit = \App\Models\Visit::factory()->forSite($site)->create();
+
+        \App\Models\Event::factory()->forVisit($visit)->create(['created_at' => now()->subMonths(25)]);
+        \App\Models\Event::factory()->forVisit($visit)->create(['created_at' => now()]);
+
+        $this->artisan('analytics:prune')->assertExitCode(0);
+
+        $this->assertSame(1, \App\Models\Event::count());
+    }
 }
