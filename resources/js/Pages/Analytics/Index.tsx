@@ -6,6 +6,12 @@ type Series = { date: string; views: number; visitors: number };
 type Rank = Record<string, string | number> & { count: number };
 type CampaignRow = { value: string; sessions: number; visitors: number };
 type CampaignShare = { total: number; from_campaigns: number; percent: number };
+type EventRow = { name: string; count: number; visitors: number };
+type GoalCard = {
+  id: string; name: string; type: string; match_value: string;
+  conversions: number; visitors: number; rate: number;
+  byCampaign: { value: string; conversions: number }[];
+};
 
 export default function AnalyticsIndex({
   site,
@@ -28,6 +34,8 @@ export default function AnalyticsIndex({
   utmSourceMediums,
   utmTerms,
   utmContents,
+  topEvents,
+  goals,
 }: {
   site: { id: string; name: string; domain: string };
   days: number;
@@ -49,6 +57,8 @@ export default function AnalyticsIndex({
   utmSourceMediums: CampaignRow[];
   utmTerms: CampaignRow[];
   utmContents: CampaignRow[];
+  topEvents: EventRow[];
+  goals: GoalCard[];
 }) {
   const { project } = usePage<PageProps>().props;
   const maxViews = Math.max(1, ...pageViewsByDay.map((d) => d.views));
@@ -159,6 +169,65 @@ export default function AnalyticsIndex({
           {campaignList('Terms', utmTerms)}
           {campaignList('Content', utmContents)}
         </div>
+
+        <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-gray-500">Events</h2>
+        <div className="mb-6 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+          <ul className="space-y-1">
+            {topEvents.map((e, i) => (
+              <li key={i} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
+                <span className="truncate font-mono">{e.name}</span>
+                <span className="font-medium">
+                  {e.count}
+                  <span className="ml-1 text-xs text-gray-400">({e.visitors})</span>
+                </span>
+              </li>
+            ))}
+            {topEvents.length === 0 && <li className="text-sm text-gray-400">No events yet</li>}
+          </ul>
+        </div>
+
+        <div className="mb-3 mt-8 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Goals</h2>
+          <Link
+            href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })}
+            className="text-sm text-indigo-600 hover:underline"
+          >
+            Manage goals
+          </Link>
+        </div>
+        {goals.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No goals defined.{' '}
+            <Link href={route('app.project.analytics.goals.create', { project: project!.id, site: site.id })} className="text-indigo-600 hover:underline">
+              Create one
+            </Link>{' '}
+            to track conversions.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {goals.map((g) => (
+              <div key={g.id} className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+                <div className="mb-2 flex items-baseline justify-between">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{g.name}</h3>
+                  <span className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{g.rate}%</span>
+                </div>
+                <p className="mb-3 text-xs text-gray-500">
+                  {g.conversions} conversions · {g.visitors} visitors · <span className="font-mono">{g.match_value}</span>
+                </p>
+                {g.byCampaign.length > 0 && (
+                  <ul className="space-y-1 border-t border-gray-100 pt-2 dark:border-gray-800">
+                    {g.byCampaign.map((c, i) => (
+                      <li key={i} className="flex justify-between text-xs text-gray-500">
+                        <span className="truncate">{c.value}</span>
+                        <span className="font-medium">{c.conversions}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </AppLayout>
   );

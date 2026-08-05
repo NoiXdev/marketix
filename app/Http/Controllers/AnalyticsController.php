@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Goal;
 use App\Services\AnalyticsAggregator;
+use App\Services\GoalAggregator;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
-    public function show(Request $request, string $site, AnalyticsAggregator $agg)
+    public function show(Request $request, string $site, AnalyticsAggregator $agg, GoalAggregator $goalAgg)
     {
         $project = $request->get('project');
         $model = $project->sites()->findOrFail($site);
@@ -40,6 +42,15 @@ class AnalyticsController extends Controller
             'utmSourceMediums' => $agg->utmSourceMedium($model->id, $days),
             'utmTerms' => $agg->utmBreakdown($model->id, 'utm_term', $days),
             'utmContents' => $agg->utmBreakdown($model->id, 'utm_content', $days),
+            'topEvents' => $goalAgg->topEvents($model->id, $days),
+            'goals' => $model->goals()->get()->map(fn (Goal $g) => array_merge([
+                'id' => $g->id,
+                'name' => $g->name,
+                'type' => $g->type->value,
+                'match_value' => $g->match_value,
+            ], $goalAgg->conversions($g, $days), [
+                'byCampaign' => $goalAgg->conversionsByCampaign($g, $days),
+            ])),
         ]);
     }
 }

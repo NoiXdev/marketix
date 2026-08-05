@@ -68,6 +68,31 @@ class AnalyticsDashboardTest extends TestCase
             );
     }
 
+    public function test_dashboard_exposes_events_and_goals(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $project = \App\Models\Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = \App\Models\Site::factory()->forProject($project)->create();
+
+        $visit = \App\Models\Visit::factory()->forSite($site)->create(['utm_source' => 'google']);
+        \App\Models\Event::factory()->forVisit($visit)->create(['name' => 'signup']);
+        \App\Models\Goal::factory()->forSite($site)->create(['type' => \App\Enums\GoalType::Event, 'match_value' => 'signup', 'name' => 'Signup']);
+
+        $this->actingAs($user)
+            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=30')
+            ->assertOk()
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Analytics/Index')
+                ->has('topEvents', 1)
+                ->where('topEvents.0.name', 'signup')
+                ->has('goals', 1)
+                ->where('goals.0.conversions', 1)
+                ->where('goals.0.name', 'Signup')
+                ->has('goals.0.byCampaign')
+            );
+    }
+
     public function test_foreign_project_site_is_not_found(): void
     {
         $user = User::factory()->create();
