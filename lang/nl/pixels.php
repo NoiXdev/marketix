@@ -15,4 +15,17 @@ return [
         'title' => 'Pixel verwijderen?',
         'confirm' => '":name" verwijderen? Dit kan niet ongedaan worden gemaakt.',
     ],
+    'form' => [
+        'back' => 'Terug naar pixels',
+        'add_title' => 'Pixel toevoegen',
+        'edit_title' => 'Bewerken',
+        'section' => 'Pixelinstellingen',
+        'provider' => 'Aanbieder',
+        'name' => 'Naam',
+        'name_placeholder' => 'bijv. Belangrijkste Facebook-pixel',
+        'tag' => 'Tag / ID',
+        'tag_placeholder' => 'Voer je pixel-ID of tag in',
+        'create_submit' => 'Pixel toevoegen',
+        'save_submit' => 'Wijzigingen opslaan',
+    ],
 ];

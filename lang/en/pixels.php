@@ -15,4 +15,17 @@ return [
         'title' => 'Delete pixel?',
         'confirm' => 'Delete ":name"? This cannot be undone.',
     ],
+    'form' => [
+        'back' => 'Back to pixels',
+        'add_title' => 'Add pixel',
+        'edit_title' => 'Edit',
+        'section' => 'Pixel settings',
+        'provider' => 'Provider',
+        'name' => 'Name',
+        'name_placeholder' => 'e.g. Main Facebook Pixel',
+        'tag' => 'Tag / ID',
+        'tag_placeholder' => 'Enter your pixel ID or tag',
+        'create_submit' => 'Add pixel',
+        'save_submit' => 'Save changes',
+    ],
 ];

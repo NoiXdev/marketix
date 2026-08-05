@@ -15,4 +15,17 @@ return [
         'title' => 'Supprimer le pixel ?',
         'confirm' => 'Supprimer « :name » ? Cette action est irréversible.',
     ],
+    'form' => [
+        'back' => 'Retour aux pixels',
+        'add_title' => 'Ajouter un pixel',
+        'edit_title' => 'Modifier',
+        'section' => 'Paramètres du pixel',
+        'provider' => 'Fournisseur',
+        'name' => 'Nom',
+        'name_placeholder' => 'p. ex. Pixel Facebook principal',
+        'tag' => 'Tag / ID',
+        'tag_placeholder' => 'Saisissez votre ID ou tag de pixel',
+        'create_submit' => 'Ajouter le pixel',
+        'save_submit' => 'Enregistrer les modifications',
+    ],
 ];
