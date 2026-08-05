@@ -15,6 +15,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\ForcePasswordChangeController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PasskeyManagementController;
@@ -147,6 +148,12 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::put('/sites/{site}', [SiteController::class, 'update'])->name('app.project.sites.update');
             Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
             Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
+            Route::get('/analytics/{site}/goals', [GoalController::class, 'index'])->name('app.project.analytics.goals.index');
+            Route::get('/analytics/{site}/goals/create', [GoalController::class, 'create'])->name('app.project.analytics.goals.create');
+            Route::post('/analytics/{site}/goals', [GoalController::class, 'store'])->name('app.project.analytics.goals.store');
+            Route::get('/analytics/{site}/goals/{goal}/edit', [GoalController::class, 'edit'])->name('app.project.analytics.goals.edit');
+            Route::put('/analytics/{site}/goals/{goal}', [GoalController::class, 'update'])->name('app.project.analytics.goals.update');
+            Route::delete('/analytics/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('app.project.analytics.goals.destroy');
 
             // Team (project admins only)
             Route::middleware('project_admin')->group(function () {

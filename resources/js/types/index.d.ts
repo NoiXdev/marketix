@@ -55,6 +55,13 @@ export interface Site {
   created_at?: string;
 }
 
+export interface Goal {
+  id: string;
+  name: string;
+  type: string;
+  match_value: string;
+}
+
 export type ProjectRole = 'admin' | 'member';
 
 export interface ProjectMember {
