@@ -175,4 +175,9 @@ class AnalyticsAggregator
             'percent' => $total > 0 ? round($fromCampaigns / $total * 100, 1) : 0.0,
         ];
     }
+
+    public function totalSessions(string $siteId, int $days): int
+    {
+        return $this->visitBase($siteId, $days)->count();
+    }
 }
