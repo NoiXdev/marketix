@@ -15,7 +15,7 @@ class GoalRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        // Pageview goals match on a path — ensure a leading slash (except a '*' prefix wildcard alone).
+        // Pageview goals match on a path — ensure a leading slash on any non-empty match_value.
         if ($this->input('type') === GoalType::Pageview->value && is_string($this->input('match_value'))) {
             $mv = trim($this->input('match_value'));
             if ($mv !== '' && ! str_starts_with($mv, '/')) {

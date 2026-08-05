@@ -111,8 +111,20 @@
     return vid;
   }
 
+  var pendingEvents = [];
+  var consentListenerInstalled = false;
+
+  function flushPendingEvents() {
+    if (!siteConfig || !consentGranted(siteConfig.consent_signal)) return;
+    var queued = pendingEvents;
+    pendingEvents = [];
+    for (var i = 0; i < queued.length; i++) {
+      postEvent(queued[i].name, queued[i].props, firstPartyId());
+    }
+  }
+
   function sendEvent(name, props) {
-    if (!siteConfig) return; // config not yet loaded (queued calls flush after load)
+    if (!siteConfig) return;
     if (props) {
       try {
         if (JSON.stringify(props).length > 1024) props = null;
@@ -120,13 +132,27 @@
         props = null;
       }
     }
+
     if (siteConfig.tracking_mode !== 'cookie') {
       postEvent(name, props, null);
       return;
     }
-    if (siteConfig.consent_mode === 'third_party_signal' && !consentGranted(siteConfig.consent_signal)) {
-      return; // no consent, no event
+
+    // own_banner is reserved for v1.1 and has no consent gate implemented — never track.
+    if (siteConfig.consent_mode === 'own_banner') {
+      return;
     }
+
+    if (siteConfig.consent_mode === 'third_party_signal' && !consentGranted(siteConfig.consent_signal)) {
+      // Buffer until the site's CMP dispatches 'marketix:consent'; then replay.
+      pendingEvents.push({ name: name, props: props });
+      if (!consentListenerInstalled) {
+        consentListenerInstalled = true;
+        window.addEventListener('marketix:consent', flushPendingEvents);
+      }
+      return;
+    }
+
     postEvent(name, props, firstPartyId());
   }
 
