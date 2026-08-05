@@ -23,7 +23,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
         <div className="relative" ref={ref}>
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-foreground"
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
             >
                 {/* Avatar */}
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent-soft-foreground">
@@ -52,7 +52,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                         {auth.user.super_admin && (
                             <Link
                                 href={route('app.admin.users.index')}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground"
+                                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
                                 onClick={() => setOpen(false)}
                             >
                                 <Shield className="h-4 w-4 text-subtle" />
@@ -61,7 +61,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                         )}
                         <Link
                             href={route('app.profile.edit')}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
                             onClick={() => setOpen(false)}
                         >
                             <User className="h-4 w-4 text-subtle" />
@@ -71,7 +71,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                             href={route('app.auth.logout')}
                             method="post"
                             as="button"
-                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
                             onClick={() => setOpen(false)}
                         >
                             <LogOut className="h-4 w-4 text-subtle" />

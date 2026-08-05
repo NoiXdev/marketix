@@ -18,7 +18,7 @@ export default function ProjectSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground"
+        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
       >
         <FolderKanban className="h-4 w-4 shrink-0 text-subtle" />
         <span className="flex-1 truncate text-left">{currentProject?.name}</span>
@@ -36,7 +36,7 @@ export default function ProjectSwitcher() {
               <button
                 key={p.id}
                 onClick={() => switchProject(p)}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground"
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
               >
                 <FolderKanban className="h-4 w-4 shrink-0 text-subtle" />
                 <span className="flex-1 truncate text-left">{p.name}</span>

@@ -46,7 +46,7 @@ export default function Sidebar() {
               <li key={key}>
                 <Link
                   href={href}
-                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
                     isActive
                       ? 'bg-accent-soft text-accent-soft-foreground'
                       : 'text-muted hover:bg-surface hover:text-foreground'

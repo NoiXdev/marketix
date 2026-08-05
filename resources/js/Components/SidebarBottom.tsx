@@ -35,7 +35,7 @@ export default function SidebarBottom({ docsUrl }: { docsUrl: string }) {
       <div className="flex justify-between px-3">
         <ThemeToggle />
         <a
-          className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface"
+          className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
           href={docsUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -45,11 +45,11 @@ export default function SidebarBottom({ docsUrl }: { docsUrl: string }) {
           <BookOpen className="h-5 w-5 text-muted" />
         </a>
         {auth.user.super_admin && (
-          <Link className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface" href={route('app.admin.users.index')}>
+          <Link className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]" href={route('app.admin.users.index')}>
             <Shield className="h-5 w-5 text-muted" />
           </Link>
         )}
-        <Link className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface" href={route('app.auth.logout')} method="post" as="button">
+        <Link className="cursor-pointer rounded-lg border border-line p-1 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]" href={route('app.auth.logout')} method="post" as="button">
           <LucideLogOut className="h-5 w-5 text-muted" />
         </Link>
       </div>

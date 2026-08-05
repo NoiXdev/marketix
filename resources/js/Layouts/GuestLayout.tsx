@@ -33,7 +33,7 @@ export default function GuestLayout({ children, title, description }: PropsWithC
       </div>
 
       {/* Right panel — form */}
-      <div className="flex flex-1 flex-col items-center justify-center bg-canvas px-4 py-12 sm:px-8">
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-8">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <Brand
