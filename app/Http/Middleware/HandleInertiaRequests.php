@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => App::getLocale(),
             'availableLocales' => Locales::all(),
             'translations' => fn () => Translations::forLocale(App::getLocale()),
-            'navCounts' => ($p = $request->get('project')) ? ['links' => $p->urls()->count()] : [],
+            'navCounts' => fn () => ($p = $request->get('project')) ? ['links' => $p->urls()->count()] : [],
         ];
     }
 
