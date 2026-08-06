@@ -27,6 +27,7 @@ function VisitorsBars({ data, max, viewsLabel }: { data: Series[]; max: number; 
           <div
             className="w-full rounded-t bg-accent transition-all"
             style={{ height: `${Math.max((d.views / max) * 100, d.views > 0 ? 4 : 1)}%` }}
+            title={`${d.date}: ${d.views}`}
           />
           <div className="pointer-events-none absolute bottom-full z-10 mb-1 hidden whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)] group-hover:block">
             <p className="font-semibold">

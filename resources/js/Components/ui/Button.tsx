@@ -31,7 +31,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   ref,
 ) {
   return (
-    <button ref={ref} type={type} disabled={disabled || loading} className={`${base} ${sizes[size]} ${variants[variant]} ${className}`} {...props}>
+    <button
+      ref={ref}
+      type={type}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
+      {...props}
+    >
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
       {children}
     </button>

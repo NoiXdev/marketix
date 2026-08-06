@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from 'react';
+import { cloneElement, isValidElement, PropsWithChildren, ReactElement, ReactNode } from 'react';
 
 interface FieldProps {
   label?: ReactNode;
@@ -8,6 +8,15 @@ interface FieldProps {
 }
 
 export function Field({ label, hint, error, htmlFor, children }: PropsWithChildren<FieldProps>) {
+  const describedById = htmlFor && (error || hint) ? `${htmlFor}-desc` : undefined;
+
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+        'aria-invalid': error ? true : undefined,
+        'aria-describedby': describedById,
+      })
+    : children;
+
   return (
     <div className="space-y-1.5">
       {label && (
@@ -15,11 +24,15 @@ export function Field({ label, hint, error, htmlFor, children }: PropsWithChildr
           {label}
         </label>
       )}
-      {children}
+      {control}
       {error ? (
-        <p className="text-xs text-danger-foreground">{error}</p>
+        <p id={describedById} className="text-xs text-danger-foreground">
+          {error}
+        </p>
       ) : hint ? (
-        <p className="text-xs text-muted">{hint}</p>
+        <p id={describedById} className="text-xs text-muted">
+          {hint}
+        </p>
       ) : null}
     </div>
   );
