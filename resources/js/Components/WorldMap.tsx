@@ -14,9 +14,10 @@ export interface CountryDatum {
   count: number;
 }
 
-// 5-step fill ramp, light → indigo (matches the dashboard accent).
-const BUCKETS = ['#e0e7ff', '#a5b4fc', '#6366f1', '#4338ca', '#312e81'];
-const NO_DATA = '#eef2f6'; // slate-100-ish
+// 5-step fill ramp, light → teal (matches the app accent). Fixed data-viz
+// hues (legible on both light and dark surfaces); no-data uses a theme token.
+const BUCKETS = ['#d5f0ea', '#8fddcf', '#43c2ac', '#0d9488', '#0a6b60'];
+const NO_DATA = 'var(--elevated)';
 
 const projection = geoNaturalEarth1();
 const pathGen = geoPath(projection);
@@ -54,11 +55,11 @@ export default function WorldMap({ data }: Props) {
   const hasData = max > 0;
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+    <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Clicks by country</h2>
+        <h2 className="text-sm font-semibold text-foreground">Clicks by country</h2>
         {!hasData && (
-          <span className="text-xs text-slate-400">No location data yet</span>
+          <span className="text-xs text-subtle">No location data yet</span>
         )}
       </div>
 
@@ -74,7 +75,7 @@ export default function WorldMap({ data }: Props) {
                 <path
                   key={i}
                   d={d}
-                  className="stroke-white dark:stroke-slate-900 [&]:dark:opacity-90"
+                  className="stroke-[color:var(--surface)]"
                   strokeWidth={0.4}
                   fill={datum ? fillFor(datum.count) : NO_DATA}
                   onMouseEnter={(e) =>
@@ -99,7 +100,7 @@ export default function WorldMap({ data }: Props) {
 
         {hover && (
           <div
-            className="pointer-events-none absolute z-10 rounded-md bg-slate-900 px-2 py-1 text-xs text-white shadow-lg"
+            className="pointer-events-none absolute z-10 rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
             style={{ left: hover.x + 12, top: hover.y + 12 }}
           >
             {hover.name}: {hover.count.toLocaleString()}
@@ -109,7 +110,7 @@ export default function WorldMap({ data }: Props) {
 
       {/* Legend */}
       {hasData && (
-        <div className="mt-4 flex items-center gap-2 text-xs text-slate-400">
+        <div className="mt-4 flex items-center gap-2 text-xs text-subtle">
           <span>Fewer</span>
           {BUCKETS.map((c) => (
             <span key={c} className="inline-block h-3 w-6 rounded-sm" style={{ backgroundColor: c }} />
