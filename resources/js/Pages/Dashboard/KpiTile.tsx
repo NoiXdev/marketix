@@ -7,11 +7,12 @@ import { ReactNode } from 'react';
 export default function KpiTile({
   label, value, deltaPct, subtitle, icon: Icon, compact = true,
 }: {
-  label: string; value: number; deltaPct?: number | null; subtitle?: ReactNode; icon: LucideIcon; compact?: boolean;
+  label: string; value: number | string; deltaPct?: number | null; subtitle?: ReactNode; icon: LucideIcon; compact?: boolean;
 }) {
   const { t } = useTranslation();
   const showDelta = deltaPct !== undefined;
   const up = (deltaPct ?? 0) >= 0;
+  const display = typeof value === 'number' ? (compact ? formatCompactNumber(value) : value.toLocaleString()) : value;
 
   return (
     <Card className="p-4">
@@ -21,8 +22,8 @@ export default function KpiTile({
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <p className="mt-2 text-[27px] font-bold tracking-tight text-foreground tabular-nums" title={compact ? value.toLocaleString() : undefined}>
-        {compact ? formatCompactNumber(value) : value.toLocaleString()}
+      <p className="mt-2 text-[27px] font-bold tracking-tight text-foreground tabular-nums" title={typeof value === 'number' && compact ? value.toLocaleString() : undefined}>
+        {display}
       </p>
       {showDelta && (
         <p className={`mt-0.5 inline-flex items-center gap-1 text-xs font-bold ${deltaPct === null ? 'text-muted' : up ? 'text-success-foreground' : 'text-danger-foreground'}`}>
