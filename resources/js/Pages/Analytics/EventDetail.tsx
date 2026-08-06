@@ -1,6 +1,10 @@
 import AppLayout from '@/Layouts/AppLayout';
+import RangeTabs from '@/Pages/Analytics/RangeTabs';
+import { BackLink } from '@/Components/ui';
+import RankedList from '@/Pages/Dashboard/RankedList';
+import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 
 type PropValue = { value: string; count: number };
 type NumericSummary = { count: number; sum: number; avg: number };
@@ -20,6 +24,7 @@ export default function EventDetail({
   keys: PropKey[];
 }) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   function setDays(d: number) {
     router.get(
@@ -30,56 +35,41 @@ export default function EventDetail({
   }
 
   return (
-    <AppLayout title={`Event — ${event}`}>
+    <AppLayout title={t('analytics.events.page_title', { name: event })}>
       <div className="px-8 py-8">
-        <div className="mb-6 flex items-center justify-between">
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <Link
-              href={route('app.project.analytics.show', { project: project!.id, site: site.id })}
-              className="text-sm text-indigo-600 hover:underline"
-            >
-              ← Analytics
-            </Link>
-            <h1 className="font-mono text-xl font-semibold text-gray-900 dark:text-gray-100">{event}</h1>
-            <p className="text-sm text-gray-500">
-              {total} events · {site.name}
-            </p>
+            <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id })}>
+              {t('analytics.events.back')}
+            </BackLink>
+            <h1 className="mt-1 font-mono text-2xl font-bold tracking-tight text-foreground">{event}</h1>
+            <p className="mt-1 text-sm text-muted">{t('analytics.events.subtitle', { total, name: site.name })}</p>
           </div>
-          <div className="flex gap-1">
-            {[1, 7, 30, 90].map((d) => (
-              <button
-                key={d}
-                onClick={() => setDays(d)}
-                className={`rounded-lg px-3 py-1.5 text-sm ${days === d ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
-              >
-                {d === 1 ? 'Today' : `${d}d`}
-              </button>
-            ))}
-          </div>
+          <RangeTabs days={days} onChange={setDays} />
         </div>
 
         {keys.length === 0 ? (
-          <p className="text-sm text-gray-500">No properties recorded for this event.</p>
+          <p className="text-sm text-muted">{t('analytics.events.empty')}</p>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
             {keys.map((k) => (
-              <div key={k.key} className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
-                <h3 className="mb-2 font-mono text-sm font-semibold text-gray-700 dark:text-gray-300">{k.key}</h3>
-                {k.numeric && (
-                  <p className="mb-3 border-b border-gray-100 pb-2 text-xs text-gray-500 dark:border-gray-800">
-                    Sum <span className="font-medium text-gray-700 dark:text-gray-300">{k.numeric.sum}</span> · Avg{' '}
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{k.numeric.avg}</span> · {k.numeric.count} numeric
-                  </p>
-                )}
-                <ul className="space-y-1">
-                  {k.values.map((v, i) => (
-                    <li key={i} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                      <span className="truncate">{v.value}</span>
-                      <span className="font-medium">{v.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <section key={k.key} className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+                <div className="border-b border-line px-4 py-3">
+                  <h2 className="font-mono text-sm font-semibold text-foreground">{k.key}</h2>
+                  {k.numeric && (
+                    <p className="mt-1.5 text-xs text-muted">
+                      {t('analytics.events.numeric.sum')} <span className="font-semibold text-foreground">{k.numeric.sum}</span> ·{' '}
+                      {t('analytics.events.numeric.avg')} <span className="font-semibold text-foreground">{k.numeric.avg}</span> ·{' '}
+                      {k.numeric.count} {t('analytics.events.numeric.count_suffix')}
+                    </p>
+                  )}
+                </div>
+                <RankedList
+                  emptyLabel={t('analytics.dashboard.no_data')}
+                  rows={k.values.map((v, i) => ({ key: `${v.value}-${i}`, label: v.value, value: v.count }))}
+                />
+              </section>
             ))}
           </div>
         )}
