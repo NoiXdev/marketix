@@ -31,12 +31,6 @@ class QrCodeRequest extends FormRequest
             'style' => ['required', 'array'],
             'style.foreground' => ['required', 'string'],
             'style.background' => ['required', 'string'],
-            // Old shape kept nullable: the new form no longer sends these
-            // (Task 11 removes them from the payload logically), but they
-            // must not be rejected while still present in flight.
-            'style.dot_style' => ['nullable', 'string'],
-            'style.corner_square_style' => ['nullable', 'string'],
-            'style.corner_dot_style' => ['nullable', 'string'],
             'style.logo_type' => ['required', 'in:none,predefined,custom'],
             'style.logo_name' => ['nullable', 'string'],
             'style.logo_data' => ['nullable', 'string'],

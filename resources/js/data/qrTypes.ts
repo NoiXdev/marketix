@@ -93,9 +93,6 @@ export function buildQrContent(
   }
 }
 
-export type DotStyle           = 'square' | 'dots' | 'rounded' | 'classy' | 'classy-rounded' | 'extra-rounded';
-export type CornerSquareStyle  = 'square' | 'dot' | 'extra-rounded';
-export type CornerDotStyle     = 'square' | 'dot';
 export type LogoType           = 'none' | 'predefined' | 'custom';
 
 export type QrEcc = 'L' | 'M' | 'Q' | 'H';
@@ -112,9 +109,6 @@ export type FrameStyle    = 'none' | 'simple' | 'rounded' | 'badge-bottom';
 export interface QrStyle {
   foreground:           string;
   background:           string;
-  dot_style:            DotStyle;
-  corner_square_style:  CornerSquareStyle;
-  corner_dot_style:     CornerDotStyle;
   logo_type:            LogoType;
   logo_name:            string;
   logo_data:            string;
@@ -143,9 +137,6 @@ export interface QrStyle {
 export const DEFAULT_STYLE: QrStyle = {
   foreground:           '#000000',
   background:           '#ffffff',
-  dot_style:            'square',
-  corner_square_style:  'square',
-  corner_dot_style:     'square',
   logo_type:            'none',
   logo_name:            '',
   logo_data:            '',
