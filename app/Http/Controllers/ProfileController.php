@@ -34,6 +34,12 @@ class ProfileController extends Controller
                 'last_used_at' => $p->last_used_at?->toDayDateTimeString(),
                 'created_at' => $p->created_at?->toDayDateTimeString(),
             ])->all(),
+            'tokens' => $user->tokens()->latest()->get(['id', 'name', 'last_used_at', 'created_at'])->map(fn ($token) => [
+                'id' => (string) $token->id,
+                'name' => $token->name,
+                'last_used_at' => $token->last_used_at?->toDayDateTimeString(),
+                'created_at' => $token->created_at?->toDayDateTimeString(),
+            ])->all(),
         ]);
     }
 

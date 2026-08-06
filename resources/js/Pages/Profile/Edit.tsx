@@ -1,9 +1,11 @@
 import { Button, Card, Field, Flash, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import ProfileLayout from '@/Layouts/ProfileLayout';
+import ApiTokensSection from '@/Pages/Profile/partials/ApiTokensSection';
 import PasskeysSection from '@/Pages/Profile/partials/PasskeysSection';
 import TwoFactorSection from '@/Pages/Profile/partials/TwoFactorSection';
-import { useForm } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 
 interface ProfileUser {
   name: string;
@@ -14,6 +16,13 @@ interface Passkey {
   id: string;
   name: string;
   authenticator: string | null;
+  last_used_at: string | null;
+  created_at: string | null;
+}
+
+interface ApiToken {
+  id: string;
+  name: string;
   last_used_at: string | null;
   created_at: string | null;
 }
@@ -30,6 +39,7 @@ interface Props {
   twoFactorSetup: TwoFactorSetup | null;
   recoveryCodes: string[] | null;
   passkeys: Passkey[];
+  tokens: ApiToken[];
 }
 
 export default function ProfileEdit({
@@ -39,8 +49,10 @@ export default function ProfileEdit({
   twoFactorSetup,
   recoveryCodes,
   passkeys,
+  tokens,
 }: Props) {
   const { t } = useTranslation();
+  const { flash } = usePage<PageProps>().props;
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
     password: '',
@@ -112,6 +124,7 @@ export default function ProfileEdit({
           recoveryCodes={recoveryCodes}
         />
         <PasskeysSection passkeys={passkeys} />
+        <ApiTokensSection tokens={tokens} newToken={flash?.token ?? null} />
       </div>
     </ProfileLayout>
   );

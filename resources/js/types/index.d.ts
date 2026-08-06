@@ -113,6 +113,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     success?: string;
     error?: string;
     warning?: string;
+    token?: string;
   };
   locale: string;
   availableLocales: { code: string; label: string }[];
