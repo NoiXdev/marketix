@@ -16,3 +16,4 @@ export { FormSection } from './FormSection';
 export { ErrorSummary } from './ErrorSummary';
 export { BackLink } from './BackLink';
 export { Pagination } from './Pagination';
+export { LinkButton } from './LinkButton';
