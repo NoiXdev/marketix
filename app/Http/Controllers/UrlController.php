@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateLink;
 use App\Enums\UrlStatus;
 use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\UrlRequest;
@@ -96,13 +97,13 @@ class UrlController extends Controller
         ]);
     }
 
-    public function store(UrlRequest $request)
+    public function store(UrlRequest $request, CreateLink $createLink)
     {
         $project = $request->get('project');
         $validated = $request->validated();
         $pixelIds = $request->input('pixel_ids', []);
 
-        $url = $project->urls()->create($validated);
+        $url = $createLink->handle($project, $request->user(), $validated);
         $this->syncUrlPixels($url, $pixelIds);
 
         return redirect()->route('app.project.links.index')
