@@ -11,6 +11,11 @@ return [
         'activity' => 'Activiteit',
         'horizon' => 'Horizon',
         'documentation' => 'Documentatie',
+        'groups' => [
+            'management' => 'Beheer',
+            'settings' => 'Instellingen',
+            'system' => 'Systeem',
+        ],
     ],
     'common' => [
         'leave_blank_to_keep' => '(leeg laten om huidige te behouden)',

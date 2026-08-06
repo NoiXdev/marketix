@@ -11,6 +11,11 @@ return [
         'activity' => 'Activity',
         'horizon' => 'Horizon',
         'documentation' => 'Documentation',
+        'groups' => [
+            'management' => 'Management',
+            'settings' => 'Settings',
+            'system' => 'System',
+        ],
     ],
     'common' => [
         'leave_blank_to_keep' => '(leave blank to keep current)',
