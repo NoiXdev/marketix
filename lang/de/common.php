@@ -82,4 +82,8 @@ return [
         'to' => 'Bis',
         'download_range' => 'Zeitraum herunterladen',
     ],
+    'roles' => [
+        'admin' => 'Admin',
+        'member' => 'Mitglied',
+    ],
 ];

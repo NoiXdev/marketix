@@ -82,4 +82,8 @@ return [
         'to' => 'Tot',
         'download_range' => 'Bereik downloaden',
     ],
+    'roles' => [
+        'admin' => 'Beheerder',
+        'member' => 'Lid',
+    ],
 ];

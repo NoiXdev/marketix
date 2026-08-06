@@ -82,4 +82,8 @@ return [
         'to' => 'To',
         'download_range' => 'Download range',
     ],
+    'roles' => [
+        'admin' => 'Admin',
+        'member' => 'Member',
+    ],
 ];

@@ -82,4 +82,8 @@ return [
         'to' => 'Au',
         'download_range' => 'Télécharger la période',
     ],
+    'roles' => [
+        'admin' => 'Admin',
+        'member' => 'Membre',
+    ],
 ];
