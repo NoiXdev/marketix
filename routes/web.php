@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AnalyticsIngestionController;
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
@@ -89,6 +90,8 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/profile/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('app.profile.two-factor.confirm');
         Route::delete('/profile/two-factor', [TwoFactorController::class, 'disable'])->name('app.profile.two-factor.disable');
         Route::post('/profile/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('app.profile.two-factor.recovery-codes');
+        Route::post('/profile/tokens', [ApiTokenController::class, 'store'])->name('app.profile.tokens.store');
+        Route::delete('/profile/tokens/{token}', [ApiTokenController::class, 'destroy'])->name('app.profile.tokens.destroy');
         Route::patch('/user/passkeys/{passkey}/name', [PasskeyManagementController::class, 'rename'])->name('app.passkeys.rename');
         Route::get('/password/change', [ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
         Route::put('/password/change', [ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
