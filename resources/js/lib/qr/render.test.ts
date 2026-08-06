@@ -25,4 +25,17 @@ describe('renderQr', () => {
     expect(badge.height).toBeGreaterThan(plain.height);
     expect(badge.svg).toContain('Scan me');
   });
+  it('does not throw on a badge frame with a nullish frame_text (stored style may carry null)', () => {
+    // A persisted style can carry null frame_text/color fields; the renderer must
+    // degrade gracefully instead of crashing the whole app.
+    expect(() =>
+      renderQr('x', {
+        ...DEFAULT_STYLE,
+        frame_style: 'badge-bottom',
+        frame_text: null as unknown as string,
+        frame_text_color: null as unknown as string,
+        frame_color: null as unknown as string,
+      }),
+    ).not.toThrow();
+  });
 });

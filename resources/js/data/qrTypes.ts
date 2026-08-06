@@ -149,7 +149,7 @@ export const DEFAULT_STYLE: QrStyle = {
   eye_ball_rounding: 0,
   error_correction: 'Q',
   quiet_zone: 4,
-  logo_margin: 1,
+  logo_margin: 2,
   logo_clear_modules: true,
   frame_style: 'none',
   frame_text: '',

@@ -23,9 +23,9 @@ const n = (v: number): string => String(Math.round(v * 100) / 100);
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-/** Escape a string for inclusion in XML text / attribute content. */
-function escapeXml(s: string): string {
-  return s
+/** Escape a string for inclusion in XML text / attribute content. Nullish-safe. */
+function escapeXml(s: string | null | undefined): string {
+  return String(s ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
