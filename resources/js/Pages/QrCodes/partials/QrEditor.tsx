@@ -10,6 +10,7 @@ import { FormEventHandler, useState } from 'react';
 import QrContentForm from './QrContentForm';
 import QrPreview from './QrPreview';
 import QrStyleForm from './QrStyleForm';
+import QrTemplatePanel from './QrTemplatePanel';
 
 export interface QrFormData {
   name: string;
@@ -182,7 +183,10 @@ export default function QrEditor({
               <div className="border-b border-line px-5 py-3">
                 <h3 className="text-sm font-semibold text-foreground">{t('qr.editor.style')}</h3>
               </div>
-              <div className="p-5"><QrStyleForm style={data.style} onChange={s => setData('style', s)} /></div>
+              <div className="p-5">
+                <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
+                <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
+              </div>
             </div>
           ) : (
             <div className="rounded-[var(--radius)] border border-line bg-surface">
@@ -197,7 +201,12 @@ export default function QrEditor({
               <div className="p-5">
                 {tab === 'content'
                   ? <QrContentForm type={data.type} content={data.content} onChange={c => setData('content', c)} />
-                  : <QrStyleForm style={data.style} onChange={s => setData('style', s)} />}
+                  : (
+                    <>
+                      <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
+                      <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
+                    </>
+                  )}
               </div>
             </div>
           )}
