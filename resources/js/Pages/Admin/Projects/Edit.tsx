@@ -1,4 +1,4 @@
-import { Button, Checkbox, EmptyState, Field, FormSection, IconButton, Input, PageHeader, Select, TableCard } from '@/Components/ui';
+import { Button, Checkbox, EmptyState, Field, FormSection, IconButton, Input, LinkButton, PageHeader, Select, TableCard } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
@@ -50,13 +50,10 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
   }
 
   const openBtn = (
-    <Link
-      href={route('app.project.dashboard', { project: project.id })}
-      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-line-strong bg-surface px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
-    >
+    <LinkButton variant="secondary" size="sm" href={route('app.project.dashboard', { project: project.id })}>
       <ExternalLink className="h-4 w-4" />
       {t('admin.projects.actions.open')}
-    </Link>
+    </LinkButton>
   );
 
   return (

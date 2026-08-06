@@ -4,11 +4,11 @@ import AppLayout from '@/Layouts/AppLayout';
 import ClicksChart from '@/Pages/Dashboard/ClicksChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
-import { Button, StatusPill } from '@/Components/ui';
+import { Button, LinkButton, StatusPill } from '@/Components/ui';
 import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { BarChart3, Calendar, Check, Copy, ExternalLink, MousePointerClick, Pencil, QrCode as QrCodeIcon, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 
@@ -91,9 +91,6 @@ function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows:
   );
 }
 
-const linkBtn =
-  'inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-line-strong bg-surface px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
-
 export default function LinksShow({
   link, days, rangeClicks, rangeUnique, clicksByDay,
   topCountries, topCities, topBrowsers, topOs, topReferrers, recentClicks,
@@ -159,15 +156,15 @@ export default function LinksShow({
             </div>
             <div className="flex shrink-0 items-center gap-2">
               {!link.has_qr_code && (
-                <Link href={route('app.project.qrcodes.create', { project: project!.id, link: link.id })} className={linkBtn}>
+                <LinkButton variant="secondary" size="sm" href={route('app.project.qrcodes.create', { project: project!.id, link: link.id })}>
                   <QrCodeIcon className="h-4 w-4" />
                   {t('links.actions.create_qr')}
-                </Link>
+                </LinkButton>
               )}
-              <Link href={route('app.project.links.edit', { project: project!.id, url: link.id })} className={linkBtn}>
+              <LinkButton variant="secondary" size="sm" href={route('app.project.links.edit', { project: project!.id, url: link.id })}>
                 <Pencil className="h-4 w-4" />
                 {t('common.actions.edit')}
-              </Link>
+              </LinkButton>
               <ReportDownloadButton projectId={project!.id} urlId={link.id} />
               <Button variant="danger" onClick={resetStats}>
                 <RotateCcw className="h-4 w-4" />

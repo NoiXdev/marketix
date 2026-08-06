@@ -1,5 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { EmptyState, Flash, IconButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
@@ -42,12 +42,9 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
   }
 
   const createBtn = (
-    <Link
-      href={route('app.project.pixels.create', { project: project!.id })}
-      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
-    >
+    <LinkButton href={route('app.project.pixels.create', { project: project!.id })}>
       <Plus className="h-4 w-4" /> {t('pixels.create')}
-    </Link>
+    </LinkButton>
   );
 
   return (
@@ -62,12 +59,9 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
             title={t('pixels.empty')}
             hint={t('pixels.empty_hint')}
             action={
-              <Link
-                href={route('app.project.pixels.create', { project: project!.id })}
-                className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:bg-accent-hover"
-              >
+              <LinkButton size="sm" href={route('app.project.pixels.create', { project: project!.id })}>
                 <Plus className="h-3.5 w-3.5" /> {t('pixels.create')}
-              </Link>
+              </LinkButton>
             }
           />
         ) : (

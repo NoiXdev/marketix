@@ -4,6 +4,7 @@ import KpiTile from '@/Pages/Dashboard/KpiTile';
 import QuickActions from '@/Pages/Dashboard/QuickActions';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
+import { LinkButton } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { flagFromCode } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
@@ -54,9 +55,9 @@ export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountr
               ))}
             </div>
             <ReportDownloadButton projectId={project.id} />
-            <Link href={route('app.project.links.create', { project: project.id })} className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]">
+            <LinkButton href={route('app.project.links.create', { project: project.id })}>
               <Plus className="h-4 w-4" /> {t('common.dashboard.new_link')}
-            </Link>
+            </LinkButton>
           </div>
         </div>
 

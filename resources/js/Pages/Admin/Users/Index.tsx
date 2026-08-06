@@ -1,4 +1,4 @@
-import { Flash, IconButton, Input, PageHeader, Pagination, RowActions, TableCard } from '@/Components/ui';
+import { Flash, IconButton, Input, LinkButton, PageHeader, Pagination, RowActions, TableCard } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
@@ -34,13 +34,10 @@ export default function AdminUsersIndex({ users, search }: { users: Paginated<Ad
   }
 
   const addBtn = (
-    <Link
-      href={route('app.admin.users.create')}
-      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
-    >
+    <LinkButton href={route('app.admin.users.create')}>
       <Plus className="h-4 w-4" />
       {t('admin.users.add')}
-    </Link>
+    </LinkButton>
   );
 
   return (

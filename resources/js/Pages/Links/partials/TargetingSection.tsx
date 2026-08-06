@@ -1,4 +1,4 @@
-import { Input, Select } from '@/Components/ui';
+import { Button, Input, Select } from '@/Components/ui';
 import { COUNTRIES, SUBDIVISIONS } from '@/data/countries';
 import { LANGUAGES } from '@/data/languages';
 import { useTranslation } from '@/lib/i18n';
@@ -32,14 +32,10 @@ function Section({ icon, title, description, onAdd, addLabel, children }: Sectio
           <span className="text-muted">{icon}</span>
           <span className="text-sm font-semibold text-foreground">{title}</span>
         </div>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:bg-accent-hover"
-        >
+        <Button type="button" size="sm" onClick={onAdd}>
           <Plus className="h-3.5 w-3.5" />
           {addLabel}
-        </button>
+        </Button>
       </div>
       <p className="px-5 py-3 text-xs text-muted">{description}</p>
       {children}

@@ -1,9 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { BackLink, EmptyState, Flash, IconButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import { BackLink, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { Goal, PageProps } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Target, Trash2 } from 'lucide-react';
 
 export default function GoalsIndex({ site, goals }: { site: { id: string; name: string }; goals: Goal[] }) {
@@ -16,13 +16,10 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
   }
 
   const createBtn = (
-    <Link
-      href={route('app.project.analytics.goals.create', { project: project!.id, site: site.id })}
-      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
-    >
+    <LinkButton href={route('app.project.analytics.goals.create', { project: project!.id, site: site.id })}>
       <Plus className="h-4 w-4" />
       {t('analytics.goals.create')}
-    </Link>
+    </LinkButton>
   );
 
   return (
