@@ -136,7 +136,7 @@ export default function AdminUsersEdit({
             {memberships.length === 0 ? (
               <EmptyState icon={Users} title={t('admin.users.memberships.empty')} />
             ) : (
-              <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: 'Role' }, { label: '' }]}>
+              <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: t('admin.common.role') }, { label: '' }]}>
                 <tbody className="divide-y divide-line">
                   {memberships.map((m) => (
                     <tr key={m.id}>

@@ -15,6 +15,7 @@ return [
     'common' => [
         'leave_blank_to_keep' => '(laisser vide pour conserver l\'actuel)',
         'secret_set' => '•••••••• défini',
+        'role' => 'Rôle',
     ],
     'activity' => [
         'title' => "Journal d'activité",

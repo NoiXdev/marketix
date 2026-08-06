@@ -15,6 +15,7 @@ return [
     'common' => [
         'leave_blank_to_keep' => '(leave blank to keep current)',
         'secret_set' => '•••••••• set',
+        'role' => 'Role',
     ],
     'activity' => [
         'title' => 'Activity log',

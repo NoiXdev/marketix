@@ -99,7 +99,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
               columns={[
                 { label: t('admin.users.columns.name') },
                 { label: t('admin.users.columns.email') },
-                { label: 'Role' },
+                { label: t('admin.common.role') },
                 { label: '' },
               ]}
             >

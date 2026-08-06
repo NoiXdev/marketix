@@ -15,6 +15,7 @@ return [
     'common' => [
         'leave_blank_to_keep' => '(leeg laten om huidige te behouden)',
         'secret_set' => '•••••••• ingesteld',
+        'role' => 'Rol',
     ],
     'activity' => [
         'title' => 'Activiteitenlogboek',
