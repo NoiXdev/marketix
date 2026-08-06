@@ -88,6 +88,18 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                             <BookOpen className="h-4 w-4 text-subtle" />
                             {t('common.user_menu.docs')}
                         </a>
+                        {auth.user.super_admin && (
+                            <a
+                                href="https://docs.noix.dev/marketix/admin/introduction/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                                onClick={() => setOpen(false)}
+                            >
+                                <BookOpen className="h-4 w-4 text-subtle" />
+                                {t('common.user_menu.admin_docs')}
+                            </a>
+                        )}
                         <Link
                             href={route('app.auth.logout')}
                             method="post"

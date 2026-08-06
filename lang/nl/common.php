@@ -23,6 +23,7 @@ return [
         'profile' => 'Profiel',
         'logout' => 'Uitloggen',
         'docs' => 'Documentatie',
+        'admin_docs' => 'Admin-docs',
     ],
     'language' => [
         'label' => 'Taal',

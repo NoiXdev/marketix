@@ -23,6 +23,7 @@ return [
         'profile' => 'Profil',
         'logout' => 'Se déconnecter',
         'docs' => 'Documentation',
+        'admin_docs' => 'Doc admin',
     ],
     'language' => [
         'label' => 'Langue',
