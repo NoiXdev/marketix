@@ -25,6 +25,7 @@ use App\Http\Controllers\PixelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\QrTemplateController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SiteController;
@@ -132,6 +133,11 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::put('/qr-codes/{qrCode}', [QrCodeController::class, 'update'])->name('app.project.qrcodes.update');
             Route::post('/qr-codes/{qrCode}/versions/{version}/restore', [QrCodeController::class, 'restore'])->name('app.project.qrcodes.versions.restore');
             Route::delete('/qr-codes/{qrCode}', [QrCodeController::class, 'destroy'])->name('app.project.qrcodes.destroy');
+
+            // QR brand templates
+            Route::get('/qr-templates', [QrTemplateController::class, 'index'])->name('app.project.qr-templates.index');
+            Route::post('/qr-templates', [QrTemplateController::class, 'store'])->name('app.project.qr-templates.store');
+            Route::delete('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'destroy'])->name('app.project.qr-templates.destroy');
 
             // Pixels
             Route::get('/pixels', [PixelController::class, 'index'])->name('app.project.pixels.index');
