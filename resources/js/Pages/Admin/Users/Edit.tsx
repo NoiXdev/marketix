@@ -1,8 +1,10 @@
+import { Button, Checkbox, EmptyState, Field, Flash, FormSection, IconButton, Input, PageHeader, Select, TableCard } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
-import { PageProps, ProjectRole } from '@/types';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Trash2 } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
+import { ProjectRole } from '@/types';
+import { Link, router, useForm } from '@inertiajs/react';
+import { Trash2, Users } from 'lucide-react';
 
 interface EditUser {
   id: string;
@@ -32,6 +34,7 @@ export default function AdminUsersEdit({
   memberships: Membership[];
   availableProjects: AvailableProject[];
 }) {
+  const { t } = useTranslation();
   const account = useForm({
     name: user.name,
     email: user.email,
@@ -40,10 +43,6 @@ export default function AdminUsersEdit({
     force_password_change: user.force_password_change,
   });
   const attach = useForm({ project_id: '', role: 'member' });
-  const { flash } = usePage<PageProps>().props;
-
-  const inputClass =
-    'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
 
   function saveAccount(e: React.FormEvent) {
     e.preventDefault();
@@ -66,115 +65,123 @@ export default function AdminUsersEdit({
   }
 
   async function removeMembership(membership: Membership) {
-    if (!(await confirmDelete({ title: 'Remove from project?', text: `Remove ${user.name} from ${membership.name}?`, confirmText: 'Remove' }))) return;
+    if (
+      !(await confirmDelete({
+        title: t('admin.users.memberships.remove_confirm.title'),
+        text: t('admin.users.memberships.remove_confirm.text', { name: user.name, project: membership.name }),
+        confirmText: t('admin.users.memberships.remove_confirm.confirm'),
+      }))
+    )
+      return;
     router.delete(route('app.admin.users.projects.destroy', { user: user.id, project: membership.id }));
   }
 
-  const cardClass = 'mb-8 max-w-2xl rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900';
-
   return (
-    <AdminLayout title="Edit user">
+    <AdminLayout title={t('admin.users.edit.title')}>
       <div className="px-8 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Edit user</h1>
+        <PageHeader title={t('admin.users.edit.title')} />
 
-        {flash?.success && (
-          <div className="mb-4 max-w-2xl rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
-        )}
-        {flash?.error && (
-          <div className="mb-4 max-w-2xl rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{flash.error}</div>
-        )}
+        <Flash />
 
         {/* Account */}
-        <form onSubmit={saveAccount} className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Account</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
-              <input value={account.data.name} onChange={(e) => account.setData('name', e.target.value)} className={inputClass} />
-              {account.errors.name && <p className="mt-1 text-xs text-red-600">{account.errors.name}</p>}
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
-              <input type="email" value={account.data.email} onChange={(e) => account.setData('email', e.target.value)} className={inputClass} />
-              {account.errors.email && <p className="mt-1 text-xs text-red-600">{account.errors.email}</p>}
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">New password (leave blank to keep)</label>
-              <input type="password" value={account.data.password} onChange={(e) => account.setData('password', e.target.value)} className={inputClass} />
-              {account.errors.password && <p className="mt-1 text-xs text-red-600">{account.errors.password}</p>}
-            </div>
-            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-              <input type="checkbox" checked={account.data.super_admin} onChange={(e) => account.setData('super_admin', e.target.checked)} />
-              Super admin
+        <form onSubmit={saveAccount} className="mb-8 max-w-2xl">
+          <FormSection title={t('admin.users.sections.account')}>
+            <Field label={t('admin.users.fields.name')} error={account.errors.name}>
+              <Input value={account.data.name} onChange={(e) => account.setData('name', e.target.value)} />
+            </Field>
+            <Field label={t('admin.users.fields.email')} error={account.errors.email}>
+              <Input type="email" value={account.data.email} onChange={(e) => account.setData('email', e.target.value)} />
+            </Field>
+            <Field label={t('admin.users.fields.new_password_hint')} error={account.errors.password}>
+              <Input type="password" value={account.data.password} onChange={(e) => account.setData('password', e.target.value)} />
+            </Field>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <Checkbox checked={account.data.super_admin} onChange={(e) => account.setData('super_admin', e.target.checked)} />
+              {t('admin.users.fields.super_admin')}
             </label>
-            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-              <input type="checkbox" checked={account.data.force_password_change} onChange={(e) => account.setData('force_password_change', e.target.checked)} />
-              Force password change on next login
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <Checkbox
+                checked={account.data.force_password_change}
+                onChange={(e) => account.setData('force_password_change', e.target.checked)}
+              />
+              {t('admin.users.fields.force_password_change')}
             </label>
             <div className="flex gap-2">
-              <button disabled={account.processing} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Save</button>
-              <Link href={route('app.admin.users.index')} className="rounded-md px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">Cancel</Link>
+              <Button type="submit" loading={account.processing}>
+                {t('common.actions.save')}
+              </Button>
+              <Link
+                href={route('app.admin.users.index')}
+                className="inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              >
+                {t('common.actions.cancel')}
+              </Link>
             </div>
-          </div>
+          </FormSection>
         </form>
 
         {/* Security actions */}
-        <div className={cardClass}>
-          <h2 className="mb-1 text-lg font-semibold text-slate-900 dark:text-white">Security actions</h2>
-          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">Email this user a link to reset their password.</p>
-          <button onClick={sendPasswordReset} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
-            Send password reset
-          </button>
+        <div className="mb-8 max-w-2xl">
+          <FormSection title={t('admin.users.sections.security')}>
+            <p className="text-sm text-muted">{t('admin.users.security.reset_description')}</p>
+            <Button variant="secondary" onClick={sendPasswordReset}>
+              {t('admin.users.security.send_reset')}
+            </Button>
+          </FormSection>
         </div>
 
         {/* Project memberships */}
-        <div className={cardClass}>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Project memberships</h2>
-
-          {memberships.length === 0 ? (
-            <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">Not a member of any project yet.</p>
-          ) : (
-            <div className="mb-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-              <table className="w-full text-sm">
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="mb-8 max-w-2xl">
+          <FormSection title={t('admin.users.memberships.title')}>
+            {memberships.length === 0 ? (
+              <EmptyState icon={Users} title={t('admin.users.memberships.empty')} />
+            ) : (
+              <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: 'Role' }, { label: '' }]}>
+                <tbody className="divide-y divide-line">
                   {memberships.map((m) => (
                     <tr key={m.id}>
-                      <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{m.name}</td>
+                      <td className="px-4 py-3 font-medium text-foreground">{m.name}</td>
                       <td className="px-4 py-3">
-                        <select value={m.role} onChange={(e) => changeRole(m, e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                          <option value="admin">Admin</option>
-                          <option value="member">Member</option>
-                        </select>
+                        <div className="w-32">
+                          <Select value={m.role} onChange={(e) => changeRole(m, e.target.value)}>
+                            <option value="admin">{t('common.roles.admin')}</option>
+                            <option value="member">{t('common.roles.member')}</option>
+                          </Select>
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => removeMembership(m)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => removeMembership(m)} />
                       </td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
-          )}
+              </TableCard>
+            )}
 
-          <form onSubmit={attachProject} className="flex items-end gap-2">
-            <div className="flex-1">
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Add to project</label>
-              <select value={attach.data.project_id} onChange={(e) => attach.setData('project_id', e.target.value)} className={inputClass}>
-                <option value="">Select a project…</option>
-                {availableProjects.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-              {attach.errors.project_id && <p className="mt-1 text-xs text-red-600">{attach.errors.project_id}</p>}
-            </div>
-            <select value={attach.data.role} onChange={(e) => attach.setData('role', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-              <option value="member">Member</option>
-              <option value="admin">Admin</option>
-            </select>
-            <button disabled={attach.processing || !attach.data.project_id} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Add</button>
-          </form>
+            <form onSubmit={attachProject} className="flex items-end gap-2">
+              <div className="flex-1">
+                <Field label={t('admin.users.memberships.add_label')} error={attach.errors.project_id}>
+                  <Select value={attach.data.project_id} onChange={(e) => attach.setData('project_id', e.target.value)}>
+                    <option value="">{t('admin.users.memberships.select_project_placeholder')}</option>
+                    {availableProjects.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              </div>
+              <div className="w-32">
+                <Select value={attach.data.role} onChange={(e) => attach.setData('role', e.target.value)}>
+                  <option value="member">{t('common.roles.member')}</option>
+                  <option value="admin">{t('common.roles.admin')}</option>
+                </Select>
+              </div>
+              <Button type="submit" loading={attach.processing} disabled={attach.processing || !attach.data.project_id}>
+                {t('common.actions.add')}
+              </Button>
+            </form>
+          </FormSection>
         </div>
       </div>
     </AdminLayout>

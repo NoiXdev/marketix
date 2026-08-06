@@ -1,8 +1,10 @@
+import { Button, Checkbox, EmptyState, Field, FormSection, IconButton, Input, PageHeader, Select, TableCard } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { useTranslation } from '@/lib/i18n';
 import { ProjectMember } from '@/types';
 import { Link, router, useForm } from '@inertiajs/react';
-import { ExternalLink, Trash2 } from 'lucide-react';
+import { ExternalLink, Trash2, Users } from 'lucide-react';
 
 interface EditProject {
   id: string;
@@ -17,7 +19,7 @@ interface AssignableUser {
 }
 
 export default function AdminProjectsEdit({ project, members, assignableUsers }: { project: EditProject; members: ProjectMember[]; assignableUsers: AssignableUser[] }) {
-  const inputClass = 'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
+  const { t } = useTranslation();
   const details = useForm({ name: project.name, locked: project.locked });
   const assign = useForm({ user_id: '', role: 'member' });
 
@@ -36,81 +38,116 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
   }
 
   async function removeMember(member: ProjectMember) {
-    if (!(await confirmDelete({ title: 'Remove member?', text: `Remove ${member.name} from this project?`, confirmText: 'Remove' }))) return;
+    if (
+      !(await confirmDelete({
+        title: t('admin.projects.members.remove_confirm.title'),
+        text: t('admin.projects.members.remove_confirm.text', { name: member.name }),
+        confirmText: t('admin.projects.members.remove_confirm.confirm'),
+      }))
+    )
+      return;
     router.delete(route('app.admin.projects.members.destroy', { project: project.id, user: member.id }));
   }
 
-  return (
-    <AdminLayout title="Edit project">
-      <div className="px-8 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Edit project</h1>
-          <Link
-            href={route('app.project.dashboard', { project: project.id })}
-            className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Open project
-          </Link>
-        </div>
+  const openBtn = (
+    <Link
+      href={route('app.project.dashboard', { project: project.id })}
+      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-line-strong bg-surface px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+    >
+      <ExternalLink className="h-4 w-4" />
+      {t('admin.projects.actions.open')}
+    </Link>
+  );
 
-        <form onSubmit={saveDetails} className="mb-10 max-w-md space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
-            <input value={details.data.name} onChange={(e) => details.setData('name', e.target.value)} className={inputClass} />
-            {details.errors.name && <p className="mt-1 text-xs text-red-600">{details.errors.name}</p>}
-          </div>
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-            <input type="checkbox" checked={details.data.locked} onChange={(e) => details.setData('locked', e.target.checked)} />
-            Locked
-          </label>
-          <div className="flex gap-2">
-            <button disabled={details.processing} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Save</button>
-            <Link href={route('app.admin.projects.index')} className="rounded-md px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">Back</Link>
-          </div>
+  return (
+    <AdminLayout title={t('admin.projects.edit.title')}>
+      <div className="px-8 py-8">
+        <PageHeader title={t('admin.projects.edit.title')} action={openBtn} />
+
+        <form onSubmit={saveDetails} className="mb-10 max-w-md">
+          <FormSection>
+            <Field label={t('admin.projects.fields.name')} error={details.errors.name}>
+              <Input value={details.data.name} onChange={(e) => details.setData('name', e.target.value)} />
+            </Field>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <Checkbox checked={details.data.locked} onChange={(e) => details.setData('locked', e.target.checked)} />
+              {t('admin.projects.fields.locked')}
+            </label>
+            <div className="flex gap-2">
+              <Button type="submit" loading={details.processing}>
+                {t('common.actions.save')}
+              </Button>
+              <Link
+                href={route('app.admin.projects.index')}
+                className="inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              >
+                {t('common.actions.cancel')}
+              </Link>
+            </div>
+          </FormSection>
         </form>
 
-        <h2 className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">Members</h2>
-        <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full text-sm">
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {members.map((member) => (
-                <tr key={member.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">{member.name}</td>
-                  <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{member.email}</td>
-                  <td className="px-4 py-3">
-                    <select value={member.role} onChange={(e) => changeRole(member, e.target.value)} className="rounded-md border border-slate-300 px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                      <option value="admin">Admin</option>
-                      <option value="member">Member</option>
-                    </select>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button onClick={() => removeMember(member)} className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('admin.projects.members.title')}</h2>
+
+        {members.length === 0 ? (
+          <div className="mb-4">
+            <EmptyState icon={Users} title={t('admin.projects.members.empty')} />
+          </div>
+        ) : (
+          <div className="mb-4">
+            <TableCard
+              columns={[
+                { label: t('admin.users.columns.name') },
+                { label: t('admin.users.columns.email') },
+                { label: 'Role' },
+                { label: '' },
+              ]}
+            >
+              <tbody className="divide-y divide-line">
+                {members.map((member) => (
+                  <tr key={member.id}>
+                    <td className="px-4 py-3 font-medium text-foreground">{member.name}</td>
+                    <td className="px-4 py-3 text-muted">{member.email}</td>
+                    <td className="px-4 py-3">
+                      <div className="w-32">
+                        <Select value={member.role} onChange={(e) => changeRole(member, e.target.value)}>
+                          <option value="admin">{t('common.roles.admin')}</option>
+                          <option value="member">{t('common.roles.member')}</option>
+                        </Select>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => removeMember(member)} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </TableCard>
+          </div>
+        )}
 
         <form onSubmit={assignUser} className="flex max-w-2xl items-end gap-2">
           <div className="flex-1">
-            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Assign user</label>
-            <select value={assign.data.user_id} onChange={(e) => assign.setData('user_id', e.target.value)} className={inputClass}>
-              <option value="">Select a user…</option>
-              {assignableUsers.map((u) => (
-                <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-              ))}
-            </select>
-            {assign.errors.user_id && <p className="mt-1 text-xs text-red-600">{assign.errors.user_id}</p>}
+            <Field label={t('admin.projects.members.assign_label')} error={assign.errors.user_id}>
+              <Select value={assign.data.user_id} onChange={(e) => assign.setData('user_id', e.target.value)}>
+                <option value="">{t('admin.projects.members.select_user_placeholder')}</option>
+                {assignableUsers.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.email})
+                  </option>
+                ))}
+              </Select>
+            </Field>
           </div>
-          <select value={assign.data.role} onChange={(e) => assign.setData('role', e.target.value)} className="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </select>
-          <button disabled={assign.processing || !assign.data.user_id} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Assign</button>
+          <div className="w-32">
+            <Select value={assign.data.role} onChange={(e) => assign.setData('role', e.target.value)}>
+              <option value="member">{t('common.roles.member')}</option>
+              <option value="admin">{t('common.roles.admin')}</option>
+            </Select>
+          </div>
+          <Button type="submit" loading={assign.processing} disabled={assign.processing || !assign.data.user_id}>
+            {t('admin.projects.members.assign_button')}
+          </Button>
         </form>
       </div>
     </AdminLayout>
