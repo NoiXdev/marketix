@@ -1,6 +1,7 @@
+import { Button, Checkbox, Field, Flash, Input, PageHeader } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { PageProps } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { useTranslation } from '@/lib/i18n';
+import { useForm } from '@inertiajs/react';
 
 interface Props {
   app_name: string | null;
@@ -10,14 +11,10 @@ interface Props {
   favicon_url: string | null;
 }
 
-const inputClass =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
-const labelClass = 'mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300';
-
 type ImageField = 'logo_light' | 'logo_dark' | 'logo_email' | 'favicon';
 
 export default function AdminBrandingEdit(props: Props) {
-  const { flash } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   const currentUrl: Record<ImageField, string | null> = {
     logo_light: props.logo_light_url,
@@ -54,70 +51,47 @@ export default function AdminBrandingEdit(props: Props) {
   }
 
   const imageFields: { field: ImageField; remove: keyof typeof data; label: string; hint: string }[] = [
-    { field: 'logo_light', remove: 'remove_logo_light', label: 'Logo (light mode)', hint: 'Shown on light backgrounds.' },
-    { field: 'logo_dark', remove: 'remove_logo_dark', label: 'Logo (dark mode)', hint: 'Shown on dark backgrounds.' },
-    { field: 'logo_email', remove: 'remove_logo_email', label: 'Email / PDF logo', hint: 'Used in emails and PDF reports.' },
-    { field: 'favicon', remove: 'remove_favicon', label: 'Favicon', hint: '.ico, .png, .jpg.' },
+    { field: 'logo_light', remove: 'remove_logo_light', label: t('admin.branding.fields.logo_light'), hint: t('admin.branding.fields.logo_light_hint') },
+    { field: 'logo_dark', remove: 'remove_logo_dark', label: t('admin.branding.fields.logo_dark'), hint: t('admin.branding.fields.logo_dark_hint') },
+    { field: 'logo_email', remove: 'remove_logo_email', label: t('admin.branding.fields.logo_email'), hint: t('admin.branding.fields.logo_email_hint') },
+    { field: 'favicon', remove: 'remove_favicon', label: t('admin.branding.fields.favicon'), hint: t('admin.branding.fields.favicon_hint') },
   ];
 
   return (
-    <AdminLayout title="Branding">
+    <AdminLayout title={t('admin.branding.title')}>
       <div className="px-8 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Branding</h1>
+        <PageHeader title={t('admin.branding.title')} />
 
-        {flash?.success && (
-          <div className="mb-4 max-w-md rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
-        )}
-        {flash?.error && (
-          <div className="mb-4 max-w-md rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{flash.error}</div>
-        )}
+        <Flash />
 
         <form onSubmit={submit} className="max-w-md space-y-6">
-          <div>
-            <label className={labelClass}>Application name</label>
-            <input
-              value={data.app_name}
-              onChange={(e) => setData('app_name', e.target.value)}
-              placeholder="Marketix"
-              className={inputClass}
-            />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Leave blank to use the default ("Marketix").</p>
-            {errors.app_name && <p className="mt-1 text-xs text-red-600">{errors.app_name}</p>}
-          </div>
+          <Field label={t('admin.branding.fields.app_name')} hint={t('admin.branding.fields.app_name_hint')} error={errors.app_name}>
+            <Input value={data.app_name} onChange={(e) => setData('app_name', e.target.value)} placeholder="Marketix" />
+          </Field>
 
           {imageFields.map(({ field, remove, label, hint }) => (
-            <div key={field}>
-              <label className={labelClass}>{label}</label>
+            <Field key={field} label={label} hint={hint} error={errors[field]}>
               {currentUrl[field] && (
-                <img src={currentUrl[field]!} alt={label} className="mb-2 h-10 w-auto rounded border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800" />
+                <img src={currentUrl[field]!} alt={label} className="mb-2 h-10 w-auto rounded border border-line bg-elevated p-1" />
               )}
               <input
                 type="file"
                 accept={field === 'favicon' ? '.ico,.png,.jpg,.jpeg' : 'image/*'}
                 onChange={(e) => setData(field, e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-indigo-700 dark:text-slate-400 dark:file:bg-indigo-900/30 dark:file:text-indigo-300"
+                className="block w-full text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-soft-foreground"
               />
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{hint}</p>
               {currentUrl[field] && (
-                <label className="mt-1 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(data[remove])}
-                    onChange={(e) => setData(remove, e.target.checked)}
-                  />
-                  Remove current
+                <label className="mt-1 flex items-center gap-2 text-xs text-muted">
+                  <Checkbox checked={Boolean(data[remove])} onChange={(e) => setData(remove, e.target.checked)} />
+                  {t('admin.branding.remove_current')}
                 </label>
               )}
-              {errors[field] && <p className="mt-1 text-xs text-red-600">{errors[field]}</p>}
-            </div>
+            </Field>
           ))}
 
-          <button
-            disabled={processing}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-          >
-            Save
-          </button>
+          <Button type="submit" loading={processing}>
+            {t('common.actions.save')}
+          </Button>
         </form>
       </div>
     </AdminLayout>

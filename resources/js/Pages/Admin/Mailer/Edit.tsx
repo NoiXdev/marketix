@@ -1,6 +1,7 @@
+import { Button, Field, Flash, FormSection, Input, PageHeader, Select } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { PageProps } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { useTranslation } from '@/lib/i18n';
+import { useForm } from '@inertiajs/react';
 
 interface MailerSettings {
   default_mailer: string;
@@ -19,12 +20,8 @@ interface Props {
   has_smtp_password: boolean;
 }
 
-const inputClass =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
-const labelClass = 'mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300';
-
 export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_password }: Props) {
-  const { flash } = usePage<PageProps>().props;
+  const { t } = useTranslation();
   const { data, setData, put, processing, errors } = useForm({
     default_mailer: settings.default_mailer,
     from_address: settings.from_address,
@@ -51,155 +48,116 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
   }
 
   return (
-    <AdminLayout title="Mailer">
+    <AdminLayout title={t('admin.mailer.title')}>
       <div className="px-8 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Mailer settings</h1>
+        <PageHeader title={t('admin.mailer.title')} />
 
-        {flash?.success && (
-          <div className="mb-4 max-w-md rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
-        )}
-        {flash?.error && (
-          <div className="mb-4 max-w-md rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{flash.error}</div>
-        )}
+        <Flash />
 
         <form onSubmit={submit} className="max-w-md space-y-4">
-          <div>
-            <label htmlFor="default_mailer" className={labelClass}>Active mailer</label>
-            <select
-              id="default_mailer"
-              value={data.default_mailer}
-              onChange={(e) => setData('default_mailer', e.target.value)}
-              className={inputClass}
-            >
-              <option value="postal">Postal</option>
-              <option value="smtp">SMTP</option>
-              <option value="log">Log (no delivery)</option>
-            </select>
-            {errors.default_mailer && <p className="mt-1 text-xs text-red-600">{errors.default_mailer}</p>}
-          </div>
+          <Field label={t('admin.mailer.fields.default_mailer')} htmlFor="default_mailer" error={errors.default_mailer}>
+            <Select id="default_mailer" value={data.default_mailer} onChange={(e) => setData('default_mailer', e.target.value)}>
+              <option value="postal">{t('admin.mailer.options.postal')}</option>
+              <option value="smtp">{t('admin.mailer.options.smtp')}</option>
+              <option value="log">{t('admin.mailer.options.log')}</option>
+            </Select>
+          </Field>
 
-          <div>
-            <label htmlFor="from_address" className={labelClass}>From address</label>
-            <input
-              id="from_address"
-              type="email"
-              value={data.from_address}
-              onChange={(e) => setData('from_address', e.target.value)}
-              className={inputClass}
-            />
-            {errors.from_address && <p className="mt-1 text-xs text-red-600">{errors.from_address}</p>}
-          </div>
+          <Field label={t('admin.mailer.fields.from_address')} htmlFor="from_address" error={errors.from_address}>
+            <Input id="from_address" type="email" value={data.from_address} onChange={(e) => setData('from_address', e.target.value)} />
+          </Field>
 
-          <div>
-            <label htmlFor="from_name" className={labelClass}>From name</label>
-            <input
-              id="from_name"
-              value={data.from_name}
-              onChange={(e) => setData('from_name', e.target.value)}
-              className={inputClass}
-            />
-            {errors.from_name && <p className="mt-1 text-xs text-red-600">{errors.from_name}</p>}
-          </div>
+          <Field label={t('admin.mailer.fields.from_name')} htmlFor="from_name" error={errors.from_name}>
+            <Input id="from_name" value={data.from_name} onChange={(e) => setData('from_name', e.target.value)} />
+          </Field>
 
           {data.default_mailer === 'postal' && (
-            <fieldset className="space-y-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
-              <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-300">Postal</legend>
-              <div>
-                <label htmlFor="postal_url" className={labelClass}>Postal server URL</label>
-                <input
-                  id="postal_url"
-                  value={data.postal_url}
-                  onChange={(e) => setData('postal_url', e.target.value)}
-                  className={inputClass}
-                />
-                {errors.postal_url && <p className="mt-1 text-xs text-red-600">{errors.postal_url}</p>}
-              </div>
-              <div>
-                <label htmlFor="postal_key" className={labelClass}>API key {has_postal_key && '(leave blank to keep current)'}</label>
-                <input
+            <fieldset className="space-y-4 rounded-md border border-line p-4">
+              <legend className="px-1 text-sm font-semibold text-foreground">{t('admin.mailer.options.postal')}</legend>
+              <Field label={t('admin.mailer.fields.postal_url')} htmlFor="postal_url" error={errors.postal_url}>
+                <Input id="postal_url" value={data.postal_url} onChange={(e) => setData('postal_url', e.target.value)} />
+              </Field>
+              <Field
+                label={
+                  <>
+                    {t('admin.mailer.fields.postal_key')}
+                    {has_postal_key && ' ' + t('admin.common.leave_blank_to_keep')}
+                  </>
+                }
+                htmlFor="postal_key"
+                error={errors.postal_key}
+              >
+                <Input
                   id="postal_key"
                   type="password"
-                  placeholder={has_postal_key ? '•••••••• set' : ''}
+                  placeholder={has_postal_key ? t('admin.common.secret_set') : ''}
                   value={data.postal_key}
                   onChange={(e) => setData('postal_key', e.target.value)}
-                  className={inputClass}
                 />
-                {errors.postal_key && <p className="mt-1 text-xs text-red-600">{errors.postal_key}</p>}
-              </div>
+              </Field>
             </fieldset>
           )}
 
           {data.default_mailer === 'smtp' && (
-            <fieldset className="space-y-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
-              <legend className="px-1 text-sm font-semibold text-slate-700 dark:text-slate-300">SMTP</legend>
-              <div>
-                <label htmlFor="smtp_host" className={labelClass}>Host</label>
-                <input id="smtp_host" value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} className={inputClass} />
-                {errors.smtp_host && <p className="mt-1 text-xs text-red-600">{errors.smtp_host}</p>}
-              </div>
-              <div>
-                <label htmlFor="smtp_port" className={labelClass}>Port</label>
-                <input
+            <fieldset className="space-y-4 rounded-md border border-line p-4">
+              <legend className="px-1 text-sm font-semibold text-foreground">{t('admin.mailer.options.smtp')}</legend>
+              <Field label={t('admin.mailer.fields.smtp_host')} htmlFor="smtp_host" error={errors.smtp_host}>
+                <Input id="smtp_host" value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} />
+              </Field>
+              <Field label={t('admin.mailer.fields.smtp_port')} htmlFor="smtp_port" error={errors.smtp_port}>
+                <Input
                   id="smtp_port"
                   type="number"
                   value={data.smtp_port}
                   onChange={(e) => setData('smtp_port', Number(e.target.value))}
-                  className={inputClass}
                 />
-                {errors.smtp_port && <p className="mt-1 text-xs text-red-600">{errors.smtp_port}</p>}
-              </div>
-              <div>
-                <label htmlFor="smtp_username" className={labelClass}>Username</label>
-                <input id="smtp_username" value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} className={inputClass} />
-                {errors.smtp_username && <p className="mt-1 text-xs text-red-600">{errors.smtp_username}</p>}
-              </div>
-              <div>
-                <label htmlFor="smtp_password" className={labelClass}>Password {has_smtp_password && '(leave blank to keep current)'}</label>
-                <input
+              </Field>
+              <Field label={t('admin.mailer.fields.smtp_username')} htmlFor="smtp_username" error={errors.smtp_username}>
+                <Input id="smtp_username" value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} />
+              </Field>
+              <Field
+                label={
+                  <>
+                    {t('admin.mailer.fields.smtp_password')}
+                    {has_smtp_password && ' ' + t('admin.common.leave_blank_to_keep')}
+                  </>
+                }
+                htmlFor="smtp_password"
+                error={errors.smtp_password}
+              >
+                <Input
                   id="smtp_password"
                   type="password"
-                  placeholder={has_smtp_password ? '•••••••• set' : ''}
+                  placeholder={has_smtp_password ? t('admin.common.secret_set') : ''}
                   value={data.smtp_password}
                   onChange={(e) => setData('smtp_password', e.target.value)}
-                  className={inputClass}
                 />
-                {errors.smtp_password && <p className="mt-1 text-xs text-red-600">{errors.smtp_password}</p>}
-              </div>
-              <div>
-                <label htmlFor="smtp_scheme" className={labelClass}>Encryption scheme (e.g. tls)</label>
-                <input id="smtp_scheme" value={data.smtp_scheme} onChange={(e) => setData('smtp_scheme', e.target.value)} className={inputClass} />
-                {errors.smtp_scheme && <p className="mt-1 text-xs text-red-600">{errors.smtp_scheme}</p>}
-              </div>
+              </Field>
+              <Field label={t('admin.mailer.fields.smtp_scheme')} htmlFor="smtp_scheme" error={errors.smtp_scheme}>
+                <Input id="smtp_scheme" value={data.smtp_scheme} onChange={(e) => setData('smtp_scheme', e.target.value)} />
+              </Field>
             </fieldset>
           )}
 
-          <button
-            disabled={processing}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-          >
-            Save
-          </button>
+          <Button type="submit" loading={processing}>
+            {t('common.actions.save')}
+          </Button>
         </form>
 
-        <form onSubmit={sendTest} className="mt-8 max-w-md space-y-3 border-t border-slate-200 pt-6 dark:border-slate-700">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Send test email</h2>
-          <div>
-            <label htmlFor="test_email" className={labelClass}>Recipient (defaults to your address)</label>
-            <input
-              id="test_email"
-              type="email"
-              value={testForm.data.test_email}
-              onChange={(e) => testForm.setData('test_email', e.target.value)}
-              className={inputClass}
-            />
-            {testForm.errors.test_email && <p className="mt-1 text-xs text-red-600">{testForm.errors.test_email}</p>}
-          </div>
-          <button
-            disabled={testForm.processing}
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Send test
-          </button>
+        <form onSubmit={sendTest} className="mt-8 max-w-md">
+          <FormSection title={t('admin.mailer.test.title')}>
+            <Field label={t('admin.mailer.test.recipient_label')} htmlFor="test_email" error={testForm.errors.test_email}>
+              <Input
+                id="test_email"
+                type="email"
+                value={testForm.data.test_email}
+                onChange={(e) => testForm.setData('test_email', e.target.value)}
+              />
+            </Field>
+            <Button type="submit" variant="secondary" loading={testForm.processing}>
+              {t('admin.mailer.test.send_button')}
+            </Button>
+          </FormSection>
         </form>
       </div>
     </AdminLayout>
