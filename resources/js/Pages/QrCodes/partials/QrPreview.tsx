@@ -1,3 +1,4 @@
+import { Button } from '@/Components/ui';
 import { QrIcon, QR_ICONS, iconToDataUrl } from '@/data/qrIcons';
 import { QrStyle } from '@/data/qrTypes';
 import { Download } from 'lucide-react';
@@ -87,18 +88,16 @@ export default function QrPreview({ data, style, name = 'qr-code' }: Props) {
     <div className="flex flex-col items-center gap-4">
       <div
         ref={containerRef}
-        className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700"
+        className="overflow-hidden rounded-[12px] border border-line"
         style={{ background: style.background }}
       />
       <div className="flex gap-2">
-        <button type="button" onClick={() => download('png')}
-          className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+        <Button type="button" variant="secondary" size="sm" onClick={() => download('png')}>
           <Download className="h-3.5 w-3.5" /> PNG
-        </button>
-        <button type="button" onClick={() => download('svg')}
-          className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+        </Button>
+        <Button type="button" variant="secondary" size="sm" onClick={() => download('svg')}>
           <Download className="h-3.5 w-3.5" /> SVG
-        </button>
+        </Button>
       </div>
     </div>
   );

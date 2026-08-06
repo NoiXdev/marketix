@@ -1,5 +1,7 @@
+import { Input } from '@/Components/ui';
 import { QrIcon, QR_ICONS, iconToDataUrl } from '@/data/qrIcons';
 import { CornerDotStyle, CornerSquareStyle, DotStyle, LogoType, QrStyle } from '@/data/qrTypes';
+import { useTranslation } from '@/lib/i18n';
 import { Upload, X } from 'lucide-react';
 import { useRef } from 'react';
 
@@ -20,8 +22,8 @@ function Opt({ label, active, onClick, children }: {
       title={label}
       className={`flex flex-col items-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
         active
-          ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/20 dark:text-indigo-300'
-          : 'border-slate-200 text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
+          ? 'border-accent bg-accent-soft text-accent-soft-foreground'
+          : 'border-line text-muted hover:border-line-strong'
       }`}
     >
       {children}
@@ -55,6 +57,7 @@ const CORNER_DOT_SHAPES: { value: CornerDotStyle; label: string; preview: React.
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function QrStyleForm({ style, onChange }: Props) {
+  const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Single-key update — safe because it merges into a fresh object each time
@@ -96,18 +99,18 @@ export default function QrStyleForm({ style, onChange }: Props) {
 
       {/* ── Colors ── */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Colors</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('qr.style.colors')}</h3>
         <div className="flex gap-4">
           {(['foreground', 'background'] as const).map((key) => (
             <label key={key} className="flex-1">
-              <span className="block text-xs capitalize text-slate-500 dark:text-slate-400 mb-1">{key}</span>
+              <span className="block text-xs capitalize text-muted mb-1">{t(`qr.style.${key}`)}</span>
               <div className="flex items-center gap-2">
                 <input type="color" value={style[key]}
                   onChange={e => set(key, e.target.value)}
-                  className="h-9 w-14 cursor-pointer rounded border border-slate-300 p-0.5 dark:border-slate-600" />
-                <input type="text" value={style[key]}
+                  className="h-9 w-14 cursor-pointer rounded border border-line-strong p-0.5" />
+                <Input type="text" value={style[key]}
                   onChange={e => set(key, e.target.value)}
-                  className="flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white" />
+                  className="flex-1" />
               </div>
             </label>
           ))}
@@ -116,54 +119,63 @@ export default function QrStyleForm({ style, onChange }: Props) {
 
       {/* ── Matrix / Dot style ── */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Matrix style</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('qr.style.matrix')}</h3>
         <div className="grid grid-cols-3 gap-2">
-          {DOT_SHAPES.map(({ value, label, preview }) => (
-            <Opt key={value} label={label} active={style.dot_style === value} onClick={() => set('dot_style', value)}>
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-slate-700 dark:text-slate-300">{preview}</svg>
-            </Opt>
-          ))}
+          {DOT_SHAPES.map(({ value, label, preview }) => {
+            const isActive = style.dot_style === value;
+            return (
+              <Opt key={value} label={label} active={isActive} onClick={() => set('dot_style', value)}>
+                <svg viewBox="0 0 24 24" className={`h-7 w-7 ${isActive ? 'text-accent-soft-foreground' : 'text-foreground'}`}>{preview}</svg>
+              </Opt>
+            );
+          })}
         </div>
       </div>
 
       {/* ── Eye frame (corner square) ── */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Eye frame</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('qr.style.eye_frame')}</h3>
         <div className="grid grid-cols-3 gap-2">
-          {CORNER_SQUARE_SHAPES.map(({ value, label, preview }) => (
-            <Opt key={value} label={label} active={style.corner_square_style === value} onClick={() => set('corner_square_style', value)}>
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-slate-700 dark:text-slate-300">{preview}</svg>
-            </Opt>
-          ))}
+          {CORNER_SQUARE_SHAPES.map(({ value, label, preview }) => {
+            const isActive = style.corner_square_style === value;
+            return (
+              <Opt key={value} label={label} active={isActive} onClick={() => set('corner_square_style', value)}>
+                <svg viewBox="0 0 24 24" className={`h-7 w-7 ${isActive ? 'text-accent-soft-foreground' : 'text-foreground'}`}>{preview}</svg>
+              </Opt>
+            );
+          })}
         </div>
       </div>
 
       {/* ── Eye ball (corner dot) ── */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Eye ball</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('qr.style.eye_ball')}</h3>
         <div className="grid grid-cols-2 gap-2">
-          {CORNER_DOT_SHAPES.map(({ value, label, preview }) => (
-            <Opt key={value} label={label} active={style.corner_dot_style === value} onClick={() => set('corner_dot_style', value)}>
-              <svg viewBox="0 0 24 24" className="h-7 w-7 text-slate-700 dark:text-slate-300">{preview}</svg>
-            </Opt>
-          ))}
+          {CORNER_DOT_SHAPES.map(({ value, label, preview }) => {
+            const isActive = style.corner_dot_style === value;
+            return (
+              <Opt key={value} label={label} active={isActive} onClick={() => set('corner_dot_style', value)}>
+                <svg viewBox="0 0 24 24" className={`h-7 w-7 ${isActive ? 'text-accent-soft-foreground' : 'text-foreground'}`}>{preview}</svg>
+              </Opt>
+            );
+          })}
         </div>
       </div>
 
       {/* ── Logo / Icon ── */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Logo / Icon</h3>
+        <h3 className="mb-3 text-sm font-semibold text-foreground">{t('qr.style.logo')}</h3>
 
         {/* Logo type tabs */}
-        <div className="mb-3 flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs dark:border-slate-700 dark:bg-slate-800">
-          {(['none', 'predefined', 'custom'] as LogoType[]).map(t => (
-            <button key={t} type="button" onClick={() => selectLogoType(t)}
-              className={`flex-1 rounded-md py-1.5 capitalize transition-colors ${
-                style.logo_type === t
-                  ? 'bg-white font-semibold text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
+        <div className="mb-3 flex rounded-lg border border-line bg-elevated p-0.5 text-xs">
+          {(['none', 'predefined', 'custom'] as LogoType[]).map(lt => (
+            <button key={lt} type="button" onClick={() => selectLogoType(lt)}
+              className={`flex-1 rounded-md py-1.5 transition-colors ${
+                style.logo_type === lt
+                  ? 'bg-surface font-semibold text-foreground shadow-[var(--shadow-sm)]'
+                  : 'text-muted hover:text-foreground'
               }`}>
-              {t}
+              {t(`qr.style.logo_${lt}`)}
             </button>
           ))}
         </div>
@@ -181,12 +193,12 @@ export default function QrStyleForm({ style, onChange }: Props) {
                   title={icon.label}
                   className={`flex flex-col items-center gap-1 rounded-lg border p-2 text-xs transition-colors ${
                     isActive
-                      ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500 dark:border-indigo-400 dark:bg-indigo-900/20 dark:ring-indigo-400'
-                      : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-500'
+                      ? 'border-accent bg-accent-soft ring-1 ring-[color:var(--accent-ring)]'
+                      : 'border-line hover:border-line-strong'
                   }`}
                 >
                   <img src={iconToDataUrl(icon)} alt={icon.label} className="h-6 w-6" />
-                  <span className={`truncate w-full text-center ${isActive ? 'font-semibold text-indigo-700 dark:text-indigo-300' : 'text-slate-500 dark:text-slate-400'}`}>
+                  <span className={`truncate w-full text-center ${isActive ? 'font-semibold text-accent-soft-foreground' : 'text-muted'}`}>
                     {icon.label}
                   </span>
                 </button>
@@ -201,17 +213,17 @@ export default function QrStyleForm({ style, onChange }: Props) {
             {style.logo_data ? (
               <div className="flex items-center gap-3">
                 <img src={style.logo_data} alt="Logo"
-                  className="h-12 w-12 rounded border border-slate-200 object-contain p-1 dark:border-slate-700" />
+                  className="h-12 w-12 rounded border border-line object-contain p-1" />
                 <button type="button" onClick={removeLogo}
-                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700">
-                  <X className="h-3.5 w-3.5" /> Remove
+                  className="flex items-center gap-1 text-xs text-danger-foreground hover:text-danger-foreground">
+                  <X className="h-3.5 w-3.5" /> {t('qr.style.remove')}
                 </button>
               </div>
             ) : (
               <button type="button" onClick={() => fileRef.current?.click()}
-                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-slate-300 py-6 text-slate-400 hover:border-indigo-400 hover:text-indigo-500 dark:border-slate-700">
+                className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-line-strong py-6 text-subtle hover:border-accent hover:text-accent-soft-foreground">
                 <Upload className="h-5 w-5" />
-                <span className="text-xs">Click to upload image</span>
+                <span className="text-xs">{t('qr.style.upload')}</span>
               </button>
             )}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleCustomLogo} />
@@ -222,14 +234,14 @@ export default function QrStyleForm({ style, onChange }: Props) {
         {style.logo_type !== 'none' && (
           <div className="mt-4">
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs text-slate-500 dark:text-slate-400">Icon size</span>
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{style.logo_size}%</span>
+              <span className="text-xs text-subtle">{t('qr.style.icon_size')}</span>
+              <span className="text-xs font-semibold text-foreground">{style.logo_size}%</span>
             </div>
             <input type="range" min="10" max="60" step="5" value={style.logo_size}
               onChange={e => set('logo_size', Number(e.target.value))}
-              className="w-full accent-indigo-600" />
-            <div className="mt-0.5 flex justify-between text-xs text-slate-400">
-              <span>Small</span><span>Large</span>
+              className="w-full accent-[color:var(--accent)]" />
+            <div className="mt-0.5 flex justify-between text-xs text-subtle">
+              <span>{t('qr.style.small')}</span><span>{t('qr.style.large')}</span>
             </div>
           </div>
         )}
