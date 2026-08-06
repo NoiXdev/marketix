@@ -1,12 +1,12 @@
 import QrVersionsPanel, { QrVersionEntry } from '@/Components/QrVersionsPanel';
+import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { QrStyle, QrType } from '@/data/qrTypes';
 import { confirmAction } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { isRiskyEdit, QrEditState } from '@/lib/qrRisk';
 import { PageProps, PixelOption } from '@/types';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
@@ -87,15 +87,12 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
   }
 
   return (
-    <AppLayout title="Edit QR code">
+    <AppLayout title={t('qr.editor.edit_page_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <Link href={route('app.project.qrcodes.index', { project: project!.id })}
-            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-            <ArrowLeft className="h-4 w-4" /> Back to QR codes
-          </Link>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">
-            Edit <span className="text-indigo-600 dark:text-indigo-400">{qrCode.name}</span>
+          <BackLink href={route('app.project.qrcodes.index', { project: project!.id })}>{t('qr.editor.back')}</BackLink>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
+            {t('qr.editor.edit_title')} <span className="text-accent-soft-foreground">{qrCode.name}</span>
           </h1>
         </div>
         <div className="space-y-4">
@@ -104,7 +101,7 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
             setData={setData}
             errors={errors as Record<string, string>}
             processing={processing}
-            submitLabel="Save changes"
+            submitLabel={t('qr.editor.save_submit')}
             cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
             domains={domains}
             dynamicUrl={qrCode.dynamic_url ?? undefined}
