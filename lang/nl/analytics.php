@@ -37,7 +37,7 @@ return [
 
     'goals' => [
         'title' => 'Doelen — :name',
-        'back' => '← Analytics',
+        'back' => 'Terug naar analytics',
         'create' => 'Doel toevoegen',
         'edit' => 'Doel bewerken',
         'empty' => 'Nog geen doelen. Voeg er een toe om conversies te volgen.',
@@ -59,7 +59,7 @@ return [
 
     'dashboard' => [
         'title' => 'Analytics — :name',
-        'back' => '← Sites',
+        'back' => 'Terug naar sites',
         'range_today' => 'Vandaag',
         'chart_title' => 'Bezoekers over tijd',
         'no_data' => 'Geen gegevens',
@@ -109,7 +109,7 @@ return [
 
     'events' => [
         'page_title' => 'Event — :name',
-        'back' => '← Analytics',
+        'back' => 'Terug naar analytics',
         'subtitle' => ':total events · :name',
         'empty' => 'Geen eigenschappen geregistreerd voor dit event.',
 

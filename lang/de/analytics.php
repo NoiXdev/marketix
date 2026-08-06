@@ -37,7 +37,7 @@ return [
 
     'goals' => [
         'title' => 'Ziele — :name',
-        'back' => '← Analytics',
+        'back' => 'Zurück zu Analytics',
         'create' => 'Ziel hinzufügen',
         'edit' => 'Ziel bearbeiten',
         'empty' => 'Noch keine Ziele. Fügen Sie eines hinzu, um Conversions zu verfolgen.',
@@ -59,7 +59,7 @@ return [
 
     'dashboard' => [
         'title' => 'Analytics — :name',
-        'back' => '← Websites',
+        'back' => 'Zurück zu den Sites',
         'range_today' => 'Heute',
         'chart_title' => 'Besucher im Zeitverlauf',
         'no_data' => 'Keine Daten',
@@ -109,7 +109,7 @@ return [
 
     'events' => [
         'page_title' => 'Event — :name',
-        'back' => '← Analytics',
+        'back' => 'Zurück zu Analytics',
         'subtitle' => ':total Events · :name',
         'empty' => 'Für dieses Event wurden keine Eigenschaften erfasst.',
 
