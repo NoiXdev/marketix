@@ -23,6 +23,7 @@ return [
             'invitation_resent' => 'hat eine Einladung erneut gesendet',
             'invitation_accepted' => 'hat eine Einladung angenommen',
         ],
+        'subject_line' => ':verb :subject',
     ],
     'history' => [
         'title' => 'Verlauf',

@@ -59,8 +59,9 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
           <FormSection>
             <div className="flex items-end gap-2">
               <div className="flex-1">
-                <Field label={t('team.invite.label')} error={invite.errors.email}>
+                <Field label={t('team.invite.label')} htmlFor="invite_email" error={invite.errors.email}>
                   <Input
+                    id="invite_email"
                     type="email"
                     value={invite.data.email}
                     onChange={(e) => invite.setData('email', e.target.value)}

@@ -22,10 +22,10 @@ const KNOWN_LABEL_CODES = new Set([
   'invitation_accepted',
 ]);
 
-function describe(a: ActivityEntry, t: (key: string) => string): string {
+function describe(a: ActivityEntry, t: (key: string, replacements?: Record<string, string | number>) => string): string {
   const verb = KNOWN_LABEL_CODES.has(a.description) ? t(`activity.feed.labels.${a.description}`) : a.description;
   if (['created', 'updated', 'deleted'].includes(a.description) && a.subject_type) {
-    return `${verb} a ${a.subject_type}`;
+    return t('activity.feed.subject_line', { verb, subject: a.subject_type });
   }
   return verb;
 }
@@ -34,7 +34,7 @@ export default function ActivityFeed({ activities, showProject = false }: { acti
   const { t } = useTranslation();
 
   if (activities.length === 0) {
-    return <p className="py-12 text-center text-sm text-subtle">No activity yet.</p>;
+    return <p className="py-12 text-center text-sm text-subtle">{t('common.dashboard.no_activity')}</p>;
   }
 
   return (

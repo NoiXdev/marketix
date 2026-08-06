@@ -23,6 +23,7 @@ return [
             'invitation_resent' => 'resent an invitation',
             'invitation_accepted' => 'accepted an invitation',
         ],
+        'subject_line' => ':verb a :subject',
     ],
     'history' => [
         'title' => 'History',
