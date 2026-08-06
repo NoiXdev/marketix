@@ -1,10 +1,12 @@
+import { Button, Field, Input } from '@/Components/ui';
 import GuestLayout from '@/Layouts/GuestLayout';
+import { useTranslation } from '@/lib/i18n';
 import { Head, router, useForm } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
-import { Loader2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 export default function TwoFactorChallenge({ hasPasskeys }: { hasPasskeys: boolean }) {
+  const { t } = useTranslation();
   const [useRecovery, setUseRecovery] = useState(false);
   const { data, setData, post, processing, errors } = useForm({ code: '', recovery_code: '' });
 
@@ -21,19 +23,16 @@ export default function TwoFactorChallenge({ hasPasskeys }: { hasPasskeys: boole
     post(route('app.auth.two-factor.store'));
   };
 
-  const inputClass =
-    'mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white';
-
   return (
-    <GuestLayout title="Two-factor authentication" description="Confirm access to your account">
-      <Head title="Two-factor authentication" />
+    <GuestLayout
+      title={t('auth.two_factor_challenge.title')}
+      description={t('auth.two_factor_challenge.description')}
+    >
+      <Head title={t('auth.two_factor_challenge.head')} />
       <form onSubmit={submit} className="space-y-4">
         {!useRecovery ? (
-          <div>
-            <label htmlFor="code" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Authentication code
-            </label>
-            <input
+          <Field label={t('auth.two_factor_challenge.code_label')} htmlFor="code" error={errors.code}>
+            <Input
               id="code"
               type="text"
               inputMode="numeric"
@@ -41,44 +40,49 @@ export default function TwoFactorChallenge({ hasPasskeys }: { hasPasskeys: boole
               autoFocus
               value={data.code}
               onChange={(e) => setData('code', e.target.value)}
-              className={inputClass}
             />
-            {errors.code && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.code}</p>}
-          </div>
+          </Field>
         ) : (
-          <div>
-            <label htmlFor="recovery_code" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Recovery code
-            </label>
-            <input id="recovery_code" type="text" value={data.recovery_code} onChange={(e) => setData('recovery_code', e.target.value)} className={inputClass} />
-            {errors.recovery_code && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.recovery_code}</p>}
-          </div>
+          <Field
+            label={t('auth.two_factor_challenge.recovery_code_label')}
+            htmlFor="recovery_code"
+            error={errors.recovery_code}
+          >
+            <Input
+              id="recovery_code"
+              type="text"
+              value={data.recovery_code}
+              onChange={(e) => setData('recovery_code', e.target.value)}
+            />
+          </Field>
         )}
 
-        <button
-          type="submit"
-          disabled={processing}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-60"
-        >
-          {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-          Verify
-        </button>
+        <Button type="submit" loading={processing} className="w-full justify-center">
+          {t('auth.two_factor_challenge.submit')}
+        </Button>
 
-        <button type="button" onClick={() => setUseRecovery((v) => !v)} className="w-full text-center text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-          {useRecovery ? 'Use an authentication code' : 'Use a recovery code'}
+        <button
+          type="button"
+          onClick={() => setUseRecovery((v) => !v)}
+          className="w-full text-center text-xs text-accent-soft-foreground hover:underline"
+        >
+          {useRecovery
+            ? t('auth.two_factor_challenge.use_code')
+            : t('auth.two_factor_challenge.use_recovery')}
         </button>
 
         {hasPasskeys && passkey.isSupported && (
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => void passkey.verify()}
             disabled={passkey.isLoading}
-            className="w-full rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="w-full justify-center"
           >
-            Use a passkey
-          </button>
+            {t('auth.two_factor_challenge.use_passkey')}
+          </Button>
         )}
-        {hasPasskeys && passkey.error && <p className="text-xs text-red-600 dark:text-red-400">{passkey.error}</p>}
+        {hasPasskeys && passkey.error && <p className="text-xs text-danger-foreground">{passkey.error}</p>}
       </form>
     </GuestLayout>
   );
