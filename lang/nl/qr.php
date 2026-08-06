@@ -69,6 +69,7 @@ return [
         'eye_frame' => 'Oogkader',
         'eye_ball' => 'Oogpunt',
         'logo' => 'Logo / Icoon',
+        'logo_alt' => 'Logo',
         'logo_none' => 'Geen',
         'logo_predefined' => 'Vooraf ingesteld',
         'logo_custom' => 'Eigen',

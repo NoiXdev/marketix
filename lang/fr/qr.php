@@ -69,6 +69,7 @@ return [
         'eye_frame' => 'Cadre des yeux',
         'eye_ball' => 'Œil central',
         'logo' => 'Logo / Icône',
+        'logo_alt' => 'Logo',
         'logo_none' => 'Aucun',
         'logo_predefined' => 'Prédéfini',
         'logo_custom' => 'Personnalisé',

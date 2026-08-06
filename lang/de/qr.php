@@ -69,6 +69,7 @@ return [
         'eye_frame' => 'Augen-Rahmen',
         'eye_ball' => 'Augen-Punkt',
         'logo' => 'Logo / Icon',
+        'logo_alt' => 'Logo',
         'logo_none' => 'Keins',
         'logo_predefined' => 'Vordefiniert',
         'logo_custom' => 'Eigenes',

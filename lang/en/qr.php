@@ -69,6 +69,7 @@ return [
         'eye_frame' => 'Eye frame',
         'eye_ball' => 'Eye ball',
         'logo' => 'Logo / Icon',
+        'logo_alt' => 'Logo',
         'logo_none' => 'None',
         'logo_predefined' => 'Predefined',
         'logo_custom' => 'Custom',

@@ -440,7 +440,7 @@ export default function QrStyleForm({ style, onChange }: Props) {
           <div>
             {style.logo_data ? (
               <div className="flex items-center gap-3">
-                <img src={style.logo_data} alt="Logo"
+                <img src={style.logo_data} alt={t('qr.style.logo_alt')}
                   className="h-12 w-12 rounded border border-line object-contain p-1" />
                 <button type="button" onClick={removeLogo}
                   className="flex items-center gap-1 text-xs text-danger-foreground hover:text-danger-foreground">
@@ -514,7 +514,8 @@ export default function QrStyleForm({ style, onChange }: Props) {
               <span className="mb-1 block text-xs text-muted">{t('qr.frame.text')}</span>
               <Input type="text" value={style.frame_text}
                 onChange={e => set('frame_text', e.target.value)}
-                placeholder={t('qr.frame.text_placeholder')} />
+                placeholder={t('qr.frame.text_placeholder')}
+                maxLength={60} />
             </label>
             <div className="flex gap-3">
               <label className="flex-1">

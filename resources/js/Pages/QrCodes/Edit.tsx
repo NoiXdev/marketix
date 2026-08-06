@@ -1,7 +1,7 @@
 import QrVersionsPanel, { QrVersionEntry } from '@/Components/QrVersionsPanel';
 import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
-import { QrStyle, QrType } from '@/data/qrTypes';
+import { DEFAULT_STYLE, QrStyle, QrType } from '@/data/qrTypes';
 import { confirmAction } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { isRiskyEdit, QrEditState } from '@/lib/qrRisk';
@@ -43,7 +43,7 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
     domain_id:  qrCode.domain_id ?? (domains[0]?.id ?? ''),
     slug:       qrCode.slug ?? '',
     content:            qrCode.content,
-    style:              qrCode.style,
+    style:              { ...DEFAULT_STYLE, ...qrCode.style },
     status:             qrCode.status != null ? String(qrCode.status) : '1',
     password:           '',
     expired_at:         qrCode.expired_at ?? '',
@@ -60,7 +60,7 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
     domain_id: qrCode.domain_id ?? '',
     slug: qrCode.slug ?? '',
     content: qrCode.content,
-    style: qrCode.style,
+    style: { ...DEFAULT_STYLE, ...qrCode.style },
   };
 
   async function submit(e: FormEvent) {
