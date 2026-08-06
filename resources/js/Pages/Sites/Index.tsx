@@ -1,82 +1,91 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { PageProps, Site } from '@/types';
+import { EmptyState, Flash, IconButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
+import { useTranslation } from '@/lib/i18n';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { PageProps, Site } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Plus, Trash2 } from 'lucide-react';
+import { LineChart, Pencil, Plus, Trash2 } from 'lucide-react';
 
 export default function SitesIndex({ sites }: { sites: Site[] }) {
-  const { project, flash } = usePage<PageProps>().props;
+  const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   async function destroy(site: Site) {
     if (!(await confirmDelete({ title: site.name }))) return;
     router.delete(route('app.project.sites.destroy', { project: project!.id, site: site.id }));
   }
 
+  const createBtn = (
+    <Link
+      href={route('app.project.sites.create', { project: project!.id })}
+      className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+    >
+      <Plus className="h-4 w-4" />
+      {t('analytics.sites.create')}
+    </Link>
+  );
+
   return (
-    <AppLayout title="Analytics">
+    <AppLayout title={t('analytics.sites.title')}>
       <div className="px-8 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Analytics — Sites</h1>
-          <Link
-            href={route('app.project.sites.create', { project: project!.id })}
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+        <PageHeader title={t('analytics.sites.title')} action={createBtn} />
+        <Flash />
+
+        {sites.length === 0 ? (
+          <EmptyState
+            icon={LineChart}
+            title={t('analytics.sites.empty')}
+            hint={t('analytics.sites.empty_hint')}
+            action={
+              <Link
+                href={route('app.project.sites.create', { project: project!.id })}
+                className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground hover:bg-accent-hover"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t('analytics.sites.create')}
+              </Link>
+            }
+          />
+        ) : (
+          <TableCard
+            columns={[
+              { label: t('analytics.sites.columns.name') },
+              { label: t('analytics.sites.columns.domain') },
+              { label: t('analytics.sites.columns.mode') },
+              { label: '' },
+            ]}
           >
-            <Plus className="h-4 w-4" /> Add site
-          </Link>
-        </div>
-
-        {flash?.success && (
-          <div className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-300">
-            {flash.success}
-          </div>
-        )}
-
-        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800/50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Domain</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Mode</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-line">
               {sites.map((site) => (
-                <tr key={site.id} className="bg-white dark:bg-gray-900">
+                <tr
+                  key={site.id}
+                  onClick={rowLink(route('app.project.analytics.show', { project: project!.id, site: site.id }))}
+                  className={`group ${ROW_LINK_CLASS}`}
+                >
                   <td className="px-4 py-3">
                     <Link
                       href={route('app.project.analytics.show', { project: project!.id, site: site.id })}
-                      className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                      className="font-medium text-foreground hover:text-accent-soft-foreground"
                     >
                       {site.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{site.domain}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{site.tracking_mode}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
+                  <td className="px-4 py-3 text-muted">{site.domain}</td>
+                  <td className="px-4 py-3 text-muted">{site.tracking_mode}</td>
+                  <RowActions>
+                    <IconButton
+                      icon={Pencil}
+                      label={t('common.actions.edit')}
                       href={route('app.project.sites.edit', { project: project!.id, site: site.id })}
-                      className="mr-3 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
-                    >
-                      Edit
-                    </Link>
-                    <button onClick={() => destroy(site)} className="text-sm text-red-600 hover:text-red-500">
-                      <Trash2 className="inline h-4 w-4" />
-                    </button>
-                  </td>
+                    />
+                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(site)} />
+                  </RowActions>
                 </tr>
               ))}
-              {sites.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500">
-                    No sites yet. Add your first site to start tracking.
-                  </td>
-                </tr>
-              )}
             </tbody>
-          </table>
-        </div>
+          </TableCard>
+        )}
       </div>
     </AppLayout>
   );
