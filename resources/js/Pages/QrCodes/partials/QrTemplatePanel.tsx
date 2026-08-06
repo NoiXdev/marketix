@@ -18,6 +18,8 @@ interface Props {
   onApply: (style: QrStyle) => void;
 }
 
+type Status = { kind: 'success' | 'error'; message: string };
+
 export default function QrTemplatePanel({ style, onApply }: Props) {
   const { t } = useTranslation();
   const currentProject = usePage<PageProps>().props.project;
@@ -25,13 +27,15 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [status, setStatus] = useState<Status | null>(null);
 
   useEffect(() => {
     if (!currentProject) return;
 
     window.axios
       .get<{ templates: QrTemplate[] }>(route('app.project.qr-templates.index', { project: currentProject.id }))
-      .then(res => setTemplates(res.data.templates));
+      .then(res => setTemplates(res.data.templates))
+      .catch(() => setStatus({ kind: 'error', message: "Couldn't load templates." }));
   }, [currentProject]);
 
   const handleSave: FormEventHandler = e => {
@@ -39,6 +43,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
     if (!currentProject || !name.trim() || saving) return;
 
     setSaving(true);
+    setStatus(null);
     window.axios
       .post<{ template: QrTemplate }>(route('app.project.qr-templates.store', { project: currentProject.id }), {
         name: name.trim(),
@@ -47,7 +52,9 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
       .then(res => {
         setTemplates(prev => [res.data.template, ...prev]);
         setName('');
+        setStatus({ kind: 'success', message: t('qr.template.saved') });
       })
+      .catch(() => setStatus({ kind: 'error', message: "Couldn't save the template." }))
       .finally(() => setSaving(false));
   };
 
@@ -62,15 +69,26 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
     if (!confirmed) return;
 
     setDeletingId(template.id);
+    setStatus(null);
     window.axios
       .delete(route('app.project.qr-templates.destroy', { project: currentProject.id, qrTemplate: template.id }))
-      .then(() => setTemplates(prev => prev.filter(tpl => tpl.id !== template.id)))
+      .then(() => {
+        setTemplates(prev => prev.filter(tpl => tpl.id !== template.id));
+        setStatus({ kind: 'success', message: t('qr.template.deleted') });
+      })
+      .catch(() => setStatus({ kind: 'error', message: "Couldn't delete the template." }))
       .finally(() => setDeletingId(null));
   }
 
   return (
     <div className="space-y-3 border-t border-line pt-4">
       <h3 className="text-sm font-semibold text-foreground">{t('qr.template.title')}</h3>
+
+      {status && (
+        <p className={`text-xs ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>
+          {status.message}
+        </p>
+      )}
 
       {templates.length === 0 ? (
         <p className="text-xs text-muted">{t('qr.template.empty')}</p>
