@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Profil',
+    'back' => 'Zurück zum Dashboard',
     'name' => 'Name',
     'email' => 'E-Mail',
     'password' => [
