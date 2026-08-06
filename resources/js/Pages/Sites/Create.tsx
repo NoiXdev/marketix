@@ -36,7 +36,7 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
     <AppLayout title={t('analytics.sites.create')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.sites.title')}</BackLink>
+          <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.sites.back')}</BackLink>
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('analytics.sites.create')}</h1>
         </div>
 

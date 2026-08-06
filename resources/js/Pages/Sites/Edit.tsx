@@ -22,7 +22,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      title={copied ? t('links.copy.copied') : t('links.copy.idle')}
+      title={copied ? t('analytics.sites.copied') : t('analytics.sites.copy')}
       className={`rounded-md p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
         copied ? 'text-success-foreground' : 'text-subtle hover:bg-elevated hover:text-foreground'
       }`}
@@ -73,7 +73,7 @@ export default function SitesEdit({
     <AppLayout title={t('analytics.sites.edit')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.sites.title')}</BackLink>
+          <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.sites.back')}</BackLink>
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('analytics.sites.edit')}</h1>
         </div>
 

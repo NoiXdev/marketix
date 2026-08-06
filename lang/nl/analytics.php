@@ -3,6 +3,7 @@
 return [
     'sites' => [
         'title' => 'Analytics — Sites',
+        'back' => 'Terug naar sites',
         'create' => 'Site toevoegen',
         'edit' => 'Site bewerken',
         'empty' => 'Nog geen sites.',
@@ -30,6 +31,8 @@ return [
 
         'snippet_title' => 'Trackingsnippet',
         'snippet_hint' => 'Plak dit in de <head> van :domain.',
+        'copy' => 'Snippet kopiëren',
+        'copied' => 'Gekopieerd!',
     ],
 
     'goals' => [

@@ -3,6 +3,7 @@
 return [
     'sites' => [
         'title' => 'Analytics — Sites',
+        'back' => 'Back to sites',
         'create' => 'Add site',
         'edit' => 'Edit site',
         'empty' => 'No sites yet.',
@@ -30,6 +31,8 @@ return [
 
         'snippet_title' => 'Tracking snippet',
         'snippet_hint' => 'Paste this into the <head> of :domain.',
+        'copy' => 'Copy snippet',
+        'copied' => 'Copied!',
     ],
 
     'goals' => [
