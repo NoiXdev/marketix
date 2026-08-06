@@ -1,3 +1,4 @@
+import { Button, Card, Field, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { router, useForm } from '@inertiajs/react';
 
@@ -12,8 +13,6 @@ interface Props {
   setup: TwoFactorSetup | null;
   recoveryCodes: string[] | null;
 }
-
-const inputClass = 'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
 
 export default function TwoFactorSection({ enabled, pending, setup, recoveryCodes }: Props) {
   const { t } = useTranslation();
@@ -38,8 +37,7 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
     });
   };
 
-  const regenerate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const regenerate = () => {
     passwordForm.post(route('app.profile.two-factor.recovery-codes'), {
       preserveScroll: true,
       onSuccess: () => passwordForm.reset(),
@@ -47,13 +45,13 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
   };
 
   return (
-    <section className="space-y-4 rounded-md border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-      <h2 className="text-sm font-semibold text-slate-900 dark:text-white">{t('profile.two_factor.heading')}</h2>
+    <Card className="space-y-4 p-4">
+      <h2 className="text-sm font-semibold text-foreground">{t('profile.two_factor.heading')}</h2>
 
       {recoveryCodes && (
-        <div className="rounded-md bg-amber-50 p-3 dark:bg-amber-900/20">
-          <p className="text-xs font-medium text-amber-800 dark:text-amber-300">{t('profile.two_factor.recovery_codes_notice')}</p>
-          <ul className="mt-2 grid grid-cols-2 gap-1 font-mono text-xs text-amber-900 dark:text-amber-200">
+        <div className="rounded-[var(--radius-sm)] bg-warning-soft p-3">
+          <p className="text-xs font-medium text-warning-foreground">{t('profile.two_factor.recovery_codes_notice')}</p>
+          <ul className="mt-2 grid grid-cols-2 gap-1 font-mono text-xs text-warning-foreground">
             {recoveryCodes.map((c) => (
               <li key={c}>{c}</li>
             ))}
@@ -62,60 +60,59 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
       )}
 
       {!enabled && !pending && (
-        <button onClick={enable} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
-          {t('profile.two_factor.enable')}
-        </button>
+        <Button onClick={enable}>{t('profile.two_factor.enable')}</Button>
       )}
 
       {pending && setup && (
         <form onSubmit={confirm} className="space-y-3">
-          <p className="text-sm text-slate-600 dark:text-slate-400">{t('profile.two_factor.scan_instruction')}</p>
+          <p className="text-sm text-muted">{t('profile.two_factor.scan_instruction')}</p>
           <img src={setup.qrCode} alt={t('profile.two_factor.qr_alt')} className="h-44 w-44" />
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-subtle">
             {t('profile.two_factor.manual_key')} <span className="font-mono">{setup.secretKey}</span>
           </p>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="123456"
-            value={confirmForm.data.code}
-            onChange={(e) => confirmForm.setData('code', e.target.value)}
-            className={inputClass}
-          />
-          {confirmForm.errors.code && <p className="text-xs text-red-600">{confirmForm.errors.code}</p>}
-          <button disabled={confirmForm.processing} className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
+          <Field htmlFor="two_factor_code" error={confirmForm.errors.code}>
+            <Input
+              id="two_factor_code"
+              type="text"
+              inputMode="numeric"
+              placeholder="123456"
+              value={confirmForm.data.code}
+              onChange={(e) => confirmForm.setData('code', e.target.value)}
+            />
+          </Field>
+          <Button type="submit" loading={confirmForm.processing}>
             {t('profile.two_factor.confirm')}
-          </button>
+          </Button>
         </form>
       )}
 
       {enabled && (
         <div className="space-y-3">
-          <p className="text-sm text-green-700 dark:text-green-400">{t('profile.two_factor.enabled')}</p>
+          <p className="text-sm text-success-foreground">{t('profile.two_factor.enabled')}</p>
           <form onSubmit={disable} className="flex flex-wrap items-end gap-2">
             <div className="flex-1">
-              <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">{t('profile.two_factor.current_password')}</label>
-              <input type="password" value={passwordForm.data.current_password} onChange={(e) => passwordForm.setData('current_password', e.target.value)} className={inputClass} />
-              {passwordForm.errors.current_password && <p className="mt-1 text-xs text-red-600">{passwordForm.errors.current_password}</p>}
+              <Field
+                label={t('profile.two_factor.current_password')}
+                htmlFor="two_factor_current_password"
+                error={passwordForm.errors.current_password}
+              >
+                <Input
+                  id="two_factor_current_password"
+                  type="password"
+                  value={passwordForm.data.current_password}
+                  onChange={(e) => passwordForm.setData('current_password', e.target.value)}
+                />
+              </Field>
             </div>
-            <button
-              type="submit"
-              disabled={passwordForm.processing}
-              className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400"
-            >
+            <Button type="submit" variant="danger" disabled={passwordForm.processing}>
               {t('profile.two_factor.disable')}
-            </button>
-            <button
-              type="button"
-              onClick={regenerate}
-              disabled={passwordForm.processing}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300"
-            >
+            </Button>
+            <Button type="button" variant="secondary" onClick={regenerate} disabled={passwordForm.processing}>
               {t('profile.two_factor.regenerate')}
-            </button>
+            </Button>
           </form>
         </div>
       )}
-    </section>
+    </Card>
   );
 }
