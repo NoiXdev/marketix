@@ -8,7 +8,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, title }: PropsWithChildren<AdminLayoutProps>) {
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-canvas">
       {title && <Head title={title} />}
       <AdminSidebar />
       <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
