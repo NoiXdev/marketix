@@ -155,7 +155,8 @@ class ReadToolsTest extends TestCase
             ->tool(GetLinkStatsTool::class, ['link_id' => $mine['url']->id])
             ->assertOk()
             ->assertSee('Germany')
-            ->assertSee('Chrome · Windows')
+            ->assertSee('Chrome')
+            ->assertSee('Windows')
             ->assertSee('referrer.example');
     }
 

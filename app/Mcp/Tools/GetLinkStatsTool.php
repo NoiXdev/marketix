@@ -7,7 +7,6 @@ use App\Models\Url;
 use App\Services\StatisticsAggregator;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
-use Illuminate\Support\Facades\DB;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -61,25 +60,19 @@ class GetLinkStatsTool extends Tool
             ->values()
             ->all();
 
-        // The Statistic table has no single "device" column — the Links/Show
-        // page renders the device column as `[browser, os].join(' · ')`
-        // (resources/js/Pages/Links/Show.tsx). We reuse that exact pairing
-        // here rather than inventing a new metric.
-        $byDevice = Statistic::query()
-            ->where('project_id', $url->project_id)
-            ->where('url_id', $url->id)
-            ->where('is_bot', false)
-            ->where('created_at', '>=', $since)
-            ->select('browser', 'os', DB::raw('COUNT(*) as count'))
-            ->groupBy('browser', 'os')
-            ->orderByDesc('count')
-            ->limit(8)
-            ->get()
-            ->map(function (Statistic $row): array {
-                $device = collect([$row->browser, $row->os])->filter()->implode(' · ');
+        // The Statistic table has no single "device" column, and the app
+        // never aggregates browser+os as one combined metric anywhere (the
+        // canonical Statistics page and Links/Show both expose browser and
+        // os as separate breakdowns — topBrowsers / topOs). So we reuse the
+        // aggregator's single-column breakdown() for each, rather than
+        // inventing a combined-tuple metric that doesn't exist elsewhere.
+        $byBrowser = $stats->breakdown($url->project_id, $url->id, 'browser', $since)
+            ->map(fn (Statistic $row): array => ['browser' => $row->browser, 'count' => (int) $row->count])
+            ->values()
+            ->all();
 
-                return ['device' => $device !== '' ? $device : 'Unknown', 'count' => (int) $row->count];
-            })
+        $byOs = $stats->breakdown($url->project_id, $url->id, 'os', $since)
+            ->map(fn (Statistic $row): array => ['os' => $row->os, 'count' => (int) $row->count])
             ->values()
             ->all();
 
@@ -87,7 +80,8 @@ class GetLinkStatsTool extends Tool
             'clicks' => $stats->totalClicks($url->project_id, $url->id, $since),
             'unique_clicks' => $stats->uniqueClicks($url->project_id, $url->id, $since),
             'by_country' => $byCountry,
-            'by_device' => $byDevice,
+            'by_browser' => $byBrowser,
+            'by_os' => $byOs,
             'by_referrer' => $byReferrer,
         ];
 
