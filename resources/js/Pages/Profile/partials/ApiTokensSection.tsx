@@ -37,7 +37,7 @@ function CopyButton({ text }: { text: string }) {
 
 export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToken[]; newToken?: string | null }) {
   const { t } = useTranslation();
-  const { data, setData, post, processing, reset } = useForm({ name: '' });
+  const { data, setData, post, processing, errors, reset } = useForm({ name: '' });
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +106,7 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
 
       <form onSubmit={submit} className="flex items-end gap-2">
         <div className="flex-1">
-          <Field label={t('profile.tokens.name_label')} htmlFor="token_name">
+          <Field label={t('profile.tokens.name_label')} htmlFor="token_name" error={errors.name}>
             <Input
               id="token_name"
               type="text"
