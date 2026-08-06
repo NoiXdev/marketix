@@ -59,6 +59,20 @@ class AttachQrToLinkTest extends TestCase
             'logo_name' => '',
             'logo_data' => '',
             'logo_size' => 30,
+            'module_mode' => 'square',
+            'module_rounding' => 0,
+            'eye_frame_mode' => 'square',
+            'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square',
+            'eye_ball_rounding' => 0,
+            'error_correction' => 'Q',
+            'quiet_zone' => 4,
+            'logo_margin' => 1,
+            'logo_clear_modules' => true,
+            'frame_style' => 'none',
+            'frame_text_color' => '#000000',
+            'frame_color' => '#000000',
+            'frame_background' => '#ffffff',
         ];
     }
 

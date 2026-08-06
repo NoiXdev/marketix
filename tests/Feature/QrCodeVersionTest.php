@@ -51,6 +51,13 @@ class QrCodeVersionTest extends TestCase
                     'dot_style' => 'square', 'corner_square_style' => 'square',
                     'corner_dot_style' => 'square', 'logo_type' => 'none',
                     'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+                    'module_mode' => 'square', 'module_rounding' => 0,
+                    'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+                    'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+                    'error_correction' => 'Q', 'quiet_zone' => 4,
+                    'logo_margin' => 1, 'logo_clear_modules' => true,
+                    'frame_style' => 'none', 'frame_text_color' => '#000000',
+                    'frame_color' => '#000000', 'frame_background' => '#ffffff',
                 ],
             ],
             ['X-Inertia' => 'true'],
@@ -74,6 +81,13 @@ class QrCodeVersionTest extends TestCase
             'dot_style' => 'square', 'corner_square_style' => 'square',
             'corner_dot_style' => 'square', 'logo_type' => 'none',
             'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+            'module_mode' => 'square', 'module_rounding' => 0,
+            'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+            'error_correction' => 'Q', 'quiet_zone' => 4,
+            'logo_margin' => 1, 'logo_clear_modules' => true,
+            'frame_style' => 'none', 'frame_text_color' => '#000000',
+            'frame_color' => '#000000', 'frame_background' => '#ffffff',
         ];
 
         $this->actingAs($user)->postJson(
@@ -104,6 +118,13 @@ class QrCodeVersionTest extends TestCase
             'dot_style' => 'square', 'corner_square_style' => 'square',
             'corner_dot_style' => 'square', 'logo_type' => 'none',
             'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+            'module_mode' => 'square', 'module_rounding' => 0,
+            'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+            'error_correction' => 'Q', 'quiet_zone' => 4,
+            'logo_margin' => 1, 'logo_clear_modules' => true,
+            'frame_style' => 'none', 'frame_text_color' => '#000000',
+            'frame_color' => '#000000', 'frame_background' => '#ffffff',
         ];
 
         $this->actingAs($user)->postJson(
@@ -143,6 +164,13 @@ class QrCodeVersionTest extends TestCase
             'dot_style' => 'square', 'corner_square_style' => 'square',
             'corner_dot_style' => 'square', 'logo_type' => 'none',
             'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+            'module_mode' => 'square', 'module_rounding' => 0,
+            'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+            'error_correction' => 'Q', 'quiet_zone' => 4,
+            'logo_margin' => 1, 'logo_clear_modules' => true,
+            'frame_style' => 'none', 'frame_text_color' => '#000000',
+            'frame_color' => '#000000', 'frame_background' => '#ffffff',
         ];
 
         // v1: dynamic link.
@@ -181,6 +209,13 @@ class QrCodeVersionTest extends TestCase
             'dot_style' => 'square', 'corner_square_style' => 'square',
             'corner_dot_style' => 'square', 'logo_type' => 'none',
             'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+            'module_mode' => 'square', 'module_rounding' => 0,
+            'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+            'error_correction' => 'Q', 'quiet_zone' => 4,
+            'logo_margin' => 1, 'logo_clear_modules' => true,
+            'frame_style' => 'none', 'frame_text_color' => '#000000',
+            'frame_color' => '#000000', 'frame_background' => '#ffffff',
         ];
         $this->actingAs($user)->postJson(
             route('app.project.qrcodes.store', ['project' => $project->id]),
@@ -211,6 +246,13 @@ class QrCodeVersionTest extends TestCase
             'dot_style' => 'square', 'corner_square_style' => 'square',
             'corner_dot_style' => 'square', 'logo_type' => 'none',
             'logo_name' => '', 'logo_data' => '', 'logo_size' => 30,
+            'module_mode' => 'square', 'module_rounding' => 0,
+            'eye_frame_mode' => 'square', 'eye_frame_rounding' => 0,
+            'eye_ball_mode' => 'square', 'eye_ball_rounding' => 0,
+            'error_correction' => 'Q', 'quiet_zone' => 4,
+            'logo_margin' => 1, 'logo_clear_modules' => true,
+            'frame_style' => 'none', 'frame_text_color' => '#000000',
+            'frame_color' => '#000000', 'frame_background' => '#ffffff',
         ];
 
         // v1: dynamic QR — version row must record domain_id and slug.
