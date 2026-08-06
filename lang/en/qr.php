@@ -138,6 +138,9 @@ return [
         'delete_confirm_title' => 'Delete template',
         'delete_confirm_text' => 'Delete the template ":name"?',
         'delete_confirm_button' => 'Delete',
+        'load_error' => "Couldn't load templates.",
+        'save_error' => "Couldn't save the template.",
+        'delete_error' => "Couldn't delete the template.",
     ],
 
     'export' => [

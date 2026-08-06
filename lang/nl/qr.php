@@ -138,6 +138,9 @@ return [
         'delete_confirm_title' => 'Sjabloon verwijderen',
         'delete_confirm_text' => 'Sjabloon ":name" verwijderen?',
         'delete_confirm_button' => 'Verwijderen',
+        'load_error' => 'Sjablonen konden niet worden geladen.',
+        'save_error' => 'Sjabloon kon niet worden opgeslagen.',
+        'delete_error' => 'Sjabloon kon niet worden verwijderd.',
     ],
 
     'export' => [

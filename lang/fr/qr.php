@@ -138,6 +138,9 @@ return [
         'delete_confirm_title' => 'Supprimer le modèle',
         'delete_confirm_text' => 'Supprimer le modèle « :name » ?',
         'delete_confirm_button' => 'Supprimer',
+        'load_error' => 'Impossible de charger les modèles.',
+        'save_error' => "Impossible d'enregistrer le modèle.",
+        'delete_error' => 'Impossible de supprimer le modèle.',
     ],
 
     'export' => [

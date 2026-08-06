@@ -138,6 +138,9 @@ return [
         'delete_confirm_title' => 'Vorlage löschen',
         'delete_confirm_text' => 'Vorlage „:name" löschen?',
         'delete_confirm_button' => 'Löschen',
+        'load_error' => 'Vorlagen konnten nicht geladen werden.',
+        'save_error' => 'Vorlage konnte nicht gespeichert werden.',
+        'delete_error' => 'Vorlage konnte nicht gelöscht werden.',
     ],
 
     'export' => [

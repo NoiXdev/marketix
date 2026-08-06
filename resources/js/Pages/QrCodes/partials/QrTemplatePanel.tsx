@@ -35,7 +35,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
     window.axios
       .get<{ templates: QrTemplate[] }>(route('app.project.qr-templates.index', { project: currentProject.id }))
       .then(res => setTemplates(res.data.templates))
-      .catch(() => setStatus({ kind: 'error', message: "Couldn't load templates." }));
+      .catch(() => setStatus({ kind: 'error', message: t('qr.template.load_error') }));
   }, [currentProject]);
 
   const handleSave: FormEventHandler = e => {
@@ -54,7 +54,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
         setName('');
         setStatus({ kind: 'success', message: t('qr.template.saved') });
       })
-      .catch(() => setStatus({ kind: 'error', message: "Couldn't save the template." }))
+      .catch(() => setStatus({ kind: 'error', message: t('qr.template.save_error') }))
       .finally(() => setSaving(false));
   };
 
@@ -76,7 +76,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
         setTemplates(prev => prev.filter(tpl => tpl.id !== template.id));
         setStatus({ kind: 'success', message: t('qr.template.deleted') });
       })
-      .catch(() => setStatus({ kind: 'error', message: "Couldn't delete the template." }))
+      .catch(() => setStatus({ kind: 'error', message: t('qr.template.delete_error') }))
       .finally(() => setDeletingId(null));
   }
 
