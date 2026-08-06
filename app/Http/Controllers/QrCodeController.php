@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateQrCode;
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
 use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
@@ -103,46 +104,13 @@ class QrCodeController extends Controller
         ]);
     }
 
-    public function store(QrCodeRequest $request)
+    public function store(QrCodeRequest $request, CreateQrCode $createQrCode)
     {
         $project = $request->get('project');
         $data = $request->validated();
-        $pixelIds = $request->input('pixel_ids', []);
+        $data['pixel_ids'] = $request->input('pixel_ids', []);
 
-        DB::transaction(function () use ($project, $data, $pixelIds) {
-            $urlId = null;
-
-            if ($data['is_dynamic']) {
-                if (! empty($data['url_id'])) {
-                    // Attach mode (editable): apply settings to the shared link.
-                    $url = $project->urls()->findOrFail($data['url_id']);
-                    $url->update($this->linkSettingAttributes($data));
-                    $this->syncUrlPixels($url, $pixelIds);
-                    $urlId = $url->id;
-                } else {
-                    $url = $project->urls()->create(array_merge([
-                        'domain_id' => $data['domain_id'],
-                        'slug' => $data['slug'],
-                        'url' => $this->backingTarget($project, $data),
-                        'type' => RedirectType::REDIRECT,
-                        'status' => UrlStatus::ACTIVATED,
-                    ], $this->linkSettingAttributes($data)));
-                    $this->syncUrlPixels($url, $pixelIds);
-                    $urlId = $url->id;
-                }
-            }
-
-            $qr = $project->qrCodes()->create([
-                'url_id' => $urlId,
-                'name' => $data['name'],
-                'type' => $data['type'],
-                'is_dynamic' => $data['is_dynamic'],
-                'content' => $data['content'],
-                'style' => $data['style'],
-            ]);
-
-            $this->recordVersion($qr);
-        });
+        $createQrCode->handle($project, $request->user(), $data);
 
         return redirect()->route('app.project.qrcodes.index')
             ->with('success', 'QR code created.');
