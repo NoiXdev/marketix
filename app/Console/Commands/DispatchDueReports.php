@@ -37,6 +37,7 @@ class DispatchDueReports extends Command
         $due = ScheduledReport::query()
             ->where('active', true)
             ->where('next_run_at', '<=', now())
+            ->whereHas('project')
             ->get();
 
         foreach ($due as $report) {

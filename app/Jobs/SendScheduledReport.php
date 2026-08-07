@@ -37,6 +37,14 @@ class SendScheduledReport implements ShouldQueue
 
     public function handle(ReportTypeRegistry $registry): void
     {
+        if ($this->report->project === null) {
+            Log::warning('Skipping scheduled report: project no longer exists.', [
+                'scheduled_report_id' => $this->report->id,
+            ]);
+
+            return;
+        }
+
         $type = $registry->for($this->report->type);
 
         if (! $type->validateSubject($this->report->project, $this->report->subject_id)) {
@@ -46,6 +54,12 @@ class SendScheduledReport implements ShouldQueue
                 'subject_id' => $this->report->subject_id,
             ]);
 
+            return;
+        }
+
+        $recipients = $this->overrideRecipients ?? $this->report->recipients;
+
+        if (empty($recipients)) {
             return;
         }
 
@@ -59,12 +73,6 @@ class SendScheduledReport implements ShouldQueue
         $pdf = ($this->report->formats['pdf'] ?? false)
             ? base64_decode(Pdf::view($type->pdfView(), $viewData)->format('a4')->base64())
             : null;
-
-        $recipients = $this->overrideRecipients ?? $this->report->recipients;
-
-        if (empty($recipients)) {
-            return;
-        }
 
         $subject = trans('reports.email.subject', [
             'name' => $this->report->name,

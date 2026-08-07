@@ -189,4 +189,20 @@ class SendScheduledReportTest extends TestCase
 
         Mail::assertNothingSent();
     }
+
+    public function test_soft_deleted_project_causes_nothing_to_be_sent(): void
+    {
+        Mail::fake();
+
+        $project = Project::factory()->create();
+        $report = $this->makeProjectReport($project, [
+            'formats' => ['csv' => true, 'pdf' => false],
+        ]);
+
+        $project->delete();
+
+        SendScheduledReport::dispatchSync($report);
+
+        Mail::assertNothingSent();
+    }
 }

@@ -139,4 +139,22 @@ class DispatchDueReportsTest extends TestCase
 
         Queue::assertNotPushed(SendScheduledReport::class);
     }
+
+    public function test_active_due_report_with_soft_deleted_project_is_not_dispatched(): void
+    {
+        Queue::fake();
+
+        $project = Project::factory()->create();
+        $user = User::factory()->create();
+        $this->makeReport($project, $user, [
+            'active' => true,
+            'next_run_at' => now()->subHour(),
+        ]);
+
+        $project->delete();
+
+        $this->artisan('reports:dispatch-due')->assertExitCode(0);
+
+        Queue::assertNotPushed(SendScheduledReport::class);
+    }
 }

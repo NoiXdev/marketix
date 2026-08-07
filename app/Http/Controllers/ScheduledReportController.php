@@ -55,7 +55,7 @@ class ScheduledReportController extends Controller
         $project->scheduledReports()->create($data + ['created_by' => $request->user()->id]);
 
         return redirect()->route('app.project.reports.index')
-            ->with('success', 'Report created.');
+            ->with('success', trans('reports.index.created_flash'));
     }
 
     public function edit(Request $request, ReportTypeRegistry $registry, string $report)
@@ -100,7 +100,7 @@ class ScheduledReportController extends Controller
         $model->update($data);
 
         return redirect()->route('app.project.reports.index')
-            ->with('success', 'Report updated.');
+            ->with('success', trans('reports.index.updated_flash'));
     }
 
     public function destroy(Request $request, string $report)
@@ -109,7 +109,7 @@ class ScheduledReportController extends Controller
         $project->scheduledReports()->findOrFail($report)->delete();
 
         return redirect()->route('app.project.reports.index')
-            ->with('success', 'Report deleted.');
+            ->with('success', trans('reports.index.deleted_flash'));
     }
 
     public function toggle(Request $request, string $report)
@@ -132,7 +132,7 @@ class ScheduledReportController extends Controller
 
         $model->update($attributes);
 
-        return redirect()->back()->with('success', 'Report updated.');
+        return redirect()->back()->with('success', trans('reports.index.toggled_flash'));
     }
 
     public function sendNow(Request $request, string $report)
