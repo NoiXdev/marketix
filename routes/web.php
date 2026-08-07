@@ -29,6 +29,7 @@ use App\Http\Controllers\QrCodeController;
 use App\Http\Controllers\QrTemplateController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ScheduledReportController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
@@ -106,6 +107,16 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
             Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
+
+            // Scheduled reports
+            Route::get('/reports', [ScheduledReportController::class, 'index'])->name('app.project.reports.index');
+            Route::get('/reports/create', [ScheduledReportController::class, 'create'])->name('app.project.reports.create');
+            Route::post('/reports', [ScheduledReportController::class, 'store'])->name('app.project.reports.store');
+            Route::get('/reports/{report}/edit', [ScheduledReportController::class, 'edit'])->name('app.project.reports.edit');
+            Route::put('/reports/{report}', [ScheduledReportController::class, 'update'])->name('app.project.reports.update');
+            Route::delete('/reports/{report}', [ScheduledReportController::class, 'destroy'])->name('app.project.reports.destroy');
+            Route::post('/reports/{report}/toggle', [ScheduledReportController::class, 'toggle'])->name('app.project.reports.toggle');
+            Route::post('/reports/{report}/send-now', [ScheduledReportController::class, 'sendNow'])->name('app.project.reports.send-now');
 
             // Links
             Route::get('/links', [UrlController::class, 'index'])->name('app.project.links.index');
