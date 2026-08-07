@@ -11,6 +11,7 @@ return [
         'sites' => 'Analytics',
         'activity' => 'Aktivität',
         'team' => 'Team',
+        'reports' => 'Berichte',
         'groups' => [
             'overview' => 'Überblick',
             'links_codes' => 'Links & Codes',
