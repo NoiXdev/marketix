@@ -3,7 +3,7 @@ import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
-  BarChart3, ChevronLeft, Globe, History, LayoutDashboard, LineChart, LinkIcon, QrCode, Users, Zap,
+  BarChart3, ChevronLeft, FileBarChart, Globe, History, LayoutDashboard, LineChart, LinkIcon, QrCode, Users, Zap,
 } from 'lucide-react';
 import { useState } from 'react';
 import Brand from './Brand';
@@ -27,6 +27,7 @@ const groups: NavGroup[] = [
     items: [
       { key: 'statistics', icon: BarChart3, routeName: 'app.project.statistics' },
       { key: 'sites', icon: LineChart, routeName: 'app.project.sites.index' },
+      { key: 'reports', icon: FileBarChart, routeName: 'app.project.reports.index' },
     ],
   },
   { labelKey: 'management', items: [{ key: 'activity', icon: History, routeName: 'app.project.activity.index' }] },
