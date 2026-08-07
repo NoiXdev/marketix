@@ -46,12 +46,12 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
 
   return (
     <Card className="space-y-4 p-4">
-      <h2 className="text-sm font-semibold text-foreground">{t('profile.two_factor.heading')}</h2>
+      <h2 className="text-foreground text-sm font-semibold">{t('profile.two_factor.heading')}</h2>
 
       {recoveryCodes && (
-        <div className="rounded-[var(--radius-sm)] bg-warning-soft p-3">
-          <p className="text-xs font-medium text-warning-foreground">{t('profile.two_factor.recovery_codes_notice')}</p>
-          <ul className="mt-2 grid grid-cols-2 gap-1 font-mono text-xs text-warning-foreground">
+        <div className="bg-warning-soft rounded-[var(--radius-sm)] p-3">
+          <p className="text-warning-foreground text-xs font-medium">{t('profile.two_factor.recovery_codes_notice')}</p>
+          <ul className="text-warning-foreground mt-2 grid grid-cols-2 gap-1 font-mono text-xs">
             {recoveryCodes.map((c) => (
               <li key={c}>{c}</li>
             ))}
@@ -59,15 +59,13 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
         </div>
       )}
 
-      {!enabled && !pending && (
-        <Button onClick={enable}>{t('profile.two_factor.enable')}</Button>
-      )}
+      {!enabled && !pending && <Button onClick={enable}>{t('profile.two_factor.enable')}</Button>}
 
       {pending && setup && (
         <form onSubmit={confirm} className="space-y-3">
-          <p className="text-sm text-muted">{t('profile.two_factor.scan_instruction')}</p>
+          <p className="text-muted text-sm">{t('profile.two_factor.scan_instruction')}</p>
           <img src={setup.qrCode} alt={t('profile.two_factor.qr_alt')} className="h-44 w-44" />
-          <p className="text-xs text-subtle">
+          <p className="text-subtle text-xs">
             {t('profile.two_factor.manual_key')} <span className="font-mono">{setup.secretKey}</span>
           </p>
           <Field htmlFor="two_factor_code" error={confirmForm.errors.code}>
@@ -88,14 +86,10 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
 
       {enabled && (
         <div className="space-y-3">
-          <p className="text-sm text-success-foreground">{t('profile.two_factor.enabled')}</p>
-          <form onSubmit={disable} className="flex flex-wrap items-end gap-2">
-            <div className="flex-1">
-              <Field
-                label={t('profile.two_factor.current_password')}
-                htmlFor="two_factor_current_password"
-                error={passwordForm.errors.current_password}
-              >
+          <p className="text-success-foreground text-sm">{t('profile.two_factor.enabled')}</p>
+          <form onSubmit={disable} className="flex flex-col items-end gap-2">
+            <div className="w-full flex-1">
+              <Field label={t('profile.two_factor.current_password')} htmlFor="two_factor_current_password" error={passwordForm.errors.current_password}>
                 <Input
                   id="two_factor_current_password"
                   type="password"
@@ -104,12 +98,14 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
                 />
               </Field>
             </div>
-            <Button type="submit" variant="danger" disabled={passwordForm.processing}>
-              {t('profile.two_factor.disable')}
-            </Button>
-            <Button type="button" variant="secondary" onClick={regenerate} disabled={passwordForm.processing}>
-              {t('profile.two_factor.regenerate')}
-            </Button>
+            <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-2">
+              <Button type="submit" size={'sm'} variant="danger" disabled={passwordForm.processing}>
+                {t('profile.two_factor.disable')}
+              </Button>
+              <Button type="button" size={'sm'} variant="secondary" onClick={regenerate} disabled={passwordForm.processing}>
+                {t('profile.two_factor.regenerate')}
+              </Button>
+            </div>
           </form>
         </div>
       )}

@@ -17,7 +17,7 @@ export default function ProfileLayout({ children, title }: PropsWithChildren<Pro
       <header className="flex h-14 items-center border-b border-line bg-surface px-4">
         <Brand />
       </header>
-      <main className="mx-auto w-full max-w-md px-4 py-10">
+      <main className="mx-auto w-full max-w-xl px-4 py-10">
         <div className="mb-6">
           <BackLink href="/">{t('profile.back')}</BackLink>
         </div>
