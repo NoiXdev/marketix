@@ -39,6 +39,21 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
   const { t } = useTranslation();
   const { data, setData, post, processing, errors, reset } = useForm({ name: '' });
 
+  const endpoint = `${typeof window !== 'undefined' ? window.location.origin : ''}/mcp/marketix`;
+  const configSnippet = `{
+  "mcpServers": {
+    "marketix": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "${endpoint}",
+        "--header",
+        "Authorization: Bearer <token>"
+      ]
+    }
+  }
+}`;
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     post(route('app.profile.tokens.store'), {
@@ -65,13 +80,25 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
         <p className="mt-1 text-xs text-subtle">{t('profile.tokens.description')}</p>
       </div>
 
-      <div className="space-y-1 rounded-[var(--radius-sm)] bg-elevated p-3 text-xs text-muted">
-        <p>
-          {t('profile.tokens.endpoint_label')} <code className="text-foreground">/mcp/marketix</code>
-        </p>
+      <div className="space-y-2 rounded-[var(--radius-sm)] bg-elevated p-3 text-xs text-muted">
+        <div className="flex items-start justify-between gap-2">
+          <p className="min-w-0 break-all">
+            {t('profile.tokens.endpoint_label')} <code className="text-foreground">{endpoint}</code>
+          </p>
+          <CopyButton text={endpoint} />
+        </div>
         <p>
           {t('profile.tokens.auth_header_label')} <code className="text-foreground">Authorization: Bearer &lt;token&gt;</code>
         </p>
+        <div>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <span>{t('profile.tokens.config_label')}</span>
+            <CopyButton text={configSnippet} />
+          </div>
+          <pre className="overflow-x-auto rounded-[var(--radius-sm)] bg-foreground p-3 text-xs text-canvas">
+            <code>{configSnippet}</code>
+          </pre>
+        </div>
         <p>{t('profile.tokens.mcp_remote_note')}</p>
       </div>
 

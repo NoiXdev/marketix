@@ -40,6 +40,7 @@ return [
         'endpoint_label' => 'MCP endpoint:',
         'auth_header_label' => 'Authorization header:',
         'mcp_remote_note' => "Clients that can't send custom headers can use mcp-remote as a bridge.",
+        'config_label' => 'Example client config (mcp-remote):',
         'one_time_warning' => 'Copy this token now — it will not be shown again.',
         'copy_idle' => 'Copy',
         'copy_copied' => 'Copied',

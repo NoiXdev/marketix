@@ -40,6 +40,7 @@ return [
         'endpoint_label' => 'MCP-endpoint:',
         'auth_header_label' => 'Authorization-header:',
         'mcp_remote_note' => 'Clients die geen aangepaste headers kunnen versturen, kunnen mcp-remote als bridge gebruiken.',
+        'config_label' => 'Voorbeeld-clientconfiguratie (mcp-remote):',
         'one_time_warning' => 'Kopieer dit token nu — het wordt niet opnieuw getoond.',
         'copy_idle' => 'Kopiëren',
         'copy_copied' => 'Gekopieerd',

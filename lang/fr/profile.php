@@ -40,6 +40,7 @@ return [
         'endpoint_label' => 'Point de terminaison MCP :',
         'auth_header_label' => 'En-tête Authorization :',
         'mcp_remote_note' => "Les clients qui ne peuvent pas envoyer d'en-têtes personnalisés peuvent utiliser mcp-remote comme pont.",
+        'config_label' => 'Exemple de configuration client (mcp-remote) :',
         'one_time_warning' => 'Copiez ce jeton maintenant — il ne sera plus jamais affiché.',
         'copy_idle' => 'Copier',
         'copy_copied' => 'Copié',

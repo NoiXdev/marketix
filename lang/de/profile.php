@@ -40,6 +40,7 @@ return [
         'endpoint_label' => 'MCP-Endpunkt:',
         'auth_header_label' => 'Authorization-Header:',
         'mcp_remote_note' => 'Clients, die keine benutzerdefinierten Header senden können, können mcp-remote als Brücke verwenden.',
+        'config_label' => 'Beispiel-Client-Konfiguration (mcp-remote):',
         'one_time_warning' => 'Kopieren Sie dieses Token jetzt — es wird nicht erneut angezeigt.',
         'copy_idle' => 'Kopieren',
         'copy_copied' => 'Kopiert',
