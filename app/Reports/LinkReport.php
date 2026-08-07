@@ -3,19 +3,19 @@
 namespace App\Reports;
 
 use App\Models\Project;
-use App\Services\StatisticsAggregator;
-use Carbon\CarbonImmutable;
+use App\Reports\Csv\WritesCsv;
 use InvalidArgumentException;
 
 /**
- * Single-link click summary: same shape as ProjectSummaryReport (totals,
- * uniques, breakdowns, trend) but scoped to one Url within the project, and
- * without a top-links breakdown. Subject must be a Url id belonging to the
- * project.
+ * Thin adapter over the existing ReportDataService::forUrl() (the same data
+ * used by the on-demand /reports/download/link/{url} PDF). Subject must be
+ * a Url id belonging to the project.
  */
 final class LinkReport implements ReportType
 {
-    public function __construct(private readonly StatisticsAggregator $stats) {}
+    use WritesCsv;
+
+    public function __construct(private readonly ReportDataService $reports) {}
 
     public function key(): string
     {
@@ -36,86 +36,78 @@ final class LinkReport implements ReportType
         return $project->urls()->whereKey($subjectId)->value('slug');
     }
 
-    public function gather(Project $project, ?string $subjectId, CarbonImmutable $start, CarbonImmutable $end): ReportData
+    public function title(Project $project, ?string $subjectId): string
     {
         if ($subjectId === null) {
             throw new InvalidArgumentException('LinkReport requires a subject id.');
         }
 
-        $url = $project->urls()->whereKey($subjectId)->firstOrFail();
-        $projectId = $project->id;
+        $slug = $project->urls()->whereKey($subjectId)->value('slug');
 
-        $kpis = [
-            ['label' => __('reports.report.total_clicks'), 'value' => (string) $this->stats->totalClicks($projectId, $url->id, $start, $end)],
-            ['label' => __('reports.report.unique_clicks'), 'value' => (string) $this->stats->uniqueClicks($projectId, $url->id, $start, $end)],
-        ];
-
-        $breakdowns = [];
-        foreach ($this->breakdownColumns() as $column => $label) {
-            $breakdowns[] = [
-                'title' => $label,
-                'rows' => $this->stats->breakdown($projectId, $url->id, $column, $start, $end)
-                    ->map(fn ($row) => ['label' => (string) $row->{$column}, 'value' => (string) $row->count])
-                    ->all(),
-            ];
-        }
-
-        $series = array_map(
-            fn (array $day) => ['date' => $day['date'], 'value' => $day['clicks']],
-            $this->stats->clicksByDayBetween($projectId, $url->id, $start, $end),
-        );
-
-        return new ReportData(
-            title: $url->slug ?: $url->url,
-            periodLabel: $this->periodLabel($start, $end),
-            kpis: $kpis,
-            breakdowns: $breakdowns,
-            series: $series,
-        );
+        return "Link report — /{$slug}";
     }
 
-    public function emailView(): string
+    public function viewData(Project $project, ?string $subjectId, ReportDateRange $range): array
     {
-        return 'reports.body.link';
+        if ($subjectId === null) {
+            throw new InvalidArgumentException('LinkReport requires a subject id.');
+        }
+
+        $url = $project->urls()->find($subjectId);
+
+        if ($url === null) {
+            throw new InvalidArgumentException('LinkReport subject id does not resolve to a Url in this project.');
+        }
+
+        return $this->reports->forUrl($url, $range)->toArray();
     }
 
     public function pdfView(): string
     {
-        return 'reports.pdf.link';
+        return 'reports.link';
     }
 
-    public function csvRows(ReportData $data): array
+    public function emailView(): string
     {
-        $rows = [[__('reports.report.trend').' — '.__('reports.report.total_clicks'), '']];
-        $rows[] = ['Date', 'Clicks'];
-        foreach ($data->series as $point) {
-            $rows[] = [$point['date'], $point['value']];
+        return 'reports.email.link';
+    }
+
+    public function csv(array $viewData): string
+    {
+        $rows = [
+            [$viewData['title'] ?? '', $viewData['rangeLabel'] ?? ''],
+            ['Total clicks', $viewData['totalClicks'] ?? 0],
+            ['Unique clicks', $viewData['uniqueClicks'] ?? 0],
+            [],
+            ['Date', 'Clicks', 'Unique'],
+        ];
+
+        foreach ($viewData['timeSeries'] ?? [] as $point) {
+            $rows[] = [$point['date'], $point['clicks'], $point['unique']];
         }
 
-        foreach ($data->breakdowns as $breakdown) {
+        foreach ($viewData['breakdowns'] ?? [] as $column => $breakdownRows) {
+            if ($breakdownRows === []) {
+                continue;
+            }
+
             $rows[] = [];
-            $rows[] = [$breakdown['title'], 'Count'];
-            foreach ($breakdown['rows'] as $row) {
-                $rows[] = [$row['label'], $row['value']];
+            $rows[] = [ucfirst($column), 'Count'];
+            foreach ($breakdownRows as $row) {
+                $rows[] = [$row['label'], $row['count']];
             }
         }
 
-        return $rows;
-    }
+        $recentClicks = $viewData['recentClicks'] ?? [];
+        if ($recentClicks !== []) {
+            $rows[] = [];
+            $rows[] = ['Recent clicks', ''];
+            $rows[] = ['When', 'Country', 'City', 'Browser', 'OS'];
+            foreach ($recentClicks as $click) {
+                $rows[] = [$click['created_at'], $click['country'] ?? '', $click['city'] ?? '', $click['browser'] ?? '', $click['os'] ?? ''];
+            }
+        }
 
-    /** @return array<string, string> Statistics-page breakdown columns, keyed by their aggregator column name. */
-    private function breakdownColumns(): array
-    {
-        return [
-            'country' => __('reports.report.top_countries'),
-            'browser' => __('reports.report.top_browsers'),
-            'os' => __('reports.report.top_os'),
-            'domain' => __('reports.report.top_referrers'),
-        ];
-    }
-
-    private function periodLabel(CarbonImmutable $start, CarbonImmutable $end): string
-    {
-        return $start->translatedFormat('j M Y').' – '.$end->translatedFormat('j M Y');
+        return $this->rowsToCsv($rows);
     }
 }

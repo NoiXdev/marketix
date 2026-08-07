@@ -3,18 +3,18 @@
 namespace App\Reports;
 
 use App\Models\Project;
-use App\Services\StatisticsAggregator;
-use Carbon\CarbonImmutable;
+use App\Reports\Csv\WritesCsv;
 
 /**
- * Project-wide click summary: totals + uniques + top links + the same
- * breakdown columns as the Statistics page (country/browser/os/domain),
- * plus a daily click trend. Has no distinct subject — $subjectId must be
- * null.
+ * Thin adapter over the existing ReportDataService::forProject() (the same
+ * data used by the on-demand /reports/download/project PDF). Has no
+ * distinct subject — $subjectId must be null.
  */
 final class ProjectSummaryReport implements ReportType
 {
-    public function __construct(private readonly StatisticsAggregator $stats) {}
+    use WritesCsv;
+
+    public function __construct(private readonly ReportDataService $reports) {}
 
     public function key(): string
     {
@@ -31,89 +31,62 @@ final class ProjectSummaryReport implements ReportType
         return null;
     }
 
-    public function gather(Project $project, ?string $subjectId, CarbonImmutable $start, CarbonImmutable $end): ReportData
+    public function title(Project $project, ?string $subjectId): string
     {
-        $projectId = $project->id;
-
-        $kpis = [
-            ['label' => __('reports.report.total_clicks'), 'value' => (string) $this->stats->totalClicks($projectId, null, $start, $end)],
-            ['label' => __('reports.report.unique_clicks'), 'value' => (string) $this->stats->uniqueClicks($projectId, null, $start, $end)],
-        ];
-
-        $breakdowns = [];
-
-        $breakdowns[] = [
-            'title' => __('reports.report.top_links'),
-            'rows' => $this->stats->topLinks($projectId, $start, $end, 5)
-                ->map(fn ($row) => ['label' => "/{$row->slug} ({$row->domain_name})", 'value' => (string) $row->clicks])
-                ->all(),
-        ];
-
-        foreach ($this->breakdownColumns() as $column => $label) {
-            $breakdowns[] = [
-                'title' => $label,
-                'rows' => $this->stats->breakdown($projectId, null, $column, $start, $end)
-                    ->map(fn ($row) => ['label' => (string) $row->{$column}, 'value' => (string) $row->count])
-                    ->all(),
-            ];
-        }
-
-        $series = array_map(
-            fn (array $day) => ['date' => $day['date'], 'value' => $day['clicks']],
-            $this->stats->clicksByDayBetween($projectId, null, $start, $end),
-        );
-
-        return new ReportData(
-            title: $project->name,
-            periodLabel: $this->periodLabel($start, $end),
-            kpis: $kpis,
-            breakdowns: $breakdowns,
-            series: $series,
-        );
+        return $project->name;
     }
 
-    public function emailView(): string
+    public function viewData(Project $project, ?string $subjectId, ReportDateRange $range): array
     {
-        return 'reports.body.project_summary';
+        return $this->reports->forProject($project, $range)->toArray();
     }
 
     public function pdfView(): string
     {
-        return 'reports.pdf.project_summary';
+        return 'reports.project';
     }
 
-    public function csvRows(ReportData $data): array
+    public function emailView(): string
     {
-        $rows = [[__('reports.report.trend').' — '.__('reports.report.total_clicks'), '']];
-        $rows[] = ['Date', 'Clicks'];
-        foreach ($data->series as $point) {
-            $rows[] = [$point['date'], $point['value']];
+        return 'reports.email.project';
+    }
+
+    public function csv(array $viewData): string
+    {
+        $rows = [
+            [$viewData['title'] ?? '', $viewData['rangeLabel'] ?? ''],
+            ['Total clicks', $viewData['totalClicks'] ?? 0],
+            ['Unique clicks', $viewData['uniqueClicks'] ?? 0],
+            [],
+            ['Date', 'Clicks', 'Unique'],
+        ];
+
+        foreach ($viewData['timeSeries'] ?? [] as $point) {
+            $rows[] = [$point['date'], $point['clicks'], $point['unique']];
         }
 
-        foreach ($data->breakdowns as $breakdown) {
+        $topLinks = $viewData['topLinks'] ?? [];
+        if ($topLinks !== []) {
             $rows[] = [];
-            $rows[] = [$breakdown['title'], 'Count'];
-            foreach ($breakdown['rows'] as $row) {
-                $rows[] = [$row['label'], $row['value']];
+            $rows[] = ['Top links', ''];
+            $rows[] = ['Link', 'Clicks'];
+            foreach ($topLinks as $link) {
+                $rows[] = ["{$link['domain']}/{$link['slug']}", $link['clicks']];
             }
         }
 
-        return $rows;
-    }
+        foreach ($viewData['breakdowns'] ?? [] as $column => $breakdownRows) {
+            if ($breakdownRows === []) {
+                continue;
+            }
 
-    /** @return array<string, string> Statistics-page breakdown columns, keyed by their aggregator column name. */
-    private function breakdownColumns(): array
-    {
-        return [
-            'country' => __('reports.report.top_countries'),
-            'browser' => __('reports.report.top_browsers'),
-            'os' => __('reports.report.top_os'),
-            'domain' => __('reports.report.top_referrers'),
-        ];
-    }
+            $rows[] = [];
+            $rows[] = [ucfirst($column), 'Count'];
+            foreach ($breakdownRows as $row) {
+                $rows[] = [$row['label'], $row['count']];
+            }
+        }
 
-    private function periodLabel(CarbonImmutable $start, CarbonImmutable $end): string
-    {
-        return $start->translatedFormat('j M Y').' – '.$end->translatedFormat('j M Y');
+        return $this->rowsToCsv($rows);
     }
 }

@@ -7,8 +7,7 @@ use InvalidArgumentException;
 
 /**
  * Resolves the 3 built-in ReportType implementations through the container
- * (so their aggregator dependencies are injected) and indexes them by key.
- * Registered as a singleton in AppServiceProvider.
+ * and indexes them by key. Registered as a singleton in AppServiceProvider.
  */
 final class ReportTypeRegistry
 {

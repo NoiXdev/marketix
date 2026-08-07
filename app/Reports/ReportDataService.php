@@ -13,9 +13,9 @@ class ReportDataService
 {
     public function __construct(private readonly StatisticsAggregator $stats) {}
 
-    public function forProject(Project $project, ReportDateRange $range): LegacyReportData
+    public function forProject(Project $project, ReportDateRange $range): ReportData
     {
-        return new LegacyReportData(
+        return new ReportData(
             scope: 'project',
             title: "Statistics report — {$project->name}",
             subtitle: $project->name,
@@ -29,7 +29,7 @@ class ReportDataService
         );
     }
 
-    public function forUrl(Url $url, ReportDateRange $range): LegacyReportData
+    public function forUrl(Url $url, ReportDateRange $range): ReportData
     {
         $recent = $this->stats
             ->recentClicks($url->project_id, $url->id, $range->start(), $range->end())
@@ -42,7 +42,7 @@ class ReportDataService
                 'created_at' => (string) $r->created_at,
             ])->all();
 
-        return new LegacyReportData(
+        return new ReportData(
             scope: 'link',
             title: "Link report — /{$url->slug}",
             subtitle: $url->url,

@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Reports\LegacyReportData;
+use App\Reports\ReportData;
 use Tests\TestCase;
 
 class ReportTemplateRenderTest extends TestCase
 {
-    private function sampleData(string $scope): LegacyReportData
+    private function sampleData(string $scope): ReportData
     {
-        return new LegacyReportData(
+        return new ReportData(
             scope: $scope,
             title: $scope === 'link' ? 'Link report — /go' : 'Statistics report — Acme',
             subtitle: 'Acme',

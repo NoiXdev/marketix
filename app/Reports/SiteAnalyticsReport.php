@@ -3,6 +3,7 @@
 namespace App\Reports;
 
 use App\Models\Project;
+use App\Reports\Csv\WritesCsv;
 use App\Services\AnalyticsAggregator;
 use App\Services\GoalAggregator;
 use Carbon\CarbonImmutable;
@@ -13,16 +14,23 @@ use InvalidArgumentException;
  * views, goal conversions and top events for the window. Subject must be a
  * Site id belonging to the project.
  *
+ * Unlike ProjectSummaryReport/LinkReport, this type does not reuse the
+ * click-shaped ReportData struct — AnalyticsAggregator/GoalAggregator model
+ * a different domain (site visits/page views, not URL clicks), so
+ * viewData() returns its own array shape built directly from them.
+ *
  * AnalyticsAggregator/GoalAggregator only support a trailing "last N days
  * ending now()" window (no absolute [start, end] range), unlike
- * StatisticsAggregator. [$start, $end] is therefore converted to a day
- * count and passed through as-is — for the "previous_month" period this is
- * an approximation (a trailing N-day window ending today, not the exact
+ * ReportDataService/StatisticsAggregator. ReportDateRange::days() is
+ * therefore used as that day count — for the "previous_month" period this
+ * is an approximation (a trailing N-day window ending today, not the exact
  * historical month), consistent with how the Analytics page itself always
  * windows relative to now().
  */
 final class SiteAnalyticsReport implements ReportType
 {
+    use WritesCsv;
+
     public function __construct(
         private readonly AnalyticsAggregator $analytics,
         private readonly GoalAggregator $goals,
@@ -47,91 +55,106 @@ final class SiteAnalyticsReport implements ReportType
         return $project->sites()->whereKey($subjectId)->value('name');
     }
 
-    public function gather(Project $project, ?string $subjectId, CarbonImmutable $start, CarbonImmutable $end): ReportData
+    public function title(Project $project, ?string $subjectId): string
     {
         if ($subjectId === null) {
             throw new InvalidArgumentException('SiteAnalyticsReport requires a subject id.');
         }
 
-        $site = $project->sites()->whereKey($subjectId)->firstOrFail();
-        $days = $this->daysBetween($start, $end);
+        $name = $project->sites()->whereKey($subjectId)->value('name');
 
-        $kpis = [
-            ['label' => __('reports.report.visits'), 'value' => (string) $this->analytics->totalSessions($site->id, $days)],
-            ['label' => __('reports.report.page_views'), 'value' => (string) $this->analytics->totalPageViews($site->id, $days)],
-        ];
-
-        $breakdowns = [];
-
-        $breakdowns[] = [
-            'title' => __('reports.report.goals'),
-            'rows' => $site->goals()->get()->map(function ($goal) use ($days) {
-                $conversions = $this->goals->conversions($goal, $days);
-
-                return [
-                    'label' => $goal->name,
-                    'value' => "{$conversions['conversions']} ({$conversions['rate']}%)",
-                ];
-            })->all(),
-        ];
-
-        $breakdowns[] = [
-            'title' => __('reports.report.top_events'),
-            'rows' => $this->goals->topEvents($site->id, $days, 8)
-                ->map(fn ($row) => ['label' => $row->name, 'value' => (string) $row->count])
-                ->all(),
-        ];
-
-        $series = array_map(
-            fn (array $day) => ['date' => $day['date'], 'value' => $day['views']],
-            $this->analytics->pageViewsByDay($site->id, $days),
-        );
-
-        return new ReportData(
-            title: $site->name,
-            periodLabel: $this->periodLabel($start, $end),
-            kpis: $kpis,
-            breakdowns: $breakdowns,
-            series: $series,
-        );
+        return "Site analytics report — {$name}";
     }
 
-    public function emailView(): string
+    public function viewData(Project $project, ?string $subjectId, ReportDateRange $range): array
     {
-        return 'reports.body.site_analytics';
+        if ($subjectId === null) {
+            throw new InvalidArgumentException('SiteAnalyticsReport requires a subject id.');
+        }
+
+        $site = $project->sites()->find($subjectId);
+
+        if ($site === null) {
+            throw new InvalidArgumentException('SiteAnalyticsReport subject id does not resolve to a Site in this project.');
+        }
+
+        $days = $range->days();
+
+        $goals = $site->goals()->get()->map(function ($goal) use ($days) {
+            $conversions = $this->goals->conversions($goal, $days);
+
+            return [
+                'name' => $goal->name,
+                'conversions' => $conversions['conversions'],
+                'visitors' => $conversions['visitors'],
+                'rate' => $conversions['rate'],
+            ];
+        })->all();
+
+        $topEvents = $this->goals->topEvents($site->id, $days, 8)
+            ->map(fn ($row) => [
+                'name' => $row->name,
+                'count' => (int) $row->count,
+                'visitors' => (int) $row->visitors,
+            ])->all();
+
+        return [
+            'title' => "Site analytics report — {$site->name}",
+            'subtitle' => $site->name,
+            'rangeLabel' => $range->label(),
+            'generatedAt' => CarbonImmutable::now()->format('j M Y, H:i'),
+            'visits' => $this->analytics->totalSessions($site->id, $days),
+            'page_views' => $this->analytics->totalPageViews($site->id, $days),
+            'goals' => $goals,
+            'top_events' => $topEvents,
+            'series' => $this->analytics->pageViewsByDay($site->id, $days),
+        ];
     }
 
     public function pdfView(): string
     {
-        return 'reports.pdf.site_analytics';
+        return 'reports.site';
     }
 
-    public function csvRows(ReportData $data): array
+    public function emailView(): string
     {
-        $rows = [[__('reports.report.trend').' — '.__('reports.report.page_views'), '']];
-        $rows[] = ['Date', 'Page views'];
-        foreach ($data->series as $point) {
-            $rows[] = [$point['date'], $point['value']];
+        return 'reports.email.site';
+    }
+
+    public function csv(array $viewData): string
+    {
+        $rows = [
+            [$viewData['title'] ?? '', $viewData['rangeLabel'] ?? ''],
+            ['Visits', $viewData['visits'] ?? 0],
+            ['Page views', $viewData['page_views'] ?? 0],
+            [],
+            ['Date', 'Views', 'Visitors'],
+        ];
+
+        foreach ($viewData['series'] ?? [] as $point) {
+            $rows[] = [$point['date'], $point['views'], $point['visitors']];
         }
 
-        foreach ($data->breakdowns as $breakdown) {
+        $goals = $viewData['goals'] ?? [];
+        if ($goals !== []) {
             $rows[] = [];
-            $rows[] = [$breakdown['title'], 'Value'];
-            foreach ($breakdown['rows'] as $row) {
-                $rows[] = [$row['label'], $row['value']];
+            $rows[] = ['Goals', ''];
+            $rows[] = ['Name', 'Conversions', 'Visitors', 'Rate (%)'];
+            foreach ($goals as $goal) {
+                $rows[] = [$goal['name'], $goal['conversions'], $goal['visitors'], $goal['rate']];
             }
         }
 
-        return $rows;
-    }
+        $topEvents = $viewData['top_events'] ?? [];
+        if ($topEvents !== []) {
+            $rows[] = [];
+            $rows[] = ['Top events', ''];
+            $rows[] = ['Name', 'Count', 'Visitors'];
+            foreach ($topEvents as $event) {
+                $rows[] = [$event['name'], $event['count'], $event['visitors']];
+            }
+        }
 
-    private function daysBetween(CarbonImmutable $start, CarbonImmutable $end): int
-    {
-        return max(1, $start->startOfDay()->diffInDays($end->startOfDay()) + 1);
-    }
-
-    private function periodLabel(CarbonImmutable $start, CarbonImmutable $end): string
-    {
-        return $start->translatedFormat('j M Y').' – '.$end->translatedFormat('j M Y');
+        return $this->rowsToCsv($rows);
     }
 }

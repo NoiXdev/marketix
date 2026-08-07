@@ -17,7 +17,7 @@ use App\Models\User;
 use App\Models\Visit;
 use App\Reports\LinkReport;
 use App\Reports\ProjectSummaryReport;
-use App\Reports\ReportData;
+use App\Reports\ReportDateRange;
 use App\Reports\ReportTypeRegistry;
 use App\Reports\SiteAnalyticsReport;
 use Carbon\CarbonImmutable;
@@ -41,11 +41,11 @@ class ReportTypesTest extends TestCase
         parent::tearDown();
     }
 
-    private function window(): array
+    private function window(): ReportDateRange
     {
         $end = CarbonImmutable::now();
 
-        return [$end->subDays(6), $end];
+        return ReportDateRange::custom($end->subDays(6), $end);
     }
 
     private function createUrl(Project $project, string $slug): Url
@@ -100,41 +100,37 @@ class ReportTypesTest extends TestCase
         $this->assertNull($report->subjectLabel($project, null));
     }
 
-    public function test_project_summary_report_gathers_totals_breakdowns_and_series(): void
+    public function test_project_summary_report_view_data_has_expected_keys_and_title(): void
     {
         $project = Project::factory()->create(['name' => 'Acme']);
         $url = $this->createUrl($project, 'go');
-        [$start, $end] = $this->window();
+        $range = $this->window();
 
         Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '1'), 'country' => 'Germany', 'browser' => 'Chrome', 'os' => 'macOS', 'domain' => 'ref-a.test']);
         Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '2'), 'country' => 'Germany', 'browser' => 'Firefox', 'os' => 'Windows', 'domain' => 'ref-b.test']);
         Statistic::factory()->forUrl($url)->bot()->create(['visitor_hash' => hash('sha256', '3')]);
 
         $report = app(ReportTypeRegistry::class)->for('project_summary');
-        $data = $report->gather($project, null, $start, $end);
+        $this->assertSame('Acme', $report->title($project, null));
 
-        $this->assertInstanceOf(ReportData::class, $data);
-        $this->assertSame('Acme', $data->title);
-        $this->assertNotSame('', $data->periodLabel);
+        $data = $report->viewData($project, null, $range);
 
-        $kpiLabels = array_column($data->kpis, 'label');
-        $this->assertContains(__('reports.report.total_clicks'), $kpiLabels);
-        $this->assertContains(__('reports.report.unique_clicks'), $kpiLabels);
-        $totalClicksKpi = collect($data->kpis)->firstWhere('label', __('reports.report.total_clicks'));
-        $this->assertSame('2', $totalClicksKpi['value']); // bot click excluded
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('totalClicks', $data);
+        $this->assertArrayHasKey('uniqueClicks', $data);
+        $this->assertArrayHasKey('timeSeries', $data);
+        $this->assertArrayHasKey('breakdowns', $data);
+        $this->assertArrayHasKey('topLinks', $data);
+        $this->assertSame(2, $data['totalClicks']); // bot click excluded
+        $this->assertCount(7, $data['timeSeries']);
+        $this->assertArrayHasKey('country', $data['breakdowns']);
 
-        // top links + country/browser/os/domain breakdowns = 5 sections
-        $this->assertCount(5, $data->breakdowns);
-        $titles = array_column($data->breakdowns, 'title');
-        $this->assertContains(__('reports.report.top_links'), $titles);
-        $this->assertContains(__('reports.report.top_countries'), $titles);
+        $this->assertSame('reports.project', $report->pdfView());
+        $this->assertSame('reports.email.project', $report->emailView());
 
-        $this->assertCount(7, $data->series);
-        $this->assertSame(2, array_sum(array_column($data->series, 'value')));
-
-        $csv = $report->csvRows($data);
-        $this->assertNotEmpty($csv);
-        $this->assertIsArray($csv[0]);
+        $csv = $report->csv($data);
+        $this->assertIsString($csv);
+        $this->assertStringContainsString('Total clicks', $csv);
     }
 
     // --- LinkReport ------------------------------------------------------
@@ -155,28 +151,35 @@ class ReportTypesTest extends TestCase
         $this->assertSame('go', $report->subjectLabel($project, $url->id));
     }
 
-    public function test_link_report_gathers_totals_and_series_scoped_to_url(): void
+    public function test_link_report_view_data_has_expected_keys_and_title(): void
     {
         $project = Project::factory()->create();
         $url = $this->createUrl($project, 'go');
         $other = $this->createUrl($project, 'other');
-        [$start, $end] = $this->window();
+        $range = $this->window();
 
         Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '1'), 'country' => 'Germany']);
         Statistic::factory()->forUrl($other)->create(['visitor_hash' => hash('sha256', '2')]);
 
         $report = app(ReportTypeRegistry::class)->for('link');
-        $data = $report->gather($project, $url->id, $start, $end);
+        $this->assertSame('Link report — /go', $report->title($project, $url->id));
 
-        $this->assertSame('go', $data->title);
-        $totalClicksKpi = collect($data->kpis)->firstWhere('label', __('reports.report.total_clicks'));
-        $this->assertSame('1', $totalClicksKpi['value']);
-        $this->assertCount(4, $data->breakdowns); // no top-links section for a single link
-        $this->assertCount(7, $data->series);
-        $this->assertSame(1, array_sum(array_column($data->series, 'value')));
+        $data = $report->viewData($project, $url->id, $range);
 
-        $csv = $report->csvRows($data);
-        $this->assertNotEmpty($csv);
+        $this->assertArrayHasKey('title', $data);
+        $this->assertArrayHasKey('totalClicks', $data);
+        $this->assertArrayHasKey('timeSeries', $data);
+        $this->assertArrayHasKey('breakdowns', $data);
+        $this->assertArrayHasKey('recentClicks', $data);
+        $this->assertSame(1, $data['totalClicks']);
+        $this->assertCount(7, $data['timeSeries']);
+
+        $this->assertSame('reports.link', $report->pdfView());
+        $this->assertSame('reports.email.link', $report->emailView());
+
+        $csv = $report->csv($data);
+        $this->assertIsString($csv);
+        $this->assertNotSame('', $csv);
     }
 
     // --- SiteAnalyticsReport ---------------------------------------------
@@ -197,11 +200,11 @@ class ReportTypesTest extends TestCase
         $this->assertSame($site->name, $report->subjectLabel($project, $site->id));
     }
 
-    public function test_site_analytics_report_gathers_visits_page_views_goals_and_events(): void
+    public function test_site_analytics_report_view_data_has_expected_keys_and_title(): void
     {
         $project = Project::factory()->create();
         $site = Site::factory()->forProject($project)->create(['name' => 'Marketing site']);
-        [$start, $end] = $this->window();
+        $range = $this->window();
 
         $visit = Visit::factory()->forSite($site)->create();
         PageView::factory()->forVisit($visit)->create();
@@ -215,27 +218,25 @@ class ReportTypesTest extends TestCase
         ]);
 
         $report = app(ReportTypeRegistry::class)->for('site_analytics');
-        $data = $report->gather($project, $site->id, $start, $end);
+        $this->assertSame('Site analytics report — Marketing site', $report->title($project, $site->id));
 
-        $this->assertSame('Marketing site', $data->title);
+        $data = $report->viewData($project, $site->id, $range);
 
-        $kpiLabels = array_column($data->kpis, 'label');
-        $this->assertContains(__('reports.report.visits'), $kpiLabels);
-        $this->assertContains(__('reports.report.page_views'), $kpiLabels);
-        $pageViewsKpi = collect($data->kpis)->firstWhere('label', __('reports.report.page_views'));
-        $this->assertSame('2', $pageViewsKpi['value']);
+        $this->assertArrayHasKey('visits', $data);
+        $this->assertArrayHasKey('page_views', $data);
+        $this->assertArrayHasKey('goals', $data);
+        $this->assertArrayHasKey('top_events', $data);
+        $this->assertArrayHasKey('series', $data);
+        $this->assertSame(2, $data['page_views']);
+        $this->assertCount(7, $data['series']);
+        $this->assertSame($goal->name, $data['goals'][0]['name']);
+        $this->assertSame('signup', $data['top_events'][0]['name']);
 
-        $titles = array_column($data->breakdowns, 'title');
-        $this->assertContains(__('reports.report.goals'), $titles);
-        $this->assertContains(__('reports.report.top_events'), $titles);
+        $this->assertSame('reports.site', $report->pdfView());
+        $this->assertSame('reports.email.site', $report->emailView());
 
-        $goalsBreakdown = collect($data->breakdowns)->firstWhere('title', __('reports.report.goals'));
-        $this->assertSame($goal->name, $goalsBreakdown['rows'][0]['label']);
-
-        $this->assertCount(7, $data->series);
-        $this->assertSame(2, array_sum(array_column($data->series, 'value')));
-
-        $csv = $report->csvRows($data);
-        $this->assertNotEmpty($csv);
+        $csv = $report->csv($data);
+        $this->assertIsString($csv);
+        $this->assertStringContainsString('Visits', $csv);
     }
 }

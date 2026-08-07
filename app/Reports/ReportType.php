@@ -3,12 +3,12 @@
 namespace App\Reports;
 
 use App\Models\Project;
-use Carbon\CarbonImmutable;
 
 /**
  * Contract implemented by every pluggable report type (project summary,
- * link, site analytics). Each type owns its own data-gathering (via the
- * existing aggregators) and the names of its email/PDF blade views.
+ * link, site analytics). Each type is a thin adapter over the existing
+ * report/analytics subsystem (ReportDataService, AnalyticsAggregator,
+ * GoalAggregator) — it does not gather data itself.
  */
 interface ReportType
 {
@@ -32,20 +32,29 @@ interface ReportType
     public function subjectLabel(Project $project, ?string $subjectId): ?string;
 
     /**
-     * Build the ReportData for $project (+ $subjectId) over [$start, $end].
+     * A human-readable title for the report (project name, link slug, site
+     * name).
      */
-    public function gather(Project $project, ?string $subjectId, CarbonImmutable $start, CarbonImmutable $end): ReportData;
-
-    /** Blade view name for the email body, e.g. 'reports.body.project_summary'. */
-    public function emailView(): string;
-
-    /** Blade view name for the PDF attachment, e.g. 'reports.pdf.project_summary'. */
-    public function pdfView(): string;
+    public function title(Project $project, ?string $subjectId): string;
 
     /**
-     * Flatten $data into CSV rows; the first row is the header.
+     * Template variables for BOTH the PDF view and the email view, built
+     * for $project (+ $subjectId) over $range.
      *
-     * @return array<int, array<int, string|int>>
+     * @return array<string, mixed>
      */
-    public function csvRows(ReportData $data): array;
+    public function viewData(Project $project, ?string $subjectId, ReportDateRange $range): array;
+
+    /** Blade view name for the PDF attachment, e.g. 'reports.project'. */
+    public function pdfView(): string;
+
+    /** Blade view name for the email body, e.g. 'reports.email.project'. */
+    public function emailView(): string;
+
+    /**
+     * Serialize $viewData (as produced by viewData()) into a CSV string.
+     *
+     * @param  array<string, mixed>  $viewData
+     */
+    public function csv(array $viewData): string;
 }
