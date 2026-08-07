@@ -93,9 +93,13 @@ export default function ReportsIndex({ reports }: { reports: ReportRow[] }) {
                     <button
                       type="button"
                       onClick={() => toggle(report)}
+                      aria-label={t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
+                      title={t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
                       className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
                     >
-                      <StatusPill status={report.active ? 'success' : 'neutral'}>{t('reports.form.active')}</StatusPill>
+                      <StatusPill status={report.active ? 'success' : 'neutral'}>
+                        {t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
+                      </StatusPill>
                     </button>
                   </td>
                   <RowActions>

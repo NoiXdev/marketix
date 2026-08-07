@@ -24,11 +24,14 @@ return [
             'button' => 'Delete',
         ],
         'sent_now_flash' => 'Report sent.',
+        'active' => 'Active',
+        'inactive' => 'Inactive',
     ],
 
     'form' => [
         'create_title' => 'Create report',
         'edit_title' => 'Edit report',
+        'save_error_title' => "Couldn't save — please fix the following:",
         'name' => 'Name',
         'name_placeholder' => 'e.g. Weekly summary',
         'type' => 'Report type',

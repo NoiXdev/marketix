@@ -24,11 +24,14 @@ return [
             'button' => 'Verwijderen',
         ],
         'sent_now_flash' => 'Rapport verzonden.',
+        'active' => 'Actief',
+        'inactive' => 'Inactief',
     ],
 
     'form' => [
         'create_title' => 'Rapport aanmaken',
         'edit_title' => 'Rapport bewerken',
+        'save_error_title' => 'Opslaan mislukt — los de volgende fouten op:',
         'name' => 'Naam',
         'name_placeholder' => 'bijv. Wekelijkse samenvatting',
         'type' => 'Rapporttype',

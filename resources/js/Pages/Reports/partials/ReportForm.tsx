@@ -168,7 +168,7 @@ export default function ReportForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <ErrorSummary title={t('links.form.save_error_title')} errors={errorMessages} />
+      <ErrorSummary title={t('reports.form.save_error_title')} errors={errorMessages} />
 
       <FormSection>
         <Field label={t('reports.form.name')} htmlFor="name" error={errors.name}>

@@ -24,11 +24,14 @@ return [
             'button' => 'Supprimer',
         ],
         'sent_now_flash' => 'Rapport envoyé.',
+        'active' => 'Actif',
+        'inactive' => 'Inactif',
     ],
 
     'form' => [
         'create_title' => 'Créer un rapport',
         'edit_title' => 'Modifier le rapport',
+        'save_error_title' => "Impossible d'enregistrer — veuillez corriger les erreurs suivantes :",
         'name' => 'Nom',
         'name_placeholder' => 'ex. Résumé hebdomadaire',
         'type' => 'Type de rapport',

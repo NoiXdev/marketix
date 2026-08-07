@@ -24,11 +24,14 @@ return [
             'button' => 'Löschen',
         ],
         'sent_now_flash' => 'Bericht wurde gesendet.',
+        'active' => 'Aktiv',
+        'inactive' => 'Inaktiv',
     ],
 
     'form' => [
         'create_title' => 'Bericht erstellen',
         'edit_title' => 'Bericht bearbeiten',
+        'save_error_title' => 'Speichern fehlgeschlagen – bitte beheben Sie folgende Fehler:',
         'name' => 'Name',
         'name_placeholder' => 'z. B. Wöchentliche Zusammenfassung',
         'type' => 'Berichtstyp',
