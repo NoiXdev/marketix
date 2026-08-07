@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Reports\ReportData;
+use App\Reports\LegacyReportData;
 use App\Settings\BrandingSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\Mailable;
@@ -61,7 +61,7 @@ class BrandingTemplatesTest extends TestCase
     {
         $this->setBrand('Acme Links');
 
-        $data = new ReportData(
+        $data = new LegacyReportData(
             scope: 'project',
             title: 'Statistics report — Acme',
             subtitle: 'Acme',

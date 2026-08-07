@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\PersonalAccessToken;
+use App\Reports\ReportTypeRegistry;
 use App\Services\CertificateReader;
 use App\Services\DnsResolver;
 use App\Services\SystemCertificateReader;
@@ -26,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(DnsResolver::class, SystemDnsResolver::class);
         $this->app->bind(CertificateReader::class, SystemCertificateReader::class);
+        $this->app->singleton(ReportTypeRegistry::class);
     }
 
     /**

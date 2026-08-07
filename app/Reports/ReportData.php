@@ -2,30 +2,23 @@
 
 namespace App\Reports;
 
-class ReportData
+/**
+ * Typed struct returned by every ReportType::gather(). Pure data — no
+ * behavior, no framework dependencies. Consumed by the email/PDF blade
+ * views (via emailView()/pdfView()) and by csvRows().
+ */
+final class ReportData
 {
     /**
-     * @param  list<array{date:string,clicks:int,unique:int}>  $timeSeries
-     * @param  array<string,list<array{label:string,count:int}>>  $breakdowns
-     * @param  list<array{slug:string,domain:string,clicks:int}>  $topLinks
-     * @param  list<array{country:?string,city:?string,browser:?string,os:?string,domain:?string,created_at:string}>  $recentClicks
+     * @param  array<int, array{label: string, value: string}>  $kpis
+     * @param  array<int, array{title: string, rows: array<int, array{label: string, value: string}>}>  $breakdowns
+     * @param  array<int, array{date: string, value: int}>  $series
      */
     public function __construct(
-        public readonly string $scope,
         public readonly string $title,
-        public readonly string $subtitle,
-        public readonly string $rangeLabel,
-        public readonly string $generatedAt,
-        public readonly int $totalClicks,
-        public readonly int $uniqueClicks,
-        public readonly array $timeSeries,
+        public readonly string $periodLabel,
+        public readonly array $kpis,
         public readonly array $breakdowns,
-        public readonly array $topLinks = [],
-        public readonly array $recentClicks = [],
+        public readonly array $series,
     ) {}
-
-    public function toArray(): array
-    {
-        return get_object_vars($this);
-    }
 }
