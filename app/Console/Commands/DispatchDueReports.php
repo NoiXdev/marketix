@@ -27,27 +27,34 @@ class DispatchDueReports extends Command
     public function handle(): int
     {
         $sendHour = config('reports.send_hour');
-        $dispatched = 0;
 
-        ScheduledReport::where('active', true)
+        // Load the due set once (a single WHERE evaluation) rather than
+        // chunking: chunk() re-runs the same WHERE per page with an
+        // offset, but the callback below mutates next_run_at, so
+        // processed rows drop out of the WHERE and later pages would
+        // overshoot and skip still-due rows. Due-per-hour is bounded, so
+        // ->get() is appropriate here.
+        $due = ScheduledReport::query()
+            ->where('active', true)
             ->where('next_run_at', '<=', now())
-            ->each(function (ScheduledReport $report) use ($sendHour, &$dispatched) {
-                SendScheduledReport::dispatch($report);
+            ->get();
 
-                $report->forceFill([
-                    'last_sent_at' => now(),
-                    'next_run_at' => NextRunCalculator::next(
-                        $report->frequency,
-                        $report->weekday,
-                        $report->day_of_month,
-                        $sendHour,
-                        CarbonImmutable::now(),
-                    ),
-                ])->save();
+        foreach ($due as $report) {
+            SendScheduledReport::dispatch($report);
 
-                $dispatched++;
-            });
+            $report->forceFill([
+                'last_sent_at' => now(),
+                'next_run_at' => NextRunCalculator::next(
+                    $report->frequency,
+                    $report->weekday,
+                    $report->day_of_month,
+                    $sendHour,
+                    CarbonImmutable::now(),
+                ),
+            ])->save();
+        }
 
+        $dispatched = $due->count();
         $this->info("Dispatched {$dispatched} due scheduled report(s).");
 
         return self::SUCCESS;
