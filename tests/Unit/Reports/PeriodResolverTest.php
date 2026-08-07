@@ -59,6 +59,30 @@ class PeriodResolverTest extends TestCase
         $this->assertSame('2025-12-31 23:59:59', $end->toDateTimeString());
     }
 
+    public function test_previous_month_from_day_31_does_not_overflow_into_current_month(): void
+    {
+        // Regression guard: naive $now->subMonth() from a day-31 date uses
+        // Carbon's overflowing arithmetic and can land back in the *same*
+        // month (2026-03-31 minus 1 month -> 2026-03-03), which would make
+        // this incorrectly resolve to March instead of February.
+        $now = CarbonImmutable::parse('2026-03-31 10:00', config('app.timezone'));
+
+        [$start, $end] = PeriodResolver::resolve('previous_month', $now);
+
+        $this->assertSame('2026-02-01 00:00:00', $start->toDateTimeString());
+        $this->assertSame('2026-02-28 23:59:59', $end->toDateTimeString());
+    }
+
+    public function test_previous_month_from_day_31_in_a_31_day_month_resolves_to_prior_30_day_month(): void
+    {
+        $now = CarbonImmutable::parse('2026-05-31 10:00', config('app.timezone'));
+
+        [$start, $end] = PeriodResolver::resolve('previous_month', $now);
+
+        $this->assertSame('2026-04-01 00:00:00', $start->toDateTimeString());
+        $this->assertSame('2026-04-30 23:59:59', $end->toDateTimeString());
+    }
+
     public function test_unknown_period_throws(): void
     {
         $this->expectException(InvalidArgumentException::class);

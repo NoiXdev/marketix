@@ -33,7 +33,11 @@ class PeriodResolver
         }
 
         if ($period === 'previous_month') {
-            $previousMonth = $now->subMonth();
+            // Compute from the 1st of the current month, where subtracting a
+            // month is always safe — subtracting a month directly from a
+            // day-29/30/31 uses Carbon's overflowing arithmetic and can land
+            // back in the *same* month (e.g. 2026-03-31 → 2026-03-03).
+            $previousMonth = $now->startOfMonth()->subMonth();
 
             return [$previousMonth->startOfMonth(), $previousMonth->endOfMonth()];
         }
