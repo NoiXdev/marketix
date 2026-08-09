@@ -16,7 +16,7 @@ class NavCountsShareTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_navCounts_populates_with_link_count_on_project_page(): void
+    public function test_nav_counts_populates_with_link_count_on_project_page(): void
     {
         $user = User::factory()->create();
         $project = Project::create(['name' => 'Acme']);
@@ -63,14 +63,14 @@ class NavCountsShareTest extends TestCase
                 ->where('navCounts.links', 3));
     }
 
-    public function test_navCounts_empty_when_no_project(): void
+    public function test_nav_counts_empty_when_no_project(): void
     {
         $this->get(route('app.auth.show-login'))
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('navCounts', []));
     }
 
-    public function test_navCounts_empty_when_project_has_no_urls(): void
+    public function test_nav_counts_empty_when_project_has_no_urls(): void
     {
         $user = User::factory()->create();
         $project = Project::create(['name' => 'Empty Project']);

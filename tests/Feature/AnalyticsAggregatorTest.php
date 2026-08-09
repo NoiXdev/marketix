@@ -18,7 +18,7 @@ class AnalyticsAggregatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->agg = new AnalyticsAggregator();
+        $this->agg = new AnalyticsAggregator;
     }
 
     public function test_totals_and_unique_visitors_exclude_bots(): void

@@ -67,11 +67,11 @@ class CreateQrCode
      * live here; callers (HTTP controller, MCP tools) own those.
      *
      * @param  array<string, mixed>  $data  Same shape as QrCodeRequest::validated()
-     *   (name, type, is_dynamic, content, style, and — when dynamic — either
-     *   url_id, or domain_id/slug plus the link settings: status, password,
-     *   expired_at, targeting_geo, targeting_device, targeting_language,
-     *   targeting_ab), plus an optional 'pixel_ids' (array<int, string>) to
-     *   sync onto the backing Url.
+     *                                      (name, type, is_dynamic, content, style, and — when dynamic — either
+     *                                      url_id, or domain_id/slug plus the link settings: status, password,
+     *                                      expired_at, targeting_geo, targeting_device, targeting_language,
+     *                                      targeting_ab), plus an optional 'pixel_ids' (array<int, string>) to
+     *                                      sync onto the backing Url.
      */
     public function handle(Project $project, User $user, array $data): QrCode
     {

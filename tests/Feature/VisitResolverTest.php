@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Site;
-use App\Models\Visit;
 use App\Support\VisitResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -25,7 +24,7 @@ class VisitResolverTest extends TestCase
     public function test_creates_a_new_visit_with_zero_pageviews_and_first_touch(): void
     {
         $site = Site::factory()->create();
-        $resolver = new VisitResolver();
+        $resolver = new VisitResolver;
 
         $visit = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/lp', $this->firstTouch());
 
@@ -39,7 +38,7 @@ class VisitResolverTest extends TestCase
     public function test_returns_existing_visit_within_window_unchanged(): void
     {
         $site = Site::factory()->create();
-        $resolver = new VisitResolver();
+        $resolver = new VisitResolver;
 
         $first = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/lp', $this->firstTouch());
         $second = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/other', ['utm_source' => 'newsletter'] + $this->firstTouch());
@@ -53,7 +52,7 @@ class VisitResolverTest extends TestCase
     public function test_opens_new_visit_after_window(): void
     {
         $site = Site::factory()->create();
-        $resolver = new VisitResolver();
+        $resolver = new VisitResolver;
 
         Carbon::setTestNow(now());
         $a = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/lp', $this->firstTouch());

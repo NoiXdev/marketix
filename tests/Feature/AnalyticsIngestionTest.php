@@ -200,7 +200,7 @@ class AnalyticsIngestionTest extends TestCase
         $this->assertSame(1, $site->visits()->count()); // same session
         $this->assertSame(1, $site->visits()->first()->pageview_count); // event did not increment
         $this->assertDatabaseHas('events', ['site_id' => $site->id, 'name' => 'purchase', 'path' => '/checkout']);
-        $this->assertSame(['plan' => 'pro'], \App\Models\Event::where('site_id', $site->id)->first()->props);
+        $this->assertSame(['plan' => 'pro'], Event::where('site_id', $site->id)->first()->props);
     }
 
     public function test_event_without_prior_pageview_opens_visit_with_zero_pageviews(): void

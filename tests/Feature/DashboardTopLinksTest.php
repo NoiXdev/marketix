@@ -33,7 +33,7 @@ class DashboardTopLinksTest extends TestCase
         Statistic::factory()->forUrl($a)->bot()->create(['created_at' => now()->subDay()]);
         Statistic::factory()->forUrl($a)->create(['created_at' => now()->subDays(60)]);
 
-        $rows = (new StatisticsAggregator())->topLinks($project->id, now()->subDays(29)->startOfDay(), now(), 5);
+        $rows = (new StatisticsAggregator)->topLinks($project->id, now()->subDays(29)->startOfDay(), now(), 5);
 
         $this->assertSame('aaa', $rows->first()->slug);
         $this->assertSame(3, (int) $rows->first()->clicks);

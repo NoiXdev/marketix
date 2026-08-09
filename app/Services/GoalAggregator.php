@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class GoalAggregator
 {
-    public function __construct(private AnalyticsAggregator $analytics = new AnalyticsAggregator()) {}
+    public function __construct(private AnalyticsAggregator $analytics = new AnalyticsAggregator) {}
 
     /** @return Collection<int, \stdClass> */
     public function topEvents(string $siteId, int $days, int $limit = 8): Collection

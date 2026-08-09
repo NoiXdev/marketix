@@ -125,7 +125,7 @@ return [
             'logo_dark' => 'Logo (donkere modus)',
             'logo_dark_hint' => 'Wordt getoond op donkere achtergronden.',
             'logo_email' => 'E-mail-/pdf-logo',
-            'logo_email_hint' => "Wordt gebruikt in e-mails en pdf-rapporten.",
+            'logo_email_hint' => 'Wordt gebruikt in e-mails en pdf-rapporten.',
             'favicon' => 'Favicon',
             'favicon_hint' => '.ico, .png, .jpg.',
         ],

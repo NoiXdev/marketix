@@ -6,6 +6,7 @@ use App\Models\PageView;
 use App\Models\Visit;
 use App\Support\CrawlerDetector;
 use App\Support\UserAgent;
+use App\Support\VisitResolver;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -46,7 +47,7 @@ class RecordPageViewJob implements ShouldQueue
         $device = UserAgent::device($this->userAgent);
         $refererDomain = $this->referer ? parse_url($this->referer, PHP_URL_HOST) : null;
 
-        $visit = app(\App\Support\VisitResolver::class)->resolve(
+        $visit = app(VisitResolver::class)->resolve(
             $this->siteId,
             $this->projectId,
             $this->visitorHash,

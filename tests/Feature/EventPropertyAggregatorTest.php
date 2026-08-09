@@ -17,7 +17,7 @@ class EventPropertyAggregatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->agg = new EventPropertyAggregator();
+        $this->agg = new EventPropertyAggregator;
     }
 
     private function event(Site $site, array $props, bool $bot = false): void

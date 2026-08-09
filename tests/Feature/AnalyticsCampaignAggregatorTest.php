@@ -17,7 +17,7 @@ class AnalyticsCampaignAggregatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->agg = new AnalyticsAggregator();
+        $this->agg = new AnalyticsAggregator;
     }
 
     public function test_utm_breakdown_counts_sessions_and_visitors_excluding_bots(): void

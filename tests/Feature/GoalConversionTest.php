@@ -21,7 +21,7 @@ class GoalConversionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->agg = new GoalAggregator();
+        $this->agg = new GoalAggregator;
     }
 
     public function test_top_events_counts_and_unique_visitors_exclude_bots(): void
