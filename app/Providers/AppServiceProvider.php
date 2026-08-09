@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\PersonalAccessToken;
+use App\Reports\ReportTypeRegistry;
 use App\Services\CertificateReader;
 use App\Services\DnsResolver;
 use App\Services\SystemCertificateReader;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passkeys\Passkey;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(DnsResolver::class, SystemDnsResolver::class);
         $this->app->bind(CertificateReader::class, SystemCertificateReader::class);
+        $this->app->singleton(ReportTypeRegistry::class);
     }
 
     /**
@@ -32,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        // ULID-aware token model — see App\Models\PersonalAccessToken.
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         // The default ResetPassword notification builds its link via
         // route('password.reset'), which this app does not define — the reset

@@ -10,7 +10,7 @@ const INTERACTIVE_SELECTOR = 'a, button, select, input, label, [role="button"]';
  * Merge with the row's existing classes (e.g. `group ${ROW_LINK_CLASS}`).
  */
 export const ROW_LINK_CLASS =
-  'cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50';
+  'cursor-pointer transition-colors hover:bg-elevated';
 
 /**
  * Returns a `<tr>` onClick handler that navigates to `href`.

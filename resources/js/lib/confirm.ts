@@ -1,6 +1,15 @@
 import Swal from 'sweetalert2';
 
-import { getStoredTheme, resolveIsDark } from '@/lib/theme';
+// Token-driven button/popup styling. SweetAlert renders in a portal on
+// document.body, so `var(--…)` resolves against :root / .dark just like the
+// rest of the app — no JS theme branching needed.
+const POPUP = 'rounded-[var(--radius)] border border-line';
+const CANCEL_BTN =
+    'mr-3 inline-flex items-center rounded-[var(--radius-sm)] border border-line-strong bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
+const DANGER_BTN =
+    'inline-flex items-center rounded-[var(--radius-sm)] bg-[color:var(--danger-dot)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
+const PRIMARY_BTN =
+    'inline-flex items-center rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
 
 type ConfirmDeleteOptions = {
     /** Dialog heading. Defaults to 'Are you sure?'. */
@@ -13,30 +22,26 @@ type ConfirmDeleteOptions = {
 
 /**
  * Themed delete confirmation backed by SweetAlert2. Resolves to `true` when the
- * user confirms, `false` otherwise. Styling follows the app's light/dark theme.
+ * user confirms, `false` otherwise. Styling follows the app's design tokens.
  */
 export async function confirmDelete(opts: ConfirmDeleteOptions = {}): Promise<boolean> {
-    const isDark = resolveIsDark(getStoredTheme());
-
     const result = await Swal.fire({
         title: opts.title ?? 'Are you sure?',
         text: opts.text,
         icon: 'warning',
-        iconColor: '#ef4444',
+        iconColor: 'var(--danger-dot)',
         showCancelButton: true,
         confirmButtonText: opts.confirmText ?? 'Delete',
         cancelButtonText: 'Cancel',
         focusCancel: true,
         reverseButtons: true,
         buttonsStyling: false,
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#e2e8f0' : '#0f172a',
+        background: 'var(--surface)',
+        color: 'var(--foreground)',
         customClass: {
-            popup: 'rounded-xl',
-            confirmButton:
-                'inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
-            cancelButton:
-                'mr-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
+            popup: POPUP,
+            confirmButton: DANGER_BTN,
+            cancelButton: CANCEL_BTN,
         },
     });
 
@@ -53,31 +58,27 @@ type ConfirmActionOptions = {
 };
 
 /**
- * Themed non-destructive confirmation (indigo confirm button). Resolves to
+ * Themed non-destructive confirmation (accent confirm button). Resolves to
  * `true` when confirmed. Use for risky-but-not-deleting actions.
  */
 export async function confirmAction(opts: ConfirmActionOptions = {}): Promise<boolean> {
-    const isDark = resolveIsDark(getStoredTheme());
-
     const result = await Swal.fire({
         title: opts.title ?? 'Are you sure?',
         text: opts.text,
         icon: 'warning',
-        iconColor: '#f59e0b',
+        iconColor: 'var(--warning-dot)',
         showCancelButton: true,
         confirmButtonText: opts.confirmText ?? 'Confirm',
         cancelButtonText: 'Cancel',
         focusCancel: true,
         reverseButtons: true,
         buttonsStyling: false,
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#e2e8f0' : '#0f172a',
+        background: 'var(--surface)',
+        color: 'var(--foreground)',
         customClass: {
-            popup: 'rounded-xl',
-            confirmButton:
-                'inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-            cancelButton:
-                'mr-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
+            popup: POPUP,
+            confirmButton: PRIMARY_BTN,
+            cancelButton: CANCEL_BTN,
         },
     });
 
@@ -103,13 +104,11 @@ type ConfirmTypedOptions = {
  * when confirmed with a matching value.
  */
 export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> {
-    const isDark = resolveIsDark(getStoredTheme());
-
     const result = await Swal.fire({
         title: opts.title ?? 'Are you sure?',
         text: opts.text,
         icon: 'warning',
-        iconColor: '#ef4444',
+        iconColor: 'var(--danger-dot)',
         input: 'text',
         inputPlaceholder: opts.match,
         inputAttributes: { autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off' },
@@ -119,8 +118,8 @@ export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> 
         focusCancel: false,
         reverseButtons: true,
         buttonsStyling: false,
-        background: isDark ? '#1e293b' : '#ffffff',
-        color: isDark ? '#e2e8f0' : '#0f172a',
+        background: 'var(--surface)',
+        color: 'var(--foreground)',
         preConfirm: (value: string) => {
             if (value !== opts.match) {
                 Swal.showValidationMessage(opts.mismatchText ?? `Please type "${opts.match}" to confirm.`);
@@ -129,11 +128,9 @@ export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> 
             return true;
         },
         customClass: {
-            popup: 'rounded-xl',
-            confirmButton:
-                'inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
-            cancelButton:
-                'mr-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800',
+            popup: POPUP,
+            confirmButton: DANGER_BTN,
+            cancelButton: CANCEL_BTN,
         },
     });
 

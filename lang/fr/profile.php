@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Profil',
+    'back' => 'Retour au tableau de bord',
     'name' => 'Nom',
     'email' => 'E-mail',
     'password' => [
@@ -32,5 +33,27 @@ return [
         'remove' => 'Supprimer',
         'name_label' => 'Nom du passkey',
         'add' => 'Ajouter un passkey',
+    ],
+    'tokens' => [
+        'heading' => 'Jetons API',
+        'description' => 'Créez des jetons pour connecter des clients MCP (par ex. Claude, Cursor) à vos données Marketix.',
+        'endpoint_label' => 'Point de terminaison MCP :',
+        'auth_header_label' => 'En-tête Authorization :',
+        'mcp_remote_note' => "Les clients qui ne peuvent pas envoyer d'en-têtes personnalisés peuvent utiliser mcp-remote comme pont.",
+        'config_label' => 'Exemple de configuration client (mcp-remote) :',
+        'one_time_warning' => 'Copiez ce jeton maintenant — il ne sera plus jamais affiché.',
+        'copy_idle' => 'Copier',
+        'copy_copied' => 'Copié',
+        'created' => 'créé',
+        'last_used' => 'dernière utilisation',
+        'never' => 'jamais utilisé',
+        'revoke' => 'Révoquer',
+        'confirm_title' => 'Révoquer ce jeton ?',
+        'confirm_text' => 'Tout client utilisant ce jeton perdra immédiatement l\'accès.',
+        'confirm_button' => 'Révoquer',
+        'empty' => 'Aucun jeton API pour le moment.',
+        'name_label' => 'Nom du jeton',
+        'name_placeholder' => 'p. ex. Claude Desktop',
+        'create' => 'Créer un jeton',
     ],
 ];

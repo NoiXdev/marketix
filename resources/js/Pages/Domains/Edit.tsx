@@ -1,14 +1,17 @@
 import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
+import { BackLink, Button, Field, FormSection, Input } from '@/Components/ui';
+import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, Domain, PageProps } from '@/types';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
 import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 
 export default function DomainsEdit({ domain, appDomain, history }: { domain: Domain; appDomain: string; history?: ActivityEntry[] }) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   const { data, setData, put, processing, errors } = useForm({
     name: domain.name,
@@ -33,112 +36,56 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
   }
 
   return (
-    <AppLayout title="Edit domain">
+    <AppLayout title={t('domains.form.edit_page_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <Link
-            href={route('app.project.domains.index', { project: project!.id })}
-            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to domains
-          </Link>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">
-            Edit <span className="text-indigo-600 dark:text-indigo-400">{domain.name}</span>
+          <BackLink href={route('app.project.domains.index', { project: project!.id })}>{t('domains.form.back')}</BackLink>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
+            {t('domains.form.edit_title')} <span className="text-accent-soft-foreground">{domain.name}</span>
           </h1>
         </div>
 
-        <div className="mb-6 max-w-lg">
+        <div className="mb-6 max-w-lg space-y-4">
           <DnsInfoBox appDomain={appDomain} />
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Domain status</h2>
-              <button
-                type="button"
-                onClick={check}
-                disabled={checking}
-                className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
+          <FormSection>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">{t('domains.form.status_title')}</h2>
+              <Button variant="secondary" size="sm" onClick={check} disabled={checking}>
                 <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
-                Check now
-              </button>
+                {t('domains.form.check_now')}
+              </Button>
             </div>
             <StatusPills domain={domain} />
-            <dl className="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+            <dl className="space-y-1 text-xs text-muted">
               {domain.check_details?.dns?.domain_ips && (
-                <div>Resolves to: {domain.check_details.dns.domain_ips.join(', ') || '—'}</div>
+                <div>{t('domains.form.resolves_to')} {domain.check_details.dns.domain_ips.join(', ') || '—'}</div>
               )}
-              {domain.check_details?.ssl?.error && <div>SSL: {domain.check_details.ssl.error}</div>}
-              {domain.check_details?.reachable?.error && <div>Reachable: {domain.check_details.reachable.error}</div>}
-              {domain.last_checked_at && <div>Last checked: {new Date(domain.last_checked_at).toLocaleString()}</div>}
+              {domain.check_details?.ssl?.error && <div>{t('domains.form.ssl_error')} {domain.check_details.ssl.error}</div>}
+              {domain.check_details?.reachable?.error && <div>{t('domains.form.reachable_error')} {domain.check_details.reachable.error}</div>}
+              {domain.last_checked_at && <div>{t('domains.form.last_checked')} {new Date(domain.last_checked_at).toLocaleString()}</div>}
             </dl>
-          </div>
+          </FormSection>
         </div>
 
-        <div className="max-w-lg rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+        <div className="max-w-lg">
           <form onSubmit={submit} className="space-y-5">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Domain name <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={data.name}
-                onChange={(e) => setData('name', e.target.value)}
-                placeholder="links.example.com"
-                className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-              />
-              {errors.name && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.name}</p>}
-            </div>
+            <FormSection>
+              <Field label={<>{t('domains.form.name')} <span className="text-danger-foreground">*</span></>} htmlFor="name" error={errors.name}>
+                <Input id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('domains.form.name_placeholder')} />
+              </Field>
+              <Field label={t('domains.form.root_redirect')} htmlFor="redirect_root" hint={t('domains.form.root_redirect_hint')} error={errors.redirect_root}>
+                <Input id="redirect_root" type="url" value={data.redirect_root} onChange={(e) => setData('redirect_root', e.target.value)} placeholder={t('domains.form.root_redirect_placeholder')} />
+              </Field>
+              <Field label={t('domains.form.not_found_redirect')} htmlFor="redirect_not_found" hint={t('domains.form.not_found_redirect_hint')} error={errors.redirect_not_found}>
+                <Input id="redirect_not_found" type="url" value={data.redirect_not_found} onChange={(e) => setData('redirect_not_found', e.target.value)} placeholder={t('domains.form.not_found_redirect_placeholder')} />
+              </Field>
+            </FormSection>
 
-            <div>
-              <label htmlFor="redirect_root" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Root redirect
-              </label>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Where to redirect visitors who hit the bare domain with no slug.</p>
-              <input
-                id="redirect_root"
-                type="url"
-                value={data.redirect_root}
-                onChange={(e) => setData('redirect_root', e.target.value)}
-                placeholder="https://example.com"
-                className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-              />
-              {errors.redirect_root && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.redirect_root}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="redirect_not_found" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                404 redirect
-              </label>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Where to redirect visitors when a slug is not found.</p>
-              <input
-                id="redirect_not_found"
-                type="url"
-                value={data.redirect_not_found}
-                onChange={(e) => setData('redirect_not_found', e.target.value)}
-                placeholder="https://example.com/404"
-                className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-              />
-              {errors.redirect_not_found && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.redirect_not_found}</p>}
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={processing}
-                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60"
-              >
-                {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-                Save changes
-              </button>
-              <Link
-                href={route('app.project.domains.index', { project: project!.id })}
-                className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-              >
-                Cancel
+            <div className="flex items-center gap-3">
+              <Button type="submit" loading={processing}>{t('domains.form.save_submit')}</Button>
+              <Link href={route('app.project.domains.index', { project: project!.id })} className="text-sm text-muted transition-colors hover:text-foreground">
+                {t('common.actions.cancel')}
               </Link>
             </div>
           </form>

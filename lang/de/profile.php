@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Profil',
+    'back' => 'Zurück zum Dashboard',
     'name' => 'Name',
     'email' => 'E-Mail',
     'password' => [
@@ -32,5 +33,27 @@ return [
         'remove' => 'Entfernen',
         'name_label' => 'Passkey-Name',
         'add' => 'Passkey hinzufügen',
+    ],
+    'tokens' => [
+        'heading' => 'API-Token',
+        'description' => 'Erstellen Sie Token, um MCP-Clients (z. B. Claude, Cursor) mit Ihren Marketix-Daten zu verbinden.',
+        'endpoint_label' => 'MCP-Endpunkt:',
+        'auth_header_label' => 'Authorization-Header:',
+        'mcp_remote_note' => 'Clients, die keine benutzerdefinierten Header senden können, können mcp-remote als Brücke verwenden.',
+        'config_label' => 'Beispiel-Client-Konfiguration (mcp-remote):',
+        'one_time_warning' => 'Kopieren Sie dieses Token jetzt — es wird nicht erneut angezeigt.',
+        'copy_idle' => 'Kopieren',
+        'copy_copied' => 'Kopiert',
+        'created' => 'erstellt',
+        'last_used' => 'zuletzt verwendet',
+        'never' => 'noch nie verwendet',
+        'revoke' => 'Widerrufen',
+        'confirm_title' => 'Dieses Token widerrufen?',
+        'confirm_text' => 'Jeder Client, der dieses Token verwendet, verliert sofort den Zugriff.',
+        'confirm_button' => 'Widerrufen',
+        'empty' => 'Noch keine API-Token.',
+        'name_label' => 'Token-Name',
+        'name_placeholder' => 'z. B. Claude Desktop',
+        'create' => 'Token erstellen',
     ],
 ];

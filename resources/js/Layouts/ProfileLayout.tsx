@@ -1,6 +1,7 @@
 import Brand from '@/Components/Brand';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { BackLink } from '@/Components/ui';
+import { useTranslation } from '@/lib/i18n';
+import { Head } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 
 interface ProfileLayoutProps {
@@ -8,20 +9,18 @@ interface ProfileLayoutProps {
 }
 
 export default function ProfileLayout({ children, title }: PropsWithChildren<ProfileLayoutProps>) {
+  const { t } = useTranslation();
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-canvas text-foreground">
       {title && <Head title={title} />}
-      <header className="flex h-14 items-center border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900">
+      <header className="flex h-14 items-center border-b border-line bg-surface px-4">
         <Brand />
       </header>
-      <main className="mx-auto w-full max-w-md px-4 py-10">
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
+      <main className="mx-auto w-full max-w-xl px-4 py-10">
+        <div className="mb-6">
+          <BackLink href="/">{t('profile.back')}</BackLink>
+        </div>
         {children}
       </main>
     </div>

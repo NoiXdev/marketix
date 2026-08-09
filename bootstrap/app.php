@@ -36,6 +36,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectGuestsTo('/auth/login');
 
+        // Public analytics ingestion is called cross-origin from customer
+        // websites, which cannot carry this app's CSRF token — exempt it like
+        // any public webhook/API endpoint. Abuse is bounded by throttling and
+        // the fact that these routes never touch an authenticated session.
+        $middleware->validateCsrfTokens(except: [
+            'a/*',
+        ]);
+
         $middleware->alias([
             'project_admin' => EnsureProjectAdmin::class,
             'super_admin' => EnsureSuperAdmin::class,

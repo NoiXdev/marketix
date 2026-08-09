@@ -1,5 +1,7 @@
+import { Button, Card, Field, Flash, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import ProfileLayout from '@/Layouts/ProfileLayout';
+import ApiTokensSection from '@/Pages/Profile/partials/ApiTokensSection';
 import PasskeysSection from '@/Pages/Profile/partials/PasskeysSection';
 import TwoFactorSection from '@/Pages/Profile/partials/TwoFactorSection';
 import { PageProps } from '@/types';
@@ -18,6 +20,13 @@ interface Passkey {
   created_at: string | null;
 }
 
+interface ApiToken {
+  id: string;
+  name: string;
+  last_used_at: string | null;
+  created_at: string | null;
+}
+
 interface TwoFactorSetup {
   secretKey: string;
   qrCode: string;
@@ -30,6 +39,7 @@ interface Props {
   twoFactorSetup: TwoFactorSetup | null;
   recoveryCodes: string[] | null;
   passkeys: Passkey[];
+  tokens: ApiToken[];
 }
 
 export default function ProfileEdit({
@@ -39,6 +49,7 @@ export default function ProfileEdit({
   twoFactorSetup,
   recoveryCodes,
   passkeys,
+  tokens,
 }: Props) {
   const { t } = useTranslation();
   const { flash } = usePage<PageProps>().props;
@@ -56,68 +67,55 @@ export default function ProfileEdit({
     });
   }
 
-  const inputClass =
-    'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
-
   return (
     <ProfileLayout title={t('profile.title')}>
-      <h1 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">{t('profile.title')}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-foreground">{t('profile.title')}</h1>
 
-      {flash?.success && (
-        <div className="mb-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-300">
-          {flash.success}
-        </div>
-      )}
+      <Flash />
 
-      <div className="mb-8 space-y-3 rounded-md border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+      <Card className="mb-8 space-y-3 p-4">
         <div>
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('profile.name')}</p>
-          <p className="text-sm text-slate-900 dark:text-white">{user.name}</p>
+          <p className="text-xs font-medium text-subtle">{t('profile.name')}</p>
+          <p className="text-sm text-foreground">{user.name}</p>
         </div>
         <div>
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('profile.email')}</p>
-          <p className="text-sm text-slate-900 dark:text-white">{user.email}</p>
+          <p className="text-xs font-medium text-subtle">{t('profile.email')}</p>
+          <p className="text-sm text-foreground">{user.email}</p>
         </div>
-      </div>
+      </Card>
 
-      <form onSubmit={submit} className="space-y-4">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white">{t('profile.password.heading')}</h2>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('profile.password.current')}</label>
-          <input
-            type="password"
-            value={data.current_password}
-            onChange={(e) => setData('current_password', e.target.value)}
-            className={inputClass}
-          />
-          {errors.current_password && <p className="mt-1 text-xs text-red-600">{errors.current_password}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('profile.password.new')}</label>
-          <input
-            type="password"
-            value={data.password}
-            onChange={(e) => setData('password', e.target.value)}
-            className={inputClass}
-          />
-          {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">{t('profile.password.confirm')}</label>
-          <input
-            type="password"
-            value={data.password_confirmation}
-            onChange={(e) => setData('password_confirmation', e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <button
-          disabled={processing}
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
-          {t('profile.password.submit')}
-        </button>
+      <form onSubmit={submit}>
+        <FormSection title={t('profile.password.heading')}>
+          <Field label={t('profile.password.current')} htmlFor="current_password" error={errors.current_password}>
+            <Input
+              id="current_password"
+              type="password"
+              value={data.current_password}
+              onChange={(e) => setData('current_password', e.target.value)}
+            />
+          </Field>
+          <Field label={t('profile.password.new')} htmlFor="password" error={errors.password}>
+            <Input
+              id="password"
+              type="password"
+              value={data.password}
+              onChange={(e) => setData('password', e.target.value)}
+            />
+          </Field>
+          <Field label={t('profile.password.confirm')} htmlFor="password_confirmation">
+            <Input
+              id="password_confirmation"
+              type="password"
+              value={data.password_confirmation}
+              onChange={(e) => setData('password_confirmation', e.target.value)}
+            />
+          </Field>
+          <Button type="submit" loading={processing}>
+            {t('profile.password.submit')}
+          </Button>
+        </FormSection>
       </form>
+
       <div className="mt-8 space-y-6">
         <TwoFactorSection
           enabled={twoFactorEnabled}
@@ -126,6 +124,7 @@ export default function ProfileEdit({
           recoveryCodes={recoveryCodes}
         />
         <PasskeysSection passkeys={passkeys} />
+        <ApiTokensSection tokens={tokens} newToken={flash?.token ?? null} />
       </div>
     </ProfileLayout>
   );

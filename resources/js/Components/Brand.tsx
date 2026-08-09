@@ -13,8 +13,8 @@ interface BrandProps {
 
 export default function Brand({
   className = 'flex items-center gap-2',
-  iconClassName = 'h-5 w-5 text-indigo-600',
-  textClassName = 'text-sm font-semibold text-slate-900 dark:text-white',
+  iconClassName = 'h-5 w-5 text-accent',
+  textClassName = 'text-sm font-semibold text-foreground',
   logoClassName = 'h-6 w-auto',
   forceLogo,
   suffix,

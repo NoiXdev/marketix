@@ -13,20 +13,22 @@ export default function GuestLayout({ children, title, description }: PropsWithC
   const { version } = usePage<PageProps>().props;
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="flex min-h-screen bg-canvas text-foreground">
       {/* Left panel — branding */}
-      <div className="hidden flex-col justify-between bg-slate-900 p-10 text-white lg:flex lg:w-96 xl:w-[480px]">
+      <div className="hidden flex-col justify-between p-10 text-accent-foreground lg:flex lg:w-96 xl:w-[480px] bg-[linear-gradient(150deg,var(--accent),var(--accent-hover))]">
         <Brand
           forceLogo="dark"
           className="flex items-center gap-2 text-lg font-semibold"
-          iconClassName="h-5 w-5 text-indigo-400"
-          textClassName="text-lg font-semibold text-white"
+          iconClassName="h-5 w-5 text-accent-foreground"
+          textClassName="text-lg font-semibold text-accent-foreground"
         />
         <div>
           <blockquote className="space-y-2">
-            <p className="text-lg leading-relaxed text-slate-300">Short links, big impact. Manage all your branded links and track every click in one place.</p>
+            <p className="text-lg leading-relaxed text-accent-foreground/90">
+              Short links, big impact. Manage all your branded links and track every click in one place.
+            </p>
           </blockquote>
-          <p className="mt-6 text-xs text-slate-500">v{version}</p>
+          <p className="mt-6 text-xs text-accent-foreground/70">v{version}</p>
         </div>
       </div>
 
@@ -35,15 +37,15 @@ export default function GuestLayout({ children, title, description }: PropsWithC
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <Brand
-            className="mb-8 flex items-center gap-2 text-lg font-semibold text-slate-900 lg:hidden dark:text-white"
-            iconClassName="h-5 w-5 text-indigo-500"
+            className="mb-8 flex items-center gap-2 text-lg font-semibold text-foreground lg:hidden"
+            iconClassName="h-5 w-5 text-accent"
             textClassName="text-lg font-semibold"
           />
 
           {(title || description) && (
             <div className="mb-8">
-              {title && <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>}
-              {description && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+              {title && <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>}
+              {description && <p className="mt-1 text-sm text-muted">{description}</p>}
             </div>
           )}
 
@@ -53,7 +55,7 @@ export default function GuestLayout({ children, title, description }: PropsWithC
             <LocaleSwitcher />
           </div>
 
-          <p className="mt-8 text-center text-xs text-slate-400 lg:hidden dark:text-slate-600">v{version}</p>
+          <p className="mt-8 text-center text-xs text-subtle lg:hidden">v{version}</p>
         </div>
       </div>
     </div>

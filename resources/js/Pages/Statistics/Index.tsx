@@ -1,10 +1,13 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import AppLayout from '@/Layouts/AppLayout';
+import KpiTile from '@/Pages/Dashboard/KpiTile';
+import RankedList from '@/Pages/Dashboard/RankedList';
+import { useTranslation } from '@/lib/i18n';
+import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
-import { BarChart3, Globe, Monitor, MousePointerClick } from 'lucide-react';
+import { BarChart3, MousePointerClick } from 'lucide-react';
 
 interface DayClicks { date: string; clicks: number }
 interface TopLink { id: string; slug: string; domain_name: string; clicks: number }
@@ -23,21 +26,22 @@ interface Props {
   topReferrers: (BreakdownRow & { domain: string })[];
 }
 
-function BarChart({ data }: { data: DayClicks[] }) {
-  const max = Math.max(...data.map((d) => d.clicks), 1);
+const RANGES = [7, 30, 90];
 
+function ClicksBars({ data, clicksLabel }: { data: DayClicks[]; clicksLabel: string }) {
+  const max = Math.max(...data.map((d) => d.clicks), 1);
   return (
     <div className="flex h-32 items-end gap-px">
       {data.map((d) => (
         <div key={d.date} className="group relative flex flex-1 flex-col items-center">
           <div
-            className="w-full rounded-t bg-indigo-500 transition-all group-hover:bg-indigo-600 dark:bg-indigo-600 dark:group-hover:bg-indigo-500"
+            className="w-full rounded-t bg-accent transition-all"
             style={{ height: `${Math.max((d.clicks / max) * 100, d.clicks > 0 ? 4 : 1)}%` }}
+            title={`${d.date}: ${d.clicks} ${clicksLabel}`}
           />
-          {/* Tooltip */}
-          <div className="pointer-events-none absolute bottom-full mb-1 hidden rounded bg-slate-900 px-2 py-1 text-xs text-white group-hover:block dark:bg-slate-700">
-            <p className="font-semibold">{d.clicks} clicks</p>
-            <p className="text-slate-400">{d.date}</p>
+          <div className="pointer-events-none absolute bottom-full z-10 mb-1 hidden whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)] group-hover:block">
+            <p className="font-semibold">{d.clicks.toLocaleString()} {clicksLabel}</p>
+            <p className="text-subtle">{d.date}</p>
           </div>
         </div>
       ))}
@@ -45,41 +49,17 @@ function BarChart({ data }: { data: DayClicks[] }) {
   );
 }
 
-function BreakdownTable({ title, rows, labelKey }: { title: string; rows: BreakdownRow[]; labelKey: string }) {
-  const total = rows.reduce((s, r) => s + (r.count as number), 0) || 1;
-
+function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows: BreakdownRow[]; labelKey: string; emptyLabel: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-        <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</h2>
+    <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+      <div className="border-b border-line px-4 py-3">
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
-      {rows.length === 0 ? (
-        <p className="px-4 py-6 text-center text-sm text-slate-400">No data yet</p>
-      ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-          {rows.map((row, i) => {
-            const label = String(row[labelKey] || '—');
-            const pct = Math.round(((row.count as number) / total) * 100);
-            return (
-              <li key={i} className="px-4 py-2.5">
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="truncate font-medium text-slate-700 dark:text-slate-300">{label}</span>
-                  <span className="ml-2 shrink-0 tabular-nums text-slate-500 dark:text-slate-400">
-                    {(row.count as number).toLocaleString()} <span className="text-xs text-slate-400">({pct}%)</span>
-                  </span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-indigo-500 dark:bg-indigo-600"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
+      <RankedList
+        emptyLabel={emptyLabel}
+        rows={rows.map((r, i) => ({ key: `${String(r[labelKey] ?? '')}-${i}`, label: String(r[labelKey] || '—'), value: r.count }))}
+      />
+    </section>
   );
 }
 
@@ -89,41 +69,33 @@ export default function StatisticsIndex({
   clicksByCountry,
 }: Props) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
 
   function setDays(d: number) {
     router.get(route('app.project.statistics', { project: project!.id }), { days: d }, { preserveState: true });
   }
 
-  const summaryCards = [
-    { label: 'Total clicks',  value: totalClicks.toLocaleString(),  icon: BarChart3,         color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400' },
-    { label: 'Unique clicks', value: uniqueClicks.toLocaleString(), icon: MousePointerClick,  color: 'text-violet-600 bg-violet-50 dark:bg-violet-900/20 dark:text-violet-400' },
-  ];
-
   return (
-    <AppLayout title="Statistics">
+    <AppLayout title={t('statistics.title')}>
       <div className="px-8 py-8">
-
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Statistics</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Click analytics for this project</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">{t('statistics.title')}</h1>
+            <p className="mt-1 text-sm text-muted">{t('statistics.subtitle')}</p>
           </div>
-
-          {/* Range selector + Download PDF */}
           <div className="flex items-center gap-3">
-            <div className="flex rounded-lg border border-slate-200 bg-white text-sm dark:border-slate-700 dark:bg-slate-900">
-              {[7, 30, 90].map((d) => (
+            <div className="inline-flex overflow-hidden rounded-lg border border-line">
+              {RANGES.map((d) => (
                 <button
                   key={d}
                   onClick={() => setDays(d)}
-                  className={`px-3 py-1.5 first:rounded-l-lg last:rounded-r-lg transition-colors ${
-                    days === d
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
+                  className={`border-r border-line px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                    days === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
                   }`}
                 >
-                  {d}d
+                  {d}
+                  {t('common.dashboard.range_days')}
                 </button>
               ))}
             </div>
@@ -132,69 +104,60 @@ export default function StatisticsIndex({
         </div>
 
         {/* Summary cards */}
-        <div className="mb-6 grid grid-cols-2 gap-4">
-          {summaryCards.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
-                <span className={`rounded-lg p-2 ${color}`}><Icon className="h-4 w-4" /></span>
-              </div>
-              <p className="mt-3 text-3xl font-bold text-slate-900 dark:text-white">{value}</p>
-            </div>
-          ))}
+        <div className="mb-6 grid grid-cols-2 gap-3.5">
+          <KpiTile compact={false} label={t('statistics.total_clicks')} value={totalClicks} icon={BarChart3} />
+          <KpiTile compact={false} label={t('statistics.unique_clicks')} value={uniqueClicks} icon={MousePointerClick} />
         </div>
 
         {/* Clicks over time */}
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Clicks over time <span className="font-normal text-slate-400">— last {days} days</span>
+        <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+          <h2 className="mb-4 text-sm font-semibold text-foreground">
+            {t('statistics.clicks_over_time')} <span className="font-normal text-muted">{t('statistics.last_days', { days: String(days) })}</span>
           </h2>
-          <BarChart data={clicksByDay} />
-          <div className="mt-2 flex justify-between text-xs text-slate-400">
+          <ClicksBars data={clicksByDay} clicksLabel={t('statistics.clicks')} />
+          <div className="mt-2 flex justify-between text-xs text-subtle">
             <span>{clicksByDay[0]?.date}</span>
             <span>{clicksByDay[clicksByDay.length - 1]?.date}</span>
           </div>
-        </div>
+        </section>
 
         {/* Top links */}
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-          <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Top links</h2>
+        <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+          <div className="border-b border-line px-4 py-3">
+            <h2 className="text-sm font-semibold text-foreground">{t('statistics.top_links')}</h2>
           </div>
           {topLinks.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-slate-400">No data yet</p>
+            <p className="px-4 py-6 text-center text-sm text-subtle">{t('statistics.no_data')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Link</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-400">Clicks</th>
+                <tr className="border-b border-line">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('statistics.columns.link')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-muted">{t('statistics.columns.clicks')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-line">
                 {topLinks.map((link) => (
                   <tr
                     key={link.id}
                     onClick={rowLink(route('app.project.links.show', { project: project!.id, url: link.id }))}
-                    className={ROW_LINK_CLASS}
+                    className={`group ${ROW_LINK_CLASS}`}
                   >
-                    <td className="px-4 py-2.5 font-medium text-slate-700 dark:text-slate-300">
+                    <td className="px-4 py-2.5 font-medium text-foreground">
                       <Link
                         href={route('app.project.links.show', { project: project!.id, url: link.id })}
-                        className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                        className="hover:text-accent-soft-foreground"
                       >
-                        <span className="text-slate-400">{link.domain_name}/</span>{link.slug}
+                        <span className="text-subtle">{link.domain_name}/</span>{link.slug}
                       </Link>
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 dark:text-slate-400">
-                      {link.clicks.toLocaleString()}
-                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-muted">{link.clicks.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </div>
+        </section>
 
         {/* Clicks by country map */}
         <div className="mb-6">
@@ -202,13 +165,12 @@ export default function StatisticsIndex({
         </div>
 
         {/* Breakdown grids */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <BreakdownTable title="Countries" rows={topCountries} labelKey="country" />
-          <BreakdownTable title="Browsers"  rows={topBrowsers}  labelKey="browser" />
-          <BreakdownTable title="OS"        rows={topOs}        labelKey="os" />
-          <BreakdownTable title="Referrers" rows={topReferrers} labelKey="domain" />
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+          <Breakdown title={t('statistics.breakdown.countries')} rows={topCountries} labelKey="country" emptyLabel={t('statistics.no_data')} />
+          <Breakdown title={t('statistics.breakdown.browsers')} rows={topBrowsers} labelKey="browser" emptyLabel={t('statistics.no_data')} />
+          <Breakdown title={t('statistics.breakdown.os')} rows={topOs} labelKey="os" emptyLabel={t('statistics.no_data')} />
+          <Breakdown title={t('statistics.breakdown.referrers')} rows={topReferrers} labelKey="domain" emptyLabel={t('statistics.no_data')} />
         </div>
-
       </div>
     </AppLayout>
   );

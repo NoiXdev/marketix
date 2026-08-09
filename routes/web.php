@@ -9,10 +9,15 @@ use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AnalyticsIngestionController;
+use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
+use App\Http\Controllers\EventAnalyticsController;
 use App\Http\Controllers\ForcePasswordChangeController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PasskeyManagementController;
@@ -21,8 +26,11 @@ use App\Http\Controllers\PixelController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\QrCodeController;
+use App\Http\Controllers\QrTemplateController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ScheduledReportController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
@@ -83,6 +91,8 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/profile/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('app.profile.two-factor.confirm');
         Route::delete('/profile/two-factor', [TwoFactorController::class, 'disable'])->name('app.profile.two-factor.disable');
         Route::post('/profile/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('app.profile.two-factor.recovery-codes');
+        Route::post('/profile/tokens', [ApiTokenController::class, 'store'])->name('app.profile.tokens.store');
+        Route::delete('/profile/tokens/{token}', [ApiTokenController::class, 'destroy'])->name('app.profile.tokens.destroy');
         Route::patch('/user/passkeys/{passkey}/name', [PasskeyManagementController::class, 'rename'])->name('app.passkeys.rename');
         Route::get('/password/change', [ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
         Route::put('/password/change', [ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
@@ -97,6 +107,16 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
             Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
+
+            // Scheduled reports
+            Route::get('/reports', [ScheduledReportController::class, 'index'])->name('app.project.reports.index');
+            Route::get('/reports/create', [ScheduledReportController::class, 'create'])->name('app.project.reports.create');
+            Route::post('/reports', [ScheduledReportController::class, 'store'])->name('app.project.reports.store');
+            Route::get('/reports/{report}/edit', [ScheduledReportController::class, 'edit'])->name('app.project.reports.edit');
+            Route::put('/reports/{report}', [ScheduledReportController::class, 'update'])->name('app.project.reports.update');
+            Route::delete('/reports/{report}', [ScheduledReportController::class, 'destroy'])->name('app.project.reports.destroy');
+            Route::post('/reports/{report}/toggle', [ScheduledReportController::class, 'toggle'])->name('app.project.reports.toggle');
+            Route::post('/reports/{report}/send-now', [ScheduledReportController::class, 'sendNow'])->name('app.project.reports.send-now');
 
             // Links
             Route::get('/links', [UrlController::class, 'index'])->name('app.project.links.index');
@@ -128,6 +148,11 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::post('/qr-codes/{qrCode}/versions/{version}/restore', [QrCodeController::class, 'restore'])->name('app.project.qrcodes.versions.restore');
             Route::delete('/qr-codes/{qrCode}', [QrCodeController::class, 'destroy'])->name('app.project.qrcodes.destroy');
 
+            // QR brand templates
+            Route::get('/qr-templates', [QrTemplateController::class, 'index'])->name('app.project.qr-templates.index');
+            Route::post('/qr-templates', [QrTemplateController::class, 'store'])->name('app.project.qr-templates.store');
+            Route::delete('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'destroy'])->name('app.project.qr-templates.destroy');
+
             // Pixels
             Route::get('/pixels', [PixelController::class, 'index'])->name('app.project.pixels.index');
             Route::get('/pixels/create', [PixelController::class, 'create'])->name('app.project.pixels.create');
@@ -135,6 +160,22 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/pixels/{pixel}/edit', [PixelController::class, 'edit'])->name('app.project.pixels.edit');
             Route::put('/pixels/{pixel}', [PixelController::class, 'update'])->name('app.project.pixels.update');
             Route::delete('/pixels/{pixel}', [PixelController::class, 'destroy'])->name('app.project.pixels.destroy');
+
+            // Sites (analytics)
+            Route::get('/sites', [SiteController::class, 'index'])->name('app.project.sites.index');
+            Route::get('/sites/create', [SiteController::class, 'create'])->name('app.project.sites.create');
+            Route::post('/sites', [SiteController::class, 'store'])->name('app.project.sites.store');
+            Route::get('/sites/{site}/edit', [SiteController::class, 'edit'])->name('app.project.sites.edit');
+            Route::put('/sites/{site}', [SiteController::class, 'update'])->name('app.project.sites.update');
+            Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
+            Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
+            Route::get('/analytics/{site}/goals', [GoalController::class, 'index'])->name('app.project.analytics.goals.index');
+            Route::get('/analytics/{site}/goals/create', [GoalController::class, 'create'])->name('app.project.analytics.goals.create');
+            Route::post('/analytics/{site}/goals', [GoalController::class, 'store'])->name('app.project.analytics.goals.store');
+            Route::get('/analytics/{site}/goals/{goal}/edit', [GoalController::class, 'edit'])->name('app.project.analytics.goals.edit');
+            Route::put('/analytics/{site}/goals/{goal}', [GoalController::class, 'update'])->name('app.project.analytics.goals.update');
+            Route::delete('/analytics/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('app.project.analytics.goals.destroy');
+            Route::get('/analytics/{site}/events', [EventAnalyticsController::class, 'show'])->name('app.project.analytics.events.show');
 
             // Team (project admins only)
             Route::middleware('project_admin')->group(function () {
@@ -191,6 +232,17 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/activity', [AdminActivityController::class, 'index'])->name('app.admin.activity.index');
     });
 });
+
+// Public analytics ingestion — reachable on any customer domain (CORS via config/cors.php).
+Route::get('/a/config/{trackingId}', [AnalyticsIngestionController::class, 'config'])
+    ->middleware('throttle:300,1')
+    ->name('app.analytics.config');
+Route::post('/a/event', [AnalyticsIngestionController::class, 'event'])
+    ->middleware('throttle:120,1')
+    ->name('app.analytics.event');
+// Tracking snippet — stable URL, served with Cache-Control + ETag (see controller).
+Route::get('/mx.js', [AnalyticsIngestionController::class, 'snippet'])
+    ->name('app.analytics.snippet');
 
 // URL shortener — handles requests on custom short-link domains
 Route::post('/{slug}', [RedirectController::class, 'checkPassword'])

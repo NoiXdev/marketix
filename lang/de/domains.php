@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Domänen',
+    'subtitle' => 'Eigene Domains für dieses Projekt verwalten',
+    'create' => 'Domain hinzufügen',
+    'empty' => 'Noch keine Domains',
+    'empty_hint' => 'Fügen Sie eine eigene Domain hinzu, um sie für Ihre Links zu nutzen.',
+    'columns' => [
+        'domain' => 'Domain',
+        'root_redirect' => 'Root-Weiterleitung',
+        'not_found_redirect' => '404-Weiterleitung',
+        'status' => 'Status',
+    ],
+    'status' => [
+        'dns' => 'DNS',
+        'reachable' => 'Erreichbar',
+        'ssl' => 'SSL',
+    ],
+    'never_checked' => 'Nie geprüft',
+    'actions' => [
+        'check' => 'Status prüfen',
+    ],
+    'delete' => [
+        'title' => 'Domain löschen?',
+        'confirm' => '„:name" löschen? Dies kann nicht rückgängig gemacht werden.',
+    ],
+    'form' => [
+        'back' => 'Zurück zu den Domains',
+        'add_title' => 'Domain hinzufügen',
+        'edit_title' => 'Bearbeiten',
+        'edit_page_title' => 'Domain bearbeiten',
+        'name' => 'Domainname',
+        'name_placeholder' => 'links.beispiel.de',
+        'root_redirect' => 'Root-Weiterleitung',
+        'root_redirect_hint' => 'Wohin Besucher weitergeleitet werden, die die Domain ohne Slug aufrufen.',
+        'root_redirect_placeholder' => 'https://beispiel.de',
+        'not_found_redirect' => '404-Weiterleitung',
+        'not_found_redirect_hint' => 'Wohin Besucher weitergeleitet werden, wenn ein Slug nicht gefunden wird.',
+        'not_found_redirect_placeholder' => 'https://beispiel.de/404',
+        'create_submit' => 'Domain erstellen',
+        'save_submit' => 'Änderungen speichern',
+        'status_title' => 'Domain-Status',
+        'check_now' => 'Jetzt prüfen',
+        'resolves_to' => 'Löst auf zu:',
+        'ssl_error' => 'SSL:',
+        'reachable_error' => 'Erreichbar:',
+        'last_checked' => 'Zuletzt geprüft:',
+        'dns' => [
+            'title' => 'Domain verbinden',
+            'instruction' => 'Zeigen Sie Ihre Domain bei Ihrem DNS-Anbieter per CNAME-Eintrag auf uns:',
+            'copy' => 'Kopieren',
+            'copied' => 'Kopiert',
+            'ssl_note' => 'Sobald das DNS propagiert ist, stellen wir automatisch ein SSL-Zertifikat aus — das kann einige Minuten dauern.',
+        ],
+    ],
+];

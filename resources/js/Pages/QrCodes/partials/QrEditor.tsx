@@ -1,13 +1,16 @@
-import { DYNAMIC_TYPES, DEFAULT_STYLE, STATIC_TYPES, QrStyle, QrType, buildQrContent, qrTypeTrackable } from '@/data/qrTypes';
+import { DYNAMIC_TYPES, STATIC_TYPES, QrStyle, QrType, buildQrContent, qrTypeTrackable } from '@/data/qrTypes';
 import LinkAdvancedFields, { LinkAdvancedData } from '@/Pages/Links/partials/LinkAdvancedFields';
 import { AbVariant, DeviceRule, GeoRule, LanguageRule } from '@/Pages/Links/partials/TargetingSection';
+import { Badge, Button, Field, FormSection, Input, Select } from '@/Components/ui';
+import { useTranslation } from '@/lib/i18n';
 import { PixelOption } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ChevronDown, Loader2 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import QrContentForm from './QrContentForm';
 import QrPreview from './QrPreview';
 import QrStyleForm from './QrStyleForm';
+import QrTemplatePanel from './QrTemplatePanel';
 
 export interface QrFormData {
   name: string;
@@ -17,8 +20,7 @@ export interface QrFormData {
   slug: string;
   content: Record<string, string>;
   style: QrStyle;
-  url_id?: string; // attach mode: back this QR with an existing link instead of creating one
-  // Backing-link settings (dynamic QRs only)
+  url_id?: string;
   status: string;
   password: string;
   expired_at: string;
@@ -40,17 +42,16 @@ interface Props {
   cancelHref: string;
   onSubmit: FormEventHandler;
   domains: Domain[];
-  dynamicUrl?: string; // saved short-link URL (edit page)
-  attachLink?: { domainName: string; slug: string; target: string } | null; // attach mode
+  dynamicUrl?: string;
+  attachLink?: { domainName: string; slug: string; target: string } | null;
   pixels: PixelOption[];
   linkHasPassword?: boolean;
 }
 
-const inp = 'block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white';
-
 export default function QrEditor({
   data, setData, errors, processing, submitLabel, cancelHref, onSubmit, domains, dynamicUrl, attachLink, pixels, linkHasPassword,
 }: Props) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<'content' | 'style'>('content');
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -70,8 +71,6 @@ export default function QrEditor({
     setData('content', { ...first.defaultContent });
   }
 
-  // The QR encodes its short link for dynamic types. In attach mode the link
-  // is fixed; otherwise prefer the live domain+slug, then the saved URL (edit).
   const selectedDomain = domains.find(d => d.id === data.domain_id);
   const liveDynamicUrl = attachLink
     ? `https://${attachLink.domainName}/${attachLink.slug}`
@@ -84,129 +83,86 @@ export default function QrEditor({
   const hasBackingLink = !!attachLink || data.is_dynamic;
   const advancedDefaultUrl = attachLink ? attachLink.target : (data.content.url || '');
 
+  const segBtn = (active: boolean) =>
+    `flex-1 rounded-md py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+      active ? 'bg-surface text-foreground shadow-[var(--shadow-sm)]' : 'text-muted hover:text-foreground'
+    }`;
+
   return (
     <form onSubmit={onSubmit}>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         {/* ── Left: configuration ── */}
-        <div className="space-y-5">
-
+        <div className="space-y-4">
           {/* Name */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              QR Code name
-            </label>
-            <input type="text" value={data.name} onChange={e => setData('name', e.target.value)}
-              placeholder="e.g. Website QR" className={inp} />
-            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-          </div>
+          <FormSection>
+            <Field label={t('qr.editor.name')} htmlFor="qr-name" error={errors.name}>
+              <Input id="qr-name" type="text" value={data.name} onChange={e => setData('name', e.target.value)} placeholder={t('qr.editor.name_placeholder')} />
+            </Field>
+          </FormSection>
 
           {attachLink ? (
-            /* Attach mode: the backing link is fixed and read-only. */
-            <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <h3 className="mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Tracking link</h3>
-              <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">
-                This QR is attached to an existing short link, so every scan is tracked on that link's statistics.
-              </p>
-              <p className="font-mono text-sm text-indigo-600 dark:text-indigo-400">
-                https://{attachLink.domainName}/{attachLink.slug}
-              </p>
-              <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">
-                Destination: {attachLink.target}
-              </p>
-              {errors.url_id && <p className="mt-2 text-xs text-red-600">{errors.url_id}</p>}
-            </div>
+            <FormSection title={t('qr.editor.tracking_link')} description={t('qr.editor.tracking_link_attached_desc')}>
+              <p className="font-mono text-sm text-accent-soft-foreground">https://{attachLink.domainName}/{attachLink.slug}</p>
+              <p className="truncate text-xs text-muted">{t('qr.editor.destination')} {attachLink.target}</p>
+              {errors.url_id && <p className="text-xs text-danger-foreground">{errors.url_id}</p>}
+            </FormSection>
           ) : (
             <>
-              {/* Static / Dynamic toggle */}
-              <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-                <div className="mb-4 flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm dark:border-slate-700 dark:bg-slate-800">
+              <FormSection>
+                <div className="flex gap-1 rounded-[var(--radius-sm)] border border-line bg-elevated p-1">
                   {[false, true].map(dyn => (
-                    <button key={String(dyn)} type="button" onClick={() => toggleDynamic(dyn)}
-                      className={`flex-1 rounded-md py-1.5 transition-colors ${
-                        data.is_dynamic === dyn
-                          ? 'bg-white font-semibold text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                          : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-                      }`}>
-                      {dyn ? 'Dynamic QR' : 'Static QR'}
+                    <button key={String(dyn)} type="button" onClick={() => toggleDynamic(dyn)} className={segBtn(data.is_dynamic === dyn)}>
+                      {dyn ? t('qr.editor.dynamic') : t('qr.editor.static')}
                     </button>
                   ))}
                 </div>
-
-                {/* Type grid */}
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {typeList.map(t => {
-                    const trackable = qrTypeTrackable(t, data.is_dynamic);
+                  {typeList.map(ty => {
+                    const trackable = qrTypeTrackable(ty, data.is_dynamic);
+                    const active = data.type === ty.value;
                     return (
-                      <button key={t.value} type="button" onClick={() => changeType(t.value)}
-                        className={`relative flex flex-col items-center gap-1.5 rounded-lg border px-2 py-3 text-xs transition-colors ${
-                          data.type === t.value
-                            ? 'border-indigo-500 bg-indigo-50 font-semibold text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/20 dark:text-indigo-300'
-                            : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:text-slate-400'
+                      <button key={ty.value} type="button" onClick={() => changeType(ty.value)}
+                        className={`flex flex-col items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-3 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                          active ? 'border-accent bg-accent-soft font-semibold text-accent-soft-foreground' : 'border-line text-muted hover:border-line-strong'
                         }`}>
-                        <span className="text-xl leading-none">{t.icon}</span>
-                        {t.label}
-                        <span className={`mt-0.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                          trackable
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-                        }`}>
-                          {trackable ? 'Trackable' : 'Not tracked'}
-                        </span>
+                        <span className="text-xl leading-none">{ty.icon}</span>
+                        {ty.label}
+                        <Badge variant={trackable ? 'success' : 'neutral'}>{trackable ? t('qr.editor.trackable') : t('qr.editor.not_tracked')}</Badge>
                       </button>
                     );
                   })}
                 </div>
-              </div>
+              </FormSection>
 
-              {/* Backing short link (dynamic only) */}
               {data.is_dynamic && (
-                <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-                  <h3 className="mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Tracking link</h3>
-                  <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">
-                    This QR encodes a short link, so every scan is tracked (location, device, referrer).
-                  </p>
+                <FormSection title={t('qr.editor.tracking_link')} description={t('qr.editor.tracking_link_desc')}>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Domain</label>
-                      <select value={data.domain_id} onChange={e => setData('domain_id', e.target.value)}
-                        className={inp}>
-                        <option value="">Select a domain…</option>
+                    <Field label={t('qr.editor.domain')} htmlFor="qr-domain" error={errors.domain_id}>
+                      <Select id="qr-domain" value={data.domain_id} onChange={e => setData('domain_id', e.target.value)}>
+                        <option value="">{t('qr.editor.domain_select')}</option>
                         {domains.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                      </select>
-                      {errors.domain_id && <p className="mt-1 text-xs text-red-600">{errors.domain_id}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Slug</label>
-                      <input type="text" value={data.slug} onChange={e => setData('slug', e.target.value)}
-                        placeholder="promo" className={inp} />
-                      {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug}</p>}
-                    </div>
+                      </Select>
+                    </Field>
+                    <Field label={t('qr.editor.slug')} htmlFor="qr-slug" error={errors.slug}>
+                      <Input id="qr-slug" type="text" value={data.slug} onChange={e => setData('slug', e.target.value)} placeholder={t('qr.editor.slug_placeholder')} />
+                    </Field>
                   </div>
-                  {liveDynamicUrl && (
-                    <p className="mt-3 font-mono text-xs text-indigo-600 dark:text-indigo-400">{liveDynamicUrl}</p>
-                  )}
-                </div>
+                  {liveDynamicUrl && <p className="font-mono text-xs text-accent-soft-foreground">{liveDynamicUrl}</p>}
+                </FormSection>
               )}
             </>
           )}
 
           {hasBackingLink && (
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-              <button
-                type="button"
-                onClick={() => setAdvancedOpen((o) => !o)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left"
-              >
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Advanced link settings</span>
-                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
+            <div className="rounded-[var(--radius)] border border-line bg-surface">
+              <button type="button" onClick={() => setAdvancedOpen(o => !o)} className="flex w-full items-center justify-between px-5 py-4 text-left">
+                <span className="text-sm font-semibold text-foreground">{t('qr.editor.advanced')}</span>
+                <ChevronDown className={`h-4 w-4 text-subtle transition-transform ${advancedOpen ? 'rotate-180' : ''}`} />
               </button>
               {advancedOpen && (
-                <div className="border-t border-slate-200 p-5 dark:border-slate-800">
+                <div className="border-t border-line p-5">
                   {attachLink && (
-                    <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                      These settings belong to a shared link. Changing them affects that link everywhere it is used.
-                    </p>
+                    <p className="mb-4 rounded-[var(--radius-sm)] bg-warning-soft px-3 py-2 text-xs text-warning-foreground">{t('qr.editor.advanced_shared_warning')}</p>
                   )}
                   <LinkAdvancedFields
                     data={data}
@@ -221,58 +177,52 @@ export default function QrEditor({
             </div>
           )}
 
-          {/* Content / Style — attach mode shows style only (destination is the existing link) */}
+          {/* Content / Style */}
           {attachLink ? (
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-              <div className="border-b border-slate-200 px-5 py-3 dark:border-slate-800">
-                <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">Style</h3>
+            <div className="rounded-[var(--radius)] border border-line bg-surface">
+              <div className="border-b border-line px-5 py-3">
+                <h3 className="text-sm font-semibold text-foreground">{t('qr.editor.style')}</h3>
               </div>
               <div className="p-5">
                 <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
+                <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
               </div>
             </div>
           ) : (
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex border-b border-slate-200 dark:border-slate-800">
-                {(['content', 'style'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setTab(t)}
-                    className={`flex-1 py-3 text-sm font-medium capitalize transition-colors ${
-                      tab === t
-                        ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-                    }`}>{t}</button>
+            <div className="rounded-[var(--radius)] border border-line bg-surface">
+              <div className="flex border-b border-line">
+                {([['content', t('qr.editor.tab_content')], ['style', t('qr.editor.tab_style')]] as const).map(([key, label]) => (
+                  <button key={key} type="button" onClick={() => setTab(key)}
+                    className={`flex-1 border-b-2 py-3 text-sm font-semibold transition-colors -mb-px ${
+                      tab === key ? 'border-accent text-accent-soft-foreground' : 'border-transparent text-muted hover:text-foreground'
+                    }`}>{label}</button>
                 ))}
               </div>
               <div className="p-5">
-                {tab === 'content' ? (
-                  <QrContentForm type={data.type} content={data.content}
-                    onChange={c => setData('content', c)} />
-                ) : (
-                  <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
-                )}
+                {tab === 'content'
+                  ? <QrContentForm type={data.type} content={data.content} onChange={c => setData('content', c)} />
+                  : (
+                    <>
+                      <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
+                      <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
+                    </>
+                  )}
               </div>
             </div>
           )}
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={processing}
-              className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60">
-              {processing && <Loader2 className="h-4 w-4 animate-spin" />}
-              {submitLabel}
-            </button>
-            <Link href={cancelHref} className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400">
-              Cancel
-            </Link>
+            <Button type="submit" loading={processing}>{submitLabel}</Button>
+            <Link href={cancelHref} className="text-sm text-muted transition-colors hover:text-foreground">{t('common.actions.cancel')}</Link>
           </div>
         </div>
 
         {/* ── Right: sticky preview ── */}
         <div className="lg:sticky lg:top-8 lg:self-start">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-            <h2 className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-300">Preview</h2>
+          <FormSection title={t('qr.editor.preview')}>
             <QrPreview data={qrContent} style={data.style} name={data.name || 'qr-code'} />
-          </div>
+          </FormSection>
         </div>
       </div>
     </form>

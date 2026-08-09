@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Domains',
+    'subtitle' => 'Manage custom domains for this project',
+    'create' => 'Add domain',
+    'empty' => 'No domains yet',
+    'empty_hint' => 'Add a custom domain to start using it for your links.',
+    'columns' => [
+        'domain' => 'Domain',
+        'root_redirect' => 'Root redirect',
+        'not_found_redirect' => '404 redirect',
+        'status' => 'Status',
+    ],
+    'status' => [
+        'dns' => 'DNS',
+        'reachable' => 'Reachable',
+        'ssl' => 'SSL',
+    ],
+    'never_checked' => 'Never checked',
+    'actions' => [
+        'check' => 'Check status',
+    ],
+    'delete' => [
+        'title' => 'Delete domain?',
+        'confirm' => 'Delete ":name"? This cannot be undone.',
+    ],
+    'form' => [
+        'back' => 'Back to domains',
+        'add_title' => 'Add domain',
+        'edit_title' => 'Edit',
+        'edit_page_title' => 'Edit domain',
+        'name' => 'Domain name',
+        'name_placeholder' => 'links.example.com',
+        'root_redirect' => 'Root redirect',
+        'root_redirect_hint' => 'Where to redirect visitors who hit the bare domain with no slug.',
+        'root_redirect_placeholder' => 'https://example.com',
+        'not_found_redirect' => '404 redirect',
+        'not_found_redirect_hint' => 'Where to redirect visitors when a slug is not found.',
+        'not_found_redirect_placeholder' => 'https://example.com/404',
+        'create_submit' => 'Create domain',
+        'save_submit' => 'Save changes',
+        'status_title' => 'Domain status',
+        'check_now' => 'Check now',
+        'resolves_to' => 'Resolves to:',
+        'ssl_error' => 'SSL:',
+        'reachable_error' => 'Reachable:',
+        'last_checked' => 'Last checked:',
+        'dns' => [
+            'title' => 'Connect your domain',
+            'instruction' => 'At your DNS provider, point your domain to us with a CNAME record:',
+            'copy' => 'Copy',
+            'copied' => 'Copied',
+            'ssl_note' => 'Once DNS propagates we automatically issue an SSL certificate — this can take a few minutes.',
+        ],
+    ],
+];

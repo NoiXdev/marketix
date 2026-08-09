@@ -1,8 +1,10 @@
-import { QrIcon, QR_ICONS, iconToDataUrl } from '@/data/qrIcons';
+import { Button } from '@/Components/ui';
 import { QrStyle } from '@/data/qrTypes';
+import { useTranslation } from '@/lib/i18n';
+import { downloadBlob, toPdfBlob, toPngBlob, toSvgBlob } from '@/lib/qr/export';
+import { renderQr } from '@/lib/qr/render';
 import { Download } from 'lucide-react';
-import QRCodeStyling from 'qr-code-styling';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface Props {
   data: string;
@@ -10,95 +12,62 @@ interface Props {
   name?: string;
 }
 
-function getLogoUrl(style: QrStyle): string | undefined {
-  if (style.logo_type === 'custom' && style.logo_data) return style.logo_data;
-  if (style.logo_type === 'predefined' && style.logo_name) {
-    const icon = QR_ICONS.find((i: QrIcon) => i.id === style.logo_name);
-    if (icon) return iconToDataUrl(icon);
-  }
-  return undefined;
-}
-
-// A stable key that represents which logo is active — used to detect image changes
-function logoKey(style: QrStyle): string {
-  return `${style.logo_type}::${style.logo_name}::${style.logo_data?.slice(0, 32) ?? ''}`;
-}
-
-function buildOptions(data: string, style: QrStyle): ConstructorParameters<typeof QRCodeStyling>[0] {
-  const logoUrl = getLogoUrl(style);
-  return {
-    width: 280,
-    height: 280,
-    type: 'canvas' as const,
-    data: data || 'https://marketix.app',
-    dotsOptions:          { color: style.foreground, type: style.dot_style as any },
-    cornersSquareOptions: { color: style.foreground, type: style.corner_square_style as any },
-    cornersDotOptions:    { color: style.foreground, type: style.corner_dot_style as any },
-    backgroundOptions:    { color: style.background },
-    ...(logoUrl
-      ? { image: logoUrl, imageOptions: { crossOrigin: 'anonymous' as const, margin: 4, imageSize: style.logo_size / 100 } }
-      : { image: '', imageOptions: { imageSize: 0 } }),
-  };
-}
-
-function initQr(container: HTMLDivElement, data: string, style: QrStyle): QRCodeStyling {
-  container.innerHTML = '';
-  const qr = new QRCodeStyling(buildOptions(data, style));
-  qr.append(container);
-  return qr;
-}
+const DEBOUNCE_MS = 150;
 
 export default function QrPreview({ data, style, name = 'qr-code' }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const qrRef        = useRef<QRCodeStyling | null>(null);
-  const prevLogoKey  = useRef<string>('');
+  const { t } = useTranslation();
 
-  // Mount
+  // Recomputed immediately so the very first paint has content, then kept in
+  // sync with `data`/`style` via a short debounce so slider drags stay smooth.
+  const immediate = useMemo(() => renderQr(data, style), [data, style]);
+  const [result, setResult] = useState(immediate);
+
   useEffect(() => {
-    if (!containerRef.current) return;
-    prevLogoKey.current = logoKey(style);
-    qrRef.current = initQr(containerRef.current, data, style);
-    return () => {
-      if (containerRef.current) containerRef.current.innerHTML = '';
-      qrRef.current = null;
-    };
-  }, []);
+    const id = window.setTimeout(() => setResult(immediate), DEBOUNCE_MS);
+    return () => window.clearTimeout(id);
+  }, [immediate]);
 
-  // Update whenever data or style changes
-  useEffect(() => {
-    if (!qrRef.current || !containerRef.current) return;
+  const { svg, width, height } = result;
 
-    const key = logoKey(style);
-    if (key !== prevLogoKey.current) {
-      // qr-code-styling's update() doesn't apply image changes reliably —
-      // destroy and recreate the instance when the logo changes.
-      prevLogoKey.current = key;
-      qrRef.current = initQr(containerRef.current, data, style);
-    } else {
-      qrRef.current.update(buildOptions(data, style));
+  function downloadSvg() {
+    downloadBlob(toSvgBlob(svg), `${name}.svg`);
+  }
+
+  async function downloadPng() {
+    try {
+      const blob = await toPngBlob(svg, width, height, 8);
+      downloadBlob(blob, `${name}.png`);
+    } catch (e) {
+      console.error(e);
     }
-  }, [data, style]);
+  }
 
-  function download(ext: 'png' | 'svg') {
-    qrRef.current?.download({ name, extension: ext });
+  async function downloadPdf() {
+    try {
+      const blob = await toPdfBlob(svg, width, height);
+      downloadBlob(blob, `${name}.pdf`);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div
-        ref={containerRef}
-        className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700"
+        className="w-[280px] max-w-full overflow-hidden rounded-[12px] border border-line [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
         style={{ background: style.background }}
+        dangerouslySetInnerHTML={{ __html: svg }}
       />
       <div className="flex gap-2">
-        <button type="button" onClick={() => download('png')}
-          className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
-          <Download className="h-3.5 w-3.5" /> PNG
-        </button>
-        <button type="button" onClick={() => download('svg')}
-          className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
-          <Download className="h-3.5 w-3.5" /> SVG
-        </button>
+        <Button type="button" variant="secondary" size="sm" onClick={downloadPng}>
+          <Download className="h-3.5 w-3.5" /> {t('qr.export.png')}
+        </Button>
+        <Button type="button" variant="secondary" size="sm" onClick={downloadSvg}>
+          <Download className="h-3.5 w-3.5" /> {t('qr.export.svg')}
+        </Button>
+        <Button type="button" variant="secondary" size="sm" onClick={downloadPdf}>
+          <Download className="h-3.5 w-3.5" /> {t('qr.export.pdf')}
+        </Button>
       </div>
     </div>
   );

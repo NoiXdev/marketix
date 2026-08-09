@@ -182,4 +182,23 @@ class StatisticsAggregator
             ->limit($limit)
             ->get(['id', 'country', 'city', 'browser', 'os', 'domain', 'created_at']);
     }
+
+    /**
+     * The top-clicked links within a window, ranked by click count desc.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function topLinks(string $projectId, Carbon|CarbonImmutable $since, Carbon|CarbonImmutable $until, int $limit = 5): Collection
+    {
+        return Statistic::where('statistics.project_id', $projectId)
+            ->where('statistics.is_bot', false)
+            ->whereBetween('statistics.created_at', [$since, $until])
+            ->join('urls', 'statistics.url_id', '=', 'urls.id')
+            ->join('domains', 'urls.domain_id', '=', 'domains.id')
+            ->select('urls.id', 'urls.slug', 'domains.name as domain_name', DB::raw('COUNT(*) as clicks'))
+            ->groupBy('urls.id', 'urls.slug', 'domains.name')
+            ->orderByDesc('clicks')
+            ->limit($limit)
+            ->get();
+    }
 }

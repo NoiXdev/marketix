@@ -42,6 +42,26 @@ export interface Pixel {
 
 export type PixelOption = Pick<Pixel, 'id' | 'name' | 'provider'>;
 
+export interface Site {
+  id: string;
+  name: string;
+  domain: string;
+  tracking_id: string;
+  tracking_mode: string;
+  consent_mode: string;
+  consent_signal?: string | null;
+  respect_dnt?: boolean;
+  retention_days?: number | null;
+  created_at?: string;
+}
+
+export interface Goal {
+  id: string;
+  name: string;
+  type: string;
+  match_value: string;
+}
+
 export type ProjectRole = 'admin' | 'member';
 
 export interface ProjectMember {
@@ -93,8 +113,10 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     success?: string;
     error?: string;
     warning?: string;
+    token?: string;
   };
   locale: string;
   availableLocales: { code: string; label: string }[];
   translations: Record<string, unknown>;
+  navCounts?: Record<string, number>;
 };

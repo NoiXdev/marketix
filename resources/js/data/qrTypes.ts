@@ -93,31 +93,67 @@ export function buildQrContent(
   }
 }
 
-export type DotStyle           = 'square' | 'dots' | 'rounded' | 'classy' | 'classy-rounded' | 'extra-rounded';
-export type CornerSquareStyle  = 'square' | 'dot' | 'extra-rounded';
-export type CornerDotStyle     = 'square' | 'dot';
 export type LogoType           = 'none' | 'predefined' | 'custom';
+
+export type QrEcc = 'L' | 'M' | 'Q' | 'H';
+export interface QrGradient {
+  type: 'linear' | 'radial';
+  rotation: number;                               // degrees (linear)
+  stops: { offset: number; color: string }[];     // ≥2, offsets 0..1
+}
+export type ModuleMode   = 'square' | 'dots' | 'rounded' | 'classy';
+export type EyeFrameMode  = 'square' | 'rounded' | 'dots';
+export type EyeBallMode   = 'square' | 'rounded' | 'dot';
+export type FrameStyle    = 'none' | 'simple' | 'rounded' | 'badge-bottom';
 
 export interface QrStyle {
   foreground:           string;
   background:           string;
-  dot_style:            DotStyle;
-  corner_square_style:  CornerSquareStyle;
-  corner_dot_style:     CornerDotStyle;
   logo_type:            LogoType;
   logo_name:            string;
   logo_data:            string;
   logo_size:            number;
+  module_mode: ModuleMode;
+  module_rounding: number;        // 0..1
+  eye_frame_mode: EyeFrameMode;
+  eye_frame_rounding: number;     // 0..1
+  eye_ball_mode: EyeBallMode;
+  eye_ball_rounding: number;      // 0..1
+  eye_color?: string;             // default = foreground
+  eye_gradient?: QrGradient;
+  fg_gradient?: QrGradient;
+  bg_gradient?: QrGradient;
+  error_correction: QrEcc;
+  quiet_zone: number;             // modules
+  logo_margin: number;            // modules
+  logo_clear_modules: boolean;
+  frame_style: FrameStyle;
+  frame_text: string;
+  frame_text_color: string;
+  frame_color: string;
+  frame_background: string;
 }
 
 export const DEFAULT_STYLE: QrStyle = {
   foreground:           '#000000',
   background:           '#ffffff',
-  dot_style:            'square',
-  corner_square_style:  'square',
-  corner_dot_style:     'square',
   logo_type:            'none',
   logo_name:            '',
   logo_data:            '',
   logo_size:            30,
+  module_mode: 'square',
+  module_rounding: 0,
+  eye_frame_mode: 'square',
+  eye_frame_rounding: 0,
+  eye_ball_mode: 'square',
+  eye_ball_rounding: 0,
+  error_correction: 'Q',
+  quiet_zone: 4,
+  logo_margin: 2,
+  logo_clear_modules: true,
+  frame_style: 'none',
+  frame_text: '',
+  frame_text_color: '#000000',
+  frame_color: '#000000',
+  frame_background: '#ffffff',
 };

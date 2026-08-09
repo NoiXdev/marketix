@@ -13,6 +13,7 @@
         "jaybizzle/crawler-detect": "^1.4",
         "laravel/framework": "^13.0",
         "laravel/horizon": "^5.47",
+        "laravel/mcp": "^0.9.1",
         "laravel/octane": "^2.17",
         "laravel/passkeys": "^0.2.1",
         "laravel/sanctum": "^4.0",

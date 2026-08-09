@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Domeinen',
+    'subtitle' => 'Beheer aangepaste domeinen voor dit project',
+    'create' => 'Domein toevoegen',
+    'empty' => 'Nog geen domeinen',
+    'empty_hint' => 'Voeg een aangepast domein toe om het voor je links te gebruiken.',
+    'columns' => [
+        'domain' => 'Domein',
+        'root_redirect' => 'Root-omleiding',
+        'not_found_redirect' => '404-omleiding',
+        'status' => 'Status',
+    ],
+    'status' => [
+        'dns' => 'DNS',
+        'reachable' => 'Bereikbaar',
+        'ssl' => 'SSL',
+    ],
+    'never_checked' => 'Nooit gecontroleerd',
+    'actions' => [
+        'check' => 'Status controleren',
+    ],
+    'delete' => [
+        'title' => 'Domein verwijderen?',
+        'confirm' => '":name" verwijderen? Dit kan niet ongedaan worden gemaakt.',
+    ],
+    'form' => [
+        'back' => 'Terug naar domeinen',
+        'add_title' => 'Domein toevoegen',
+        'edit_title' => 'Bewerken',
+        'edit_page_title' => 'Domein bewerken',
+        'name' => 'Domeinnaam',
+        'name_placeholder' => 'links.voorbeeld.nl',
+        'root_redirect' => 'Root-omleiding',
+        'root_redirect_hint' => 'Waarheen bezoekers worden omgeleid die het kale domein zonder slug openen.',
+        'root_redirect_placeholder' => 'https://voorbeeld.nl',
+        'not_found_redirect' => '404-omleiding',
+        'not_found_redirect_hint' => 'Waarheen bezoekers worden omgeleid wanneer een slug niet wordt gevonden.',
+        'not_found_redirect_placeholder' => 'https://voorbeeld.nl/404',
+        'create_submit' => 'Domein aanmaken',
+        'save_submit' => 'Wijzigingen opslaan',
+        'status_title' => 'Domeinstatus',
+        'check_now' => 'Nu controleren',
+        'resolves_to' => 'Verwijst naar:',
+        'ssl_error' => 'SSL:',
+        'reachable_error' => 'Bereikbaar:',
+        'last_checked' => 'Laatst gecontroleerd:',
+        'dns' => [
+            'title' => 'Je domein verbinden',
+            'instruction' => 'Wijs je domein bij je DNS-provider naar ons met een CNAME-record:',
+            'copy' => 'Kopiëren',
+            'copied' => 'Gekopieerd',
+            'ssl_note' => 'Zodra DNS is doorgevoerd, geven we automatisch een SSL-certificaat uit — dit kan enkele minuten duren.',
+        ],
+    ],
+];

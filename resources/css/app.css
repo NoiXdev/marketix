@@ -3,3 +3,42 @@
 @plugin '@tailwindcss/forms';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --canvas:#f4f6f8; --surface:#ffffff; --elevated:#eef1f5; --line:#e2e6ec; --line-strong:#d3d9e2;
+  --foreground:#1b1f27; --muted:#626c7d; --subtle:#8a94a4;
+  --accent:#0d9488; --accent-hover:#0f766e; --accent-foreground:#ffffff;
+  --accent-soft:#dcf3ef; --accent-soft-foreground:#0f6d63; --accent-ring:rgba(13,148,136,.26);
+  --success-soft:#e6f5ec; --success-foreground:#1a7a43; --success-dot:#23a35a;
+  --warning-soft:#fbf1df; --warning-foreground:#96650f; --warning-dot:#cf8a1a;
+  --danger-soft:#fceceb;  --danger-foreground:#b23029;  --danger-dot:#d64137;
+  --neutral-soft:#eceff3;  --neutral-foreground:#4a5568;  --neutral-dot:#8a94a4;
+  --radius:10px; --radius-sm:7px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.06);
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+}
+
+.dark {
+  --canvas:#14161b; --surface:#1b1e25; --elevated:#22262f; --line:#2b303a; --line-strong:#363c48;
+  --foreground:#e7eaf0; --muted:#9aa3b2; --subtle:#6c7688;
+  --accent:#3fc9b8; --accent-hover:#57d3c3; --accent-foreground:#04140f;
+  --accent-soft:rgba(63,201,184,.15); --accent-soft-foreground:#8fe3d7; --accent-ring:rgba(63,201,184,.40);
+  --success-soft:rgba(41,163,90,.16); --success-foreground:#74d39c; --success-dot:#35b46b;
+  --warning-soft:rgba(207,138,26,.17); --warning-foreground:#e7b25e; --warning-dot:#d79a35;
+  --danger-soft:rgba(214,65,55,.17);  --danger-foreground:#ef9a94;  --danger-dot:#e0574d;
+  --neutral-soft:rgba(138,148,164,.15); --neutral-foreground:#aab3c1; --neutral-dot:#7d8798;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 24px rgba(0,0,0,.35);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+}
+
+@theme inline {
+  --color-canvas:var(--canvas); --color-surface:var(--surface); --color-elevated:var(--elevated);
+  --color-line:var(--line); --color-line-strong:var(--line-strong);
+  --color-foreground:var(--foreground); --color-muted:var(--muted); --color-subtle:var(--subtle);
+  --color-accent:var(--accent); --color-accent-hover:var(--accent-hover); --color-accent-foreground:var(--accent-foreground);
+  --color-accent-soft:var(--accent-soft); --color-accent-soft-foreground:var(--accent-soft-foreground);
+  --color-success-soft:var(--success-soft); --color-success-foreground:var(--success-foreground);
+  --color-warning-soft:var(--warning-soft); --color-warning-foreground:var(--warning-foreground);
+  --color-danger-soft:var(--danger-soft);   --color-danger-foreground:var(--danger-foreground);
+  --color-neutral-soft:var(--neutral-soft); --color-neutral-foreground:var(--neutral-foreground);
+}

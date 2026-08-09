@@ -1,3 +1,4 @@
+import { Button, Checkbox, Field, Input } from '@/Components/ui';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useTranslation } from '@/lib/i18n';
 import { Head, Link, router, useForm } from '@inertiajs/react';
@@ -26,79 +27,52 @@ export default function Login({ status }: { status?: string }) {
     <GuestLayout title={t('auth.login.title')} description={t('auth.login.description')}>
       <Head title={t('auth.login.head')} />
 
-      {status && <div className="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">{status}</div>}
+      {status && <div className="mb-4 rounded-[var(--radius-sm)] bg-success-soft px-4 py-3 text-sm text-success-foreground">{status}</div>}
 
-      <form onSubmit={submit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('auth.login.email')}
-          </label>
-          <input
+      <form onSubmit={submit} className="space-y-5">
+        <Field label={t('auth.login.email')} htmlFor="email" error={errors.email}>
+          <Input
             id="email"
             type="email"
             autoComplete="email"
             value={data.email}
             onChange={(e) => setData('email', e.target.value)}
-            className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
             placeholder="you@example.com"
           />
-          {errors.email && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>}
-        </div>
+        </Field>
 
-        <div>
-          <div className="flex items-center justify-between">
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              {t('auth.login.password')}
-            </label>
-            <Link href={route('app.auth.show-forgot')} className="text-xs text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-              {t('auth.login.forgot')}
-            </Link>
-          </div>
-          <input
+        <Field label={t('auth.login.password')} htmlFor="password" error={errors.password}>
+          <Input
             id="password"
             type="password"
             autoComplete="current-password"
             value={data.password}
             onChange={(e) => setData('password', e.target.value)}
-            className="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-white"
           />
-          {errors.password && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</p>}
-        </div>
+        </Field>
 
-        <div className="flex items-center gap-2">
-          <input
-            id="remember"
-            type="checkbox"
-            checked={data.remember}
-            onChange={(e) => setData('remember', e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-          />
-          <label htmlFor="remember" className="text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 text-sm text-muted">
+            <Checkbox checked={data.remember} onChange={(e) => setData('remember', e.target.checked)} />
             {t('auth.login.remember')}
           </label>
+          <Link href={route('app.auth.show-forgot')} className="text-sm font-semibold text-accent-soft-foreground hover:underline">
+            {t('auth.login.forgot')}
+          </Link>
         </div>
 
-        <button
-          type="submit"
-          disabled={processing}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:opacity-60"
-        >
+        <Button type="submit" disabled={processing} className="w-full justify-center py-2.5">
           {processing && <Loader2 className="h-4 w-4 animate-spin" />}
           {t('auth.login.submit')}
-        </button>
+        </Button>
       </form>
 
       {passkey.isSupported && (
         <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => void passkey.verify()}
-            disabled={passkey.isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
+          <Button type="button" variant="secondary" onClick={() => void passkey.verify()} disabled={passkey.isLoading} className="w-full justify-center">
             {t('auth.login.passkey')}
-          </button>
-          {passkey.error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{passkey.error}</p>}
+          </Button>
+          {passkey.error && <p className="mt-1 text-xs text-danger-foreground">{passkey.error}</p>}
         </div>
       )}
     </GuestLayout>

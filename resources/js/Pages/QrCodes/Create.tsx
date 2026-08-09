@@ -1,8 +1,9 @@
+import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { DEFAULT_STYLE, DYNAMIC_TYPES } from '@/data/qrTypes';
+import { useTranslation } from '@/lib/i18n';
 import { PageProps, PixelOption } from '@/types';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { useForm, usePage } from '@inertiajs/react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
 interface Domain { id: string; name: string }
@@ -22,6 +23,7 @@ export default function QrCodesCreate({
   pixels: PixelOption[];
 }) {
   const { project } = usePage<PageProps>().props;
+  const { t } = useTranslation();
   const first = DYNAMIC_TYPES[0];
 
   const { data, setData, post, processing, errors } = useForm<QrFormData>({
@@ -43,24 +45,21 @@ export default function QrCodesCreate({
     pixel_ids:          attachUrl?.pixel_ids ?? [],
   });
 
-  const title = attachUrl ? 'Create QR code for link' : 'Create QR code';
+  const title = attachUrl ? t('qr.editor.create_for_link_title') : t('qr.editor.create_title');
 
   return (
     <AppLayout title={title}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <Link href={route('app.project.qrcodes.index', { project: project!.id })}
-            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
-            <ArrowLeft className="h-4 w-4" /> Back to QR codes
-          </Link>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">{title}</h1>
+          <BackLink href={route('app.project.qrcodes.index', { project: project!.id })}>{t('qr.editor.back')}</BackLink>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{title}</h1>
         </div>
         <QrEditor
           data={data}
           setData={setData}
           errors={errors as Record<string, string>}
           processing={processing}
-          submitLabel="Create QR code"
+          submitLabel={t('qr.editor.create_submit')}
           cancelHref={route('app.project.qrcodes.index', { project: project!.id })}
           domains={domains}
           attachLink={attachUrl ? { domainName: attachUrl.domain_name ?? '', slug: attachUrl.slug, target: attachUrl.target } : null}

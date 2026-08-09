@@ -32,11 +32,13 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
                 'warning' => fn () => $request->session()->get('warning'),
+                'token' => fn () => $request->session()->get('token'),
             ],
             'branding' => $this->branding(),
             'locale' => App::getLocale(),
             'availableLocales' => Locales::all(),
             'translations' => fn () => Translations::forLocale(App::getLocale()),
+            'navCounts' => fn () => ($p = $request->get('project')) ? ['links' => $p->urls()->count()] : [],
         ];
     }
 

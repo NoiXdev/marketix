@@ -1,0 +1,57 @@
+<?php
+
+return [
+    'title' => 'Domaines',
+    'subtitle' => 'Gérez les domaines personnalisés de ce projet',
+    'create' => 'Ajouter un domaine',
+    'empty' => 'Aucun domaine',
+    'empty_hint' => "Ajoutez un domaine personnalisé pour l'utiliser avec vos liens.",
+    'columns' => [
+        'domain' => 'Domaine',
+        'root_redirect' => 'Redirection racine',
+        'not_found_redirect' => 'Redirection 404',
+        'status' => 'Statut',
+    ],
+    'status' => [
+        'dns' => 'DNS',
+        'reachable' => 'Accessible',
+        'ssl' => 'SSL',
+    ],
+    'never_checked' => 'Jamais vérifié',
+    'actions' => [
+        'check' => 'Vérifier le statut',
+    ],
+    'delete' => [
+        'title' => 'Supprimer le domaine ?',
+        'confirm' => 'Supprimer « :name » ? Cette action est irréversible.',
+    ],
+    'form' => [
+        'back' => 'Retour aux domaines',
+        'add_title' => 'Ajouter un domaine',
+        'edit_title' => 'Modifier',
+        'edit_page_title' => 'Modifier le domaine',
+        'name' => 'Nom de domaine',
+        'name_placeholder' => 'links.exemple.com',
+        'root_redirect' => 'Redirection racine',
+        'root_redirect_hint' => 'Où rediriger les visiteurs qui accèdent au domaine nu sans slug.',
+        'root_redirect_placeholder' => 'https://exemple.com',
+        'not_found_redirect' => 'Redirection 404',
+        'not_found_redirect_hint' => 'Où rediriger les visiteurs lorsqu\'un slug est introuvable.',
+        'not_found_redirect_placeholder' => 'https://exemple.com/404',
+        'create_submit' => 'Créer le domaine',
+        'save_submit' => 'Enregistrer les modifications',
+        'status_title' => 'Statut du domaine',
+        'check_now' => 'Vérifier maintenant',
+        'resolves_to' => 'Résout vers :',
+        'ssl_error' => 'SSL :',
+        'reachable_error' => 'Accessible :',
+        'last_checked' => 'Dernière vérification :',
+        'dns' => [
+            'title' => 'Connecter votre domaine',
+            'instruction' => 'Chez votre fournisseur DNS, pointez votre domaine vers nous avec un enregistrement CNAME :',
+            'copy' => 'Copier',
+            'copied' => 'Copié',
+            'ssl_note' => 'Une fois le DNS propagé, nous émettons automatiquement un certificat SSL — cela peut prendre quelques minutes.',
+        ],
+    ],
+];

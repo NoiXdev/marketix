@@ -23,9 +23,9 @@ export default function ThemeToggle() {
       onClick={cycle}
       title={`Theme: ${label} (click to change)`}
       aria-label={`Theme: ${label}. Click to change.`}
-      className="cursor-pointer rounded-lg border p-1 dark:bg-indigo-900 dark:hover:bg-indigo-700"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
     >
-      <Icon className="h-5 w-5 shrink-0 text-slate-400" />
+      <Icon className="h-[18px] w-[18px]" />
     </button>
   );
 }

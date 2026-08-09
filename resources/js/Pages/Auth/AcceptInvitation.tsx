@@ -1,5 +1,8 @@
+import { Button, Field, Input, LinkButton } from '@/Components/ui';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Link, useForm } from '@inertiajs/react';
+import { useTranslation } from '@/lib/i18n';
+import { useForm } from '@inertiajs/react';
+import { FormEvent } from 'react';
 
 interface Props {
   state: 'valid' | 'invalid' | 'wrong_user';
@@ -11,31 +14,36 @@ interface Props {
 }
 
 export default function AcceptInvitation({ state, token, email, projectName, needsAccount, authenticated }: Props) {
+  const { t } = useTranslation();
   const { data, setData, post, processing, errors } = useForm({
     name: '',
     password: '',
     password_confirmation: '',
   });
 
-  const inputClass = 'w-full rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white';
-
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault();
     post(route('app.invitations.accept', { token }));
   }
 
   if (state === 'invalid') {
     return (
-      <GuestLayout title="Invitation invalid" description="This invitation link is invalid or has expired.">
-        <Link href={route('app.auth.show-login')} className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Go to login</Link>
+      <GuestLayout
+        title={t('auth.invitation.invalid_title')}
+        description={t('auth.invitation.invalid_description')}
+      >
+        <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.go_to_login')}</LinkButton>
       </GuestLayout>
     );
   }
 
   if (state === 'wrong_user') {
     return (
-      <GuestLayout title="Wrong account" description={`This invitation is for ${email}. Log out and sign in with that email to accept it.`}>
-        <Link href={route('app.auth.show-login')} className="text-sm font-semibold text-indigo-600 hover:text-indigo-500">Go to login</Link>
+      <GuestLayout
+        title={t('auth.invitation.wrong_account_title')}
+        description={t('auth.invitation.wrong_account_description', { email: email ?? '' })}
+      >
+        <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.go_to_login')}</LinkButton>
       </GuestLayout>
     );
   }
@@ -43,8 +51,11 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
   // Existing user, not logged in → prompt login first.
   if (!needsAccount && !authenticated) {
     return (
-      <GuestLayout title="Accept invitation" description={`You've been invited to ${projectName}. Log in as ${email} to accept.`}>
-        <Link href={route('app.auth.show-login')} className="inline-flex rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Log in to accept</Link>
+      <GuestLayout
+        title={t('auth.invitation.title')}
+        description={t('auth.invitation.login_prompt', { project: projectName ?? '', email: email ?? '' })}
+      >
+        <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.login_cta')}</LinkButton>
       </GuestLayout>
     );
   }
@@ -52,9 +63,14 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
   // Logged-in existing user → one-click confirm.
   if (!needsAccount && authenticated) {
     return (
-      <GuestLayout title="Accept invitation" description={`Join ${projectName} as ${email}.`}>
+      <GuestLayout
+        title={t('auth.invitation.title')}
+        description={t('auth.invitation.confirm_prompt', { project: projectName ?? '', email: email ?? '' })}
+      >
         <form onSubmit={submit}>
-          <button disabled={processing} className="inline-flex rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Accept invitation</button>
+          <Button type="submit" loading={processing}>
+            {t('auth.invitation.accept_cta')}
+          </Button>
         </form>
       </GuestLayout>
     );
@@ -62,27 +78,40 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
 
   // New user → set name + password.
   return (
-    <GuestLayout title="Accept invitation" description={`Create your account to join ${projectName}.`}>
+    <GuestLayout
+      title={t('auth.invitation.title')}
+      description={t('auth.invitation.signup_prompt', { project: projectName ?? '' })}
+    >
       <form onSubmit={submit} className="space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
-          <input value={email} disabled className={`${inputClass} opacity-60`} />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
-          <input value={data.name} onChange={(e) => setData('name', e.target.value)} className={inputClass} />
-          {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-          <input type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} className={inputClass} />
-          {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Confirm password</label>
-          <input type="password" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} className={inputClass} />
-        </div>
-        <button disabled={processing} className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">Create account & join</button>
+        <Field label={t('auth.invitation.email_label')} htmlFor="email">
+          <Input id="email" value={email} disabled />
+        </Field>
+        <Field label={t('auth.invitation.name_label')} htmlFor="name" error={errors.name}>
+          <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
+        </Field>
+        <Field label={t('auth.invitation.password_label')} htmlFor="password" error={errors.password}>
+          <Input
+            id="password"
+            type="password"
+            value={data.password}
+            onChange={(e) => setData('password', e.target.value)}
+          />
+        </Field>
+        <Field
+          label={t('auth.invitation.confirm_password_label')}
+          htmlFor="password_confirmation"
+          error={errors.password_confirmation}
+        >
+          <Input
+            id="password_confirmation"
+            type="password"
+            value={data.password_confirmation}
+            onChange={(e) => setData('password_confirmation', e.target.value)}
+          />
+        </Field>
+        <Button type="submit" loading={processing} className="w-full justify-center">
+          {t('auth.invitation.submit')}
+        </Button>
       </form>
     </GuestLayout>
   );

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('marketix:geoip:update')->daily();
 Schedule::command('activitylog:clean')->daily();
 Schedule::command('statistics:prune')->daily();
+Schedule::command('analytics:prune')->daily();
+Schedule::command('reports:dispatch-due')->hourly()->withoutOverlapping();
 
 Schedule::call(function () {
     Domain::query()->each(fn (Domain $domain) => CheckDomainStatusJob::dispatch($domain));
