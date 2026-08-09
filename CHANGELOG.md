@@ -1,4 +1,11 @@
-## [2.0.0](https://github.com/NoiXdev/marketix/compare/v1.3.1...v) (2026-08-09)
+## [2.0.1](https://github.com/NoiXdev/marketix/compare/v2.0.0...v) (2026-08-09)
+
+
+### Bug Fixes
+
+* **docker:** install node + chromium + puppeteer for Browsershot PDF rendering ([4d2c439](https://github.com/NoiXdev/marketix/commit/4d2c4397b360c80afc47d51947e7467ec3af4378))
+
+## [2.0.0](https://github.com/NoiXdev/marketix/compare/v1.3.1...v2.0.0) (2026-08-09)
 
 
 ### Features
