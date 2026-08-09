@@ -38,6 +38,15 @@ RUN apt-get update \
         git \
         unzip \
         curl \
+        # Browsershot (spatie/laravel-pdf) renders report PDFs via a headless
+        # browser at runtime — it needs Node.js and a Chromium binary. Chromium
+        # lands at /usr/bin/chromium, matching config/laravel-pdf.php's default
+        # chrome_path. Fonts avoid tofu boxes in rendered PDFs.
+        chromium \
+        fonts-liberation \
+        fonts-noto-color-emoji \
+        nodejs \
+        npm \
     # linux-libc-dev (kernel headers) is pulled in as a build-time dependency
     # but is not needed at runtime. Purge it so the image isn't flagged for
     # kernel CVEs that don't apply to a PHP container (Trivy scan gate).
@@ -45,6 +54,13 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Browsershot resolves Puppeteer via `npm root -g`, so install it globally.
+# Skip Puppeteer's own Chromium download — we use the system chromium above
+# (config chrome_path=/usr/bin/chromium, no_sandbox=true).
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+RUN npm install -g puppeteer \
+    && npm cache clean --force
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
