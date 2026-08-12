@@ -95,6 +95,28 @@ export interface ActivityEntry {
   project?: { id: string; name: string } | null;
 }
 
+export type CrawlSummary = Record<string, number>;
+
+export interface CrawlListItem {
+  id: string;
+  start_url: string;
+  mode: string;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  pages_crawled: number;
+  created_at: string;
+}
+
+export interface CrawlPageRow {
+  id: string;
+  url: string;
+  status_code: number | null;
+  title: string | null;
+  is_indexable: boolean;
+  inlinks_count: number;
+  depth: number | null;
+  issues: string[];
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
