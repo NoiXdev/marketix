@@ -3,6 +3,7 @@
 namespace Tests\Feature\Crawler;
 
 use App\Crawler\SitemapReader;
+use App\Enums\CrawlStatus;
 use App\Jobs\AggregateCrawlJob;
 use App\Models\Crawl;
 use App\Models\CrawlLink;
@@ -50,5 +51,91 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertContains('duplicate_title', $about->issues); // both titled "Home"
         $this->assertSame('completed', $crawl->status->value);
         $this->assertArrayHasKey('duplicate_title', $crawl->summary);
+    }
+
+    public function test_depth_and_orphan_survive_start_url_redirect(): void
+    {
+        $this->fakeSitemap([]);
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com']);
+
+        $home = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com',
+            'final_url' => 'https://www.example.com/',
+            'title' => 'Home',
+            'is_indexable' => true,
+            'issues' => [],
+        ]);
+        $sub = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://www.example.com/sub',
+            'title' => 'Sub',
+            'is_indexable' => true,
+            'issues' => [],
+        ]);
+
+        CrawlLink::factory()->create([
+            'crawl_id' => $crawl->id,
+            'from_page_id' => $home->id,
+            'to_url' => 'https://www.example.com/sub',
+            'type' => 'internal',
+        ]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $home->refresh();
+        $sub->refresh();
+
+        $this->assertSame(1, $sub->depth);
+        $this->assertFalse($home->is_orphan);
+    }
+
+    public function test_depth_and_orphan_survive_when_recorded_url_only_matches_via_min_created_fallback(): void
+    {
+        // Reproduces the bug directly: the home page's recorded `url` itself does not
+        // normalize to the crawl's start_url (e.g. spatie recorded the post-redirect
+        // form), so the BFS seed can only be resolved via the "earliest created page"
+        // fallback rather than a direct url/final_url string match.
+        $this->fakeSitemap([]);
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com']);
+
+        $home = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://www.example.com/',
+            'title' => 'Home',
+            'is_indexable' => true,
+            'issues' => [],
+            'created_at' => now()->subMinute(),
+        ]);
+        $sub = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://www.example.com/sub',
+            'title' => 'Sub',
+            'is_indexable' => true,
+            'issues' => [],
+        ]);
+
+        CrawlLink::factory()->create([
+            'crawl_id' => $crawl->id,
+            'from_page_id' => $home->id,
+            'to_url' => 'https://www.example.com/sub',
+            'type' => 'internal',
+        ]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $home->refresh();
+        $sub->refresh();
+
+        $this->assertSame(1, $sub->depth);
+        $this->assertFalse($home->is_orphan);
+    }
+
+    public function test_failed_hook_marks_crawl_failed(): void
+    {
+        $crawl = Crawl::factory()->create(['status' => 'running']);
+
+        (new AggregateCrawlJob($crawl))->failed(new \RuntimeException('boom'));
+
+        $crawl->refresh();
+        $this->assertSame(CrawlStatus::Failed->value, $crawl->status->value);
+        $this->assertStringContainsString('boom', $crawl->error);
+        $this->assertNotNull($crawl->finished_at);
     }
 }
