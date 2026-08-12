@@ -29,14 +29,19 @@ enum IssueCode: string
     case MissingStructuredData = 'missing_structured_data';
     // sitemap
     case NotInSitemap = 'not_in_sitemap';
+    // resources (non-HTML files: images, media, …)
+    case LargeResource = 'large_resource';       // over the "getting big" threshold
+    case OversizedResource = 'oversized_resource'; // clearly too large for the web
 
     public function severity(): string
     {
         return match ($this) {
-            self::ServerError, self::ClientError, self::MissingTitle, self::MissingH1 => 'error',
+            self::ServerError, self::ClientError, self::MissingTitle, self::MissingH1,
+            self::OversizedResource => 'error',
             self::RedirectChain, self::MultipleH1, self::HeadingOrderSkip, self::Noindex,
             self::CanonicalMismatch, self::RobotsBlocked, self::DuplicateTitle,
-            self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription => 'warning',
+            self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription,
+            self::LargeResource => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap => 'notice',
         };

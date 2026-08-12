@@ -42,6 +42,19 @@ return [
     'col_indexable' => 'Indexierbar',
     'col_inlinks' => 'Eingehende Links',
     'col_issues' => 'Probleme',
+    'col_type' => 'Typ',
+    'file' => 'Datei',
+    'content_type' => 'Content-Type',
+    'size' => 'Größe',
+    'filter_type' => 'Typ',
+    'filter_all' => 'Alle Typen',
+    'category' => [
+        'html' => 'HTML-Seite',
+        'image' => 'Bild',
+        'pdf' => 'PDF',
+        'media' => 'Medien',
+        'other' => 'Sonstiges',
+    ],
     'issue' => [
         'client_error' => 'Client-Fehler (4xx)',
         'server_error' => 'Server-Fehler (5xx)',
@@ -62,5 +75,7 @@ return [
         'missing_alt_text' => 'Bilder ohne Alt-Text',
         'missing_structured_data' => 'Keine strukturierten Daten',
         'not_in_sitemap' => 'Nicht in Sitemap',
+        'large_resource' => 'Große Datei',
+        'oversized_resource' => 'Datei zu groß für Web',
     ],
 ];

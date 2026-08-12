@@ -39,4 +39,43 @@ class CrawlObserverTest extends TestCase
 
         $this->assertContains('client_error', $page->issues);
     }
+
+    public function test_non_html_resource_skips_html_checks_and_flags_oversize(): void
+    {
+        $crawl = Crawl::factory()->create(['start_url' => 'https://x.test']);
+        $observer = new CrawlPageObserver($crawl, new PageAnalyzer, 'x.test');
+
+        // A 400 KB SVG — classifies as an image, over the 300 KB "large" threshold.
+        $body = str_repeat('a', 400 * 1024);
+        $page = $observer->recordResponse(
+            'https://x.test/logo.svg', 200, ['Content-Type' => ['image/svg+xml']], $body, 5.0
+        );
+
+        $this->assertSame('image', $page->content_category);
+        $this->assertSame(strlen($body), $page->size_bytes);
+        $this->assertFalse($page->is_indexable);
+        $this->assertContains('large_resource', $page->issues);
+
+        // None of the nonsensical HTML/SEO issues should be present for a binary file.
+        foreach (['missing_title', 'missing_h1', 'thin_content', 'missing_meta_description', 'missing_structured_data'] as $htmlIssue) {
+            $this->assertNotContains($htmlIssue, $page->issues, "unexpected HTML issue on a non-HTML resource: {$htmlIssue}");
+        }
+
+        // And it recorded no headings/title.
+        $this->assertNull($page->title);
+        $this->assertNull($page->headings);
+    }
+
+    public function test_small_non_html_resource_has_no_issues(): void
+    {
+        $crawl = Crawl::factory()->create(['start_url' => 'https://x.test']);
+        $observer = new CrawlPageObserver($crawl, new PageAnalyzer, 'x.test');
+
+        $page = $observer->recordResponse(
+            'https://x.test/icon.png', 200, ['Content-Type' => ['image/png']], str_repeat('a', 5 * 1024), 5.0
+        );
+
+        $this->assertSame('image', $page->content_category);
+        $this->assertSame([], $page->issues);
+    }
 }

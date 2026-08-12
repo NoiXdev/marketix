@@ -42,6 +42,19 @@ return [
     'col_indexable' => 'Indexable',
     'col_inlinks' => 'Inlinks',
     'col_issues' => 'Issues',
+    'col_type' => 'Type',
+    'file' => 'File',
+    'content_type' => 'Content type',
+    'size' => 'Size',
+    'filter_type' => 'Type',
+    'filter_all' => 'All types',
+    'category' => [
+        'html' => 'HTML page',
+        'image' => 'Image',
+        'pdf' => 'PDF',
+        'media' => 'Media',
+        'other' => 'Other',
+    ],
     'issue' => [
         'client_error' => 'Client error (4xx)',
         'server_error' => 'Server error (5xx)',
@@ -62,5 +75,7 @@ return [
         'missing_alt_text' => 'Images without alt text',
         'missing_structured_data' => 'No structured data',
         'not_in_sitemap' => 'Not in sitemap',
+        'large_resource' => 'Large file',
+        'oversized_resource' => 'File too large for web',
     ],
 ];

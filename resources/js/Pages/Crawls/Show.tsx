@@ -1,7 +1,8 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { BackLink, Card, Flash, LinkButton, PageHeader, Pagination, StatusPill, TableCard } from '@/Components/ui';
+import { Badge, BackLink, Card, Flash, LinkButton, PageHeader, Pagination, Select, StatusPill, TableCard } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
-import { CrawlPageRow, CrawlSummary, PageProps } from '@/types';
+import { formatBytes } from '@/lib/formatBytes';
+import { CrawlContentCategory, CrawlPageRow, CrawlSummary, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
@@ -29,7 +30,25 @@ const statusVariant: Record<CrawlStatus, 'neutral' | 'success' | 'warning' | 'da
   failed: 'danger',
 };
 
-export default function CrawlsShow({ crawl, pages }: { crawl: CrawlDetail; pages: Paginated<CrawlPageRow> }) {
+const categoryVariant: Record<CrawlContentCategory, 'neutral' | 'accent'> = {
+  html: 'accent',
+  image: 'neutral',
+  pdf: 'neutral',
+  media: 'neutral',
+  other: 'neutral',
+};
+
+export default function CrawlsShow({
+  crawl,
+  pages,
+  categories,
+  filters,
+}: {
+  crawl: CrawlDetail;
+  pages: Paginated<CrawlPageRow>;
+  categories: CrawlContentCategory[];
+  filters: { category: string | null };
+}) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
@@ -39,6 +58,14 @@ export default function CrawlsShow({ crawl, pages }: { crawl: CrawlDetail; pages
     const id = setInterval(() => router.reload({ only: ['crawl', 'pages'] }), 3000);
     return () => clearInterval(id);
   }, [crawl.status]);
+
+  function filterByCategory(category: string) {
+    router.get(
+      route('app.project.crawls.show', { project: project!.id, crawl: crawl.id }),
+      category ? { category } : {},
+      { preserveScroll: true, preserveState: true, replace: true },
+    );
+  }
 
   const summaryEntries = Object.entries(crawl.summary);
 
@@ -84,10 +111,29 @@ export default function CrawlsShow({ crawl, pages }: { crawl: CrawlDetail; pages
           </div>
         )}
 
+        {categories.length > 1 && (
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
+            <Select
+              value={filters.category ?? ''}
+              onChange={(e) => filterByCategory(e.target.value)}
+              className="w-48"
+            >
+              <option value="">{t('crawler.filter_all')}</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {t(`crawler.category.${c}`)}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
+
         <TableCard
           columns={[
             { label: t('crawler.col_url') },
             { label: t('crawler.col_status') },
+            { label: t('crawler.col_type') },
             { label: t('crawler.col_indexable') },
             { label: t('crawler.col_inlinks') },
             { label: t('crawler.col_issues') },
@@ -105,7 +151,16 @@ export default function CrawlsShow({ crawl, pages }: { crawl: CrawlDetail; pages
                   </Link>
                 </td>
                 <td className="px-4 py-3 text-muted">{p.status_code ?? '—'}</td>
-                <td className="px-4 py-3 text-muted">{p.is_indexable ? '✓' : '✗'}</td>
+                <td className="px-4 py-3">
+                  {p.content_category ? (
+                    <Badge variant={categoryVariant[p.content_category]}>{t(`crawler.category.${p.content_category}`)}</Badge>
+                  ) : (
+                    <span className="text-muted">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-muted">
+                  {p.content_category === 'html' ? (p.is_indexable ? '✓' : '✗') : '—'}
+                </td>
                 <td className="px-4 py-3 text-muted">{p.inlinks_count}</td>
                 <td className="px-4 py-3 text-muted">{p.issues.length}</td>
               </tr>

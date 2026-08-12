@@ -106,11 +106,16 @@ export interface CrawlListItem {
   created_at: string;
 }
 
+export type CrawlContentCategory = 'html' | 'image' | 'pdf' | 'media' | 'other';
+
 export interface CrawlPageRow {
   id: string;
   url: string;
   status_code: number | null;
   title: string | null;
+  content_category: CrawlContentCategory | null;
+  content_type: string | null;
+  size_bytes: number | null;
   is_indexable: boolean;
   inlinks_count: number;
   depth: number | null;

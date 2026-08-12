@@ -51,19 +51,35 @@ class CrawlController extends Controller
         $project = $request->get('project');
         $model = $project->crawls()->findOrFail($crawl);
 
-        $pages = $model->pages()
-            ->orderBy('depth')
+        $category = $request->query('category');
+
+        $query = $model->pages()->orderBy('depth');
+        if (is_string($category) && $category !== '') {
+            $query->where('content_category', $category);
+        }
+
+        $pages = $query
             ->paginate(50)
+            ->withQueryString()
             ->through(fn ($p) => [
                 'id' => $p->id,
                 'url' => $p->url,
                 'status_code' => $p->status_code,
                 'title' => $p->title,
+                'content_category' => $p->content_category,
+                'content_type' => $p->content_type,
+                'size_bytes' => $p->size_bytes,
                 'is_indexable' => $p->is_indexable,
                 'inlinks_count' => $p->inlinks_count,
                 'depth' => $p->depth,
                 'issues' => $p->issues ?? [],
             ]);
+
+        $categories = $model->pages()
+            ->whereNotNull('content_category')
+            ->distinct()
+            ->orderBy('content_category')
+            ->pluck('content_category');
 
         return inertia('Crawls/Show', [
             'crawl' => [
@@ -76,6 +92,8 @@ class CrawlController extends Controller
                 'error' => $model->error,
             ],
             'pages' => $pages,
+            'categories' => $categories,
+            'filters' => ['category' => is_string($category) && $category !== '' ? $category : null],
         ]);
     }
 
@@ -91,6 +109,9 @@ class CrawlController extends Controller
                 'url' => $pageModel->url,
                 'final_url' => $pageModel->final_url,
                 'status_code' => $pageModel->status_code,
+                'content_category' => $pageModel->content_category,
+                'content_type' => $pageModel->content_type,
+                'size_bytes' => $pageModel->size_bytes,
                 'redirect_chain' => $pageModel->redirect_chain,
                 'title' => $pageModel->title,
                 'meta_description' => $pageModel->meta_description,
@@ -129,12 +150,14 @@ class CrawlController extends Controller
 
         return response()->streamDownload(function () use ($model) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['url', 'status_code', 'title', 'is_indexable', 'inlinks_count', 'depth', 'issues']);
+            fputcsv($out, ['url', 'status_code', 'type', 'size_bytes', 'title', 'is_indexable', 'inlinks_count', 'depth', 'issues']);
             $model->pages()->orderBy('depth')->chunk(200, function ($pages) use ($out) {
                 foreach ($pages as $p) {
                     fputcsv($out, [
                         $this->sanitizeCsvCell($p->url),
                         $p->status_code,
+                        $this->sanitizeCsvCell($p->content_category),
+                        $p->size_bytes,
                         $this->sanitizeCsvCell($p->title),
                         $p->is_indexable ? 1 : 0,
                         $p->inlinks_count,

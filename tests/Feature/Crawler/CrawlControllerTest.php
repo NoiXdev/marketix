@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class CrawlControllerTest extends TestCase
@@ -81,7 +82,8 @@ class CrawlControllerTest extends TestCase
         $rows = array_map('str_getcsv', array_filter(explode("\n", $content)));
         $dataRow = $rows[1];
 
-        [$url, , $title, , , , $issues] = $dataRow;
+        // Columns: url, status_code, type, size_bytes, title, is_indexable, inlinks_count, depth, issues
+        [$url, , , , $title, , , , $issues] = $dataRow;
 
         $this->assertStringStartsNotWith('=', $title);
         $this->assertSame("'=cmd()", $title);
@@ -99,5 +101,31 @@ class CrawlControllerTest extends TestCase
         $this->actingAs($user)
             ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
             ->assertNotFound();
+    }
+
+    public function test_show_exposes_categories_and_filters_by_type(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create(['start_url' => 'https://example.com']);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/', 'content_category' => 'html']);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/logo.svg', 'content_category' => 'image']);
+
+        // Unfiltered: both categories are offered and both pages are listed.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Crawls/Show')
+                ->where('categories', ['html', 'image'])
+                ->has('pages.data', 2)
+            );
+
+        // Filtered by image: only the SVG remains.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'category' => 'image']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters.category', 'image')
+                ->has('pages.data', 1)
+                ->where('pages.data.0.content_category', 'image')
+            );
     }
 }

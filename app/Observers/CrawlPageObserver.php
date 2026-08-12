@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Crawler\IssueCode;
 use App\Crawler\PageAnalyzer;
 use App\Crawler\PageContext;
+use App\Crawler\ResourceClassifier;
 use App\Models\Crawl;
 use App\Models\CrawlPage;
 use GuzzleHttp\Exception\RequestException;
@@ -59,10 +60,11 @@ class CrawlPageObserver extends CrawlObserver
     /** @param array<string, string[]> $headers */
     public function recordResponse(string $url, int $status, array $headers, string $body, float $responseMs): CrawlPage
     {
-        $ctx = new PageContext($url, $status, $this->baseHost);
-        $analysis = $this->analyzer->analyze($body, $ctx);
+        $contentType = $headers['Content-Type'][0] ?? $headers['content-type'][0] ?? null;
+        $category = ResourceClassifier::categorize($contentType);
+        $size = strlen($body);
 
-        $issues = array_map(fn (IssueCode $i) => $i->value, $analysis->issues);
+        $issues = [];
         if ($status >= 500) {
             $issues[] = IssueCode::ServerError->value;
         } elseif ($status >= 400) {
@@ -74,17 +76,38 @@ class CrawlPageObserver extends CrawlObserver
             $issues[] = IssueCode::RedirectChain->value;
         }
 
-        $links = $analysis->data['links'] ?? [];
-        unset($analysis->data['links']);
+        $links = [];
+        $data = [];
 
-        $page = $this->crawl->pages()->create(array_merge($analysis->data, [
+        if ($category === ResourceClassifier::HTML) {
+            $ctx = new PageContext($url, $status, $this->baseHost);
+            $analysis = $this->analyzer->analyze($body, $ctx);
+            foreach ($analysis->issues as $issue) {
+                $issues[] = $issue->value;
+            }
+            $links = $analysis->data['links'] ?? [];
+            unset($analysis->data['links']);
+            $data = $analysis->data;
+        } else {
+            // Non-HTML resource (image, PDF, media, …): the HTML/SEO analyzers make
+            // no sense here. Record it as a file and flag only if it's too large for
+            // the web. It is not an indexable page, which also keeps aggregation from
+            // flagging it as an orphan or "not in sitemap".
+            $data = ['is_indexable' => false];
+            if ($sizeIssue = ResourceClassifier::sizeIssue($category, $size)) {
+                $issues[] = $sizeIssue->value;
+            }
+        }
+
+        $page = $this->crawl->pages()->create(array_merge($data, [
             'url' => $url,
             'final_url' => $finalUrl,
             'status_code' => $status,
             'redirect_chain' => $chain ?: null,
-            'content_type' => $headers['Content-Type'][0] ?? $headers['content-type'][0] ?? null,
+            'content_type' => $contentType,
+            'content_category' => $category,
             'response_time_ms' => (int) round($responseMs),
-            'size_bytes' => strlen($body),
+            'size_bytes' => $size,
             'issues' => array_values(array_unique($issues)),
         ]));
 
