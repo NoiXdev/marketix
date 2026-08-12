@@ -14,6 +14,8 @@ return [
     'render_js_hint' => 'Für SPAs (Nuxt, Vue, React) aktivieren, die Inhalte clientseitig rendern. Langsamer.',
     'respect_robots' => 'robots.txt beachten',
     'include_subdomains' => 'Subdomains einbeziehen',
+    'crawl_sitemap' => 'XML-Sitemap mitcrawlen',
+    'crawl_sitemap_hint' => 'Den Crawl mit URLs aus der sitemap.xml starten, damit auch nur dort gelistete Seiten (z.B. verwaiste Seiten) erfasst werden.',
     'delay_ms' => 'Verzögerung zwischen Requests (ms)',
     'max_pages' => 'Seitenlimit (optional)',
     'max_pages_hint' => 'Leer lassen für kein Limit.',

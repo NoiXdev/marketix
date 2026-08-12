@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Crawler;
 
+use App\Crawler\PageAnalyzer;
+use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Jobs\AggregateCrawlJob;
 use App\Jobs\RunCrawlJob;
@@ -86,6 +88,76 @@ class RunCrawlJobTest extends TestCase
         $browsershot = $this->readProtected($renderer, 'browsershot');
         $this->assertInstanceOf(Browsershot::class, $browsershot);
         $this->assertTrue($this->readProtected($browsershot, 'noSandbox'), 'Browsershot must run with --no-sandbox');
+    }
+
+    public function test_sitemap_urls_are_seeded_into_the_queue_when_enabled(): void
+    {
+        $crawl = Crawl::factory()->create([
+            'start_url' => 'https://example.test/',
+            'mode' => 'full_site',
+            'crawl_sitemap' => true,
+            'respect_robots' => false,
+        ]);
+
+        // Fake the sitemap: one same-host URL (should be seeded) and one external
+        // URL (must be rejected — the crawl stays on the start domain).
+        $this->app->instance(SitemapReader::class, new class extends SitemapReader
+        {
+            public function urlsFor(string $startUrl): array
+            {
+                return ['https://example.test/orphan-only-in-sitemap', 'https://evil.test/x'];
+            }
+        });
+
+        $job = new class($crawl) extends RunCrawlJob
+        {
+            public function seedFor(CrawlPageObserver $observer): Crawler
+            {
+                $crawler = $this->buildCrawler($observer);
+                $this->seedSitemapUrls($crawler);
+
+                return $crawler;
+            }
+        };
+
+        $observer = new CrawlPageObserver($crawl, new PageAnalyzer, 'example.test');
+        $crawler = $job->seedFor($observer);
+
+        $this->assertTrue($crawler->getCrawlQueue()->has('https://example.test/orphan-only-in-sitemap'));
+        $this->assertFalse($crawler->getCrawlQueue()->has('https://evil.test/x'));
+    }
+
+    public function test_sitemap_urls_are_not_seeded_when_disabled(): void
+    {
+        $crawl = Crawl::factory()->create([
+            'start_url' => 'https://example.test/',
+            'mode' => 'full_site',
+            'crawl_sitemap' => false,
+        ]);
+
+        $this->app->instance(SitemapReader::class, new class extends SitemapReader
+        {
+            public function urlsFor(string $startUrl): array
+            {
+                return ['https://example.test/orphan-only-in-sitemap'];
+            }
+        });
+
+        $job = new class($crawl) extends RunCrawlJob
+        {
+            public function seedFor(CrawlPageObserver $observer): Crawler
+            {
+                $crawler = $this->buildCrawler($observer);
+                $this->seedSitemapUrls($crawler);
+
+                return $crawler;
+            }
+        };
+
+        $observer = new CrawlPageObserver($crawl, new PageAnalyzer, 'example.test');
+        $crawler = $job->seedFor($observer);
+
+        $this->assertFalse($crawler->getCrawlQueue()->has('https://example.test/orphan-only-in-sitemap'));
     }
 
     private function readProtected(object $object, string $property): mixed

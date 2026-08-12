@@ -16,6 +16,7 @@ export default function CrawlsCreate({ modes }: { modes: Option[] }) {
     render_js: false,
     respect_robots: true,
     include_subdomains: false,
+    crawl_sitemap: false,
     delay_ms: 0,
     max_pages: '' as number | '',
   });
@@ -83,6 +84,14 @@ export default function CrawlsCreate({ modes }: { modes: Option[] }) {
                 <Checkbox checked={data.include_subdomains} onChange={(e) => setData('include_subdomains', e.target.checked)} />
                 {t('crawler.include_subdomains')}
               </label>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm text-foreground">
+                  <Checkbox checked={data.crawl_sitemap} onChange={(e) => setData('crawl_sitemap', e.target.checked)} />
+                  {t('crawler.crawl_sitemap')}
+                </label>
+                <p className="ml-6 mt-1 text-xs text-muted">{t('crawler.crawl_sitemap_hint')}</p>
+              </div>
 
               <Field label={t('crawler.delay_ms')} htmlFor="delay_ms" error={errors.delay_ms}>
                 <Input

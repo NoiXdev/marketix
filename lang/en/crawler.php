@@ -14,6 +14,8 @@ return [
     'render_js_hint' => 'Enable for SPAs (Nuxt, Vue, React) that render content client-side. Slower.',
     'respect_robots' => 'Respect robots.txt',
     'include_subdomains' => 'Include subdomains',
+    'crawl_sitemap' => 'Also crawl the XML sitemap',
+    'crawl_sitemap_hint' => 'Seed the crawl with URLs from sitemap.xml so pages only listed there (e.g. orphan pages) are crawled too.',
     'delay_ms' => 'Delay between requests (ms)',
     'max_pages' => 'Page limit (optional)',
     'max_pages_hint' => 'Leave empty for no limit.',

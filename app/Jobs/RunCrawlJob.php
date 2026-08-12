@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Crawler\PageAnalyzer;
+use App\Crawler\SitemapReader;
 use App\Crawler\UrlSafety;
 use App\Enums\CrawlMode;
 use App\Enums\CrawlStatus;
@@ -20,6 +21,7 @@ use RuntimeException;
 use Spatie\Browsershot\Browsershot;
 use Spatie\Crawler\Crawler;
 use Spatie\Crawler\CrawlProfiles\CrawlInternalUrls;
+use Spatie\Crawler\CrawlUrl;
 use Spatie\Crawler\JavaScriptRenderers\BrowsershotRenderer;
 use Spatie\Crawler\JavaScriptRenderers\JavaScriptRenderer;
 
@@ -38,9 +40,37 @@ class RunCrawlJob implements ShouldQueue
         $host = parse_url($this->crawl->start_url, PHP_URL_HOST) ?? '';
         $observer = new CrawlPageObserver($this->crawl, new PageAnalyzer, $host);
 
-        $this->buildCrawler($observer)->start();
+        $crawler = $this->buildCrawler($observer);
+        $this->seedSitemapUrls($crawler);
+        $crawler->start();
 
         AggregateCrawlJob::dispatch($this->crawl);
+    }
+
+    /**
+     * When "crawl sitemap" is enabled, seed the crawl queue with the URLs listed in the
+     * site's sitemap.xml so pages that are only reachable via the sitemap (e.g. orphan
+     * pages nothing links to) are crawled too — in addition to normal link-following.
+     * Only same-host, safe URLs are seeded; the crawl profile still gates them, and
+     * this is only meaningful for a full-site crawl.
+     */
+    protected function seedSitemapUrls(Crawler $crawler): void
+    {
+        if (! $this->crawl->crawl_sitemap || $this->crawl->mode !== CrawlMode::FullSite) {
+            return;
+        }
+
+        // Only seed same-host URLs. The start host was already validated safe by
+        // SafeCrawlUrl when the crawl was created, so a same-host sitemap URL is safe
+        // too — no separate SSRF re-check needed (and the crawl profile gates it again
+        // at crawl time). Redirects to other hosts are still guarded by guardRedirect().
+        $baseHost = parse_url($this->crawl->start_url, PHP_URL_HOST);
+
+        foreach (app(SitemapReader::class)->urlsFor($this->crawl->start_url) as $url) {
+            if (parse_url($url, PHP_URL_HOST) === $baseHost) {
+                $crawler->addToCrawlQueue(new CrawlUrl($url));
+            }
+        }
     }
 
     protected function buildCrawler(CrawlPageObserver $observer): Crawler
