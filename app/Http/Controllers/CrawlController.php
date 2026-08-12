@@ -132,10 +132,34 @@ class CrawlController extends Controller
             fputcsv($out, ['url', 'status_code', 'title', 'is_indexable', 'inlinks_count', 'depth', 'issues']);
             $model->pages()->orderBy('depth')->chunk(200, function ($pages) use ($out) {
                 foreach ($pages as $p) {
-                    fputcsv($out, [$p->url, $p->status_code, $p->title, $p->is_indexable ? 1 : 0, $p->inlinks_count, $p->depth, implode('|', $p->issues ?? [])]);
+                    fputcsv($out, [
+                        $this->sanitizeCsvCell($p->url),
+                        $p->status_code,
+                        $this->sanitizeCsvCell($p->title),
+                        $p->is_indexable ? 1 : 0,
+                        $p->inlinks_count,
+                        $p->depth,
+                        $this->sanitizeCsvCell(implode('|', $p->issues ?? [])),
+                    ]);
                 }
             });
             fclose($out);
         }, "crawl-{$model->id}.csv", ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Prevent CSV formula injection: if a cell's first character would be interpreted
+     * by Excel/Sheets as the start of a formula or control sequence, prefix it with a
+     * single quote so it's treated as literal text.
+     */
+    private function sanitizeCsvCell(?string $value): string
+    {
+        $value = (string) $value;
+
+        if ($value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 }
