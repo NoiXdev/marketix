@@ -16,8 +16,12 @@ class CrawlFactory extends Factory
             'project_id' => Project::factory(),
             'start_url' => 'https://example.com',
             'mode' => 'full_site',
-            'status' => 'queued',
+            'render_js' => false,
+            'respect_robots' => true,
+            'include_subdomains' => false,
             'delay_ms' => 0,
+            'max_pages' => null,
+            'status' => 'queued',
             'pages_crawled' => 0,
         ];
     }
