@@ -9,6 +9,7 @@ enum IssueCode: string
     case ServerError = 'server_error';         // 5xx
     case RedirectChain = 'redirect_chain';     // >1 hop
     case OrphanPage = 'orphan_page';           // 0 inlinks
+    case BrokenLink = 'broken_link';           // links to a URL that returns 4xx/5xx
     // on-page / meta
     case MissingTitle = 'missing_title';
     case DuplicateTitle = 'duplicate_title';
@@ -41,7 +42,7 @@ enum IssueCode: string
             self::RedirectChain, self::MultipleH1, self::HeadingOrderSkip, self::Noindex,
             self::CanonicalMismatch, self::RobotsBlocked, self::DuplicateTitle,
             self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription,
-            self::LargeResource => 'warning',
+            self::LargeResource, self::BrokenLink => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap => 'notice',
         };

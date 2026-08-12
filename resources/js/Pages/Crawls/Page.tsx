@@ -6,7 +6,7 @@ import { CrawlContentCategory, PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
 
 type Heading = { level: number; text: string };
-type OutLink = { to_url: string; type: string; anchor: string };
+type OutLink = { to_url: string; type: string; anchor: string; status_code: number | null };
 
 interface CrawlPageDetail {
   url: string;
@@ -162,6 +162,14 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
                       <Badge variant={link.type === 'internal' ? 'neutral' : 'accent'} className="shrink-0">
                         {link.type}
                       </Badge>
+                      {link.status_code != null && (
+                        <Badge
+                          variant={link.status_code >= 400 ? 'danger' : link.status_code >= 300 ? 'warning' : 'success'}
+                          className="shrink-0"
+                        >
+                          {link.status_code}
+                        </Badge>
+                      )}
                       <span className="truncate">{link.anchor || link.to_url}</span>
                     </li>
                   ))}

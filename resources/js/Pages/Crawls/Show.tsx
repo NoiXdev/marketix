@@ -2,6 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Badge, BackLink, Card, Flash, LinkButton, PageHeader, Pagination, Select, StatusPill, TableCard } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { formatBytes } from '@/lib/formatBytes';
+import { durationBetween, formatDuration } from '@/lib/formatDuration';
 import { CrawlContentCategory, CrawlPageRow, CrawlSummary, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
@@ -16,6 +17,8 @@ interface CrawlDetail {
   pages_crawled: number;
   summary: CrawlSummary;
   error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
 }
 
 interface Paginated<T> {
@@ -79,11 +82,16 @@ export default function CrawlsShow({
         <PageHeader
           title={crawl.start_url}
           subtitle={
-            <span className="inline-flex items-center gap-2">
+            <span className="inline-flex flex-wrap items-center gap-2">
               <StatusPill status={statusVariant[crawl.status]}>{t(`crawler.status_${crawl.status}`)}</StatusPill>
               <span>
                 {crawl.pages_crawled} {t('crawler.pages')}
               </span>
+              {crawl.finished_at && (
+                <span className="text-muted">
+                  · {t('crawler.duration')}: {formatDuration(durationBetween(crawl.started_at, crawl.finished_at))}
+                </span>
+              )}
             </span>
           }
           action={

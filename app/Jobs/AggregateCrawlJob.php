@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Crawler\IssueCode;
+use App\Crawler\LinkStatusChecker;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Models\Crawl;
@@ -13,10 +14,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class AggregateCrawlJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /** Safety cap on how many external link targets we probe per crawl. */
+    private const MAX_LINK_PROBES = 2000;
 
     public function __construct(public Crawl $crawl) {}
 
@@ -83,10 +88,13 @@ class AggregateCrawlJob implements ShouldQueue
         $dupTitles = $this->duplicates($identities, 'title');
         $dupDescriptions = $this->duplicates($identities, 'meta_description');
 
+        // Broken links: probe link targets and collect the pages that link to a 4xx/5xx.
+        $brokenPageIds = $this->checkBrokenLinks($norm);
+
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $startPageId, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $startPageId, $brokenPageIds, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -116,6 +124,10 @@ class AggregateCrawlJob implements ShouldQueue
                 }
                 if ($page->meta_description !== null && ($dupDescriptions[$page->meta_description] ?? 0) > 1) {
                     $issues[IssueCode::DuplicateMetaDescription->value] = true;
+                }
+
+                if (isset($brokenPageIds[$page->id])) {
+                    $issues[IssueCode::BrokenLink->value] = true;
                 }
 
                 $page->issues = array_keys($issues->all());
@@ -176,6 +188,67 @@ class AggregateCrawlJob implements ShouldQueue
         }
 
         return $counts;
+    }
+
+    /**
+     * Probe the crawl's link targets and persist each link's HTTP status. Internal
+     * targets reuse the status of the page that was already crawled (no re-fetch);
+     * external targets are probed (up to MAX_LINK_PROBES). Returns the set of
+     * from_page_ids that link to at least one 4xx/5xx target, keyed for O(1) lookup.
+     *
+     * @param  callable(?string): string  $norm
+     * @return array<string, true>
+     */
+    protected function checkBrokenLinks(callable $norm): array
+    {
+        // Known statuses from already-crawled pages (internal links resolve here for free).
+        $statusByUrl = [];
+        foreach ($this->crawl->pages()->select(['url', 'final_url', 'status_code'])->cursor() as $p) {
+            if ($p->status_code === null) {
+                continue;
+            }
+            $statusByUrl[$norm($p->url)] = $p->status_code;
+            if ($norm($p->final_url) !== '') {
+                $statusByUrl[$norm($p->final_url)] = $p->status_code;
+            }
+        }
+
+        $checker = app(LinkStatusChecker::class);
+        $cache = [];   // normalized url => status|null
+        $probes = 0;
+
+        foreach ($this->crawl->links()->select('to_url')->distinct()->pluck('to_url') as $to) {
+            $key = $norm($to);
+
+            if (! array_key_exists($key, $cache)) {
+                if (isset($statusByUrl[$key])) {
+                    $cache[$key] = $statusByUrl[$key];
+                } elseif ($probes < self::MAX_LINK_PROBES) {
+                    $cache[$key] = $checker->status($to);
+                    $probes++;
+                } else {
+                    $cache[$key] = null;
+                }
+            }
+
+            if ($cache[$key] !== null) {
+                $this->crawl->links()->where('to_url', $to)->update(['status_code' => $cache[$key]]);
+            }
+        }
+
+        if ($probes >= self::MAX_LINK_PROBES) {
+            Log::warning('Crawl broken-link check hit the probe cap; some links were not checked.', [
+                'crawl_id' => $this->crawl->id,
+                'cap' => self::MAX_LINK_PROBES,
+            ]);
+        }
+
+        $broken = [];
+        foreach ($this->crawl->links()->where('status_code', '>=', 400)->distinct()->pluck('from_page_id') as $id) {
+            $broken[$id] = true;
+        }
+
+        return $broken;
     }
 
     public function failed(\Throwable $e): void

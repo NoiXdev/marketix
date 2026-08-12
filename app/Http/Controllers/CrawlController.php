@@ -23,6 +23,8 @@ class CrawlController extends Controller
                 'status' => $c->status->value,
                 'pages_crawled' => $c->pages_crawled,
                 'created_at' => $c->created_at->toISOString(),
+                'started_at' => $c->started_at?->toISOString(),
+                'finished_at' => $c->finished_at?->toISOString(),
             ]),
         ]);
     }
@@ -90,6 +92,8 @@ class CrawlController extends Controller
                 'pages_crawled' => $model->pages_crawled,
                 'summary' => $model->summary ?? [],
                 'error' => $model->error,
+                'started_at' => $model->started_at?->toISOString(),
+                'finished_at' => $model->finished_at?->toISOString(),
             ],
             'pages' => $pages,
             'categories' => $categories,
@@ -127,7 +131,7 @@ class CrawlController extends Controller
                 'images_missing_alt' => $pageModel->images_missing_alt ?? [],
                 'issues' => $pageModel->issues ?? [],
                 'out_links' => $pageModel->outLinks->map(fn ($l) => [
-                    'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor,
+                    'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor, 'status_code' => $l->status_code,
                 ]),
             ],
         ]);

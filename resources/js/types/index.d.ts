@@ -104,6 +104,8 @@ export interface CrawlListItem {
   status: 'queued' | 'running' | 'completed' | 'failed';
   pages_crawled: number;
   created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
 }
 
 export type CrawlContentCategory = 'html' | 'image' | 'pdf' | 'media' | 'other';

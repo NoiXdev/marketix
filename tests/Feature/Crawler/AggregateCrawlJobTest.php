@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Crawler;
 
+use App\Crawler\LinkStatusChecker;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Jobs\AggregateCrawlJob;
@@ -125,6 +126,53 @@ class AggregateCrawlJobTest extends TestCase
 
         $this->assertSame(1, $sub->depth);
         $this->assertFalse($home->is_orphan);
+    }
+
+    private function fakeLinkChecker(array $statuses): void
+    {
+        $this->app->instance(LinkStatusChecker::class, new class($statuses) extends LinkStatusChecker
+        {
+            public function __construct(private array $statuses) {}
+
+            public function status(string $url): ?int
+            {
+                return $this->statuses[$url] ?? null;
+            }
+        });
+    }
+
+    public function test_flags_pages_that_link_to_broken_urls(): void
+    {
+        $this->fakeSitemap([]);
+        $this->fakeLinkChecker([
+            'https://external.test/dead' => 404,
+            'https://external.test/ok' => 200,
+        ]);
+
+        $crawl = Crawl::factory()->create(['start_url' => 'https://x.test/']);
+        $home = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/', 'issues' => []]);
+        $other = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/other', 'issues' => []]);
+
+        $deadLink = CrawlLink::factory()->create([
+            'crawl_id' => $crawl->id, 'from_page_id' => $home->id,
+            'to_url' => 'https://external.test/dead', 'type' => 'external',
+        ]);
+        CrawlLink::factory()->create([
+            'crawl_id' => $crawl->id, 'from_page_id' => $other->id,
+            'to_url' => 'https://external.test/ok', 'type' => 'external',
+        ]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $home->refresh();
+        $other->refresh();
+        $deadLink->refresh();
+        $crawl->refresh();
+
+        $this->assertContains('broken_link', $home->issues, 'page linking to a 404 should be flagged');
+        $this->assertNotContains('broken_link', $other->issues, 'page linking to a 200 must not be flagged');
+        $this->assertSame(404, $deadLink->status_code, 'the broken link row should have its status persisted');
+        $this->assertSame(1, $crawl->summary['broken_link'] ?? 0);
     }
 
     public function test_failed_hook_marks_crawl_failed(): void

@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, StatusPill, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
+import { durationBetween, formatDuration } from '@/lib/formatDuration';
 import { useTranslation } from '@/lib/i18n';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { CrawlListItem, PageProps } from '@/types';
@@ -54,6 +55,7 @@ export default function CrawlsIndex({ crawls }: { crawls: CrawlListItem[] }) {
               { label: t('crawler.col_url') },
               { label: t('crawler.col_status') },
               { label: t('crawler.col_pages') },
+              { label: t('crawler.duration') },
               { label: '' },
             ]}
           >
@@ -76,6 +78,9 @@ export default function CrawlsIndex({ crawls }: { crawls: CrawlListItem[] }) {
                     <StatusPill status={statusVariant[c.status]}>{t(`crawler.status_${c.status}`)}</StatusPill>
                   </td>
                   <td className="px-4 py-3 text-muted">{c.pages_crawled}</td>
+                  <td className="px-4 py-3 text-muted">
+                    {c.finished_at ? formatDuration(durationBetween(c.started_at, c.finished_at)) : '—'}
+                  </td>
                   <RowActions>
                     <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(c)} />
                   </RowActions>
