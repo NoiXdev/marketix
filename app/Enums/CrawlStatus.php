@@ -1,5 +1,5 @@
 <?php
-// app/Enums/CrawlStatus.php
+
 namespace App\Enums;
 
 enum CrawlStatus: string

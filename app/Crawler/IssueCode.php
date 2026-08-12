@@ -1,5 +1,5 @@
 <?php
-// app/Crawler/IssueCode.php
+
 namespace App\Crawler;
 
 enum IssueCode: string

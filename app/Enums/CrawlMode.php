@@ -1,5 +1,5 @@
 <?php
-// app/Enums/CrawlMode.php
+
 namespace App\Enums;
 
 enum CrawlMode: string
