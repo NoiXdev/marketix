@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Crawler\UrlSafety;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
@@ -29,19 +30,17 @@ class SafeCrawlUrl implements ValidationRule
             return;
         }
 
-        $ips = @gethostbynamel($host) ?: (filter_var($host, FILTER_VALIDATE_IP) ? [$host] : []);
+        $ips = UrlSafety::resolveIps($host);
         if ($ips === []) {
             $fail(__('crawler.unresolvable_url'));
 
             return;
         }
 
-        foreach ($ips as $ip) {
-            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                $fail(__('crawler.private_url'));
+        if (! UrlSafety::ipsAreSafe($ips)) {
+            $fail(__('crawler.private_url'));
 
-                return;
-            }
+            return;
         }
     }
 }
