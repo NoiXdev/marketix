@@ -1,5 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { BackLink, Card, PageHeader } from '@/Components/ui';
+import { Badge, BackLink, Card, PageHeader } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -98,6 +98,52 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
               <ul className="space-y-1 text-sm text-foreground">
                 {page.issues.map((c) => (
                   <li key={c}>{t(`crawler.issue.${c}`)}</li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          <Card className="p-4">
+            <h3 className="mb-2 font-medium text-foreground">{t('crawler.redirect_chain')}</h3>
+            {!page.redirect_chain || page.redirect_chain.length === 0 ? (
+              <p className="text-sm text-muted">—</p>
+            ) : (
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-foreground">
+                {page.redirect_chain.map((url, i) => (
+                  <li key={i} className="truncate">
+                    {url}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Card>
+
+          <Card className="p-4">
+            <h3 className="mb-2 font-medium text-foreground">{t('crawler.out_links')}</h3>
+            {page.out_links.length === 0 ? (
+              <p className="text-sm text-muted">—</p>
+            ) : (
+              <ul className="space-y-1.5 text-sm text-foreground">
+                {page.out_links.map((link, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <Badge variant={link.type === 'internal' ? 'neutral' : 'accent'} className="shrink-0">
+                      {link.type}
+                    </Badge>
+                    <span className="truncate">{link.anchor || link.to_url}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          <Card className="p-4">
+            <h3 className="mb-2 font-medium text-foreground">{t('crawler.structured_data')}</h3>
+            {page.structured_data.length === 0 ? (
+              <p className="text-sm text-muted">—</p>
+            ) : (
+              <ul className="space-y-1 text-sm text-foreground">
+                {page.structured_data.map((type, i) => (
+                  <li key={i}>{type}</li>
                 ))}
               </ul>
             )}
