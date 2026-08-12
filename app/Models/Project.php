@@ -73,6 +73,11 @@ class Project extends Model
         return $this->hasMany(Site::class);
     }
 
+    public function crawls(): HasMany
+    {
+        return $this->hasMany(Crawl::class);
+    }
+
     public function invitations(): HasMany
     {
         return $this->hasMany(ProjectInvitation::class);
