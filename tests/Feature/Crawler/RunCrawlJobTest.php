@@ -9,7 +9,10 @@ use App\Models\Crawl;
 use App\Observers\CrawlPageObserver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
+use Spatie\Browsershot\Browsershot;
 use Spatie\Crawler\Crawler;
+use Spatie\Crawler\JavaScriptRenderers\BrowsershotRenderer;
+use Spatie\Crawler\JavaScriptRenderers\JavaScriptRenderer;
 use Tests\TestCase;
 
 class RunCrawlJobTest extends TestCase
@@ -60,5 +63,36 @@ class RunCrawlJobTest extends TestCase
         $crawl->refresh();
         $this->assertGreaterThanOrEqual(1, $crawl->pages_crawled);
         Bus::assertDispatched(AggregateCrawlJob::class);
+    }
+
+    public function test_js_render_uses_a_no_sandbox_browsershot(): void
+    {
+        // Chromium cannot launch in a container/root environment without --no-sandbox;
+        // the JS renderer must configure Browsershot accordingly, otherwise every
+        // JS-rendered fetch fails and the crawl returns only the (failed) root page.
+        $crawl = Crawl::factory()->create(['render_js' => true]);
+
+        $job = new class($crawl) extends RunCrawlJob
+        {
+            public function exposeRenderer(): JavaScriptRenderer
+            {
+                return $this->jsRenderer();
+            }
+        };
+
+        $renderer = $job->exposeRenderer();
+        $this->assertInstanceOf(BrowsershotRenderer::class, $renderer);
+
+        $browsershot = $this->readProtected($renderer, 'browsershot');
+        $this->assertInstanceOf(Browsershot::class, $browsershot);
+        $this->assertTrue($this->readProtected($browsershot, 'noSandbox'), 'Browsershot must run with --no-sandbox');
+    }
+
+    private function readProtected(object $object, string $property): mixed
+    {
+        $ref = new \ReflectionProperty($object, $property);
+        $ref->setAccessible(true);
+
+        return $ref->getValue($object);
     }
 }

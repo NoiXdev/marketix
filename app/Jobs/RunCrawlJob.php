@@ -17,8 +17,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
+use Spatie\Browsershot\Browsershot;
 use Spatie\Crawler\Crawler;
 use Spatie\Crawler\CrawlProfiles\CrawlInternalUrls;
+use Spatie\Crawler\JavaScriptRenderers\BrowsershotRenderer;
+use Spatie\Crawler\JavaScriptRenderers\JavaScriptRenderer;
 
 class RunCrawlJob implements ShouldQueue
 {
@@ -64,7 +67,7 @@ class RunCrawlJob implements ShouldQueue
         }
 
         if ($crawl->render_js) {
-            $crawler->executeJavaScript();
+            $crawler->executeJavaScript($this->jsRenderer());
         }
 
         if (! $crawl->respect_robots) {
@@ -72,6 +75,22 @@ class RunCrawlJob implements ShouldQueue
         }
 
         return $crawler;
+    }
+
+    /**
+     * Headless-browser renderer for JS crawls. Chromium runs server-side (in a
+     * container, typically as root), where it cannot use its sandbox — so we must
+     * launch it with --no-sandbox, or every render fails with "No usable sandbox".
+     * --disable-dev-shm-usage avoids Chrome crashing on large pages when the
+     * container's /dev/shm is small.
+     */
+    protected function jsRenderer(): JavaScriptRenderer
+    {
+        $browsershot = (new Browsershot)
+            ->noSandbox()
+            ->addChromiumArguments(['disable-dev-shm-usage']);
+
+        return new BrowsershotRenderer($browsershot);
     }
 
     /**
