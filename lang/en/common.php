@@ -9,6 +9,7 @@ return [
         'pixels' => 'Pixels',
         'statistics' => 'Statistics',
         'sites' => 'Analytics',
+        'crawls' => 'SEO Crawler',
         'activity' => 'Activity',
         'team' => 'Team',
         'reports' => 'Reports',

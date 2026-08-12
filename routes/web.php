@@ -13,6 +13,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AnalyticsIngestionController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CrawlController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
@@ -160,6 +161,15 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/pixels/{pixel}/edit', [PixelController::class, 'edit'])->name('app.project.pixels.edit');
             Route::put('/pixels/{pixel}', [PixelController::class, 'update'])->name('app.project.pixels.update');
             Route::delete('/pixels/{pixel}', [PixelController::class, 'destroy'])->name('app.project.pixels.destroy');
+
+            // SEO Crawler
+            Route::get('/crawls', [CrawlController::class, 'index'])->name('app.project.crawls.index');
+            Route::get('/crawls/create', [CrawlController::class, 'create'])->name('app.project.crawls.create');
+            Route::post('/crawls', [CrawlController::class, 'store'])->name('app.project.crawls.store');
+            Route::get('/crawls/{crawl}', [CrawlController::class, 'show'])->name('app.project.crawls.show');
+            Route::get('/crawls/{crawl}/pages/{page}', [CrawlController::class, 'pageDetail'])->name('app.project.crawls.pages.show');
+            Route::get('/crawls/{crawl}/export', [CrawlController::class, 'export'])->name('app.project.crawls.export');
+            Route::delete('/crawls/{crawl}', [CrawlController::class, 'destroy'])->name('app.project.crawls.destroy');
 
             // Sites (analytics)
             Route::get('/sites', [SiteController::class, 'index'])->name('app.project.sites.index');
