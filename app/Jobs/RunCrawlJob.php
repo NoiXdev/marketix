@@ -29,7 +29,15 @@ class RunCrawlJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $timeout = 1800;
+    /**
+     * No timeout: crawling a huge site can legitimately run for a long time. A value
+     * of 0 disables the worker's per-job alarm (regardless of the worker's --timeout),
+     * so a large crawl is never killed mid-run.
+     */
+    public int $timeout = 0;
+
+    /** Don't automatically re-run an expensive crawl if it fails. */
+    public int $tries = 1;
 
     public function __construct(public Crawl $crawl) {}
 

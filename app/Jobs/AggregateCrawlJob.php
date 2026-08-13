@@ -20,6 +20,16 @@ class AggregateCrawlJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * No timeout: aggregating a huge crawl (incl. probing many external link targets)
+     * can legitimately take a long time. A value of 0 disables the worker's per-job
+     * alarm regardless of the worker's --timeout, so the job is never killed mid-run.
+     */
+    public int $timeout = 0;
+
+    /** Don't automatically re-run an expensive aggregation if it fails. */
+    public int $tries = 1;
+
     /** Safety cap on how many external link targets we probe per crawl. */
     private const MAX_LINK_PROBES = 2000;
 

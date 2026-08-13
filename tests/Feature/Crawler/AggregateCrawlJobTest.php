@@ -175,6 +175,14 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertSame(1, $crawl->summary['broken_link'] ?? 0);
     }
 
+    public function test_has_no_timeout_so_huge_crawls_can_finish(): void
+    {
+        $job = new AggregateCrawlJob(Crawl::factory()->create());
+
+        $this->assertSame(0, $job->timeout, 'aggregation must not be killed by a job timeout');
+        $this->assertSame(1, $job->tries);
+    }
+
     public function test_failed_hook_marks_crawl_failed(): void
     {
         $crawl = Crawl::factory()->create(['status' => 'running']);
