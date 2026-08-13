@@ -3,6 +3,7 @@
 namespace Tests\Feature\Crawler;
 
 use App\Crawler\PageAnalyzer;
+use App\Crawler\SafeBrowsershotRenderer;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Jobs\AggregateCrawlJob;
@@ -13,7 +14,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Spatie\Browsershot\Browsershot;
 use Spatie\Crawler\Crawler;
-use Spatie\Crawler\JavaScriptRenderers\BrowsershotRenderer;
 use Spatie\Crawler\JavaScriptRenderers\JavaScriptRenderer;
 use Tests\TestCase;
 
@@ -83,11 +83,35 @@ class RunCrawlJobTest extends TestCase
         };
 
         $renderer = $job->exposeRenderer();
-        $this->assertInstanceOf(BrowsershotRenderer::class, $renderer);
+        $this->assertInstanceOf(SafeBrowsershotRenderer::class, $renderer);
 
         $browsershot = $this->readProtected($renderer, 'browsershot');
         $this->assertInstanceOf(Browsershot::class, $browsershot);
         $this->assertTrue($this->readProtected($browsershot, 'noSandbox'), 'Browsershot must run with --no-sandbox');
+    }
+
+    public function test_js_renderer_encodes_spaces_and_swallows_render_failures(): void
+    {
+        // A single un-renderable URL (e.g. one with a raw space/umlaut) must NOT abort
+        // the crawl: spatie only catches ProcessFailedException, so Browsershot's
+        // FileUrlNotAllowed would otherwise bubble up and fail the whole scan.
+        $spy = new class extends Browsershot
+        {
+            public ?string $received = null;
+
+            public function setUrl(string $url): static
+            {
+                $this->received = $url;
+
+                throw new \RuntimeException('boom'); // stand-in for FileUrlNotAllowed / any render failure
+            }
+        };
+
+        $renderer = new SafeBrowsershotRenderer($spy);
+        $result = $renderer->getRenderedHtml('https://media.i-do.app/x/2026_07_03 datenschutz.pdf');
+
+        $this->assertSame('', $result, 'a render failure must return empty, not throw');
+        $this->assertSame('https://media.i-do.app/x/2026_07_03%20datenschutz.pdf', $spy->received, 'spaces must be encoded');
     }
 
     public function test_sitemap_urls_are_seeded_into_the_queue_when_enabled(): void

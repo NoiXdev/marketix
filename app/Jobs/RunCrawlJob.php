@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Crawler\PageAnalyzer;
+use App\Crawler\SafeBrowsershotRenderer;
 use App\Crawler\SitemapReader;
 use App\Crawler\UrlSafety;
 use App\Enums\CrawlMode;
@@ -22,7 +23,6 @@ use Spatie\Browsershot\Browsershot;
 use Spatie\Crawler\Crawler;
 use Spatie\Crawler\CrawlProfiles\CrawlInternalUrls;
 use Spatie\Crawler\CrawlUrl;
-use Spatie\Crawler\JavaScriptRenderers\BrowsershotRenderer;
 use Spatie\Crawler\JavaScriptRenderers\JavaScriptRenderer;
 
 class RunCrawlJob implements ShouldQueue
@@ -120,7 +120,7 @@ class RunCrawlJob implements ShouldQueue
             ->noSandbox()
             ->addChromiumArguments(['disable-dev-shm-usage']);
 
-        return new BrowsershotRenderer($browsershot);
+        return new SafeBrowsershotRenderer($browsershot);
     }
 
     /**
