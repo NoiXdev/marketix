@@ -25,6 +25,7 @@ return [
     'meta' => 'Meta',
     'headings' => 'Headings',
     'issues' => 'Issues',
+    'broken_links' => 'Broken links',
     'redirect_chain' => 'Redirect chain',
     'out_links' => 'Outgoing links',
     'structured_data' => 'Structured data',

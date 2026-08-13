@@ -25,6 +25,7 @@ return [
     'meta' => 'Meta',
     'headings' => 'Überschriften',
     'issues' => 'Probleme',
+    'broken_links' => 'Kaputte Links',
     'redirect_chain' => 'Redirect-Kette',
     'out_links' => 'Ausgehende Links',
     'structured_data' => 'Strukturierte Daten',

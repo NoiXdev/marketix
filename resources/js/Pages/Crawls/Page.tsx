@@ -37,6 +37,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
   const { t } = useTranslation();
 
   const isHtml = page.content_category === 'html';
+  const brokenLinks = page.out_links.filter((l) => l.status_code != null && l.status_code >= 400);
 
   return (
     <AppLayout title={page.url}>
@@ -56,6 +57,27 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
             </span>
           }
         />
+
+        {brokenLinks.length > 0 && (
+          <Card className="mb-4 border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] bg-danger-soft p-4">
+            <h3 className="mb-2 font-medium text-danger-foreground">
+              {t('crawler.broken_links')} ({brokenLinks.length})
+            </h3>
+            <ul className="space-y-1.5 text-sm">
+              {brokenLinks.map((link, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Badge variant="danger" className="shrink-0">
+                    {link.status_code}
+                  </Badge>
+                  <span className="break-all text-foreground">
+                    {link.to_url}
+                    {link.anchor && <span className="text-muted"> — {link.anchor}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2">
           {/* File / resource metadata — shown for every crawled URL. */}
