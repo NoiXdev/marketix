@@ -4,6 +4,7 @@ namespace Tests\Feature\Crawler;
 
 use App\Jobs\RunCrawlJob;
 use App\Models\Crawl;
+use App\Models\CrawlLink;
 use App\Models\CrawlPage;
 use App\Models\Project;
 use App\Models\User;
@@ -143,6 +144,27 @@ class CrawlControllerTest extends TestCase
                 ->where('filters.issue', 'missing_title')
                 ->has('pages.data', 1)
                 ->where('pages.data.0.url', 'https://example.com/a')
+            );
+    }
+
+    public function test_page_detail_shows_where_a_url_was_found(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        $source = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/blog']);
+        $target = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/dead', 'status_code' => 404]);
+        CrawlLink::factory()->create([
+            'crawl_id' => $crawl->id, 'from_page_id' => $source->id,
+            'to_url' => 'https://example.com/dead', 'type' => 'internal', 'anchor' => 'Read more',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.pages.show', ['project' => $project->id, 'crawl' => $crawl->id, 'page' => $target->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Crawls/Page')
+                ->has('page.in_links', 1)
+                ->where('page.in_links.0.from_url', 'https://example.com/blog')
+                ->where('page.in_links.0.anchor', 'Read more')
             );
     }
 }

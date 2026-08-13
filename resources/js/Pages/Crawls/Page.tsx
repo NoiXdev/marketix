@@ -3,10 +3,11 @@ import { Badge, BackLink, Card, PageHeader } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { formatBytes } from '@/lib/formatBytes';
 import { CrawlContentCategory, PageProps } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 type Heading = { level: number; text: string };
 type OutLink = { to_url: string; type: string; anchor: string; status_code: number | null };
+type InLink = { from_page_id: string; from_url: string; anchor: string | null };
 
 interface CrawlPageDetail {
   url: string;
@@ -30,6 +31,7 @@ interface CrawlPageDetail {
   images_missing_alt: string[];
   issues: string[];
   out_links: OutLink[];
+  in_links: InLink[];
 }
 
 export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: CrawlPageDetail }) {
@@ -80,6 +82,33 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
         )}
 
         <div className="grid gap-4 md:grid-cols-2">
+          {/* Where this URL was found — its origin. Key for fixing broken/404 URLs. */}
+          <Card className="p-4 md:col-span-2">
+            <h3 className="mb-2 font-medium text-foreground">
+              {t('crawler.found_on')} ({page.in_links.length})
+            </h3>
+            {page.in_links.length === 0 ? (
+              <p className="text-sm text-muted">
+                {t('crawler.no_inlinks')}
+                {page.in_sitemap && <> · {t('crawler.from_sitemap')}</>}
+              </p>
+            ) : (
+              <ul className="space-y-1.5 text-sm">
+                {page.in_links.map((link, i) => (
+                  <li key={i} className="flex flex-wrap items-baseline gap-x-2">
+                    <Link
+                      href={route('app.project.crawls.pages.show', { project: project!.id, crawl: crawlId, page: link.from_page_id })}
+                      className="break-all text-accent hover:underline"
+                    >
+                      {link.from_url}
+                    </Link>
+                    {link.anchor && <span className="text-muted">„{link.anchor}"</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
           {/* File / resource metadata — shown for every crawled URL. */}
           <Card className="p-4">
             <h3 className="mb-2 font-medium text-foreground">{t('crawler.file')}</h3>

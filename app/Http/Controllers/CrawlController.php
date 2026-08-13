@@ -114,6 +114,27 @@ class CrawlController extends Controller
         $model = $project->crawls()->findOrFail($crawl);
         $pageModel = $model->pages()->with('outLinks')->findOrFail($page);
 
+        // "Found on": the pages that link to this URL (its origin). Match the link
+        // target against the page URL allowing for trailing-slash normalisation.
+        $normalized = rtrim($pageModel->url, '/');
+        $inboundLinks = $model->links()
+            ->whereIn('to_url', array_values(array_unique([$pageModel->url, $normalized, $normalized.'/'])))
+            ->get(['from_page_id', 'anchor']);
+
+        $sourceUrls = $model->pages()
+            ->whereIn('id', $inboundLinks->pluck('from_page_id')->unique())
+            ->pluck('url', 'id');
+
+        $inLinks = $inboundLinks
+            ->map(fn ($l) => [
+                'from_page_id' => $l->from_page_id,
+                'from_url' => $sourceUrls[$l->from_page_id] ?? null,
+                'anchor' => $l->anchor,
+            ])
+            ->filter(fn ($l) => $l['from_url'] !== null)
+            ->unique(fn ($l) => $l['from_page_id'].'|'.$l['anchor'])
+            ->values();
+
         return inertia('Crawls/Page', [
             'crawlId' => $model->id,
             'page' => [
@@ -140,6 +161,7 @@ class CrawlController extends Controller
                 'out_links' => $pageModel->outLinks->map(fn ($l) => [
                     'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor, 'status_code' => $l->status_code,
                 ]),
+                'in_links' => $inLinks,
             ],
         ]);
     }
