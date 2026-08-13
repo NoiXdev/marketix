@@ -40,7 +40,12 @@ return [
             'connection' => env('DB_QUEUE_CONNECTION'),
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
-            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            // Must exceed the longest a job can run. The SEO crawl jobs (RunCrawlJob /
+            // AggregateCrawlJob) have no timeout and can run for a long time on huge
+            // sites; with several workers, a shorter retry_after would let a second
+            // worker re-reserve a still-running crawl and prematurely mark it failed.
+            // 6h of headroom; override via DB_QUEUE_RETRY_AFTER if needed.
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 21600),
             'after_commit' => false,
         ],
 
