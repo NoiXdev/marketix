@@ -54,10 +54,14 @@ class CrawlController extends Controller
         $model = $project->crawls()->findOrFail($crawl);
 
         $category = $request->query('category');
+        $issue = $request->query('issue');
 
         $query = $model->pages()->orderBy('depth');
         if (is_string($category) && $category !== '') {
             $query->where('content_category', $category);
+        }
+        if (is_string($issue) && $issue !== '') {
+            $query->whereJsonContains('issues', $issue);
         }
 
         $pages = $query
@@ -97,7 +101,10 @@ class CrawlController extends Controller
             ],
             'pages' => $pages,
             'categories' => $categories,
-            'filters' => ['category' => is_string($category) && $category !== '' ? $category : null],
+            'filters' => [
+                'category' => is_string($category) && $category !== '' ? $category : null,
+                'issue' => is_string($issue) && $issue !== '' ? $issue : null,
+            ],
         ]);
     }
 

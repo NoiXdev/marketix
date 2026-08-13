@@ -5,6 +5,7 @@ import { formatBytes } from '@/lib/formatBytes';
 import { durationBetween, formatDuration } from '@/lib/formatDuration';
 import { CrawlContentCategory, CrawlPageRow, CrawlSummary, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
+import { X } from 'lucide-react';
 import { useEffect } from 'react';
 
 type CrawlStatus = 'queued' | 'running' | 'completed' | 'failed';
@@ -50,7 +51,7 @@ export default function CrawlsShow({
   crawl: CrawlDetail;
   pages: Paginated<CrawlPageRow>;
   categories: CrawlContentCategory[];
-  filters: { category: string | null };
+  filters: { category: string | null; issue: string | null };
 }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
@@ -62,12 +63,21 @@ export default function CrawlsShow({
     return () => clearInterval(id);
   }, [crawl.status]);
 
-  function filterByCategory(category: string) {
-    router.get(
-      route('app.project.crawls.show', { project: project!.id, crawl: crawl.id }),
-      category ? { category } : {},
-      { preserveScroll: true, preserveState: true, replace: true },
-    );
+  // Apply category/issue filters as query params (server-side, composable). Passing a
+  // key merges it over the current filter; passing null clears just that one.
+  function applyFilters(next: { category?: string | null; issue?: string | null }) {
+    const category = next.category !== undefined ? next.category : filters.category;
+    const issue = next.issue !== undefined ? next.issue : filters.issue;
+
+    const params: Record<string, string> = {};
+    if (category) params.category = category;
+    if (issue) params.issue = issue;
+
+    router.get(route('app.project.crawls.show', { project: project!.id, crawl: crawl.id }), params, {
+      preserveScroll: true,
+      preserveState: true,
+      replace: true,
+    });
   }
 
   const summaryEntries = Object.entries(crawl.summary);
@@ -110,30 +120,56 @@ export default function CrawlsShow({
 
         {summaryEntries.length > 0 && (
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {summaryEntries.map(([code, count]) => (
-              <Card key={code} className="p-4">
-                <div className="text-2xl font-semibold text-foreground">{count}</div>
-                <div className="text-xs text-muted">{t(`crawler.issue.${code}`)}</div>
-              </Card>
-            ))}
+            {summaryEntries.map(([code, count]) => {
+              const active = filters.issue === code;
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => applyFilters({ issue: active ? null : code })}
+                  aria-pressed={active}
+                  className={`rounded-lg border p-4 text-left transition ${
+                    active ? 'border-accent bg-accent-soft' : 'border-line bg-surface hover:bg-elevated'
+                  }`}
+                >
+                  <div className="text-2xl font-semibold text-foreground">{count}</div>
+                  <div className="text-xs text-muted">{t(`crawler.issue.${code}`)}</div>
+                </button>
+              );
+            })}
           </div>
         )}
 
-        {categories.length > 1 && (
-          <div className="mb-3 flex items-center gap-2">
-            <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
-            <Select
-              value={filters.category ?? ''}
-              onChange={(e) => filterByCategory(e.target.value)}
-              className="w-48"
-            >
-              <option value="">{t('crawler.filter_all')}</option>
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {t(`crawler.category.${c}`)}
-                </option>
-              ))}
-            </Select>
+        {(categories.length > 1 || filters.issue) && (
+          <div className="mb-3 flex flex-wrap items-center gap-3">
+            {categories.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
+                <Select
+                  value={filters.category ?? ''}
+                  onChange={(e) => applyFilters({ category: e.target.value || null })}
+                  className="w-48"
+                >
+                  <option value="">{t('crawler.filter_all')}</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {t(`crawler.category.${c}`)}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
+
+            {filters.issue && (
+              <button
+                type="button"
+                onClick={() => applyFilters({ issue: null })}
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-soft-foreground"
+              >
+                {t('crawler.filter_issue')}: {t(`crawler.issue.${filters.issue}`)}
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         )}
 

@@ -51,6 +51,7 @@ return [
     'size' => 'Größe',
     'filter_type' => 'Typ',
     'filter_all' => 'Alle Typen',
+    'filter_issue' => 'Problem',
     'category' => [
         'html' => 'HTML-Seite',
         'image' => 'Bild',

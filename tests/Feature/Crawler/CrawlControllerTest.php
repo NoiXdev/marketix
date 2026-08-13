@@ -128,4 +128,21 @@ class CrawlControllerTest extends TestCase
                 ->where('pages.data.0.content_category', 'image')
             );
     }
+
+    public function test_show_filters_pages_by_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create(['start_url' => 'https://example.com']);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/a', 'issues' => ['missing_title', 'thin_content']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/b', 'issues' => ['broken_link']]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'issue' => 'missing_title']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Crawls/Show')
+                ->where('filters.issue', 'missing_title')
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/a')
+            );
+    }
 }
