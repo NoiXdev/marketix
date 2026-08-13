@@ -5,13 +5,31 @@ namespace App\Crawler;
 class UrlSafety
 {
     /**
-     * Resolve a hostname (or literal IP) to its IP addresses.
+     * Resolve a hostname (or literal IP) to its IP addresses, including IPv6.
      *
      * @return string[]
      */
     public static function resolveIps(string $host): array
     {
-        return @gethostbynamel($host) ?: (filter_var($host, FILTER_VALIDATE_IP) ? [$host] : []);
+        // IPv6 literal hosts arrive bracketed from parse_url, e.g. "[::1]".
+        $host = trim($host, '[]');
+
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            return [$host];
+        }
+
+        // gethostbynamel only returns A (IPv4) records. Also resolve AAAA (IPv6),
+        // otherwise a host that only publishes an IPv6 address (e.g. pointing at
+        // ::1 or an IPv4-mapped private address) would bypass the range checks.
+        $ips = @gethostbynamel($host) ?: [];
+
+        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
+            if (! empty($record['ipv6'])) {
+                $ips[] = $record['ipv6'];
+            }
+        }
+
+        return $ips;
     }
 
     /**

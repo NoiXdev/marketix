@@ -114,6 +114,28 @@ class RunCrawlJobTest extends TestCase
         $this->assertSame('https://media.i-do.app/x/2026_07_03%20datenschutz.pdf', $spy->received, 'spaces must be encoded');
     }
 
+    public function test_js_renderer_refuses_to_point_the_browser_at_an_internal_host(): void
+    {
+        // SSRF defence in depth: a private/internal host must never reach the browser
+        // (e.g. via DNS rebinding of the crawled domain).
+        $spy = new class extends Browsershot
+        {
+            public bool $setUrlCalled = false;
+
+            public function setUrl(string $url): static
+            {
+                $this->setUrlCalled = true;
+
+                return $this;
+            }
+        };
+
+        $renderer = new SafeBrowsershotRenderer($spy);
+
+        $this->assertSame('', $renderer->getRenderedHtml('http://127.0.0.1/admin'));
+        $this->assertFalse($spy->setUrlCalled, 'the browser must never be pointed at a private host');
+    }
+
     public function test_sitemap_urls_are_seeded_into_the_queue_when_enabled(): void
     {
         $crawl = Crawl::factory()->create([

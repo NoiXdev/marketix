@@ -24,6 +24,17 @@ class SafeBrowsershotRenderer implements JavaScriptRenderer
         // rejects a discovered link; encode them best-effort so such URLs still render.
         $url = str_replace(' ', '%20', $url);
 
+        // Defence in depth against SSRF: never point the headless browser at a
+        // private/internal host. Re-resolving here (rather than trusting an earlier
+        // check) also blocks DNS-rebinding, where a host resolved public at crawl time
+        // but now points at an internal address. Note: server-side redirects are
+        // already blocked by the crawler's guarded Guzzle fetch that precedes rendering;
+        // blocking client-side redirects Chrome follows itself needs egress filtering.
+        $host = parse_url($url, PHP_URL_HOST);
+        if (! is_string($host) || ! UrlSafety::hostIsSafe($host)) {
+            return '';
+        }
+
         try {
             return html_entity_decode($this->browsershot->setUrl($url)->bodyHtml());
         } catch (\Throwable $e) {
