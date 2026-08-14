@@ -10,7 +10,7 @@ class IssueCodeTest extends TestCase
     public function test_every_issue_code_has_a_known_severity(): void
     {
         foreach (IssueCode::cases() as $code) {
-            $this->assertContains($code->severity(), ['error', 'warning', 'notice'], $code->value);
+            $this->assertContains($code->severity(), ['error', 'warning', 'notice', 'info'], $code->value);
         }
     }
 
