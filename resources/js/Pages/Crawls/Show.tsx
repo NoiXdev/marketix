@@ -27,7 +27,7 @@ interface Paginated<T> {
 
 interface CatalogCheck {
   code: string;
-  severity: 'error' | 'warning' | 'notice';
+  severity: 'error' | 'warning' | 'notice' | 'info';
   status: 'active' | 'planned';
   count: number;
 }

@@ -291,4 +291,25 @@ class CrawlControllerTest extends TestCase
             ->get(route('app.project.crawls.pages.screenshot', [...$params, 'crawl' => $other->id]))
             ->assertNotFound();
     }
+
+    public function test_security_category_lists_pages_with_a_security_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/mixed', 'issues' => ['mixed_content', 'https_urls']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/clean', 'issues' => ['https_urls']]);
+
+        // Category badge counts only the page with a real problem (mixed_content), not the info-only page.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('catalog.security.count', 1));
+
+        // The security group filter lists the affected page.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'security', 'issue' => 'mixed_content']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/mixed')
+            );
+    }
 }

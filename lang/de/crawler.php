@@ -35,6 +35,7 @@ return [
     'severity_error' => 'Fehler',
     'severity_warning' => 'Warnung',
     'severity_notice' => 'Hinweis',
+    'severity_info' => 'Info',
     'serp_preview' => 'Google-Vorschau (SERP)',
     'serp_no_title' => '(kein Titel — Google generiert einen)',
     'serp_no_description' => '(keine Meta-Description — Google generiert einen Ausschnitt)',

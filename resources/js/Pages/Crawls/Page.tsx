@@ -31,23 +31,25 @@ interface CrawlPageDetail {
   structured_data: string[];
   images_missing_alt: string[];
   issues: string[];
-  issue_severities: Record<string, 'error' | 'warning' | 'notice'>;
+  issue_severities: Record<string, 'error' | 'warning' | 'notice' | 'info'>;
   out_links: OutLink[];
   in_links: InLink[];
   screenshots_enabled: boolean;
   screenshots: { desktop: string | null; mobile: string | null };
 }
 
-const severityVariant: Record<'error' | 'warning' | 'notice', 'danger' | 'warning' | 'neutral'> = {
+const severityVariant: Record<'error' | 'warning' | 'notice' | 'info', 'danger' | 'warning' | 'neutral'> = {
   error: 'danger',
   warning: 'warning',
   notice: 'neutral',
+  info: 'neutral',
 };
 
-const severityDot: Record<'error' | 'warning' | 'notice', string> = {
+const severityDot: Record<'error' | 'warning' | 'notice' | 'info', string> = {
   error: 'bg-danger-foreground',
   warning: 'bg-warning-foreground',
   notice: 'bg-neutral-foreground',
+  info: 'bg-neutral-foreground',
 };
 
 function truncateText(value: string, max: number): string {
@@ -391,7 +393,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
               }`}
             >
               {tb.severity && (
-                <span className={`h-2 w-2 shrink-0 rounded-full ${severityDot[tb.severity as 'error' | 'warning' | 'notice']}`} />
+                <span className={`h-2 w-2 shrink-0 rounded-full ${severityDot[tb.severity as 'error' | 'warning' | 'notice' | 'info']}`} />
               )}
               {tb.label}
             </button>
