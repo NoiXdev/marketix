@@ -64,6 +64,18 @@ class CrawlPageObserver extends CrawlObserver
         $category = ResourceClassifier::categorize($contentType);
         $size = strlen($body);
 
+        $lower = array_change_key_case($headers, CASE_LOWER);
+        $securityHeaders = [];
+        foreach (['content-security-policy', 'x-frame-options', 'x-content-type-options', 'strict-transport-security', 'referrer-policy', 'content-type'] as $key) {
+            if (isset($lower[$key][0])) {
+                $securityHeaders[$key] = $lower[$key][0];
+            }
+        }
+
+        $sniffHtml = (bool) preg_match('#^\s*(<!doctype html|<html[\s>])#i', ltrim($body, "\xEF\xBB\xBF"));
+        $declaredMedia = strtolower(trim(explode(';', (string) $contentType)[0]));
+        $wrongContentType = $sniffHtml && ! in_array($declaredMedia, ['text/html', 'application/xhtml+xml'], true);
+
         $issues = [];
         if ($status >= 500) {
             $issues[] = IssueCode::ServerError->value;
@@ -72,6 +84,7 @@ class CrawlPageObserver extends CrawlObserver
         }
 
         [$chain, $finalUrl] = $this->redirects($url, $headers);
+        $scheme = strtolower(parse_url($finalUrl ?: $url, PHP_URL_SCHEME) ?: 'https');
         if (count($chain) > 1) {
             $issues[] = IssueCode::RedirectChain->value;
         }
@@ -80,7 +93,7 @@ class CrawlPageObserver extends CrawlObserver
         $data = [];
 
         if ($category === ResourceClassifier::HTML) {
-            $ctx = new PageContext($url, $status, $this->baseHost);
+            $ctx = new PageContext($url, $status, $this->baseHost, false, $securityHeaders, $scheme);
             $analysis = $this->analyzer->analyze($body, $ctx);
             foreach ($analysis->issues as $issue) {
                 $issues[] = $issue->value;
@@ -99,6 +112,10 @@ class CrawlPageObserver extends CrawlObserver
             }
         }
 
+        if ($wrongContentType) {
+            $issues[] = IssueCode::WrongContentType->value;
+        }
+
         $page = $this->crawl->pages()->create(array_merge($data, [
             'url' => $url,
             'final_url' => $finalUrl,
@@ -109,6 +126,7 @@ class CrawlPageObserver extends CrawlObserver
             'response_time_ms' => (int) round($responseMs),
             'size_bytes' => $size,
             'issues' => array_values(array_unique($issues)),
+            'security_headers' => $securityHeaders ?: null,
         ]));
 
         foreach ($links as $link) {

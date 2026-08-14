@@ -24,6 +24,7 @@ class CrawlPage extends Model
             'structured_data' => 'array',
             'images_missing_alt' => 'array',
             'issues' => 'array',
+            'security_headers' => 'array',
             'is_indexable' => 'boolean',
             'in_sitemap' => 'boolean',
             'is_orphan' => 'boolean',
