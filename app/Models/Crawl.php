@@ -18,7 +18,7 @@ class Crawl extends Model
 
     protected $fillable = [
         'project_id', 'site_id', 'start_url', 'mode', 'render_js', 'respect_robots',
-        'include_subdomains', 'crawl_sitemap', 'delay_ms', 'max_pages', 'status', 'pages_crawled',
+        'include_subdomains', 'crawl_sitemap', 'capture_screenshots', 'delay_ms', 'max_pages', 'status', 'pages_crawled',
         'error', 'summary', 'started_at', 'finished_at',
     ];
 
@@ -31,6 +31,7 @@ class Crawl extends Model
             'respect_robots' => 'boolean',
             'include_subdomains' => 'boolean',
             'crawl_sitemap' => 'boolean',
+            'capture_screenshots' => 'boolean',
             'summary' => 'array',
             'started_at' => 'datetime',
             'finished_at' => 'datetime',

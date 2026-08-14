@@ -17,6 +17,7 @@ export default function CrawlsCreate({ modes }: { modes: Option[] }) {
     respect_robots: true,
     include_subdomains: false,
     crawl_sitemap: false,
+    capture_screenshots: false,
     delay_ms: 0,
     max_pages: '' as number | '',
   });
@@ -91,6 +92,14 @@ export default function CrawlsCreate({ modes }: { modes: Option[] }) {
                   {t('crawler.crawl_sitemap')}
                 </label>
                 <p className="ml-6 mt-1 text-xs text-muted">{t('crawler.crawl_sitemap_hint')}</p>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm text-foreground">
+                  <Checkbox checked={data.capture_screenshots} onChange={(e) => setData('capture_screenshots', e.target.checked)} />
+                  {t('crawler.capture_screenshots')}
+                </label>
+                <p className="ml-6 mt-1 text-xs text-muted">{t('crawler.capture_screenshots_hint')}</p>
               </div>
 
               <Field label={t('crawler.delay_ms')} htmlFor="delay_ms" error={errors.delay_ms}>

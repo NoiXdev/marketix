@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Bus;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -52,7 +53,16 @@ class RunCrawlJob implements ShouldQueue
         $this->seedSitemapUrls($crawler);
         $crawler->start();
 
-        AggregateCrawlJob::dispatch($this->crawl);
+        // Screenshots (opt-in) run AFTER aggregation, chained, so they only touch the
+        // screenshot columns and never race the aggregation's per-page writes.
+        if ($this->crawl->capture_screenshots) {
+            Bus::chain([
+                new AggregateCrawlJob($this->crawl),
+                new CaptureCrawlScreenshotsJob($this->crawl),
+            ])->dispatch();
+        } else {
+            AggregateCrawlJob::dispatch($this->crawl);
+        }
     }
 
     /**

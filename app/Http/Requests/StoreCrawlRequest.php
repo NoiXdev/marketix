@@ -23,6 +23,7 @@ class StoreCrawlRequest extends FormRequest
             'respect_robots' => ['boolean'],
             'include_subdomains' => ['boolean'],
             'crawl_sitemap' => ['boolean'],
+            'capture_screenshots' => ['boolean'],
             'delay_ms' => ['required', 'integer', 'min:0', 'max:10000'],
             'max_pages' => ['nullable', 'integer', 'min:1', 'max:100000'],
         ];

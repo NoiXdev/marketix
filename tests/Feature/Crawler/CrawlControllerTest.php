@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -180,5 +181,46 @@ class CrawlControllerTest extends TestCase
                 ->where('page.issue_severities.missing_title', 'error')
                 ->where('page.issue_severities.thin_content', 'notice')
             );
+    }
+
+    public function test_store_persists_capture_screenshots_flag(): void
+    {
+        Queue::fake();
+        [$user, $project] = $this->member();
+
+        $this->actingAs($user)->post(route('app.project.crawls.store', ['project' => $project->id]), [
+            'start_url' => 'https://example.com',
+            'mode' => 'full_site',
+            'delay_ms' => 0,
+            'capture_screenshots' => true,
+        ])->assertRedirect();
+
+        $this->assertTrue((bool) Crawl::first()->capture_screenshots);
+    }
+
+    public function test_serves_a_page_screenshot_scoped_to_the_project(): void
+    {
+        $diskName = config('filesystems.default');
+        Storage::fake($diskName);
+
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        $path = "crawl-screenshots/{$crawl->id}/p-desktop.jpg";
+        Storage::disk($diskName)->put($path, 'JPEGDATA');
+        $page = CrawlPage::factory()->for($crawl)->create(['screenshot_desktop_path' => $path]);
+
+        $params = ['project' => $project->id, 'crawl' => $crawl->id, 'page' => $page->id, 'variant' => 'desktop'];
+        $this->actingAs($user)->get(route('app.project.crawls.pages.screenshot', $params))->assertOk();
+
+        // Variant with no stored screenshot → 404.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.pages.screenshot', [...$params, 'variant' => 'mobile']))
+            ->assertNotFound();
+
+        // A crawl in another project is not reachable through this project.
+        $other = Crawl::factory()->for(Project::factory())->create();
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.pages.screenshot', [...$params, 'crawl' => $other->id]))
+            ->assertNotFound();
     }
 }

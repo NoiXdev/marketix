@@ -8,6 +8,7 @@ use App\Http\Requests\StoreCrawlRequest;
 use App\Jobs\RunCrawlJob;
 use App\Models\Crawl;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CrawlController extends Controller
@@ -166,14 +167,42 @@ class CrawlController extends Controller
                     'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor, 'status_code' => $l->status_code,
                 ]),
                 'in_links' => $inLinks,
+                'screenshots_enabled' => $model->capture_screenshots,
+                'screenshots' => [
+                    'desktop' => $pageModel->screenshot_desktop_path
+                        ? route('app.project.crawls.pages.screenshot', ['project' => $project->id, 'crawl' => $model->id, 'page' => $pageModel->id, 'variant' => 'desktop'])
+                        : null,
+                    'mobile' => $pageModel->screenshot_mobile_path
+                        ? route('app.project.crawls.pages.screenshot', ['project' => $project->id, 'crawl' => $model->id, 'page' => $pageModel->id, 'variant' => 'mobile'])
+                        : null,
+                ],
             ],
         ]);
+    }
+
+    public function screenshot(Request $request, string $crawl, string $page, string $variant)
+    {
+        abort_unless(in_array($variant, ['desktop', 'mobile'], true), 404);
+
+        $project = $request->get('project');
+        $model = $project->crawls()->findOrFail($crawl);
+        $pageModel = $model->pages()->findOrFail($page);
+
+        $path = $variant === 'mobile' ? $pageModel->screenshot_mobile_path : $pageModel->screenshot_desktop_path;
+
+        $disk = Storage::disk(config('filesystems.default'));
+        abort_if($path === null || ! $disk->exists($path), 404);
+
+        return $disk->response($path);
     }
 
     public function destroy(Request $request, string $crawl)
     {
         $project = $request->get('project');
-        $project->crawls()->findOrFail($crawl)->delete();
+        $model = $project->crawls()->findOrFail($crawl);
+
+        Storage::disk(config('filesystems.default'))->deleteDirectory("crawl-screenshots/{$model->id}");
+        $model->delete();
 
         return redirect()
             ->route('app.project.crawls.index', ['project' => $project->id])

@@ -34,6 +34,8 @@ interface CrawlPageDetail {
   issue_severities: Record<string, 'error' | 'warning' | 'notice'>;
   out_links: OutLink[];
   in_links: InLink[];
+  screenshots_enabled: boolean;
+  screenshots: { desktop: string | null; mobile: string | null };
 }
 
 const severityVariant: Record<'error' | 'warning' | 'notice', 'danger' | 'warning' | 'neutral'> = {
@@ -71,6 +73,9 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
   const brokenLinks = page.out_links.filter((l) => l.status_code != null && l.status_code >= 400);
 
   const [tab, setTab] = useState<string>('overview');
+  const [shotDevice, setShotDevice] = useState<'desktop' | 'mobile'>('desktop');
+
+  const currentShot = page.screenshots[shotDevice] ?? page.screenshots.desktop ?? page.screenshots.mobile ?? null;
 
   const brokenLinksCard = brokenLinks.length > 0 && (
     <Card className="border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] bg-danger-soft p-4 md:col-span-2">
@@ -90,6 +95,37 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           </li>
         ))}
       </ul>
+    </Card>
+  );
+
+  const screenshotsCard = (
+    <Card className="p-4 md:col-span-2">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-medium text-foreground">{t('crawler.screenshots')}</h3>
+        {(page.screenshots.desktop || page.screenshots.mobile) && (
+          <div className="inline-flex overflow-hidden rounded-lg border border-line">
+            {(['desktop', 'mobile'] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setShotDevice(d)}
+                className={`px-3 py-1 text-xs font-semibold ${
+                  shotDevice === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
+                }`}
+              >
+                {t(`crawler.device_${d}`)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      {currentShot ? (
+        <img src={currentShot} alt="" loading="lazy" className="max-h-[600px] w-auto rounded border border-line" />
+      ) : (
+        <p className="text-sm text-muted">
+          {page.screenshots_enabled ? t('crawler.screenshots_pending') : t('crawler.screenshots_disabled')}
+        </p>
+      )}
     </Card>
   );
 
@@ -365,6 +401,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
         {tab === 'overview' ? (
           <div className="grid gap-4 md:grid-cols-2">
             {isHtml && serpCard}
+            {isHtml && page.screenshots_enabled && screenshotsCard}
             {fileCard}
             {foundOnCard}
             {isHtml && metaCard}
