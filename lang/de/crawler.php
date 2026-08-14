@@ -91,6 +91,7 @@ return [
     'all_urls' => 'Alle URLs',
     'planned' => 'geplant',
     'category_planned_note' => 'Diese Checks kommen in einem späteren Release.',
+    'category_no_issues' => 'In dieser Kategorie wurden keine Probleme gefunden.',
     'category' => [
         'html' => 'HTML-Seite',
         'image' => 'Bild',

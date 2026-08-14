@@ -83,6 +83,9 @@ export default function CrawlsShow({
 
   const activeTab = filters.group ?? (filters.category ? 'all' : 'overview');
 
+  // A category is "planned-only" when none of its checks are implemented yet.
+  const hasActiveChecks = (key: string) => (catalog[key]?.checks ?? []).some((c) => c.status === 'active');
+
   function go(params: Record<string, string | null>) {
     const clean: Record<string, string> = {};
     for (const [k, v] of Object.entries(params)) if (v) clean[k] = v;
@@ -180,6 +183,7 @@ export default function CrawlsShow({
               onClick={() => go({ group: key })}
               label={t(`crawler.category_group.${key}`)}
               count={catalog[key]?.count ?? 0}
+              planned={!hasActiveChecks(key)}
             />
           ))}
         </div>
@@ -233,8 +237,10 @@ export default function CrawlsShow({
                 ))}
               </Select>
             </div>
-            {(catalog[activeTab]?.count ?? 0) === 0 && !filters.issue ? (
+            {!hasActiveChecks(activeTab) ? (
               <Card className="p-6 text-sm text-muted">{t('crawler.category_planned_note')}</Card>
+            ) : (catalog[activeTab]?.count ?? 0) === 0 && !filters.issue ? (
+              <Card className="p-6 text-sm text-muted">{t('crawler.category_no_issues')}</Card>
             ) : (
               pagesTable()
             )}
@@ -245,7 +251,19 @@ export default function CrawlsShow({
   );
 }
 
-function TabButton({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count?: number }) {
+function TabButton({
+  active,
+  onClick,
+  label,
+  count,
+  planned,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count?: number;
+  planned?: boolean;
+}) {
   return (
     <button
       type="button"
@@ -254,7 +272,7 @@ function TabButton({ active, onClick, label, count }: { active: boolean; onClick
       onClick={onClick}
       className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
         active ? 'border-accent text-foreground' : 'border-transparent text-muted hover:text-foreground'
-      } ${count === 0 ? 'opacity-60' : ''}`}
+      } ${planned ? 'opacity-60' : ''}`}
     >
       {label}
       {count !== undefined && count > 0 && <span className="rounded-full bg-neutral-soft px-1.5 text-xs text-neutral-foreground">{count}</span>}
