@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Crawler\IssueCode;
 use App\Enums\CrawlMode;
 use App\Http\Requests\StoreCrawlRequest;
 use App\Jobs\RunCrawlJob;
@@ -158,6 +159,9 @@ class CrawlController extends Controller
                 'structured_data' => $pageModel->structured_data ?? [],
                 'images_missing_alt' => $pageModel->images_missing_alt ?? [],
                 'issues' => $pageModel->issues ?? [],
+                'issue_severities' => collect($pageModel->issues ?? [])
+                    ->mapWithKeys(fn ($code) => [$code => IssueCode::tryFrom($code)?->severity() ?? 'notice'])
+                    ->all(),
                 'out_links' => $pageModel->outLinks->map(fn ($l) => [
                     'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor, 'status_code' => $l->status_code,
                 ]),

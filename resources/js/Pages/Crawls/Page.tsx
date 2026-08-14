@@ -31,9 +31,22 @@ interface CrawlPageDetail {
   structured_data: string[];
   images_missing_alt: string[];
   issues: string[];
+  issue_severities: Record<string, 'error' | 'warning' | 'notice'>;
   out_links: OutLink[];
   in_links: InLink[];
 }
+
+const severityVariant: Record<'error' | 'warning' | 'notice', 'danger' | 'warning' | 'neutral'> = {
+  error: 'danger',
+  warning: 'warning',
+  notice: 'neutral',
+};
+
+const severityDot: Record<'error' | 'warning' | 'notice', string> = {
+  error: 'bg-danger-foreground',
+  warning: 'bg-warning-foreground',
+  notice: 'bg-neutral-foreground',
+};
 
 export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: CrawlPageDetail }) {
   const { project } = usePage<PageProps>().props;
@@ -42,11 +55,6 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
   const isHtml = page.content_category === 'html';
   const brokenLinks = page.out_links.filter((l) => l.status_code != null && l.status_code >= 400);
 
-  const tabs = [
-    { key: 'overview', label: t('crawler.tab_overview') },
-    ...(isHtml ? [{ key: 'content', label: t('crawler.tab_content') }] : []),
-    { key: 'links', label: t('crawler.tab_links') },
-  ];
   const [tab, setTab] = useState<string>('overview');
 
   const brokenLinksCard = brokenLinks.length > 0 && (
@@ -93,21 +101,6 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           </div>
         )}
       </dl>
-    </Card>
-  );
-
-  const issuesCard = (
-    <Card className="p-4">
-      <h3 className="mb-2 font-medium text-foreground">{t('crawler.issues')}</h3>
-      {page.issues.length === 0 ? (
-        <p className="text-sm text-muted">—</p>
-      ) : (
-        <ul className="space-y-1 text-sm text-foreground">
-          {page.issues.map((c) => (
-            <li key={c}>{t(`crawler.issue.${c}`)}</li>
-          ))}
-        </ul>
-      )}
     </Card>
   );
 
@@ -259,6 +252,47 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
     </Card>
   );
 
+  // The evidence card most relevant to a given issue, shown inside that issue's tab.
+  function issueEvidence(code: string) {
+    switch (code) {
+      case 'broken_link':
+        return brokenLinksCard || null;
+      case 'missing_alt_text':
+        return imagesCard;
+      case 'redirect_chain':
+        return redirectChainCard;
+      case 'missing_structured_data':
+        return structuredDataCard;
+      case 'missing_h1':
+      case 'multiple_h1':
+      case 'heading_order_skip':
+        return headingsCard;
+      case 'missing_title':
+      case 'title_too_long':
+      case 'missing_meta_description':
+      case 'duplicate_title':
+      case 'duplicate_meta_description':
+      case 'noindex':
+      case 'canonical_mismatch':
+      case 'robots_blocked':
+        return metaCard;
+      case 'orphan_page':
+      case 'not_in_sitemap':
+        return foundOnCard;
+      default:
+        return fileCard;
+    }
+  }
+
+  const tabs = [
+    { key: 'overview', label: t('crawler.tab_overview'), severity: null as string | null },
+    ...page.issues.map((code) => ({
+      key: code,
+      label: t(`crawler.issue.${code}`),
+      severity: page.issue_severities[code] ?? 'notice',
+    })),
+  ];
+
   return (
     <AppLayout title={page.url}>
       <div className="px-8 py-8">
@@ -278,7 +312,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           }
         />
 
-        <div className="mb-4 flex gap-1 border-b border-line" role="tablist">
+        <div className="mb-4 flex flex-wrap gap-1 border-b border-line" role="tablist">
           {tabs.map((tb) => (
             <button
               key={tb.key}
@@ -286,41 +320,41 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
               role="tab"
               aria-selected={tab === tb.key}
               onClick={() => setTab(tb.key)}
-              className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+              className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
                 tab === tb.key ? 'border-accent text-foreground' : 'border-transparent text-muted hover:text-foreground'
               }`}
             >
+              {tb.severity && (
+                <span className={`h-2 w-2 shrink-0 rounded-full ${severityDot[tb.severity as 'error' | 'warning' | 'notice']}`} />
+              )}
               {tb.label}
             </button>
           ))}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {tab === 'overview' && (
-            <>
-              {brokenLinksCard}
-              {fileCard}
-              {issuesCard}
-            </>
-          )}
-
-          {tab === 'content' && isHtml && (
-            <>
-              {metaCard}
-              {headingsCard}
-              {structuredDataCard}
-              {imagesCard}
-            </>
-          )}
-
-          {tab === 'links' && (
-            <>
-              {foundOnCard}
-              {isHtml && outLinksCard}
-              {redirectChainCard}
-            </>
-          )}
-        </div>
+        {tab === 'overview' ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {fileCard}
+            {foundOnCard}
+            {isHtml && metaCard}
+            {isHtml && headingsCard}
+            {isHtml && outLinksCard}
+            {isHtml && structuredDataCard}
+            {isHtml && imagesCard}
+            {redirectChainCard}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Badge variant={severityVariant[page.issue_severities[tab] ?? 'notice']}>
+                {t(`crawler.severity_${page.issue_severities[tab] ?? 'notice'}`)}
+              </Badge>
+              <h2 className="font-medium text-foreground">{t(`crawler.issue.${tab}`)}</h2>
+            </div>
+            <p className="text-sm text-muted">{t(`crawler.issue_help.${tab}`)}</p>
+            <div className="grid gap-4 md:grid-cols-2">{issueEvidence(tab)}</div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );

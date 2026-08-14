@@ -167,4 +167,18 @@ class CrawlControllerTest extends TestCase
                 ->where('page.in_links.0.anchor', 'Read more')
             );
     }
+
+    public function test_page_detail_exposes_issue_severities(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        $p = CrawlPage::factory()->for($crawl)->create(['issues' => ['missing_title', 'thin_content']]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.pages.show', ['project' => $project->id, 'crawl' => $crawl->id, 'page' => $p->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('page.issue_severities.missing_title', 'error')
+                ->where('page.issue_severities.thin_content', 'notice')
+            );
+    }
 }
