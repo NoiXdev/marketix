@@ -191,6 +191,31 @@ class CrawlControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page->has('pages.data', 0));
     }
 
+    public function test_info_severity_code_is_filterable_but_not_counted_as_a_problem(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/secure', 'issues' => ['https_urls']]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                // https_urls does not inflate the security problem badge …
+                ->where('catalog.security.count', 0)
+                // … but is per-code counted for the dropdown.
+                ->where('catalog.security.checks', fn ($checks) => collect($checks)
+                    ->firstWhere('code', 'https_urls')['count'] === 1)
+            );
+
+        // …and is a working filter that lists the page.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'security', 'issue' => 'https_urls']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/secure')
+            );
+    }
+
     public function test_page_detail_shows_where_a_url_was_found(): void
     {
         [$user, $project] = $this->member();

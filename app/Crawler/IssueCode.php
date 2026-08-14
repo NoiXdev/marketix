@@ -33,6 +33,20 @@ enum IssueCode: string
     // resources (non-HTML files: images, media, …)
     case LargeResource = 'large_resource';       // over the "getting big" threshold
     case OversizedResource = 'oversized_resource'; // clearly too large for the web
+    // security
+    case MissingCspHeader = 'missing_csp_header';
+    case MissingXFrameOptions = 'missing_x_frame_options';
+    case MissingXContentTypeOptions = 'missing_x_content_type_options';
+    case MissingHstsHeader = 'missing_hsts_header';
+    case UnsafeCrossOriginLinks = 'unsafe_cross_origin_links';
+    case MissingReferrerPolicy = 'missing_referrer_policy';
+    case HttpUrls = 'http_urls';
+    case HttpsUrls = 'https_urls';
+    case MixedContent = 'mixed_content';
+    case FormUrlInsecure = 'form_url_insecure';
+    case FormOnHttp = 'form_on_http';
+    case ProtocolRelativeResourceLinks = 'protocol_relative_resource_links';
+    case WrongContentType = 'wrong_content_type';
 
     public function severity(): string
     {
@@ -42,9 +56,15 @@ enum IssueCode: string
             self::RedirectChain, self::MultipleH1, self::HeadingOrderSkip, self::Noindex,
             self::CanonicalMismatch, self::RobotsBlocked, self::DuplicateTitle,
             self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription,
-            self::LargeResource, self::BrokenLink => 'warning',
+            self::LargeResource, self::BrokenLink,
+            self::MissingXFrameOptions, self::MissingXContentTypeOptions, self::MissingHstsHeader,
+            self::UnsafeCrossOriginLinks, self::HttpUrls, self::MixedContent,
+            self::FormUrlInsecure, self::FormOnHttp, self::WrongContentType => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
-            self::MissingStructuredData, self::NotInSitemap => 'notice',
+            self::MissingStructuredData, self::NotInSitemap,
+            self::MissingCspHeader, self::MissingReferrerPolicy,
+            self::ProtocolRelativeResourceLinks => 'notice',
+            self::HttpsUrls => 'info',
         };
     }
 
@@ -59,6 +79,10 @@ enum IssueCode: string
             self::MissingAltText => IssueCategory::Images,
             self::CanonicalMismatch => IssueCategory::Canonicals,
             self::OrphanPage, self::BrokenLink => IssueCategory::Links,
+            self::MissingCspHeader, self::MissingXFrameOptions, self::MissingXContentTypeOptions,
+            self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
+            self::HttpUrls, self::HttpsUrls, self::MixedContent, self::FormUrlInsecure,
+            self::FormOnHttp, self::ProtocolRelativeResourceLinks, self::WrongContentType => IssueCategory::Security,
             self::Noindex, self::MissingStructuredData, self::NotInSitemap,
             self::LargeResource, self::OversizedResource => IssueCategory::Other,
         };

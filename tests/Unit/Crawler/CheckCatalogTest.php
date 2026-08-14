@@ -16,7 +16,7 @@ class CheckCatalogTest extends TestCase
         foreach (CheckCatalog::all() as $entry) {
             $this->assertArrayHasKey('code', $entry);
             $this->assertContains($entry['category'], $categories, $entry['code']);
-            $this->assertContains($entry['severity'], ['error', 'warning', 'notice'], $entry['code']);
+            $this->assertContains($entry['severity'], ['error', 'warning', 'notice', 'info'], $entry['code']);
             $this->assertContains($entry['status'], ['active', 'planned'], $entry['code']);
         }
     }
@@ -50,6 +50,22 @@ class CheckCatalogTest extends TestCase
     public function test_active_codes_for_category_filters(): void
     {
         $this->assertContains('missing_title', CheckCatalog::activeCodesForCategory('page_title'));
-        $this->assertSame([], CheckCatalog::activeCodesForCategory('security')); // all planned in Phase 0
+        $security = CheckCatalog::activeCodesForCategory('security');
+        $this->assertContains('mixed_content', $security);
+        $this->assertContains('https_urls', $security);
+        $this->assertCount(13, $security);
+    }
+
+    public function test_bijection_cardinality_holds(): void
+    {
+        $this->assertCount(count(IssueCode::cases()), CheckCatalog::activeCodes());
+    }
+
+    public function test_catalogue_severity_matches_issue_code_for_security(): void
+    {
+        foreach (CheckCatalog::activeCodesForCategory('security') as $code) {
+            $entry = collect(CheckCatalog::all())->firstWhere('code', $code);
+            $this->assertSame(IssueCode::from($code)->severity(), $entry['severity'], $code);
+        }
     }
 }

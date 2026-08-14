@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Crawler\CheckCatalog;
 use App\Crawler\IssueCode;
 use App\Crawler\LinkStatusChecker;
 use App\Crawler\SitemapReader;
@@ -144,6 +145,9 @@ class AggregateCrawlJob implements ShouldQueue
                 $page->save();
 
                 foreach ($page->issues as $code) {
+                    if (! CheckCatalog::isProblemCode($code)) {
+                        continue;
+                    }
                     $summary[$code] = ($summary[$code] ?? 0) + 1;
                 }
             }

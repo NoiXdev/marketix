@@ -112,7 +112,7 @@ class CrawlController extends Controller
             foreach (array_unique($issues ?? []) as $code) {
                 $perCode[$code] = ($perCode[$code] ?? 0) + 1;
                 $cat = CheckCatalog::categoryOf($code);
-                if ($cat !== null) {
+                if ($cat !== null && CheckCatalog::isProblemCode($code)) {
                     $seenCategories[$cat] = true;
                 }
             }

@@ -18,20 +18,20 @@ class CheckCatalog
     public static function all(): array
     {
         return [
-            // security (all planned — Phase 1)
-            ['code' => 'missing_csp_header', 'category' => 'security', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'missing_x_frame_options', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'missing_x_content_type_options', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'missing_hsts_header', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'unsafe_cross_origin_links', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'missing_referrer_policy', 'category' => 'security', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'http_urls', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'https_urls', 'category' => 'security', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'mixed_content', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'form_url_insecure', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'form_on_http', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'protocol_relative_resource_links', 'category' => 'security', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'wrong_content_type', 'category' => 'security', 'severity' => 'warning', 'status' => self::P],
+            // security
+            ['code' => 'missing_csp_header', 'category' => 'security', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'missing_x_frame_options', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'missing_x_content_type_options', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'missing_hsts_header', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'unsafe_cross_origin_links', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'missing_referrer_policy', 'category' => 'security', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'http_urls', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'https_urls', 'category' => 'security', 'severity' => 'info', 'status' => self::A],
+            ['code' => 'mixed_content', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'form_url_insecure', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'form_on_http', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'protocol_relative_resource_links', 'category' => 'security', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'wrong_content_type', 'category' => 'security', 'severity' => 'warning', 'status' => self::A],
 
             // response_codes
             ['code' => 'robots_blocked', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::A],
@@ -202,5 +202,17 @@ class CheckCatalog
         }
 
         return null;
+    }
+
+    /** True unless the code is an informational (`info`) signal that should not count as a problem. */
+    public static function isProblemCode(string $code): bool
+    {
+        foreach (self::all() as $entry) {
+            if ($entry['code'] === $code) {
+                return $entry['severity'] !== 'info';
+            }
+        }
+
+        return true;
     }
 }
