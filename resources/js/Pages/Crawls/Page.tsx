@@ -48,6 +48,21 @@ const severityDot: Record<'error' | 'warning' | 'notice', string> = {
   notice: 'bg-neutral-foreground',
 };
 
+function truncateText(value: string, max: number): string {
+  return value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value;
+}
+
+/** Format a URL the way Google renders its breadcrumb line, e.g. "example.com › blog › post". */
+function serpDisplayUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    const segments = u.pathname.split('/').filter(Boolean);
+    return [`${u.protocol}//${u.host}`, ...segments].join(' › ');
+  } catch {
+    return url;
+  }
+}
+
 export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: CrawlPageDetail }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
@@ -75,6 +90,21 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           </li>
         ))}
       </ul>
+    </Card>
+  );
+
+  const serpCard = (
+    <Card className="p-4 md:col-span-2">
+      <h3 className="mb-3 font-medium text-foreground">{t('crawler.serp_preview')}</h3>
+      <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-black/10">
+        <div className="truncate text-xs text-[#4d5156]">{serpDisplayUrl(page.url)}</div>
+        <div className="truncate text-lg leading-tight text-[#1a0dab]">
+          {page.title?.trim() ? truncateText(page.title.trim(), 60) : t('crawler.serp_no_title')}
+        </div>
+        <p className="mt-1 line-clamp-2 text-sm text-[#4d5156]">
+          {page.meta_description?.trim() ? truncateText(page.meta_description.trim(), 160) : t('crawler.serp_no_description')}
+        </p>
+      </div>
     </Card>
   );
 
@@ -334,6 +364,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
 
         {tab === 'overview' ? (
           <div className="grid gap-4 md:grid-cols-2">
+            {isHtml && serpCard}
             {fileCard}
             {foundOnCard}
             {isHtml && metaCard}
