@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Crawler\CheckCatalog;
+use App\Crawler\IssueCategory;
 use App\Crawler\IssueCode;
 use App\Enums\CrawlMode;
 use App\Http\Requests\StoreCrawlRequest;
@@ -55,15 +57,28 @@ class CrawlController extends Controller
         $project = $request->get('project');
         $model = $project->crawls()->findOrFail($crawl);
 
-        $category = $request->query('category');
-        $issue = $request->query('issue');
+        $category = $request->query('category');   // content type (existing)
+        $group = $request->query('group');         // issue category (new)
+        $issue = $request->query('issue');         // single check (existing/new)
 
         $query = $model->pages()->orderBy('depth');
+
         if (is_string($category) && $category !== '') {
             $query->where('content_category', $category);
         }
-        if (is_string($issue) && $issue !== '') {
+
+        if (is_string($issue) && $issue !== '' && in_array($issue, CheckCatalog::activeCodes(), true)) {
             $query->whereJsonContains('issues', $issue);
+        } elseif (is_string($group) && $group !== '') {
+            $codes = CheckCatalog::activeCodesForCategory($group);
+            $query->where(function ($q) use ($codes) {
+                foreach ($codes as $code) {
+                    $q->orWhereJsonContains('issues', $code);
+                }
+                if ($codes === []) {
+                    $q->whereRaw('1 = 0'); // category has only planned checks → no rows
+                }
+            });
         }
 
         $pages = $query
@@ -89,6 +104,43 @@ class CrawlController extends Controller
             ->orderBy('content_category')
             ->pluck('content_category');
 
+        // Per-code and per-category counts, computed in one pass over the stored issues.
+        $perCode = [];
+        $perCategory = [];
+        foreach ($model->pages()->pluck('issues') as $issues) {
+            $seenCategories = [];
+            foreach (array_unique($issues ?? []) as $code) {
+                $perCode[$code] = ($perCode[$code] ?? 0) + 1;
+                $cat = CheckCatalog::categoryOf($code);
+                if ($cat !== null) {
+                    $seenCategories[$cat] = true;
+                }
+            }
+            foreach (array_keys($seenCategories) as $cat) {
+                $perCategory[$cat] = ($perCategory[$cat] ?? 0) + 1;
+            }
+        }
+
+        // Catalogue grouped by category, in enum order, with counts.
+        $catalog = [];
+        foreach (IssueCategory::cases() as $cat) {
+            $checks = [];
+            foreach (CheckCatalog::all() as $entry) {
+                if ($entry['category'] === $cat->value) {
+                    $checks[] = [
+                        'code' => $entry['code'],
+                        'severity' => $entry['severity'],
+                        'status' => $entry['status'],
+                        'count' => $perCode[$entry['code']] ?? 0,
+                    ];
+                }
+            }
+            $catalog[$cat->value] = [
+                'count' => $perCategory[$cat->value] ?? 0,
+                'checks' => $checks,
+            ];
+        }
+
         return inertia('Crawls/Show', [
             'crawl' => [
                 'id' => $model->id,
@@ -103,8 +155,10 @@ class CrawlController extends Controller
             ],
             'pages' => $pages,
             'categories' => $categories,
+            'catalog' => $catalog,
             'filters' => [
                 'category' => is_string($category) && $category !== '' ? $category : null,
+                'group' => is_string($group) && $group !== '' ? $group : null,
                 'issue' => is_string($issue) && $issue !== '' ? $issue : null,
             ],
         ]);

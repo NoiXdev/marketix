@@ -148,6 +148,49 @@ class CrawlControllerTest extends TestCase
             );
     }
 
+    public function test_show_groups_catalogue_and_filters_by_category_and_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        $a = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/a', 'issues' => ['missing_title']]);
+        $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/b', 'issues' => ['broken_link']]);
+        $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/c', 'issues' => []]);
+
+        // Catalogue is exposed, grouped, with per-category counts.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Crawls/Show')
+                ->has('catalog')
+                ->where('catalog.page_title.count', 1)
+                ->where('catalog.security.count', 0)
+                ->has('pages.data', 3) // unfiltered = all URLs
+            );
+
+        // Filter by category → only pages with an active issue in it.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'page_title']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters.group', 'page_title')
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/a')
+            );
+
+        // Filter by a single issue.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'links', 'issue' => 'broken_link']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters.issue', 'broken_link')
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/b')
+            );
+
+        // A category with only planned checks yields no rows.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'security']))
+            ->assertInertia(fn (AssertableInertia $page) => $page->has('pages.data', 0));
+    }
+
     public function test_page_detail_shows_where_a_url_was_found(): void
     {
         [$user, $project] = $this->member();
