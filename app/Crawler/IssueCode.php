@@ -48,6 +48,22 @@ enum IssueCode: string
         };
     }
 
+    public function category(): IssueCategory
+    {
+        return match ($this) {
+            self::ClientError, self::ServerError, self::RedirectChain, self::RobotsBlocked => IssueCategory::ResponseCodes,
+            self::MissingTitle, self::DuplicateTitle, self::TitleTooLong => IssueCategory::PageTitle,
+            self::MissingMetaDescription, self::DuplicateMetaDescription => IssueCategory::MetaDescription,
+            self::MissingH1, self::MultipleH1, self::HeadingOrderSkip => IssueCategory::H1,
+            self::ThinContent => IssueCategory::Content,
+            self::MissingAltText => IssueCategory::Images,
+            self::CanonicalMismatch => IssueCategory::Canonicals,
+            self::OrphanPage, self::BrokenLink => IssueCategory::Links,
+            self::Noindex, self::MissingStructuredData, self::NotInSitemap,
+            self::LargeResource, self::OversizedResource => IssueCategory::Other,
+        };
+    }
+
     public function label(): string
     {
         return __('crawler.issue.'.$this->value);
