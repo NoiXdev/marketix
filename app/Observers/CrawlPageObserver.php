@@ -110,6 +110,9 @@ class CrawlPageObserver extends CrawlObserver
             if ($sizeIssue = ResourceClassifier::sizeIssue($category, $size)) {
                 $issues[] = $sizeIssue->value;
             }
+            if ($category === ResourceClassifier::IMAGE && $size > 102400) {
+                $issues[] = IssueCode::ImageOver100kb->value;
+            }
         }
 
         if ($wrongContentType) {
