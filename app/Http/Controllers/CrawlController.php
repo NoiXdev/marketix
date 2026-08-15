@@ -152,24 +152,19 @@ class CrawlController extends Controller
                 ->pluck('c', 'type');
 
             $rq = $model->resources()
-                ->selectRaw('url, min(type) as type, max(is_internal) as is_internal, count(distinct from_page_id) as ref_count')
+                ->selectRaw('url, min(type) as type, max(is_internal) as is_internal, count(distinct from_page_id) as ref_count, min(status_code) as status_code, min(size_bytes) as size_bytes')
                 ->groupBy('url');
             if (is_string($resourceType) && $resourceType !== '') {
                 $rq->where('type', $resourceType);
             }
             $paginator = $rq->orderByDesc('ref_count')->paginate(50)->withQueryString();
-
-            $meta = $model->pages()
-                ->whereIn('url', $paginator->pluck('url')->all())
-                ->get(['url', 'status_code', 'size_bytes'])
-                ->keyBy('url');
             $paginator->getCollection()->transform(fn ($row) => [
                 'url' => $row->url,
                 'type' => $row->type,
                 'is_internal' => (bool) $row->is_internal,
                 'ref_count' => (int) $row->ref_count,
-                'status_code' => $row->is_internal ? ($meta[$row->url]->status_code ?? null) : null,
-                'size_bytes' => $row->is_internal ? ($meta[$row->url]->size_bytes ?? null) : null,
+                'status_code' => $row->status_code !== null ? (int) $row->status_code : null,
+                'size_bytes' => $row->size_bytes !== null ? (int) $row->size_bytes : null,
             ]);
             $resources = $paginator;
         }

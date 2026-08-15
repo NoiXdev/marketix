@@ -429,12 +429,11 @@ class CrawlControllerTest extends TestCase
         $crawl = Crawl::factory()->for($project)->create();
         $p1 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/a']);
         $p2 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/b']);
-        // Internal CSS referenced by BOTH pages + crawled as its own page (size/status known).
-        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/app.css', 'status_code' => 200, 'size_bytes' => 4096, 'content_category' => 'css']);
-        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p1->id, 'url' => 'https://example.com/app.css', 'type' => 'css', 'is_internal' => true]);
-        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p2->id, 'url' => 'https://example.com/app.css', 'type' => 'css', 'is_internal' => true]);
-        // External JS referenced once (no crawled page → null size/status).
-        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p1->id, 'url' => 'https://cdn.test/lib.js', 'type' => 'javascript', 'is_internal' => false]);
+        // Internal CSS referenced by BOTH pages, with status/size stored on the resource rows.
+        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p1->id, 'url' => 'https://example.com/app.css', 'type' => 'css', 'is_internal' => true, 'status_code' => 200, 'size_bytes' => 4096]);
+        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p2->id, 'url' => 'https://example.com/app.css', 'type' => 'css', 'is_internal' => true, 'status_code' => 200, 'size_bytes' => 4096]);
+        // External JS referenced once, status/size stored (as the probe would).
+        CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $p1->id, 'url' => 'https://cdn.test/lib.js', 'type' => 'javascript', 'is_internal' => false, 'status_code' => 200, 'size_bytes' => 12000]);
 
         $this->actingAs($user)
             ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'view' => 'resources']))
@@ -442,7 +441,7 @@ class CrawlControllerTest extends TestCase
                 ->where('filters.view', 'resources')
                 ->where('resources.data', fn ($rows) => collect($rows)->firstWhere('url', 'https://example.com/app.css')['ref_count'] === 2
                     && collect($rows)->firstWhere('url', 'https://example.com/app.css')['size_bytes'] === 4096
-                    && collect($rows)->firstWhere('url', 'https://cdn.test/lib.js')['size_bytes'] === null)
+                    && collect($rows)->firstWhere('url', 'https://cdn.test/lib.js')['size_bytes'] === 12000)
                 ->where('resourceSummary.css', 1)
             );
 
