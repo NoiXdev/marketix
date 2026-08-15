@@ -361,4 +361,19 @@ class CrawlControllerTest extends TestCase
                 ->where('pages.data.0.url', 'https://example.com/x')
             );
     }
+
+    public function test_h2_category_lists_a_page_with_an_h2_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/x', 'issues' => ['missing_h2']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/clean', 'issues' => []]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'h2', 'issue' => 'missing_h2']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/x')
+            );
+    }
 }

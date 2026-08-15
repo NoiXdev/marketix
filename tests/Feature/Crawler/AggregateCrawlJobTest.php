@@ -208,4 +208,24 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertContains('duplicate_meta_keywords', $b->refresh()->issues);
         $this->assertNotContains('duplicate_meta_keywords', $c->refresh()->issues);
     }
+
+    public function test_flags_duplicate_h1(): void
+    {
+        $crawl = Crawl::factory()->create();
+        $a = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/a', 'h1' => 'Welcome', 'issues' => []]);
+        $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/b', 'h1' => 'Welcome', 'issues' => []]);
+        $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c', 'h1' => 'Unique Heading', 'issues' => []]);
+        // Two pages with no H1 at all (e.g. image-only/empty H1 → null) must never be
+        // treated as duplicates of each other: null is not a shared value.
+        $d = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/d', 'h1' => null, 'issues' => []]);
+        $e = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/e', 'h1' => null, 'issues' => []]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertContains('duplicate_h1', $a->refresh()->issues);
+        $this->assertContains('duplicate_h1', $b->refresh()->issues);
+        $this->assertNotContains('duplicate_h1', $c->refresh()->issues);
+        $this->assertNotContains('duplicate_h1', $d->refresh()->issues);
+        $this->assertNotContains('duplicate_h1', $e->refresh()->issues);
+    }
 }
