@@ -113,6 +113,19 @@ enum IssueCode: string
     case MultiplePaginationUrls = 'multiple_pagination_urls';
     case PaginationLoop = 'pagination_loop';
     case PaginationSequenceError = 'pagination_sequence_error';
+    // links
+    case PagesNonCrawlableInternalOutlinks = 'pages_non_crawlable_internal_outlinks';
+    case PagesHighCrawlDepth = 'pages_high_crawl_depth';
+    case PagesNoInternalOutlinks = 'pages_no_internal_outlinks';
+    case InternalNofollowOutlinks = 'internal_nofollow_outlinks';
+    case InternalOutlinksNoAnchor = 'internal_outlinks_no_anchor';
+    case NonDescriptiveAnchorInternalOutlinks = 'non_descriptive_anchor_internal_outlinks';
+    case PagesManyExternalOutlinks = 'pages_many_external_outlinks';
+    case PagesManyInternalOutlinks = 'pages_many_internal_outlinks';
+    case FollowNofollowInternalInlinks = 'follow_nofollow_internal_inlinks';
+    case OnlyInternalNofollowInlinks = 'only_internal_nofollow_inlinks';
+    case OutlinksToLocalhost = 'outlinks_to_localhost';
+    case OnlyNonIndexableInlinks = 'only_non_indexable_inlinks';
 
     public function severity(): string
     {
@@ -134,7 +147,10 @@ enum IssueCode: string
             self::MultipleCanonical, self::MultipleConflictingCanonical, self::NonIndexableCanonical,
             self::CanonicalInvalidAttribute, self::CanonicalOutsideHead, self::MultiplePaginationUrls,
             self::PaginationUrlNotInAnchor, self::PaginationNon200, self::PaginationUnlinked,
-            self::PaginationNonIndexable, self::PaginationSequenceError => 'warning',
+            self::PaginationNonIndexable, self::PaginationSequenceError,
+            self::PagesNonCrawlableInternalOutlinks, self::PagesNoInternalOutlinks,
+            self::OnlyInternalNofollowInlinks, self::OutlinksToLocalhost,
+            self::OnlyNonIndexableInlinks => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -149,7 +165,10 @@ enum IssueCode: string
             self::H1Over70Chars, self::AltTextInH1, self::MissingH2, self::DuplicateH2, self::H2Over70Chars,
             self::HasCanonical, self::CanonicalSelfReferencing, self::MissingCanonical,
             self::CanonicalIsRelative, self::CanonicalNotLinked, self::CanonicalFragmentUrl,
-            self::HasPagination, self::PaginationFirstPage, self::Paginated2plus => 'notice',
+            self::HasPagination, self::PaginationFirstPage, self::Paginated2plus,
+            self::PagesHighCrawlDepth, self::InternalNofollowOutlinks, self::InternalOutlinksNoAnchor,
+            self::NonDescriptiveAnchorInternalOutlinks, self::PagesManyExternalOutlinks,
+            self::PagesManyInternalOutlinks, self::FollowNofollowInternalInlinks => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -183,7 +202,13 @@ enum IssueCode: string
             self::PaginationUrlNotInAnchor, self::PaginationNon200, self::PaginationUnlinked,
             self::PaginationNonIndexable, self::MultiplePaginationUrls, self::PaginationLoop,
             self::PaginationSequenceError => IssueCategory::Pagination,
-            self::OrphanPage, self::BrokenLink => IssueCategory::Links,
+            self::OrphanPage, self::BrokenLink,
+            self::PagesNonCrawlableInternalOutlinks, self::PagesHighCrawlDepth,
+            self::PagesNoInternalOutlinks, self::InternalNofollowOutlinks,
+            self::InternalOutlinksNoAnchor, self::NonDescriptiveAnchorInternalOutlinks,
+            self::PagesManyExternalOutlinks, self::PagesManyInternalOutlinks,
+            self::FollowNofollowInternalInlinks, self::OnlyInternalNofollowInlinks,
+            self::OutlinksToLocalhost, self::OnlyNonIndexableInlinks => IssueCategory::Links,
             self::MissingCspHeader, self::MissingXFrameOptions, self::MissingXContentTypeOptions,
             self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
             self::HttpUrls, self::HttpsUrls, self::MixedContent, self::FormUrlInsecure,

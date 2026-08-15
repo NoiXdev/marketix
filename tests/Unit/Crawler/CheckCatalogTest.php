@@ -72,6 +72,7 @@ class CheckCatalogTest extends TestCase
         $this->assertCount(5, CheckCatalog::activeCodesForCategory('h2'));
         $this->assertCount(12, CheckCatalog::activeCodesForCategory('canonicals'));
         $this->assertCount(10, CheckCatalog::activeCodesForCategory('pagination'));
+        $this->assertCount(14, CheckCatalog::activeCodesForCategory('links'));
     }
 
     public function test_bijection_cardinality_holds(): void
