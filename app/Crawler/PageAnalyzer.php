@@ -3,6 +3,7 @@
 namespace App\Crawler;
 
 use App\Crawler\Analyzers\Analyzer;
+use App\Crawler\Analyzers\CanonicalAnalyzer;
 use App\Crawler\Analyzers\HeadingAnalyzer;
 use App\Crawler\Analyzers\ImageAnalyzer;
 use App\Crawler\Analyzers\IndexabilityAnalyzer;
@@ -25,6 +26,7 @@ class PageAnalyzer
             new ImageAnalyzer,
             new StructuredDataAnalyzer,
             new SecurityAnalyzer,
+            new CanonicalAnalyzer,
         ];
     }
 
