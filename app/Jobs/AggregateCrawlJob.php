@@ -46,7 +46,7 @@ class AggregateCrawlJob implements ShouldQueue
         // avoids hydrating full page models (with their heavier JSON columns) or
         // eager-loading every link relation for the whole crawl at once.
         $identities = $this->crawl->pages()
-            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'created_at'])
+            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'created_at', 'canonical', 'pagination_next', 'pagination_prev', 'status_code', 'is_indexable'])
             ->get();
 
         // The page that represents the crawl's start/home page. Prefer an exact match
@@ -67,6 +67,20 @@ class AggregateCrawlJob implements ShouldQueue
             $pageIdByUrl[$norm($p->url)] = $p->id;
             if ($norm($p->final_url) !== '') {
                 $pageIdByUrl[$norm($p->final_url)] = $p->id;
+            }
+        }
+
+        $pageByUrl = [];
+        foreach ($identities as $p) {
+            $entry = [
+                'status' => $p->status_code,
+                'indexable' => (bool) $p->is_indexable,
+                'next' => $p->pagination_next !== null ? $norm($p->pagination_next) : null,
+                'prev' => $p->pagination_prev !== null ? $norm($p->pagination_prev) : null,
+            ];
+            $pageByUrl[$norm($p->url)] = $entry;
+            if ($norm($p->final_url) !== '') {
+                $pageByUrl[$norm($p->final_url)] = $entry;
             }
         }
 
@@ -107,7 +121,7 @@ class AggregateCrawlJob implements ShouldQueue
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $startPageId, $brokenPageIds, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $startPageId, $brokenPageIds, $pageByUrl, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -147,6 +161,42 @@ class AggregateCrawlJob implements ShouldQueue
 
                 if (isset($brokenPageIds[$page->id])) {
                     $issues[IssueCode::BrokenLink->value] = true;
+                }
+
+                // Cross-page canonical checks.
+                if ($page->canonical !== null && trim($page->canonical) !== '') {
+                    $canon = $this->resolveUrl($page->canonical, $page->url);
+                    if ($canon !== null) {
+                        $canonKey = $norm($canon);
+                        if (isset($pageByUrl[$canonKey])) {
+                            if ($pageByUrl[$canonKey]['indexable'] === false) {
+                                $issues[IssueCode::NonIndexableCanonical->value] = true;
+                            }
+                        } else {
+                            $issues[IssueCode::CanonicalNotLinked->value] = true;
+                        }
+                    }
+                }
+
+                // Cross-page pagination checks (next/prev are stored pre-resolved).
+                foreach (array_filter([$page->pagination_next, $page->pagination_prev]) as $target) {
+                    $paginationKey = $norm($target);
+                    if (isset($pageByUrl[$paginationKey])) {
+                        if ($pageByUrl[$paginationKey]['status'] !== null && $pageByUrl[$paginationKey]['status'] !== 200) {
+                            $issues[IssueCode::PaginationNon200->value] = true;
+                        }
+                        if ($pageByUrl[$paginationKey]['indexable'] === false) {
+                            $issues[IssueCode::PaginationNonIndexable->value] = true;
+                        }
+                    } else {
+                        $issues[IssueCode::PaginationUnlinked->value] = true;
+                    }
+                }
+                if ($page->pagination_next !== null) {
+                    $nextKey = $norm($page->pagination_next);
+                    if (isset($pageByUrl[$nextKey]) && $pageByUrl[$nextKey]['prev'] !== $norm($page->url)) {
+                        $issues[IssueCode::PaginationSequenceError->value] = true;
+                    }
                 }
 
                 $page->issues = array_keys($issues->all());
@@ -271,6 +321,28 @@ class AggregateCrawlJob implements ShouldQueue
         }
 
         return $broken;
+    }
+
+    private function resolveUrl(string $href, string $base): ?string
+    {
+        $href = trim($href);
+        if ($href === '' || str_starts_with($href, '#')) {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $href)) {
+            return $href;
+        }
+        $b = parse_url($base);
+        if (! isset($b['scheme'], $b['host'])) {
+            return null;
+        }
+        $origin = $b['scheme'].'://'.$b['host'].(isset($b['port']) ? ':'.$b['port'] : '');
+        if (str_starts_with($href, '/')) {
+            return $origin.$href;
+        }
+        $path = rtrim(dirname($b['path'] ?? '/'), '/');
+
+        return $origin.$path.'/'.$href;
     }
 
     public function failed(\Throwable $e): void

@@ -228,4 +228,27 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertNotContains('duplicate_h1', $d->refresh()->issues);
         $this->assertNotContains('duplicate_h1', $e->refresh()->issues);
     }
+
+    public function test_flags_cross_page_canonical_and_pagination_issues(): void
+    {
+        $crawl = Crawl::factory()->create();
+        // Canonical → a crawled, non-indexable page.
+        $noindex = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/noindex', 'is_indexable' => false, 'status_code' => 200, 'issues' => []]);
+        $c1 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c1', 'canonical' => 'https://x.test/noindex', 'issues' => []]);
+        // Canonical → an uncrawled URL.
+        $c2 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c2', 'canonical' => 'https://x.test/ghost', 'issues' => []]);
+        // Pagination next → a 404 crawled page + broken reciprocity.
+        $p404 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p2', 'status_code' => 404, 'is_indexable' => true, 'pagination_prev' => 'https://x.test/other', 'issues' => []]);
+        $p1 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p1', 'status_code' => 200, 'pagination_next' => 'https://x.test/p2', 'issues' => []]);
+        // Pagination next → uncrawled.
+        $p3 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p3', 'pagination_next' => 'https://x.test/ghost2', 'issues' => []]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertContains('non_indexable_canonical', $c1->refresh()->issues);
+        $this->assertContains('canonical_not_linked', $c2->refresh()->issues);
+        $this->assertContains('pagination_non_200', $p1->refresh()->issues);
+        $this->assertContains('pagination_sequence_error', $p1->issues); // p2.prev != p1
+        $this->assertContains('pagination_unlinked', $p3->refresh()->issues);
+    }
 }
