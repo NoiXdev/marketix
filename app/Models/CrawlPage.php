@@ -40,4 +40,9 @@ class CrawlPage extends Model
     {
         return $this->hasMany(CrawlLink::class, 'from_page_id');
     }
+
+    public function resources(): HasMany
+    {
+        return $this->hasMany(CrawlResource::class, 'from_page_id');
+    }
 }

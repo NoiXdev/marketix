@@ -57,4 +57,9 @@ class Crawl extends Model
     {
         return $this->hasMany(CrawlLink::class);
     }
+
+    public function resources(): HasMany
+    {
+        return $this->hasMany(CrawlResource::class);
+    }
 }
