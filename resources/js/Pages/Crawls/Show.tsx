@@ -2,7 +2,8 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Badge, BackLink, Card, Flash, LinkButton, PageHeader, Pagination, Select, StatusPill, TableCard } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { durationBetween, formatDuration } from '@/lib/formatDuration';
-import { CrawlContentCategory, CrawlPageRow, CrawlSummary, PageProps } from '@/types';
+import { formatBytes } from '@/lib/formatBytes';
+import { CrawlContentCategory, CrawlPageRow, CrawlResourceRow, CrawlSummary, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
@@ -32,7 +33,7 @@ interface CatalogCheck {
   count: number;
 }
 type Catalog = Record<string, { count: number; checks: CatalogCheck[] }>;
-type Filters = { category: string | null; group: string | null; issue: string | null };
+type Filters = { category: string | null; group: string | null; issue: string | null; view: string | null; resource_type: string | null };
 
 const statusVariant: Record<CrawlStatus, 'neutral' | 'success' | 'warning' | 'danger'> = {
   queued: 'neutral',
@@ -64,12 +65,16 @@ export default function CrawlsShow({
   pages,
   categories,
   catalog,
+  resources,
+  resourceSummary,
   filters,
 }: {
   crawl: CrawlDetail;
   pages: Paginated<CrawlPageRow>;
   categories: CrawlContentCategory[];
   catalog: Catalog;
+  resources: Paginated<CrawlResourceRow> | null;
+  resourceSummary: Record<string, number>;
   filters: Filters;
 }) {
   const { project } = usePage<PageProps>().props;
@@ -77,11 +82,11 @@ export default function CrawlsShow({
 
   useEffect(() => {
     if (crawl.status !== 'running' && crawl.status !== 'queued') return;
-    const id = setInterval(() => router.reload({ only: ['crawl', 'pages', 'catalog'] }), 3000);
+    const id = setInterval(() => router.reload({ only: ['crawl', 'pages', 'catalog', 'resources'] }), 3000);
     return () => clearInterval(id);
   }, [crawl.status]);
 
-  const activeTab = filters.group ?? (filters.category ? 'all' : 'overview');
+  const activeTab = filters.view === 'resources' ? 'resources' : (filters.group ?? (filters.category ? 'all' : 'overview'));
 
   // A category is "planned-only" when none of its checks are implemented yet.
   const hasActiveChecks = (key: string) => (catalog[key]?.checks ?? []).some((c) => c.status === 'active');
@@ -176,6 +181,7 @@ export default function CrawlsShow({
         <div className="mb-4 flex flex-wrap gap-1 border-b border-line" role="tablist">
           <TabButton active={activeTab === 'overview'} onClick={() => go({})} label={t('crawler.tab_overview')} />
           <TabButton active={activeTab === 'all'} onClick={() => go({ category: filters.category })} label={t('crawler.all_urls')} />
+          <TabButton active={activeTab === 'resources'} onClick={() => go({ view: 'resources' })} label={t('crawler.tab_resources')} />
           {CATEGORY_ORDER.map((key) => (
             <TabButton
               key={key}
@@ -220,6 +226,58 @@ export default function CrawlsShow({
               </div>
             )}
             {pagesTable()}
+          </>
+        )}
+
+        {activeTab === 'resources' && resources && (
+          <>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {Object.entries(resourceSummary).map(([type, count]) => (
+                <Badge key={type}>
+                  {t(`crawler.category.${type}`)}: {count}
+                </Badge>
+              ))}
+            </div>
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
+              <Select value={filters.resource_type ?? ''} onChange={(e) => go({ view: 'resources', resource_type: e.target.value || null })} className="w-48">
+                <option value="">{t('crawler.filter_all')}</option>
+                {['javascript', 'css', 'font', 'image', 'other'].map((ty) => (
+                  <option key={ty} value={ty}>
+                    {t(`crawler.category.${ty}`)}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <TableCard
+              columns={[
+                { label: t('crawler.col_url') },
+                { label: t('crawler.col_type') },
+                { label: t('crawler.col_size') },
+                { label: t('crawler.col_status') },
+                { label: t('crawler.col_references') },
+              ]}
+            >
+              <tbody className="divide-y divide-line">
+                {resources.data.map((res) => (
+                  <tr key={res.url} className="hover:bg-elevated">
+                    <td className="px-4 py-3">
+                      <span className="break-all text-foreground">{res.url}</span>
+                      <span className="ml-2 text-xs text-muted">{res.is_internal ? t('crawler.resource_internal') : t('crawler.resource_external')}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge>{t(`crawler.category.${res.type}`)}</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-muted">{formatBytes(res.size_bytes)}</td>
+                    <td className="px-4 py-3 text-muted">{res.status_code ?? '—'}</td>
+                    <td className="px-4 py-3 text-muted">{res.ref_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </TableCard>
+            <div className="mt-2">
+              <Pagination links={resources.links} />
+            </div>
           </>
         )}
 

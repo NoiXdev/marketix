@@ -60,6 +60,8 @@ class CrawlController extends Controller
         $category = $request->query('category');   // content type (existing)
         $group = $request->query('group');         // issue category (new)
         $issue = $request->query('issue');         // single check (existing/new)
+        $view = $request->query('view');
+        $resourceType = $request->query('resource_type');
 
         $query = $model->pages()->orderBy('depth');
 
@@ -141,6 +143,37 @@ class CrawlController extends Controller
             ];
         }
 
+        $resources = null;
+        $resourceSummary = [];
+        if ($view === 'resources') {
+            $resourceSummary = $model->resources()
+                ->selectRaw('type, count(distinct url) as c')
+                ->groupBy('type')
+                ->pluck('c', 'type');
+
+            $rq = $model->resources()
+                ->selectRaw('url, min(type) as type, max(is_internal) as is_internal, count(distinct from_page_id) as ref_count')
+                ->groupBy('url');
+            if (is_string($resourceType) && $resourceType !== '') {
+                $rq->where('type', $resourceType);
+            }
+            $paginator = $rq->orderByDesc('ref_count')->paginate(50)->withQueryString();
+
+            $meta = $model->pages()
+                ->whereIn('url', $paginator->pluck('url')->all())
+                ->get(['url', 'status_code', 'size_bytes'])
+                ->keyBy('url');
+            $paginator->getCollection()->transform(fn ($row) => [
+                'url' => $row->url,
+                'type' => $row->type,
+                'is_internal' => (bool) $row->is_internal,
+                'ref_count' => (int) $row->ref_count,
+                'status_code' => $row->is_internal ? ($meta[$row->url]->status_code ?? null) : null,
+                'size_bytes' => $row->is_internal ? ($meta[$row->url]->size_bytes ?? null) : null,
+            ]);
+            $resources = $paginator;
+        }
+
         return inertia('Crawls/Show', [
             'crawl' => [
                 'id' => $model->id,
@@ -156,10 +189,14 @@ class CrawlController extends Controller
             'pages' => $pages,
             'categories' => $categories,
             'catalog' => $catalog,
+            'resources' => $resources,
+            'resourceSummary' => $resourceSummary,
             'filters' => [
                 'category' => is_string($category) && $category !== '' ? $category : null,
                 'group' => is_string($group) && $group !== '' ? $group : null,
                 'issue' => is_string($issue) && $issue !== '' ? $issue : null,
+                'view' => $view === 'resources' ? 'resources' : null,
+                'resource_type' => is_string($resourceType) && $resourceType !== '' ? $resourceType : null,
             ],
         ]);
     }

@@ -124,6 +124,15 @@ export interface CrawlPageRow {
   issues: string[];
 }
 
+export interface CrawlResourceRow {
+  url: string;
+  type: string;
+  is_internal: boolean;
+  ref_count: number;
+  status_code: number | null;
+  size_bytes: number | null;
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
