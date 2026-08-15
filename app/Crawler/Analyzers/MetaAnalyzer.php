@@ -5,6 +5,7 @@ namespace App\Crawler\Analyzers;
 use App\Crawler\AnalyzerResult;
 use App\Crawler\IssueCode;
 use App\Crawler\PageContext;
+use App\Crawler\PixelWidth;
 use Symfony\Component\DomCrawler\Crawler;
 
 class MetaAnalyzer implements Analyzer
@@ -22,11 +23,74 @@ class MetaAnalyzer implements Analyzer
             $r->issue(IssueCode::TitleTooLong);
         }
 
+        if ($title !== null && trim($title) !== '') {
+            if (mb_strlen($title) < 30) {
+                $r->issue(IssueCode::TitleBelow30Chars);
+            }
+            $titlePx = PixelWidth::widthPx($title, 1.0);
+            if ($titlePx < 200) {
+                $r->issue(IssueCode::TitleBelow200px);
+            } elseif ($titlePx > 561) {
+                $r->issue(IssueCode::TitleOver561px);
+            }
+            $h1 = $this->first($dom, 'h1');
+            if ($h1 !== null && $h1 !== '' && mb_strtolower(trim($h1)) === mb_strtolower(trim($title))) {
+                $r->issue(IssueCode::TitleSameAsH1);
+            }
+        }
+
+        // Structural title checks (whole document, excluding SVG <title>).
+        $allTitles = $dom->filterXPath('//title[not(ancestor::svg)]')->count();
+        $headTitles = $dom->filterXPath('//head//title[not(ancestor::svg)]')->count();
+        if ($allTitles > 1) {
+            $r->issue(IssueCode::MultipleTitle);
+        }
+        if ($allTitles > $headTitles) {
+            $r->issue(IssueCode::TitleOutsideHead);
+        }
+
         $desc = $this->attr($dom, 'head meta[name="description"]', 'content');
         $r->add('meta_description', $desc);
         $r->add('meta_description_length', $desc !== null ? mb_strlen($desc) : 0);
         if ($desc === null || trim($desc) === '') {
             $r->issue(IssueCode::MissingMetaDescription);
+        }
+
+        if ($desc !== null && trim($desc) !== '') {
+            $descLen = mb_strlen($desc);
+            if ($descLen < 70) {
+                $r->issue(IssueCode::MetaDescriptionBelow70Chars);
+            } elseif ($descLen > 155) {
+                $r->issue(IssueCode::MetaDescriptionOver155Chars);
+            }
+            $descPx = PixelWidth::widthPx($desc, 0.72);
+            if ($descPx < 400) {
+                $r->issue(IssueCode::MetaDescriptionBelow400px);
+            } elseif ($descPx > 985) {
+                $r->issue(IssueCode::MetaDescriptionOver985px);
+            }
+        }
+
+        // Structural description checks.
+        $allDesc = $dom->filter('meta[name="description"]')->count();
+        $headDesc = $dom->filter('head meta[name="description"]')->count();
+        if ($allDesc > 1) {
+            $r->issue(IssueCode::MultipleMetaDescription);
+        }
+        if ($allDesc > $headDesc) {
+            $r->issue(IssueCode::MetaDescriptionOutsideHead);
+        }
+
+        // Meta keywords: extract + structural checks.
+        $keywords = $this->attr($dom, 'meta[name="keywords"]', 'content');
+        $keywords = $keywords !== null && trim($keywords) !== '' ? trim($keywords) : null;
+        $r->add('meta_keywords', $keywords);
+        $keywordCount = $dom->filter('meta[name="keywords"]')->count();
+        if ($keywordCount === 0) {
+            $r->issue(IssueCode::MissingMetaKeywords);
+        }
+        if ($keywordCount > 1) {
+            $r->issue(IssueCode::MultipleMetaKeywords);
         }
 
         $r->add('canonical', $this->attr($dom, 'head link[rel="canonical"]', 'href'));

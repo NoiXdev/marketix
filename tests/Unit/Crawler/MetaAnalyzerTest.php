@@ -30,7 +30,15 @@ class MetaAnalyzerTest extends TestCase
         $this->assertSame('https://x.test/', $r->data['canonical']);
         $this->assertSame('index,follow', $r->data['meta_robots']);
         $this->assertGreaterThanOrEqual(150, $r->data['word_count']);
-        $this->assertSame([], $r->issues);
+        // 'Hello World' / 'A page' are short by the new length+pixel checks, and this
+        // fixture has no meta keywords tag, so those notice-level issues now fire too.
+        $this->assertSame([
+            IssueCode::TitleBelow30Chars,
+            IssueCode::TitleBelow200px,
+            IssueCode::MetaDescriptionBelow70Chars,
+            IssueCode::MetaDescriptionBelow400px,
+            IssueCode::MissingMetaKeywords,
+        ], $r->issues);
     }
 
     public function test_flags_missing_title_and_description_and_thin_content(): void
@@ -47,5 +55,51 @@ class MetaAnalyzerTest extends TestCase
         $r = $this->analyze('<html><head><title>'.str_repeat('a', 61).'</title></head><body>'.str_repeat('w ', 150).'</body></html>');
 
         $this->assertContains(IssueCode::TitleTooLong, $r->issues);
+    }
+
+    public function test_title_length_and_pixel_and_same_as_h1(): void
+    {
+        // Short title (< 30 chars, < 200px) that also equals the h1.
+        $r = $this->analyze('<html><head><title>Home</title></head><body><h1>Home</h1>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::TitleBelow30Chars, $r->issues);
+        $this->assertContains(IssueCode::TitleBelow200px, $r->issues);
+        $this->assertContains(IssueCode::TitleSameAsH1, $r->issues);
+
+        // Very long title (> 561px).
+        $long = $this->analyze('<html><head><title>'.str_repeat('a', 70).'</title></head><body>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::TitleOver561px, $long->issues);
+    }
+
+    public function test_structural_title_checks_and_svg_is_ignored(): void
+    {
+        $two = $this->analyze('<html><head><title>One</title></head><body><title>Two</title>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::MultipleTitle, $two->issues);
+        $this->assertContains(IssueCode::TitleOutsideHead, $two->issues);
+
+        // An SVG <title> must NOT count as a page title.
+        $svg = $this->analyze('<html><head><title>Only</title></head><body><svg><title>icon</title></svg>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertNotContains(IssueCode::MultipleTitle, $svg->issues);
+        $this->assertNotContains(IssueCode::TitleOutsideHead, $svg->issues);
+    }
+
+    public function test_description_length_and_structural(): void
+    {
+        $short = $this->analyze('<html><head><title>A normal length title here</title><meta name="description" content="Too short."></head><body>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::MetaDescriptionBelow70Chars, $short->issues);
+        $this->assertContains(IssueCode::MetaDescriptionBelow400px, $short->issues);
+
+        $two = $this->analyze('<html><head><title>A normal length title here</title><meta name="description" content="one"><meta name="description" content="two"></head><body>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::MultipleMetaDescription, $two->issues);
+    }
+
+    public function test_meta_keywords_extraction_and_checks(): void
+    {
+        $none = $this->analyze('<html><head><title>A normal length title here</title></head><body>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::MissingMetaKeywords, $none->issues);
+        $this->assertNull($none->data['meta_keywords']);
+
+        $kw = $this->analyze('<html><head><title>A normal length title here</title><meta name="keywords" content="a, b"><meta name="keywords" content="c"></head><body>'.str_repeat('w ', 150).'</body></html>');
+        $this->assertContains(IssueCode::MultipleMetaKeywords, $kw->issues);
+        $this->assertSame('a, b', $kw->data['meta_keywords']);
     }
 }
