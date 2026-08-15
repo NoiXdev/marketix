@@ -44,6 +44,25 @@ class ResourceExtractor implements Analyzer
             }
         });
 
+        // Responsive images: srcset is a comma-separated list of "URL [descriptor]".
+        $dom->filter('img[srcset], source[srcset]')->each(function (Crawler $n) use ($add) {
+            foreach (explode(',', $n->attr('srcset') ?? '') as $candidate) {
+                $url = trim(explode(' ', trim($candidate))[0]);
+                if ($url !== '') {
+                    $add($url, 'image');
+                }
+            }
+        });
+
+        // Inline background-image URLs (inline styles only — external CSS is not parsed).
+        $dom->filter('[style]')->each(function (Crawler $n) use ($add) {
+            if (preg_match_all('/background-image\s*:\s*[^;}]*?url\(\s*(["\']?)([^"\')]+)\1\s*\)/i', $n->attr('style') ?? '', $m)) {
+                foreach ($m[2] as $url) {
+                    $add(trim($url), 'image');
+                }
+            }
+        });
+
         $r->add('resources', array_values($byUrl));
 
         return $r;
