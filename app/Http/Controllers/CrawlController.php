@@ -62,6 +62,7 @@ class CrawlController extends Controller
         $issue = $request->query('issue');         // single check (existing/new)
         $view = $request->query('view');
         $resourceType = $request->query('resource_type');
+        $resource = $request->query('resource');
 
         $query = $model->pages()->orderBy('depth');
 
@@ -144,29 +145,41 @@ class CrawlController extends Controller
         }
 
         $resources = null;
+        $resourceRefs = null;
         $resourceSummary = [];
         if ($view === 'resources') {
             $resourceSummary = $model->resources()
-                ->selectRaw('type, count(distinct url) as c')
+                ->select('url', 'type', 'size_bytes')->distinct()->get()
                 ->groupBy('type')
-                ->pluck('c', 'type');
+                ->map(fn ($g) => ['count' => $g->count(), 'total_bytes' => (int) $g->sum('size_bytes')])
+                ->all();
 
-            $rq = $model->resources()
-                ->selectRaw('url, min(type) as type, max(is_internal) as is_internal, count(distinct from_page_id) as ref_count, min(status_code) as status_code, min(size_bytes) as size_bytes')
-                ->groupBy('url');
-            if (is_string($resourceType) && $resourceType !== '') {
-                $rq->where('type', $resourceType);
+            if (is_string($resource) && $resource !== '') {
+                $pageIds = $model->resources()->where('url', $resource)->distinct()->pluck('from_page_id');
+                $resourceRefs = [
+                    'url' => $resource,
+                    'pages' => $model->pages()->whereIn('id', $pageIds)->orderBy('url')
+                        ->paginate(50)->withQueryString()
+                        ->through(fn ($p) => ['id' => $p->id, 'url' => $p->url, 'status_code' => $p->status_code]),
+                ];
+            } else {
+                $rq = $model->resources()
+                    ->selectRaw('url, min(type) as type, max(is_internal) as is_internal, count(distinct from_page_id) as ref_count, min(status_code) as status_code, min(size_bytes) as size_bytes')
+                    ->groupBy('url');
+                if (is_string($resourceType) && $resourceType !== '') {
+                    $rq->where('type', $resourceType);
+                }
+                $paginator = $rq->orderByDesc('ref_count')->paginate(50)->withQueryString();
+                $paginator->getCollection()->transform(fn ($row) => [
+                    'url' => $row->url,
+                    'type' => $row->type,
+                    'is_internal' => (bool) $row->is_internal,
+                    'ref_count' => (int) $row->ref_count,
+                    'status_code' => $row->status_code !== null ? (int) $row->status_code : null,
+                    'size_bytes' => $row->size_bytes !== null ? (int) $row->size_bytes : null,
+                ]);
+                $resources = $paginator;
             }
-            $paginator = $rq->orderByDesc('ref_count')->paginate(50)->withQueryString();
-            $paginator->getCollection()->transform(fn ($row) => [
-                'url' => $row->url,
-                'type' => $row->type,
-                'is_internal' => (bool) $row->is_internal,
-                'ref_count' => (int) $row->ref_count,
-                'status_code' => $row->status_code !== null ? (int) $row->status_code : null,
-                'size_bytes' => $row->size_bytes !== null ? (int) $row->size_bytes : null,
-            ]);
-            $resources = $paginator;
         }
 
         return inertia('Crawls/Show', [
@@ -185,6 +198,7 @@ class CrawlController extends Controller
             'categories' => $categories,
             'catalog' => $catalog,
             'resources' => $resources,
+            'resourceRefs' => $resourceRefs,
             'resourceSummary' => $resourceSummary,
             'filters' => [
                 'category' => is_string($category) && $category !== '' ? $category : null,
@@ -192,6 +206,7 @@ class CrawlController extends Controller
                 'issue' => is_string($issue) && $issue !== '' ? $issue : null,
                 'view' => $view === 'resources' ? 'resources' : null,
                 'resource_type' => is_string($resourceType) && $resourceType !== '' ? $resourceType : null,
+                'resource' => is_string($resource) && $resource !== '' ? $resource : null,
             ],
         ]);
     }

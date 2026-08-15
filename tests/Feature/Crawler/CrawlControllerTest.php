@@ -442,7 +442,19 @@ class CrawlControllerTest extends TestCase
                 ->where('resources.data', fn ($rows) => collect($rows)->firstWhere('url', 'https://example.com/app.css')['ref_count'] === 2
                     && collect($rows)->firstWhere('url', 'https://example.com/app.css')['size_bytes'] === 4096
                     && collect($rows)->firstWhere('url', 'https://cdn.test/lib.js')['size_bytes'] === 12000)
-                ->where('resourceSummary.css', 1)
+                ->where('resourceSummary.css.count', 1)
+                ->where('resourceSummary.css.total_bytes', 4096)
+                ->where('resourceRefs', null)
+            );
+
+        // Drill-down: ?resource=<url> returns the referencing pages, resources null.
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'view' => 'resources', 'resource' => 'https://example.com/app.css']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters.resource', 'https://example.com/app.css')
+                ->where('resources', null)
+                ->where('resourceRefs.url', 'https://example.com/app.css')
+                ->has('resourceRefs.pages.data', 2)
             );
 
         // Type filter narrows to javascript only.
