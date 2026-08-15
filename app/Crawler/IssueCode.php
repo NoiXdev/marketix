@@ -62,6 +62,24 @@ enum IssueCode: string
     case InternalMetaRefreshRedirect = 'internal_meta_refresh_redirect';
     case InternalRedirectLoop = 'internal_redirect_loop';
     case InternalNoResponse = 'internal_no_response';
+    // page title refinements
+    case TitleBelow30Chars = 'title_below_30_chars';
+    case TitleBelow200px = 'title_below_200px';
+    case TitleOver561px = 'title_over_561px';
+    case TitleSameAsH1 = 'title_same_as_h1';
+    case MultipleTitle = 'multiple_title';
+    case TitleOutsideHead = 'title_outside_head';
+    // meta description refinements
+    case MetaDescriptionOver155Chars = 'meta_description_over_155_chars';
+    case MetaDescriptionBelow70Chars = 'meta_description_below_70_chars';
+    case MetaDescriptionOver985px = 'meta_description_over_985px';
+    case MetaDescriptionBelow400px = 'meta_description_below_400px';
+    case MultipleMetaDescription = 'multiple_meta_description';
+    case MetaDescriptionOutsideHead = 'meta_description_outside_head';
+    // meta keywords
+    case MissingMetaKeywords = 'missing_meta_keywords';
+    case MultipleMetaKeywords = 'multiple_meta_keywords';
+    case DuplicateMetaKeywords = 'duplicate_meta_keywords';
 
     public function severity(): string
     {
@@ -75,14 +93,20 @@ enum IssueCode: string
             self::MissingXFrameOptions, self::MissingXContentTypeOptions, self::MissingHstsHeader,
             self::UnsafeCrossOriginLinks, self::HttpUrls, self::MixedContent,
             self::FormUrlInsecure, self::FormOnHttp, self::WrongContentType,
-            self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect => 'warning',
+            self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect,
+            self::MultipleTitle, self::TitleOutsideHead, self::MultipleMetaDescription,
+            self::MetaDescriptionOutsideHead => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
             self::ProtocolRelativeResourceLinks,
             self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
             self::UrlMultipleSlashes, self::UrlRepetitivePath, self::UrlGaTrackingParams,
-            self::UrlOver115Chars, self::InternalRedirect3xx => 'notice',
+            self::UrlOver115Chars, self::InternalRedirect3xx,
+            self::TitleBelow30Chars, self::TitleBelow200px, self::TitleOver561px, self::TitleSameAsH1,
+            self::MetaDescriptionOver155Chars, self::MetaDescriptionBelow70Chars,
+            self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
+            self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -93,8 +117,14 @@ enum IssueCode: string
             self::ClientError, self::ServerError, self::RedirectChain, self::RobotsBlocked,
             self::InternalRedirect3xx, self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect,
             self::InternalRedirectLoop, self::InternalNoResponse => IssueCategory::ResponseCodes,
-            self::MissingTitle, self::DuplicateTitle, self::TitleTooLong => IssueCategory::PageTitle,
-            self::MissingMetaDescription, self::DuplicateMetaDescription => IssueCategory::MetaDescription,
+            self::MissingTitle, self::DuplicateTitle, self::TitleTooLong,
+            self::TitleBelow30Chars, self::TitleBelow200px, self::TitleOver561px, self::TitleSameAsH1,
+            self::MultipleTitle, self::TitleOutsideHead => IssueCategory::PageTitle,
+            self::MissingMetaDescription, self::DuplicateMetaDescription,
+            self::MetaDescriptionOver155Chars, self::MetaDescriptionBelow70Chars,
+            self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
+            self::MultipleMetaDescription, self::MetaDescriptionOutsideHead => IssueCategory::MetaDescription,
+            self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords => IssueCategory::MetaKeywords,
             self::MissingH1, self::MultipleH1, self::HeadingOrderSkip => IssueCategory::H1,
             self::ThinContent => IssueCategory::Content,
             self::MissingAltText => IssueCategory::Images,

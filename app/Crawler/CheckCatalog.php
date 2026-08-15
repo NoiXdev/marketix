@@ -65,27 +65,27 @@ class CheckCatalog
             ['code' => 'missing_title', 'category' => 'page_title', 'severity' => 'error', 'status' => self::A],
             ['code' => 'duplicate_title', 'category' => 'page_title', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'title_too_long', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::A],
-            ['code' => 'title_below_200px', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'title_below_30_chars', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'title_over_561px', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'title_same_as_h1', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'multiple_title', 'category' => 'page_title', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'title_outside_head', 'category' => 'page_title', 'severity' => 'warning', 'status' => self::P],
+            ['code' => 'title_below_200px', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'title_below_30_chars', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'title_over_561px', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'title_same_as_h1', 'category' => 'page_title', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'multiple_title', 'category' => 'page_title', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'title_outside_head', 'category' => 'page_title', 'severity' => 'warning', 'status' => self::A],
 
             // meta_description
             ['code' => 'missing_meta_description', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'duplicate_meta_description', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::A],
-            ['code' => 'meta_description_over_155_chars', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'meta_description_over_985px', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'meta_description_below_70_chars', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'meta_description_below_400px', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'multiple_meta_description', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'meta_description_outside_head', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::P],
+            ['code' => 'meta_description_over_155_chars', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'meta_description_over_985px', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'meta_description_below_70_chars', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'meta_description_below_400px', 'category' => 'meta_description', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'multiple_meta_description', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'meta_description_outside_head', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::A],
 
-            // meta_keywords (all planned)
-            ['code' => 'missing_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'duplicate_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'multiple_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::P],
+            // meta_keywords
+            ['code' => 'missing_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'duplicate_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'multiple_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
 
             // h1
             ['code' => 'missing_h1', 'category' => 'h1', 'severity' => 'error', 'status' => self::A],
