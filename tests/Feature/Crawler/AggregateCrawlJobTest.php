@@ -242,6 +242,10 @@ class AggregateCrawlJobTest extends TestCase
         $p1 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p1', 'status_code' => 200, 'pagination_next' => 'https://x.test/p2', 'issues' => []]);
         // Pagination next → uncrawled.
         $p3 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p3', 'pagination_next' => 'https://x.test/ghost2', 'issues' => []]);
+        // Pagination next → a crawled, non-indexable page (correct reciprocity, so only
+        // pagination_non_indexable should fire here, not pagination_sequence_error).
+        $p5noindex = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p5-noindex', 'status_code' => 200, 'is_indexable' => false, 'pagination_prev' => 'https://x.test/p5', 'issues' => []]);
+        $p5 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p5', 'status_code' => 200, 'pagination_next' => 'https://x.test/p5-noindex', 'issues' => []]);
 
         (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
 
@@ -250,5 +254,7 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertContains('pagination_non_200', $p1->refresh()->issues);
         $this->assertContains('pagination_sequence_error', $p1->issues); // p2.prev != p1
         $this->assertContains('pagination_unlinked', $p3->refresh()->issues);
+        $this->assertContains('pagination_non_indexable', $p5->refresh()->issues);
+        $this->assertNotContains('pagination_sequence_error', $p5->issues); // p5-noindex.prev == p5
     }
 }
