@@ -46,7 +46,7 @@ class AggregateCrawlJob implements ShouldQueue
         // avoids hydrating full page models (with their heavier JSON columns) or
         // eager-loading every link relation for the whole crawl at once.
         $identities = $this->crawl->pages()
-            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'created_at'])
+            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'created_at'])
             ->get();
 
         // The page that represents the crawl's start/home page. Prefer an exact match
@@ -98,6 +98,7 @@ class AggregateCrawlJob implements ShouldQueue
         // duplicate title / description
         $dupTitles = $this->duplicates($identities, 'title');
         $dupDescriptions = $this->duplicates($identities, 'meta_description');
+        $dupKeywords = $this->duplicates($identities, 'meta_keywords');
 
         // Broken links: probe link targets and collect the pages that link to a 4xx/5xx.
         $brokenPageIds = $this->checkBrokenLinks($norm);
@@ -105,7 +106,7 @@ class AggregateCrawlJob implements ShouldQueue
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $startPageId, $brokenPageIds, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $startPageId, $brokenPageIds, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -135,6 +136,9 @@ class AggregateCrawlJob implements ShouldQueue
                 }
                 if ($page->meta_description !== null && ($dupDescriptions[$page->meta_description] ?? 0) > 1) {
                     $issues[IssueCode::DuplicateMetaDescription->value] = true;
+                }
+                if ($page->meta_keywords !== null && ($dupKeywords[$page->meta_keywords] ?? 0) > 1) {
+                    $issues[IssueCode::DuplicateMetaKeywords->value] = true;
                 }
 
                 if (isset($brokenPageIds[$page->id])) {

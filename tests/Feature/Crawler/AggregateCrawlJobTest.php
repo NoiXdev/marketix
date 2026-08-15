@@ -194,4 +194,18 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertStringContainsString('boom', $crawl->error);
         $this->assertNotNull($crawl->finished_at);
     }
+
+    public function test_flags_duplicate_meta_keywords(): void
+    {
+        $crawl = Crawl::factory()->create();
+        $a = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/a', 'meta_keywords' => 'shoes, boots', 'issues' => []]);
+        $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/b', 'meta_keywords' => 'shoes, boots', 'issues' => []]);
+        $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c', 'meta_keywords' => 'unique kw', 'issues' => []]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertContains('duplicate_meta_keywords', $a->refresh()->issues);
+        $this->assertContains('duplicate_meta_keywords', $b->refresh()->issues);
+        $this->assertNotContains('duplicate_meta_keywords', $c->refresh()->issues);
+    }
 }
