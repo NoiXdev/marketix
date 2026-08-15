@@ -242,11 +242,13 @@ export default function CrawlsShow({
               <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
               <Select value={filters.resource_type ?? ''} onChange={(e) => go({ view: 'resources', resource_type: e.target.value || null })} className="w-48">
                 <option value="">{t('crawler.filter_all')}</option>
-                {['javascript', 'css', 'font', 'image', 'other'].map((ty) => (
-                  <option key={ty} value={ty}>
-                    {t(`crawler.category.${ty}`)}
-                  </option>
-                ))}
+                {Object.keys(resourceSummary)
+                  .sort()
+                  .map((ty) => (
+                    <option key={ty} value={ty}>
+                      {t(`crawler.category.${ty}`)}
+                    </option>
+                  ))}
               </Select>
             </div>
             <TableCard
