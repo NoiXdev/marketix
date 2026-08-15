@@ -6,6 +6,7 @@ use App\Crawler\CheckCatalog;
 use App\Crawler\IssueCode;
 use App\Crawler\LinkChecks;
 use App\Crawler\LinkStatusChecker;
+use App\Crawler\ResourceProbe;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Models\Crawl;
@@ -34,6 +35,9 @@ class AggregateCrawlJob implements ShouldQueue
 
     /** Safety cap on how many external link targets we probe per crawl. */
     private const MAX_LINK_PROBES = 2000;
+
+    /** Safety cap on how many external resources we probe per crawl. */
+    private const MAX_RESOURCE_PROBES = 2000;
 
     public function __construct(public Crawl $crawl) {}
 
@@ -161,6 +165,7 @@ class AggregateCrawlJob implements ShouldQueue
 
         // Broken links: probe link targets and collect the pages that link to a 4xx/5xx.
         $brokenPageIds = $this->checkBrokenLinks($norm);
+        $this->checkResources($norm);
 
         $summary = [];
 
@@ -377,6 +382,57 @@ class AggregateCrawlJob implements ShouldQueue
         }
 
         return $broken;
+    }
+
+    /**
+     * Fill status_code + size_bytes on every crawl_resources row. Internal resources
+     * take the status/size of the crawled page they resolve to (normalised match);
+     * external resources are probed (SSRF-safe, deduped, capped). Internal resources
+     * that were not crawled, and probes over the cap, are left null.
+     *
+     * @param  callable(?string): string  $norm
+     */
+    protected function checkResources(callable $norm): void
+    {
+        $meta = [];
+        foreach ($this->crawl->pages()->select(['url', 'final_url', 'status_code', 'size_bytes'])->cursor() as $p) {
+            $m = ['status' => $p->status_code, 'size' => $p->size_bytes];
+            $meta[$norm($p->url)] = $m;
+            if ($norm($p->final_url) !== '') {
+                $meta[$norm($p->final_url)] = $m;
+            }
+        }
+
+        $probe = app(ResourceProbe::class);
+        $probes = 0;
+
+        foreach ($this->crawl->resources()->select(['url', 'is_internal'])->distinct()->get() as $res) {
+            $key = $norm($res->url);
+
+            if ($res->is_internal && isset($meta[$key])) {
+                $status = $meta[$key]['status'];
+                $size = $meta[$key]['size'];
+            } elseif (! $res->is_internal && $probes < self::MAX_RESOURCE_PROBES) {
+                ['status' => $status, 'size' => $size] = $probe->probe($res->url);
+                $probes++;
+            } else {
+                continue; // internal-not-crawled, or over cap → leave null
+            }
+
+            if ($status !== null || $size !== null) {
+                $this->crawl->resources()->where('url', $res->url)->update([
+                    'status_code' => $status,
+                    'size_bytes' => $size,
+                ]);
+            }
+        }
+
+        if ($probes >= self::MAX_RESOURCE_PROBES) {
+            Log::warning('Crawl resource check hit the probe cap; some external resources were not probed.', [
+                'crawl_id' => $this->crawl->id,
+                'cap' => self::MAX_RESOURCE_PROBES,
+            ]);
+        }
     }
 
     private function resolveUrl(string $href, string $base): ?string

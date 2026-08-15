@@ -9,7 +9,9 @@ use App\Jobs\AggregateCrawlJob;
 use App\Models\Crawl;
 use App\Models\CrawlLink;
 use App\Models\CrawlPage;
+use App\Models\CrawlResource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AggregateCrawlJobTest extends TestCase
@@ -300,5 +302,31 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertContains('exact_duplicates', $a->refresh()->issues);
         $this->assertContains('exact_duplicates', $b->refresh()->issues);
         $this->assertNotContains('exact_duplicates', $c->refresh()->issues);
+    }
+
+    public function test_checkresources_fills_internal_from_pages_and_probes_external(): void
+    {
+        // cdn.test doesn't resolve, and UrlSafety::hostIsSafe() does a real DNS lookup
+        // before Http::fake() can intercept — so the external resource here must use a
+        // resolvable, public host (example.com). The internal resource stays on x.test
+        // since it's resolved via the crawled-page map and never probed.
+        Http::fake(['example.com/*' => Http::response('', 200, ['Content-Length' => '5000'])]);
+
+        $crawl = Crawl::factory()->create();
+        $home = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/', 'issues' => []]);
+        // A crawled CSS page (internal resource resolves here — note trailing-slash normalisation).
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/app.css', 'status_code' => 200, 'size_bytes' => 4096, 'content_category' => 'css', 'issues' => []]);
+
+        $internal = CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'url' => 'https://x.test/app.css/', 'type' => 'css', 'is_internal' => true]);
+        $external = CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'url' => 'https://example.com/lib.js', 'type' => 'javascript', 'is_internal' => false]);
+        $uncrawled = CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'url' => 'https://x.test/missing.css', 'type' => 'css', 'is_internal' => true]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertSame(200, $internal->refresh()->status_code);
+        $this->assertSame(4096, $internal->size_bytes); // matched via trailing-slash-normalised URL
+        $this->assertSame(200, $external->refresh()->status_code);
+        $this->assertSame(5000, $external->size_bytes);
+        $this->assertNull($uncrawled->refresh()->status_code); // internal but never crawled
     }
 }
