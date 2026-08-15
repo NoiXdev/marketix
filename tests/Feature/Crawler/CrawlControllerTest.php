@@ -312,4 +312,23 @@ class CrawlControllerTest extends TestCase
                 ->where('pages.data.0.url', 'https://example.com/mixed')
             );
     }
+
+    public function test_url_category_lists_pages_with_a_url_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/Foo_Bar', 'issues' => ['url_uppercase', 'url_underscores']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/clean', 'issues' => []]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('catalog.url.count', 1));
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'url', 'issue' => 'url_uppercase']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/Foo_Bar')
+            );
+    }
 }

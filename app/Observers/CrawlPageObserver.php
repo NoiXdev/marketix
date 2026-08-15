@@ -6,6 +6,7 @@ use App\Crawler\IssueCode;
 use App\Crawler\PageAnalyzer;
 use App\Crawler\PageContext;
 use App\Crawler\ResourceClassifier;
+use App\Crawler\UrlChecker;
 use App\Models\Crawl;
 use App\Models\CrawlPage;
 use GuzzleHttp\Exception\RequestException;
@@ -114,6 +115,10 @@ class CrawlPageObserver extends CrawlObserver
 
         if ($wrongContentType) {
             $issues[] = IssueCode::WrongContentType->value;
+        }
+
+        foreach (UrlChecker::issues($url) as $code) {
+            $issues[] = $code;
         }
 
         $page = $this->crawl->pages()->create(array_merge($data, [
