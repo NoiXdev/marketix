@@ -47,6 +47,15 @@ enum IssueCode: string
     case FormOnHttp = 'form_on_http';
     case ProtocolRelativeResourceLinks = 'protocol_relative_resource_links';
     case WrongContentType = 'wrong_content_type';
+    // url
+    case UrlNonAscii = 'url_non_ascii';
+    case UrlUnderscores = 'url_underscores';
+    case UrlUppercase = 'url_uppercase';
+    case UrlContainsSpace = 'url_contains_space';
+    case UrlMultipleSlashes = 'url_multiple_slashes';
+    case UrlRepetitivePath = 'url_repetitive_path';
+    case UrlGaTrackingParams = 'url_ga_tracking_params';
+    case UrlOver115Chars = 'url_over_115_chars';
 
     public function severity(): string
     {
@@ -63,7 +72,10 @@ enum IssueCode: string
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
-            self::ProtocolRelativeResourceLinks => 'notice',
+            self::ProtocolRelativeResourceLinks,
+            self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
+            self::UrlMultipleSlashes, self::UrlRepetitivePath, self::UrlGaTrackingParams,
+            self::UrlOver115Chars => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -83,6 +95,9 @@ enum IssueCode: string
             self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
             self::HttpUrls, self::HttpsUrls, self::MixedContent, self::FormUrlInsecure,
             self::FormOnHttp, self::ProtocolRelativeResourceLinks, self::WrongContentType => IssueCategory::Security,
+            self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
+            self::UrlMultipleSlashes, self::UrlRepetitivePath, self::UrlGaTrackingParams,
+            self::UrlOver115Chars => IssueCategory::Url,
             self::Noindex, self::MissingStructuredData, self::NotInSitemap,
             self::LargeResource, self::OversizedResource => IssueCategory::Other,
         };

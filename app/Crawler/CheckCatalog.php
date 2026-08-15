@@ -48,18 +48,18 @@ class CheckCatalog
             ['code' => 'internal_no_response', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::P],
             ['code' => 'internal_blocked_resource', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
 
-            // url (all planned — Phase 2)
-            ['code' => 'url_non_ascii', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_underscores', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_uppercase', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_multiple_slashes', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_repetitive_path', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_contains_space', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
+            // url (8 active in Phase 2; 3 remain planned)
+            ['code' => 'url_non_ascii', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_underscores', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_uppercase', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_multiple_slashes', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_repetitive_path', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_contains_space', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'url_internal_search', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
             ['code' => 'url_parameters', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
             ['code' => 'url_broken_bookmark', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_ga_tracking_params', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'url_over_115_chars', 'category' => 'url', 'severity' => 'notice', 'status' => self::P],
+            ['code' => 'url_ga_tracking_params', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'url_over_115_chars', 'category' => 'url', 'severity' => 'notice', 'status' => self::A],
 
             // page_title
             ['code' => 'missing_title', 'category' => 'page_title', 'severity' => 'error', 'status' => self::A],

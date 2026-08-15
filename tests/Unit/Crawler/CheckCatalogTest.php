@@ -54,6 +54,11 @@ class CheckCatalogTest extends TestCase
         $this->assertContains('mixed_content', $security);
         $this->assertContains('https_urls', $security);
         $this->assertCount(13, $security);
+
+        $url = CheckCatalog::activeCodesForCategory('url');
+        $this->assertContains('url_uppercase', $url);
+        $this->assertNotContains('url_parameters', $url); // stays planned
+        $this->assertCount(8, $url);
     }
 
     public function test_bijection_cardinality_holds(): void
