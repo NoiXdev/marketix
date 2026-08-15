@@ -46,4 +46,40 @@ class HeadingAnalyzerTest extends TestCase
         $r = $this->analyze('<h1>A</h1><h3>C</h3>');
         $this->assertContains(IssueCode::HeadingOrderSkip, $r->issues);
     }
+
+    public function test_h1_length_and_alt_text_and_stored_h1(): void
+    {
+        $long = $this->analyze('<h1>'.str_repeat('a', 71).'</h1><h2>ok</h2>');
+        $this->assertContains(IssueCode::H1Over70Chars, $long->issues);
+
+        $alt = $this->analyze('<h1><img alt="Logo brand name"></h1><h2>ok</h2>');
+        $this->assertContains(IssueCode::AltTextInH1, $alt->issues);
+
+        $stored = $this->analyze('<h1>Real Heading</h1><h2>ok</h2>');
+        $this->assertSame('Real Heading', $stored->data['h1']);
+    }
+
+    public function test_h2_missing_multiple_duplicate_and_length(): void
+    {
+        $missing = $this->analyze('<h1>Title</h1><p>no h2 here</p>');
+        $this->assertContains(IssueCode::MissingH2, $missing->issues);
+
+        $multi = $this->analyze('<h1>Title</h1><h2>One</h2><h2>Two</h2>');
+        $this->assertContains(IssueCode::MultipleH2, $multi->issues);
+
+        $dup = $this->analyze('<h1>Title</h1><h2>Same</h2><h2>same</h2>');
+        $this->assertContains(IssueCode::DuplicateH2, $dup->issues);
+
+        $long = $this->analyze('<h1>Title</h1><h2>'.str_repeat('b', 71).'</h2>');
+        $this->assertContains(IssueCode::H2Over70Chars, $long->issues);
+    }
+
+    public function test_h2_non_sequential_only_before_h1(): void
+    {
+        $before = $this->analyze('<h2>Early</h2><h1>Title</h1>');
+        $this->assertContains(IssueCode::H2NonSequential, $before->issues);
+
+        $after = $this->analyze('<h1>Title</h1><h2>After</h2>');
+        $this->assertNotContains(IssueCode::H2NonSequential, $after->issues);
+    }
 }
