@@ -10,6 +10,7 @@ use App\Crawler\Analyzers\IndexabilityAnalyzer;
 use App\Crawler\Analyzers\LinkExtractor;
 use App\Crawler\Analyzers\MetaAnalyzer;
 use App\Crawler\Analyzers\PaginationAnalyzer;
+use App\Crawler\Analyzers\ResourceExtractor;
 use App\Crawler\Analyzers\SecurityAnalyzer;
 use App\Crawler\Analyzers\StructuredDataAnalyzer;
 use Symfony\Component\DomCrawler\Crawler;
@@ -29,6 +30,7 @@ class PageAnalyzer
             new SecurityAnalyzer,
             new CanonicalAnalyzer,
             new PaginationAnalyzer,
+            new ResourceExtractor,
         ];
     }
 

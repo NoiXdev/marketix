@@ -90,6 +90,7 @@ class CrawlPageObserver extends CrawlObserver
         $scheme = strtolower(parse_url($finalUrl ?: $url, PHP_URL_SCHEME) ?: 'https');
 
         $links = [];
+        $resources = [];
         $data = [];
 
         if ($category === ResourceClassifier::HTML) {
@@ -100,6 +101,8 @@ class CrawlPageObserver extends CrawlObserver
             }
             $links = $analysis->data['links'] ?? [];
             unset($analysis->data['links']);
+            $resources = $analysis->data['resources'] ?? [];
+            unset($analysis->data['resources']);
             $data = $analysis->data;
         } else {
             // Non-HTML resource (image, PDF, media, …): the HTML/SEO analyzers make
@@ -147,6 +150,15 @@ class CrawlPageObserver extends CrawlObserver
                 'type' => $link['type'],
                 'anchor' => $link['anchor'],
                 'rel' => $link['rel'],
+            ]);
+        }
+
+        foreach ($resources as $res) {
+            $page->resources()->create([
+                'crawl_id' => $this->crawl->id,
+                'url' => $res['url'],
+                'type' => $res['type'],
+                'is_internal' => $res['is_internal'],
             ]);
         }
 
