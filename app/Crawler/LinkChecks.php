@@ -21,7 +21,7 @@ final class LinkChecks
 
     public static function isLocalhost(string $url): bool
     {
-        $host = strtolower(parse_url($url, PHP_URL_HOST) ?? '');
+        $host = trim(strtolower(parse_url($url, PHP_URL_HOST) ?? ''), '[]');
 
         return in_array($host, ['localhost', '127.0.0.1', '::1', '0.0.0.0'], true)
             || str_ends_with($host, '.localhost');

@@ -126,6 +126,15 @@ enum IssueCode: string
     case OnlyInternalNofollowInlinks = 'only_internal_nofollow_inlinks';
     case OutlinksToLocalhost = 'outlinks_to_localhost';
     case OnlyNonIndexableInlinks = 'only_non_indexable_inlinks';
+    // content (Tier-A)
+    case LoremIpsum = 'lorem_ipsum';
+    case ExactDuplicates = 'exact_duplicates';
+    // images
+    case ImageOver100kb = 'image_over_100kb';
+    case ImageMissingSizeAttributes = 'image_missing_size_attributes';
+    case ImageMissingAltAttribute = 'image_missing_alt_attribute';
+    case ImageAltOver100Chars = 'image_alt_over_100_chars';
+    case BackgroundImages = 'background_images';
 
     public function severity(): string
     {
@@ -150,7 +159,8 @@ enum IssueCode: string
             self::PaginationNonIndexable, self::PaginationSequenceError,
             self::PagesNonCrawlableInternalOutlinks, self::PagesNoInternalOutlinks,
             self::OnlyInternalNofollowInlinks, self::OutlinksToLocalhost,
-            self::OnlyNonIndexableInlinks => 'warning',
+            self::OnlyNonIndexableInlinks,
+            self::LoremIpsum, self::ExactDuplicates => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -168,7 +178,9 @@ enum IssueCode: string
             self::HasPagination, self::PaginationFirstPage, self::Paginated2plus,
             self::PagesHighCrawlDepth, self::InternalNofollowOutlinks, self::InternalOutlinksNoAnchor,
             self::NonDescriptiveAnchorInternalOutlinks, self::PagesManyExternalOutlinks,
-            self::PagesManyInternalOutlinks, self::FollowNofollowInternalInlinks => 'notice',
+            self::PagesManyInternalOutlinks, self::FollowNofollowInternalInlinks,
+            self::ImageOver100kb, self::ImageMissingSizeAttributes, self::ImageMissingAltAttribute,
+            self::ImageAltOver100Chars, self::BackgroundImages => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -191,8 +203,10 @@ enum IssueCode: string
             self::DuplicateH1, self::H1Over70Chars, self::AltTextInH1 => IssueCategory::H1,
             self::MissingH2, self::DuplicateH2, self::H2Over70Chars,
             self::MultipleH2, self::H2NonSequential => IssueCategory::H2,
-            self::ThinContent => IssueCategory::Content,
-            self::MissingAltText => IssueCategory::Images,
+            self::ThinContent, self::LoremIpsum, self::ExactDuplicates => IssueCategory::Content,
+            self::MissingAltText, self::ImageOver100kb, self::ImageMissingSizeAttributes,
+            self::ImageMissingAltAttribute, self::ImageAltOver100Chars,
+            self::BackgroundImages => IssueCategory::Images,
             self::CanonicalMismatch, self::HasCanonical, self::CanonicalSelfReferencing,
             self::MissingCanonical, self::MultipleCanonical, self::MultipleConflictingCanonical,
             self::NonIndexableCanonical, self::CanonicalIsRelative, self::CanonicalNotLinked,

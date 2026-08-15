@@ -27,6 +27,7 @@ class LinkChecksTest extends TestCase
     {
         $this->assertTrue(LinkChecks::isLocalhost('http://localhost/x'));
         $this->assertTrue(LinkChecks::isLocalhost('http://127.0.0.1:8080/'));
+        $this->assertTrue(LinkChecks::isLocalhost('http://[::1]/'));
         $this->assertFalse(LinkChecks::isLocalhost('https://example.com/'));
     }
 

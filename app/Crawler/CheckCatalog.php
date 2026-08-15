@@ -104,8 +104,8 @@ class CheckCatalog
 
             // content (thin_content active; Tier-C permanently planned)
             ['code' => 'thin_content', 'category' => 'content', 'severity' => 'notice', 'status' => self::A],
-            ['code' => 'exact_duplicates', 'category' => 'content', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'lorem_ipsum', 'category' => 'content', 'severity' => 'warning', 'status' => self::P],
+            ['code' => 'exact_duplicates', 'category' => 'content', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'lorem_ipsum', 'category' => 'content', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'readability_hard', 'category' => 'content', 'severity' => 'notice', 'status' => self::P],
             ['code' => 'readability_very_hard', 'category' => 'content', 'severity' => 'notice', 'status' => self::P],
             ['code' => 'near_duplicates', 'category' => 'content', 'severity' => 'warning', 'status' => self::P],
@@ -117,11 +117,11 @@ class CheckCatalog
 
             // images
             ['code' => 'missing_alt_text', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
-            ['code' => 'image_over_100kb', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'image_missing_size_attributes', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'image_missing_alt_attribute', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'image_alt_over_100_chars', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'background_images', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
+            ['code' => 'image_over_100kb', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'image_missing_size_attributes', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'image_missing_alt_attribute', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'image_alt_over_100_chars', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'background_images', 'category' => 'images', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'incorrectly_sized_images', 'category' => 'images', 'severity' => 'notice', 'status' => self::P],
 
             // canonicals
