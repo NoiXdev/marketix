@@ -72,6 +72,7 @@ return [
     'col_references' => 'Referenzen',
     'resource_internal' => 'intern',
     'resource_external' => 'extern',
+    'resource_referenced_on' => 'Referenziert auf',
     'file' => 'Datei',
     'content_type' => 'Content-Type',
     'size' => 'Größe',

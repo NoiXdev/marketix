@@ -33,7 +33,14 @@ interface CatalogCheck {
   count: number;
 }
 type Catalog = Record<string, { count: number; checks: CatalogCheck[] }>;
-type Filters = { category: string | null; group: string | null; issue: string | null; view: string | null; resource_type: string | null };
+type Filters = {
+  category: string | null;
+  group: string | null;
+  issue: string | null;
+  view: string | null;
+  resource_type: string | null;
+  resource: string | null;
+};
 
 const statusVariant: Record<CrawlStatus, 'neutral' | 'success' | 'warning' | 'danger'> = {
   queued: 'neutral',
@@ -67,6 +74,7 @@ export default function CrawlsShow({
   catalog,
   resources,
   resourceSummary,
+  resourceRefs,
   filters,
 }: {
   crawl: CrawlDetail;
@@ -74,7 +82,8 @@ export default function CrawlsShow({
   categories: CrawlContentCategory[];
   catalog: Catalog;
   resources: Paginated<CrawlResourceRow> | null;
-  resourceSummary: Record<string, number>;
+  resourceSummary: Record<string, { count: number; total_bytes: number }>;
+  resourceRefs: { url: string; pages: Paginated<{ id: string; url: string; status_code: number | null }> } | null;
   filters: Filters;
 }) {
   const { project } = usePage<PageProps>().props;
@@ -229,12 +238,45 @@ export default function CrawlsShow({
           </>
         )}
 
-        {activeTab === 'resources' && resources && (
+        {activeTab === 'resources' && filters.resource && resourceRefs && (
+          <>
+            <div className="mb-3">
+              <button type="button" onClick={() => go({ view: 'resources' })} className="text-sm text-accent-soft-foreground hover:underline">
+                ← {t('crawler.tab_resources')}
+              </button>
+            </div>
+            <div className="mb-3 break-all text-sm text-muted">
+              {t('crawler.resource_referenced_on')}: <span className="text-foreground">{resourceRefs.url}</span>
+            </div>
+            <TableCard columns={[{ label: t('crawler.col_url') }, { label: t('crawler.col_status') }]}>
+              <tbody className="divide-y divide-line">
+                {resourceRefs.pages.data.map((p) => (
+                  <tr key={p.id} className="hover:bg-elevated">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={route('app.project.crawls.pages.show', { project: project!.id, crawl: crawl.id, page: p.id })}
+                        className="font-medium text-foreground hover:text-accent-soft-foreground"
+                      >
+                        {p.url}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-muted">{p.status_code ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </TableCard>
+            <div className="mt-2">
+              <Pagination links={resourceRefs.pages.links} />
+            </div>
+          </>
+        )}
+
+        {activeTab === 'resources' && !filters.resource && resources && (
           <>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              {Object.entries(resourceSummary).map(([type, count]) => (
+              {Object.entries(resourceSummary).map(([type, s]) => (
                 <Badge key={type}>
-                  {t(`crawler.category.${type}`)}: {count}
+                  {t(`crawler.category.${type}`)}: {s.count} · {formatBytes(s.total_bytes)}
                 </Badge>
               ))}
             </div>
@@ -264,7 +306,13 @@ export default function CrawlsShow({
                 {resources.data.map((res) => (
                   <tr key={res.url} className="hover:bg-elevated">
                     <td className="px-4 py-3">
-                      <span className="break-all text-foreground">{res.url}</span>
+                      <button
+                        type="button"
+                        onClick={() => go({ view: 'resources', resource: res.url })}
+                        className="break-all text-left font-medium text-foreground hover:text-accent-soft-foreground"
+                      >
+                        {res.url}
+                      </button>
                       <span className="ml-2 text-xs text-muted">{res.is_internal ? t('crawler.resource_internal') : t('crawler.resource_external')}</span>
                     </td>
                     <td className="px-4 py-3">

@@ -72,6 +72,7 @@ return [
     'col_references' => 'References',
     'resource_internal' => 'internal',
     'resource_external' => 'external',
+    'resource_referenced_on' => 'Referenced on',
     'file' => 'File',
     'content_type' => 'Content type',
     'size' => 'Size',
