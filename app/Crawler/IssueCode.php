@@ -90,12 +90,36 @@ enum IssueCode: string
     case H2Over70Chars = 'h2_over_70_chars';
     case MultipleH2 = 'multiple_h2';
     case H2NonSequential = 'h2_non_sequential';
+    // canonicals
+    case HasCanonical = 'has_canonical';
+    case CanonicalSelfReferencing = 'canonical_self_referencing';
+    case MissingCanonical = 'missing_canonical';
+    case MultipleCanonical = 'multiple_canonical';
+    case MultipleConflictingCanonical = 'multiple_conflicting_canonical';
+    case NonIndexableCanonical = 'non_indexable_canonical';
+    case CanonicalIsRelative = 'canonical_is_relative';
+    case CanonicalNotLinked = 'canonical_not_linked';
+    case CanonicalInvalidAttribute = 'canonical_invalid_attribute';
+    case CanonicalFragmentUrl = 'canonical_fragment_url';
+    case CanonicalOutsideHead = 'canonical_outside_head';
+    // pagination
+    case HasPagination = 'has_pagination';
+    case PaginationFirstPage = 'pagination_first_page';
+    case Paginated2plus = 'paginated_2plus';
+    case PaginationUrlNotInAnchor = 'pagination_url_not_in_anchor';
+    case PaginationNon200 = 'pagination_non_200';
+    case PaginationUnlinked = 'pagination_unlinked';
+    case PaginationNonIndexable = 'pagination_non_indexable';
+    case MultiplePaginationUrls = 'multiple_pagination_urls';
+    case PaginationLoop = 'pagination_loop';
+    case PaginationSequenceError = 'pagination_sequence_error';
 
     public function severity(): string
     {
         return match ($this) {
             self::ServerError, self::ClientError, self::MissingTitle, self::MissingH1,
-            self::OversizedResource, self::InternalRedirectLoop, self::InternalNoResponse => 'error',
+            self::OversizedResource, self::InternalRedirectLoop, self::InternalNoResponse,
+            self::PaginationLoop => 'error',
             self::RedirectChain, self::MultipleH1, self::HeadingOrderSkip, self::Noindex,
             self::CanonicalMismatch, self::RobotsBlocked, self::DuplicateTitle,
             self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription,
@@ -106,7 +130,11 @@ enum IssueCode: string
             self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect,
             self::MultipleTitle, self::TitleOutsideHead, self::MultipleMetaDescription,
             self::MetaDescriptionOutsideHead,
-            self::DuplicateH1, self::MultipleH2, self::H2NonSequential => 'warning',
+            self::DuplicateH1, self::MultipleH2, self::H2NonSequential,
+            self::MultipleCanonical, self::MultipleConflictingCanonical, self::NonIndexableCanonical,
+            self::CanonicalInvalidAttribute, self::CanonicalOutsideHead, self::MultiplePaginationUrls,
+            self::PaginationUrlNotInAnchor, self::PaginationNon200, self::PaginationUnlinked,
+            self::PaginationNonIndexable, self::PaginationSequenceError => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -118,7 +146,10 @@ enum IssueCode: string
             self::MetaDescriptionOver155Chars, self::MetaDescriptionBelow70Chars,
             self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
             self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords,
-            self::H1Over70Chars, self::AltTextInH1, self::MissingH2, self::DuplicateH2, self::H2Over70Chars => 'notice',
+            self::H1Over70Chars, self::AltTextInH1, self::MissingH2, self::DuplicateH2, self::H2Over70Chars,
+            self::HasCanonical, self::CanonicalSelfReferencing, self::MissingCanonical,
+            self::CanonicalIsRelative, self::CanonicalNotLinked, self::CanonicalFragmentUrl,
+            self::HasPagination, self::PaginationFirstPage, self::Paginated2plus => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -143,7 +174,15 @@ enum IssueCode: string
             self::MultipleH2, self::H2NonSequential => IssueCategory::H2,
             self::ThinContent => IssueCategory::Content,
             self::MissingAltText => IssueCategory::Images,
-            self::CanonicalMismatch => IssueCategory::Canonicals,
+            self::CanonicalMismatch, self::HasCanonical, self::CanonicalSelfReferencing,
+            self::MissingCanonical, self::MultipleCanonical, self::MultipleConflictingCanonical,
+            self::NonIndexableCanonical, self::CanonicalIsRelative, self::CanonicalNotLinked,
+            self::CanonicalInvalidAttribute, self::CanonicalFragmentUrl,
+            self::CanonicalOutsideHead => IssueCategory::Canonicals,
+            self::HasPagination, self::PaginationFirstPage, self::Paginated2plus,
+            self::PaginationUrlNotInAnchor, self::PaginationNon200, self::PaginationUnlinked,
+            self::PaginationNonIndexable, self::MultiplePaginationUrls, self::PaginationLoop,
+            self::PaginationSequenceError => IssueCategory::Pagination,
             self::OrphanPage, self::BrokenLink => IssueCategory::Links,
             self::MissingCspHeader, self::MissingXFrameOptions, self::MissingXContentTypeOptions,
             self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
