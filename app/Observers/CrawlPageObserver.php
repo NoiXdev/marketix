@@ -5,11 +5,13 @@ namespace App\Observers;
 use App\Crawler\IssueCode;
 use App\Crawler\PageAnalyzer;
 use App\Crawler\PageContext;
+use App\Crawler\RedirectClassifier;
 use App\Crawler\ResourceClassifier;
 use App\Crawler\UrlChecker;
 use App\Models\Crawl;
 use App\Models\CrawlPage;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use Spatie\Crawler\CrawlObservers\CrawlObserver;
 use Spatie\Crawler\CrawlProgress;
 use Spatie\Crawler\CrawlResponse;
@@ -48,13 +50,13 @@ class CrawlPageObserver extends CrawlObserver
         ?TransferStatistics $transferStats = null,
     ): void {
         $status = $requestException->getResponse()?->getStatusCode();
+        $tooMany = $requestException instanceof TooManyRedirectsException;
         $page = $this->crawl->pages()->create([
             'url' => $url,
             'status_code' => $status,
-            'issues' => [$status && $status >= 400 && $status < 500 ? IssueCode::ClientError->value : IssueCode::ServerError->value],
+            'issues' => RedirectClassifier::failureIssues($status, $tooMany),
         ]);
         $this->crawl->increment('pages_crawled');
-        // no links to record for a failed fetch
         unset($page);
     }
 
@@ -86,9 +88,6 @@ class CrawlPageObserver extends CrawlObserver
 
         [$chain, $finalUrl] = $this->redirects($url, $headers);
         $scheme = strtolower(parse_url($finalUrl ?: $url, PHP_URL_SCHEME) ?: 'https');
-        if (count($chain) > 1) {
-            $issues[] = IssueCode::RedirectChain->value;
-        }
 
         $links = [];
         $data = [];
@@ -118,6 +117,10 @@ class CrawlPageObserver extends CrawlObserver
         }
 
         foreach (UrlChecker::issues($url) as $code) {
+            $issues[] = $code;
+        }
+
+        foreach (RedirectClassifier::issues($chain, $lower, $body, $category === ResourceClassifier::HTML) as $code) {
             $issues[] = $code;
         }
 

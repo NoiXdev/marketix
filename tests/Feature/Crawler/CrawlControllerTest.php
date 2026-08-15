@@ -331,4 +331,19 @@ class CrawlControllerTest extends TestCase
                 ->where('pages.data.0.url', 'https://example.com/Foo_Bar')
             );
     }
+
+    public function test_response_codes_category_lists_a_refresh_page(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/m', 'issues' => ['internal_meta_refresh_redirect']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/clean', 'issues' => []]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'response_codes', 'issue' => 'internal_meta_refresh_redirect']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/m')
+            );
+    }
 }
