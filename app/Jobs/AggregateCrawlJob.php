@@ -47,7 +47,7 @@ class AggregateCrawlJob implements ShouldQueue
         // avoids hydrating full page models (with their heavier JSON columns) or
         // eager-loading every link relation for the whole crawl at once.
         $identities = $this->crawl->pages()
-            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'created_at', 'canonical', 'pagination_next', 'pagination_prev', 'status_code', 'is_indexable'])
+            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'content_hash', 'created_at', 'canonical', 'pagination_next', 'pagination_prev', 'status_code', 'is_indexable'])
             ->get();
 
         // The page that represents the crawl's start/home page. Prefer an exact match
@@ -157,6 +157,7 @@ class AggregateCrawlJob implements ShouldQueue
         $dupDescriptions = $this->duplicates($identities, 'meta_description');
         $dupKeywords = $this->duplicates($identities, 'meta_keywords');
         $dupH1 = $this->duplicates($identities, 'h1');
+        $dupHashes = $this->duplicates($identities, 'content_hash');
 
         // Broken links: probe link targets and collect the pages that link to a 4xx/5xx.
         $brokenPageIds = $this->checkBrokenLinks($norm);
@@ -164,7 +165,7 @@ class AggregateCrawlJob implements ShouldQueue
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $dupHashes, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -200,6 +201,9 @@ class AggregateCrawlJob implements ShouldQueue
                 }
                 if ($page->h1 !== null && ($dupH1[$page->h1] ?? 0) > 1) {
                     $issues[IssueCode::DuplicateH1->value] = true;
+                }
+                if ($page->content_hash !== null && ($dupHashes[$page->content_hash] ?? 0) > 1) {
+                    $issues[IssueCode::ExactDuplicates->value] = true;
                 }
 
                 if (isset($brokenPageIds[$page->id])) {

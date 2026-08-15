@@ -102,4 +102,25 @@ class MetaAnalyzerTest extends TestCase
         $this->assertContains(IssueCode::MultipleMetaKeywords, $kw->issues);
         $this->assertSame('a, b', $kw->data['meta_keywords']);
     }
+
+    public function test_lorem_ipsum_and_content_hash(): void
+    {
+        $body = str_repeat('Lorem ipsum dolor sit amet ', 30); // ~150 words, contains "lorem ipsum"
+        $r = $this->analyze('<html><head><title>A normal length title here</title></head><body>'.$body.'</body></html>');
+        $this->assertContains(IssueCode::LoremIpsum, $r->issues);
+        $this->assertNotNull($r->data['content_hash']);
+    }
+
+    public function test_thin_body_has_null_content_hash(): void
+    {
+        $r = $this->analyze('<html><head><title>A normal length title here</title></head><body>only a few words here</body></html>');
+        $this->assertNull($r->data['content_hash']);
+    }
+
+    public function test_identical_bodies_hash_equal_ignoring_whitespace_and_case(): void
+    {
+        $a = '<html><head><title>A normal length title here</title></head><body>'.str_repeat('word ', 150).'</body></html>';
+        $b = '<html><head><title>A normal length title here</title></head><body>'.str_repeat('WORD  ', 150).'</body></html>';
+        $this->assertSame($this->analyze($a)->data['content_hash'], $this->analyze($b)->data['content_hash']);
+    }
 }

@@ -96,11 +96,17 @@ class MetaAnalyzer implements Analyzer
         $r->add('canonical', $this->attr($dom, 'head link[rel="canonical"]', 'href'));
         $r->add('meta_robots', $this->attr($dom, 'head meta[name="robots"]', 'content'));
 
-        $words = str_word_count(strip_tags($this->bodyHtml($dom)));
+        $text = strip_tags($this->bodyHtml($dom));
+        $words = str_word_count($text);
         $r->add('word_count', $words);
         if ($words < 100) {
             $r->issue(IssueCode::ThinContent);
         }
+        if (stripos($text, 'lorem ipsum') !== false) {
+            $r->issue(IssueCode::LoremIpsum);
+        }
+        $normalized = preg_replace('/\s+/', ' ', mb_strtolower(trim($text)));
+        $r->add('content_hash', ($words >= 100 && $normalized !== '') ? md5($normalized) : null);
 
         return $r;
     }

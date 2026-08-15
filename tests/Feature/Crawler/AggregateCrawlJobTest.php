@@ -287,4 +287,18 @@ class AggregateCrawlJobTest extends TestCase
         // The image resource must NOT get a dead-end outlink flag.
         $this->assertNotContains('pages_no_internal_outlinks', $image->refresh()->issues);
     }
+
+    public function test_flags_exact_duplicates(): void
+    {
+        $crawl = Crawl::factory()->create();
+        $a = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/a', 'content_hash' => 'abc123', 'issues' => []]);
+        $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/b', 'content_hash' => 'abc123', 'issues' => []]);
+        $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c', 'content_hash' => 'unique-hash', 'issues' => []]);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertContains('exact_duplicates', $a->refresh()->issues);
+        $this->assertContains('exact_duplicates', $b->refresh()->issues);
+        $this->assertNotContains('exact_duplicates', $c->refresh()->issues);
+    }
 }
