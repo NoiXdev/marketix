@@ -16,6 +16,9 @@ class ResourceProbe
 
     private const CONNECT_TIMEOUT = 4;
 
+    /** Bound the GET-fallback body read for resources without a Content-Length. */
+    private const MAX_PROBE_BYTES = 10_485_760; // 10 MB
+
     /** @return array{status: ?int, size: ?int} */
     public function probe(string $url): array
     {
@@ -33,9 +36,10 @@ class ResourceProbe
 
             // HEAD rejected, or no usable Content-Length → fall back to GET.
             if (in_array($status, [405, 501], true) || $size === null) {
-                $get = Http::timeout(self::TIMEOUT)->connectTimeout(self::CONNECT_TIMEOUT)->get($url);
+                $get = Http::timeout(self::TIMEOUT)->connectTimeout(self::CONNECT_TIMEOUT)
+                    ->withOptions(['stream' => true])->get($url);
                 $status = $get->status();
-                $size = $this->contentLength($get) ?? strlen($get->body());
+                $size = $this->contentLength($get) ?? $this->streamedSize($get);
             }
 
             return ['status' => $status, 'size' => $size];
@@ -49,5 +53,20 @@ class ResourceProbe
         $len = $response->header('Content-Length');
 
         return is_string($len) && $len !== '' && ctype_digit($len) ? (int) $len : null;
+    }
+
+    /** Sum the body in bounded chunks; null if it exceeds MAX_PROBE_BYTES (too large to measure). */
+    private function streamedSize(Response $response): ?int
+    {
+        $body = $response->toPsrResponse()->getBody();
+        $size = 0;
+        while (! $body->eof()) {
+            $size += strlen($body->read(8192));
+            if ($size > self::MAX_PROBE_BYTES) {
+                return null;
+            }
+        }
+
+        return $size;
     }
 }

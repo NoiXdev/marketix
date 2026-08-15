@@ -30,6 +30,17 @@ class ResourceProbeTest extends TestCase
         $this->assertSame(['status' => 200, 'size' => 4], (new ResourceProbe)->probe('https://example.com/c.png'));
     }
 
+    public function test_get_fallback_returns_null_past_the_size_cap(): void
+    {
+        $big = str_repeat('a', 10 * 1024 * 1024 + 1); // 10 MB + 1 byte, no Content-Length
+        Http::fakeSequence()
+            ->push('', 200)      // HEAD: 200, no Content-Length
+            ->push($big, 200);   // GET: no Content-Length → streamed, exceeds cap
+        $result = (new ResourceProbe)->probe('https://example.com/huge.bin');
+        $this->assertSame(200, $result['status']);
+        $this->assertNull($result['size']);
+    }
+
     public function test_unsafe_host_is_not_probed(): void
     {
         Http::fake();
