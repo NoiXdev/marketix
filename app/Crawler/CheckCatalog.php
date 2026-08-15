@@ -91,16 +91,16 @@ class CheckCatalog
             ['code' => 'missing_h1', 'category' => 'h1', 'severity' => 'error', 'status' => self::A],
             ['code' => 'multiple_h1', 'category' => 'h1', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'heading_order_skip', 'category' => 'h1', 'severity' => 'warning', 'status' => self::A],
-            ['code' => 'duplicate_h1', 'category' => 'h1', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'h1_over_70_chars', 'category' => 'h1', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'alt_text_in_h1', 'category' => 'h1', 'severity' => 'notice', 'status' => self::P],
+            ['code' => 'duplicate_h1', 'category' => 'h1', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'h1_over_70_chars', 'category' => 'h1', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'alt_text_in_h1', 'category' => 'h1', 'severity' => 'notice', 'status' => self::A],
 
-            // h2 (all planned)
-            ['code' => 'missing_h2', 'category' => 'h2', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'duplicate_h2', 'category' => 'h2', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'h2_over_70_chars', 'category' => 'h2', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'multiple_h2', 'category' => 'h2', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'h2_non_sequential', 'category' => 'h2', 'severity' => 'warning', 'status' => self::P],
+            // h2
+            ['code' => 'missing_h2', 'category' => 'h2', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'duplicate_h2', 'category' => 'h2', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'h2_over_70_chars', 'category' => 'h2', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'multiple_h2', 'category' => 'h2', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'h2_non_sequential', 'category' => 'h2', 'severity' => 'warning', 'status' => self::A],
 
             // content (thin_content active; Tier-C permanently planned)
             ['code' => 'thin_content', 'category' => 'content', 'severity' => 'notice', 'status' => self::A],

@@ -80,6 +80,16 @@ enum IssueCode: string
     case MissingMetaKeywords = 'missing_meta_keywords';
     case MultipleMetaKeywords = 'multiple_meta_keywords';
     case DuplicateMetaKeywords = 'duplicate_meta_keywords';
+    // h1 refinements
+    case DuplicateH1 = 'duplicate_h1';
+    case H1Over70Chars = 'h1_over_70_chars';
+    case AltTextInH1 = 'alt_text_in_h1';
+    // h2
+    case MissingH2 = 'missing_h2';
+    case DuplicateH2 = 'duplicate_h2';
+    case H2Over70Chars = 'h2_over_70_chars';
+    case MultipleH2 = 'multiple_h2';
+    case H2NonSequential = 'h2_non_sequential';
 
     public function severity(): string
     {
@@ -95,7 +105,8 @@ enum IssueCode: string
             self::FormUrlInsecure, self::FormOnHttp, self::WrongContentType,
             self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect,
             self::MultipleTitle, self::TitleOutsideHead, self::MultipleMetaDescription,
-            self::MetaDescriptionOutsideHead => 'warning',
+            self::MetaDescriptionOutsideHead,
+            self::DuplicateH1, self::MultipleH2, self::H2NonSequential => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -106,7 +117,8 @@ enum IssueCode: string
             self::TitleBelow30Chars, self::TitleBelow200px, self::TitleOver561px, self::TitleSameAsH1,
             self::MetaDescriptionOver155Chars, self::MetaDescriptionBelow70Chars,
             self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
-            self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords => 'notice',
+            self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords,
+            self::H1Over70Chars, self::AltTextInH1, self::MissingH2, self::DuplicateH2, self::H2Over70Chars => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -125,7 +137,10 @@ enum IssueCode: string
             self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
             self::MultipleMetaDescription, self::MetaDescriptionOutsideHead => IssueCategory::MetaDescription,
             self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords => IssueCategory::MetaKeywords,
-            self::MissingH1, self::MultipleH1, self::HeadingOrderSkip => IssueCategory::H1,
+            self::MissingH1, self::MultipleH1, self::HeadingOrderSkip,
+            self::DuplicateH1, self::H1Over70Chars, self::AltTextInH1 => IssueCategory::H1,
+            self::MissingH2, self::DuplicateH2, self::H2Over70Chars,
+            self::MultipleH2, self::H2NonSequential => IssueCategory::H2,
             self::ThinContent => IssueCategory::Content,
             self::MissingAltText => IssueCategory::Images,
             self::CanonicalMismatch => IssueCategory::Canonicals,

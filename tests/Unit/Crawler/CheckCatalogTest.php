@@ -68,6 +68,8 @@ class CheckCatalogTest extends TestCase
         $this->assertCount(9, CheckCatalog::activeCodesForCategory('page_title'));
         $this->assertCount(8, CheckCatalog::activeCodesForCategory('meta_description'));
         $this->assertCount(3, CheckCatalog::activeCodesForCategory('meta_keywords'));
+        $this->assertCount(6, CheckCatalog::activeCodesForCategory('h1'));
+        $this->assertCount(5, CheckCatalog::activeCodesForCategory('h2'));
     }
 
     public function test_bijection_cardinality_holds(): void
@@ -75,11 +77,17 @@ class CheckCatalogTest extends TestCase
         $this->assertCount(count(IssueCode::cases()), CheckCatalog::activeCodes());
     }
 
-    public function test_catalogue_severity_matches_issue_code_for_security(): void
+    public function test_catalogue_severity_matches_issue_code_for_all_active_codes(): void
     {
-        foreach (CheckCatalog::activeCodesForCategory('security') as $code) {
-            $entry = collect(CheckCatalog::all())->firstWhere('code', $code);
-            $this->assertSame(IssueCode::from($code)->severity(), $entry['severity'], $code);
+        foreach (CheckCatalog::all() as $entry) {
+            if ($entry['status'] !== 'active') {
+                continue;
+            }
+            $this->assertSame(
+                IssueCode::from($entry['code'])->severity(),
+                $entry['severity'],
+                $entry['code'],
+            );
         }
     }
 }
