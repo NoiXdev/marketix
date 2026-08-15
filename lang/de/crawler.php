@@ -98,6 +98,9 @@ return [
         'image' => 'Bild',
         'pdf' => 'PDF',
         'media' => 'Medien',
+        'javascript' => 'JavaScript',
+        'css' => 'CSS',
+        'font' => 'Schriftart',
         'other' => 'Sonstiges',
     ],
     'issue' => [

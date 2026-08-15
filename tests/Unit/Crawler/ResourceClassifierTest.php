@@ -17,8 +17,19 @@ class ResourceClassifierTest extends TestCase
         $this->assertSame('pdf', ResourceClassifier::categorize('application/pdf'));
         $this->assertSame('media', ResourceClassifier::categorize('video/mp4'));
         $this->assertSame('media', ResourceClassifier::categorize('audio/mpeg'));
-        $this->assertSame('other', ResourceClassifier::categorize('text/css'));
+        $this->assertSame('other', ResourceClassifier::categorize('application/octet-stream'));
         $this->assertSame('other', ResourceClassifier::categorize(null));
+    }
+
+    public function test_classifies_js_css_font(): void
+    {
+        $this->assertSame(ResourceClassifier::JAVASCRIPT, ResourceClassifier::categorize('application/javascript'));
+        $this->assertSame(ResourceClassifier::JAVASCRIPT, ResourceClassifier::categorize('text/javascript; charset=utf-8'));
+        $this->assertSame(ResourceClassifier::CSS, ResourceClassifier::categorize('text/css'));
+        $this->assertSame(ResourceClassifier::FONT, ResourceClassifier::categorize('font/woff2'));
+        $this->assertSame(ResourceClassifier::FONT, ResourceClassifier::categorize('application/vnd.ms-fontobject'));
+        // still flags a large js/css/font via the non-image tier.
+        $this->assertSame(IssueCode::LargeResource, ResourceClassifier::sizeIssue(ResourceClassifier::CSS, 3_000_000));
     }
 
     public function test_is_html(): void

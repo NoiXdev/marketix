@@ -19,6 +19,12 @@ class ResourceClassifier
 
     public const MEDIA = 'media';
 
+    public const JAVASCRIPT = 'javascript';
+
+    public const CSS = 'css';
+
+    public const FONT = 'font';
+
     public const OTHER = 'other';
 
     /** Image: getting big > 300 KB, too large > 1 MB. */
@@ -38,6 +44,9 @@ class ResourceClassifier
             str_starts_with($type, 'image/') => self::IMAGE,
             $type === 'application/pdf' => self::PDF,
             str_starts_with($type, 'video/'), str_starts_with($type, 'audio/') => self::MEDIA,
+            $type === 'application/javascript', $type === 'text/javascript', $type === 'application/x-javascript', $type === 'application/ecmascript' => self::JAVASCRIPT,
+            $type === 'text/css' => self::CSS,
+            str_starts_with($type, 'font/'), str_starts_with($type, 'application/font-'), str_starts_with($type, 'application/x-font-'), $type === 'application/vnd.ms-fontobject' => self::FONT,
             default => self::OTHER,
         };
     }

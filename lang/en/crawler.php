@@ -98,6 +98,9 @@ return [
         'image' => 'Image',
         'pdf' => 'PDF',
         'media' => 'Media',
+        'javascript' => 'JavaScript',
+        'css' => 'CSS',
+        'font' => 'Font',
         'other' => 'Other',
     ],
     'issue' => [
