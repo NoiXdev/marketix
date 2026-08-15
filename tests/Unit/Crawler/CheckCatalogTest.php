@@ -59,6 +59,11 @@ class CheckCatalogTest extends TestCase
         $this->assertContains('url_uppercase', $url);
         $this->assertNotContains('url_parameters', $url); // stays planned
         $this->assertCount(8, $url);
+
+        $responseCodes = CheckCatalog::activeCodesForCategory('response_codes');
+        $this->assertContains('internal_redirect_3xx', $responseCodes);
+        $this->assertNotContains('internal_success_2xx', $responseCodes); // stays planned
+        $this->assertCount(9, $responseCodes);
     }
 
     public function test_bijection_cardinality_holds(): void

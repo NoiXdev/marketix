@@ -56,26 +56,33 @@ enum IssueCode: string
     case UrlRepetitivePath = 'url_repetitive_path';
     case UrlGaTrackingParams = 'url_ga_tracking_params';
     case UrlOver115Chars = 'url_over_115_chars';
+    // response code refinements
+    case InternalRedirect3xx = 'internal_redirect_3xx';
+    case InternalHttpRefreshRedirect = 'internal_http_refresh_redirect';
+    case InternalMetaRefreshRedirect = 'internal_meta_refresh_redirect';
+    case InternalRedirectLoop = 'internal_redirect_loop';
+    case InternalNoResponse = 'internal_no_response';
 
     public function severity(): string
     {
         return match ($this) {
             self::ServerError, self::ClientError, self::MissingTitle, self::MissingH1,
-            self::OversizedResource => 'error',
+            self::OversizedResource, self::InternalRedirectLoop, self::InternalNoResponse => 'error',
             self::RedirectChain, self::MultipleH1, self::HeadingOrderSkip, self::Noindex,
             self::CanonicalMismatch, self::RobotsBlocked, self::DuplicateTitle,
             self::DuplicateMetaDescription, self::OrphanPage, self::MissingMetaDescription,
             self::LargeResource, self::BrokenLink,
             self::MissingXFrameOptions, self::MissingXContentTypeOptions, self::MissingHstsHeader,
             self::UnsafeCrossOriginLinks, self::HttpUrls, self::MixedContent,
-            self::FormUrlInsecure, self::FormOnHttp, self::WrongContentType => 'warning',
+            self::FormUrlInsecure, self::FormOnHttp, self::WrongContentType,
+            self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
             self::ProtocolRelativeResourceLinks,
             self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
             self::UrlMultipleSlashes, self::UrlRepetitivePath, self::UrlGaTrackingParams,
-            self::UrlOver115Chars => 'notice',
+            self::UrlOver115Chars, self::InternalRedirect3xx => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -83,7 +90,9 @@ enum IssueCode: string
     public function category(): IssueCategory
     {
         return match ($this) {
-            self::ClientError, self::ServerError, self::RedirectChain, self::RobotsBlocked => IssueCategory::ResponseCodes,
+            self::ClientError, self::ServerError, self::RedirectChain, self::RobotsBlocked,
+            self::InternalRedirect3xx, self::InternalHttpRefreshRedirect, self::InternalMetaRefreshRedirect,
+            self::InternalRedirectLoop, self::InternalNoResponse => IssueCategory::ResponseCodes,
             self::MissingTitle, self::DuplicateTitle, self::TitleTooLong => IssueCategory::PageTitle,
             self::MissingMetaDescription, self::DuplicateMetaDescription => IssueCategory::MetaDescription,
             self::MissingH1, self::MultipleH1, self::HeadingOrderSkip => IssueCategory::H1,

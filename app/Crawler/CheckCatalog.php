@@ -39,13 +39,13 @@ class CheckCatalog
             ['code' => 'server_error', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::A],
             ['code' => 'redirect_chain', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'external_server_error_5xx', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'internal_redirect_3xx', 'category' => 'response_codes', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'internal_redirect_loop', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::P],
-            ['code' => 'internal_http_refresh_redirect', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
-            ['code' => 'internal_meta_refresh_redirect', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
+            ['code' => 'internal_redirect_3xx', 'category' => 'response_codes', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'internal_redirect_loop', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::A],
+            ['code' => 'internal_http_refresh_redirect', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'internal_meta_refresh_redirect', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'internal_js_redirect', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
             ['code' => 'internal_success_2xx', 'category' => 'response_codes', 'severity' => 'notice', 'status' => self::P],
-            ['code' => 'internal_no_response', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::P],
+            ['code' => 'internal_no_response', 'category' => 'response_codes', 'severity' => 'error', 'status' => self::A],
             ['code' => 'internal_blocked_resource', 'category' => 'response_codes', 'severity' => 'warning', 'status' => self::P],
 
             // url (8 active in Phase 2; 3 remain planned)
