@@ -257,4 +257,34 @@ class AggregateCrawlJobTest extends TestCase
         $this->assertContains('pagination_non_indexable', $p5->refresh()->issues);
         $this->assertNotContains('pagination_sequence_error', $p5->issues); // p5-noindex.prev == p5
     }
+
+    public function test_flags_link_structure_issues(): void
+    {
+        $crawl = Crawl::factory()->create();
+        $noindex = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/noindex', 'content_category' => 'html', 'is_indexable' => false, 'issues' => []]);
+        $source = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/source', 'content_category' => 'html', 'is_indexable' => true, 'issues' => []]);
+        $target = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/target', 'content_category' => 'html', 'is_indexable' => true, 'issues' => []]);
+        $image = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/logo.png', 'content_category' => 'image', 'is_indexable' => false, 'issues' => []]);
+
+        // source → nofollow internal to target, localhost link, internal to a noindex page.
+        CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $source->id, 'to_url' => 'https://x.test/target', 'type' => 'internal', 'rel' => 'nofollow', 'anchor' => 'x']);
+        CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $source->id, 'to_url' => 'http://localhost/x', 'type' => 'external', 'rel' => null, 'anchor' => 'x']);
+        CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $source->id, 'to_url' => 'https://x.test/noindex', 'type' => 'internal', 'rel' => null, 'anchor' => 'x']);
+        // noindex page → target (follow), making target's only follow-inlink source non-indexable.
+        CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $noindex->id, 'to_url' => 'https://x.test/target', 'type' => 'internal', 'rel' => null, 'anchor' => 'x']);
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $s = $source->refresh()->issues;
+        $this->assertContains('internal_nofollow_outlinks', $s);
+        $this->assertContains('outlinks_to_localhost', $s);
+        $this->assertContains('pages_non_crawlable_internal_outlinks', $s);
+
+        $t = $target->refresh()->issues;
+        // target has 2 internal inlinks: one nofollow (source), one follow (noindex) → both follow+nofollow present.
+        $this->assertContains('follow_nofollow_internal_inlinks', $t);
+
+        // The image resource must NOT get a dead-end outlink flag.
+        $this->assertNotContains('pages_no_internal_outlinks', $image->refresh()->issues);
+    }
 }

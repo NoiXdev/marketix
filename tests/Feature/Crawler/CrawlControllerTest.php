@@ -391,4 +391,19 @@ class CrawlControllerTest extends TestCase
                 ->where('pages.data.0.url', 'https://example.com/x')
             );
     }
+
+    public function test_links_category_lists_a_page_with_a_link_issue(): void
+    {
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create();
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/x', 'issues' => ['outlinks_to_localhost']]);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/clean', 'issues' => []]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'group' => 'links', 'issue' => 'outlinks_to_localhost']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('pages.data', 1)
+                ->where('pages.data.0.url', 'https://example.com/x')
+            );
+    }
 }

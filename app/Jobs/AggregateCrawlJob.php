@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Crawler\CheckCatalog;
 use App\Crawler\IssueCode;
+use App\Crawler\LinkChecks;
 use App\Crawler\LinkStatusChecker;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
@@ -71,6 +72,7 @@ class AggregateCrawlJob implements ShouldQueue
         }
 
         $pageByUrl = [];
+        $pageIndexableById = [];
         foreach ($identities as $p) {
             $entry = [
                 'status' => $p->status_code,
@@ -82,23 +84,64 @@ class AggregateCrawlJob implements ShouldQueue
             if ($norm($p->final_url) !== '') {
                 $pageByUrl[$norm($p->final_url)] = $entry;
             }
+            $pageIndexableById[$p->id] = (bool) $p->is_indexable;
         }
 
-        // Single lightweight pass over internal links: feeds both the inlink counts
-        // and the BFS adjacency, instead of eager-loading outLinks per page AND a
-        // second full links() collection.
+        // Single lightweight pass over all links: feeds the internal-only inlink counts
+        // and BFS adjacency (unchanged), plus per-page outlink stats ($outStats) and
+        // per-target inlink detail ($inlinkDetail) used by the link-quality checks below.
         $inlinks = [];
         $adjById = [];
+        $outStats = [];
+        $inlinkDetail = [];
+        $emptyStats = ['internal' => 0, 'external' => 0, 'nofollow_internal' => false, 'no_anchor_internal' => false, 'non_descriptive_internal' => false, 'localhost' => false, 'non_crawlable_internal' => false];
         foreach ($identities as $p) {
             $adjById[$p->id] = [];
         }
-        foreach ($this->crawl->links()->where('type', 'internal')->select(['from_page_id', 'to_url'])->cursor() as $link) {
+        foreach ($this->crawl->links()->select(['from_page_id', 'to_url', 'type', 'rel', 'anchor'])->cursor() as $link) {
+            $fid = $link->from_page_id;
+            $outStats[$fid] ??= $emptyStats;
+            if (LinkChecks::isLocalhost($link->to_url)) {
+                $outStats[$fid]['localhost'] = true;
+            }
+
+            if ($link->type !== 'internal') {
+                $outStats[$fid]['external']++;
+
+                continue;
+            }
+
             $toKey = $norm($link->to_url);
             $inlinks[$toKey] = ($inlinks[$toKey] ?? 0) + 1;
-
             $toId = $pageIdByUrl[$toKey] ?? null;
-            if ($toId !== null && isset($adjById[$link->from_page_id])) {
-                $adjById[$link->from_page_id][] = $toId;
+            if ($toId !== null && isset($adjById[$fid])) {
+                $adjById[$fid][] = $toId;
+            }
+
+            $nofollow = str_contains(strtolower($link->rel ?? ''), 'nofollow');
+            $anchor = trim($link->anchor ?? '');
+            $outStats[$fid]['internal']++;
+            if ($nofollow) {
+                $outStats[$fid]['nofollow_internal'] = true;
+            }
+            if ($anchor === '') {
+                $outStats[$fid]['no_anchor_internal'] = true;
+            } elseif (LinkChecks::isNonDescriptive($anchor)) {
+                $outStats[$fid]['non_descriptive_internal'] = true;
+            }
+            if (isset($pageByUrl[$toKey]) && $pageByUrl[$toKey]['indexable'] === false) {
+                $outStats[$fid]['non_crawlable_internal'] = true;
+            }
+
+            $inlinkDetail[$toKey] ??= ['count' => 0, 'follow' => false, 'nofollow' => false, 'anyIndexableSource' => false];
+            $inlinkDetail[$toKey]['count']++;
+            if ($nofollow) {
+                $inlinkDetail[$toKey]['nofollow'] = true;
+            } else {
+                $inlinkDetail[$toKey]['follow'] = true;
+            }
+            if (($pageIndexableById[$fid] ?? true) === true) {
+                $inlinkDetail[$toKey]['anyIndexableSource'] = true;
             }
         }
 
@@ -121,7 +164,7 @@ class AggregateCrawlJob implements ShouldQueue
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $startPageId, $brokenPageIds, $pageByUrl, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -196,6 +239,15 @@ class AggregateCrawlJob implements ShouldQueue
                     $nextKey = $norm($page->pagination_next);
                     if (isset($pageByUrl[$nextKey]) && $pageByUrl[$nextKey]['prev'] !== $norm($page->url)) {
                         $issues[IssueCode::PaginationSequenceError->value] = true;
+                    }
+                }
+
+                if ($page->content_category === 'html') {
+                    foreach (LinkChecks::outlinkIssues($outStats[$page->id] ?? $emptyStats, $depthsById[$page->id] ?? null) as $code) {
+                        $issues[$code] = true;
+                    }
+                    foreach (LinkChecks::inlinkIssues($inlinkDetail[$key] ?? ['count' => 0, 'follow' => false, 'nofollow' => false, 'anyIndexableSource' => false]) as $code) {
+                        $issues[$code] = true;
                     }
                 }
 
