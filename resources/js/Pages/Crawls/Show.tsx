@@ -114,12 +114,13 @@ export default function CrawlsShow({
     return totals;
   }, [catalog]);
 
-  // Active checks with count > 0, flattened across categories, sorted by count desc, top 8.
+  // Active, non-info checks with count > 0, flattened across categories, sorted by count desc, top 8.
+  // (info is never a "problem" — same rule severityTotals applies.)
   const topIssues = useMemo(() => {
     const flat: { code: string; severity: Severity; count: number; category: string }[] = [];
     for (const [category, entry] of Object.entries(catalog)) {
       for (const check of entry.checks) {
-        if (check.status === 'active' && check.count > 0) {
+        if (check.status === 'active' && check.severity !== 'info' && check.count > 0) {
           flat.push({ code: check.code, severity: check.severity, count: check.count, category });
         }
       }
@@ -290,23 +291,23 @@ export default function CrawlsShow({
             )}
 
             {activeTab === 'all' && (
-            <>
-              {categories.length > 1 && (
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
-                  <Select value={filters.category ?? ''} onChange={(e) => go({ category: e.target.value || null })} className="w-48">
-                    <option value="">{t('crawler.filter_all')}</option>
-                    {categories.map((c) => (
-                      <option key={c} value={c}>
-                        {t(`crawler.category.${c}`)}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-              )}
-              {pagesTable()}
-            </>
-          )}
+              <>
+                {categories.length > 1 && (
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
+                    <Select value={filters.category ?? ''} onChange={(e) => go({ category: e.target.value || null })} className="w-48">
+                      <option value="">{t('crawler.filter_all')}</option>
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {t(`crawler.category.${c}`)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                )}
+                {pagesTable()}
+              </>
+            )}
 
           {activeTab === 'resources' && filters.resource && resourceRefs && (
             <>
