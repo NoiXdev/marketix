@@ -1,7 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Badge, BackLink, Card, PageHeader } from '@/Components/ui';
+import { CrawlSidebar, CrawlNavItem } from '@/Components/CrawlSidebar';
 import { useTranslation } from '@/lib/i18n';
 import { formatBytes } from '@/lib/formatBytes';
+import { severityBadgeVariant, severityDotClass, severityRank } from '@/lib/severity';
 import { CrawlContentCategory, PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
@@ -37,20 +39,6 @@ interface CrawlPageDetail {
   screenshots_enabled: boolean;
   screenshots: { desktop: string | null; mobile: string | null };
 }
-
-const severityVariant: Record<'error' | 'warning' | 'notice' | 'info', 'danger' | 'warning' | 'neutral'> = {
-  error: 'danger',
-  warning: 'warning',
-  notice: 'neutral',
-  info: 'neutral',
-};
-
-const severityDot: Record<'error' | 'warning' | 'notice' | 'info', string> = {
-  error: 'bg-danger-foreground',
-  warning: 'bg-warning-foreground',
-  notice: 'bg-neutral-foreground',
-  info: 'bg-neutral-foreground',
-};
 
 function truncateText(value: string, max: number): string {
   return value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value;
@@ -352,15 +340,6 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
     }
   }
 
-  const tabs = [
-    { key: 'overview', label: t('crawler.tab_overview'), severity: null as string | null },
-    ...page.issues.map((code) => ({
-      key: code,
-      label: t(`crawler.issue.${code}`),
-      severity: page.issue_severities[code] ?? 'notice',
-    })),
-  ];
-
   return (
     <AppLayout title={page.url}>
       <div className="px-8 py-8">
@@ -380,51 +359,51 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           }
         />
 
-        <div className="mb-4 flex flex-wrap gap-1 border-b border-line" role="tablist">
-          {tabs.map((tb) => (
-            <button
-              key={tb.key}
-              type="button"
-              role="tab"
-              aria-selected={tab === tb.key}
-              onClick={() => setTab(tb.key)}
-              className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
-                tab === tb.key ? 'border-accent text-foreground' : 'border-transparent text-muted hover:text-foreground'
-              }`}
-            >
-              {tb.severity && (
-                <span className={`h-2 w-2 shrink-0 rounded-full ${severityDot[tb.severity as 'error' | 'warning' | 'notice' | 'info']}`} />
+        <div className="flex flex-col gap-6 md:flex-row">
+          <CrawlSidebar
+            primary={[{ key: 'overview', label: t('crawler.tab_overview'), active: tab === 'overview', onSelect: () => setTab('overview') }]}
+            sectionLabel={t('crawler.issues')}
+            items={[...page.issues]
+              .sort((a, b) => severityRank(page.issue_severities[b] ?? 'notice') - severityRank(page.issue_severities[a] ?? 'notice'))
+              .map(
+                (code): CrawlNavItem => ({
+                  key: code,
+                  label: t(`crawler.issue.${code}`),
+                  active: tab === code,
+                  onSelect: () => setTab(code),
+                  dotClass: severityDotClass(page.issue_severities[code] ?? 'notice'),
+                }),
               )}
-              {tb.label}
-            </button>
-          ))}
-        </div>
+          />
 
-        {tab === 'overview' ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {isHtml && serpCard}
-            {isHtml && page.screenshots_enabled && screenshotsCard}
-            {fileCard}
-            {foundOnCard}
-            {isHtml && metaCard}
-            {isHtml && headingsCard}
-            {isHtml && outLinksCard}
-            {isHtml && structuredDataCard}
-            {isHtml && imagesCard}
-            {redirectChainCard}
+          <div className="min-w-0 flex-1">
+            {tab === 'overview' ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {isHtml && serpCard}
+                {isHtml && page.screenshots_enabled && screenshotsCard}
+                {fileCard}
+                {foundOnCard}
+                {isHtml && metaCard}
+                {isHtml && headingsCard}
+                {isHtml && outLinksCard}
+                {isHtml && structuredDataCard}
+                {isHtml && imagesCard}
+                {redirectChainCard}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge variant={severityBadgeVariant(page.issue_severities[tab] ?? 'notice')}>
+                    {t(`crawler.severity_${page.issue_severities[tab] ?? 'notice'}`)}
+                  </Badge>
+                  <h2 className="font-medium text-foreground">{t(`crawler.issue.${tab}`)}</h2>
+                </div>
+                <p className="text-sm text-muted">{t(`crawler.issue_help.${tab}`)}</p>
+                <div className="grid gap-4 md:grid-cols-2">{issueEvidence(tab)}</div>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Badge variant={severityVariant[page.issue_severities[tab] ?? 'notice']}>
-                {t(`crawler.severity_${page.issue_severities[tab] ?? 'notice'}`)}
-              </Badge>
-              <h2 className="font-medium text-foreground">{t(`crawler.issue.${tab}`)}</h2>
-            </div>
-            <p className="text-sm text-muted">{t(`crawler.issue_help.${tab}`)}</p>
-            <div className="grid gap-4 md:grid-cols-2">{issueEvidence(tab)}</div>
-          </div>
-        )}
+        </div>
       </div>
     </AppLayout>
   );
