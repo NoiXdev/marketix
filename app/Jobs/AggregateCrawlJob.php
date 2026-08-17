@@ -102,10 +102,14 @@ class AggregateCrawlJob implements ShouldQueue
                 }
                 $hrefNorm = $norm($href);
                 $hreflangAnnotations[] = ['lang' => $lang, 'hrefNorm' => $hrefNorm, 'href' => $href];
-                // First self-matching entry wins (e.g. a page's own "en" entry takes
-                // priority over an "x-default" entry that also happens to point at
-                // itself), matching the semantics this replaces.
-                if ($hrefNorm === $selfUrlNorm && $selfLang === null) {
+                // First non-"x-default" self-matching entry wins: "x-default" is not a
+                // real language, so a self-referencing x-default entry (common, and
+                // often listed before the real language entry) must never become
+                // selfLang — otherwise it gets compared against a real language code
+                // in the reciprocal-language check below and false-flags. If the only
+                // self entry is x-default, selfLang stays null (that check requires
+                // both langs known, so it correctly won't fire).
+                if ($hrefNorm === $selfUrlNorm && $selfLang === null && $lang !== 'x-default') {
                     $selfLang = $lang;
                 }
             }

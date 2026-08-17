@@ -82,6 +82,55 @@ class HreflangAggregateTest extends TestCase
         }
     }
 
+    public function test_reciprocal_cluster_with_x_default_listed_before_self_language_is_not_flagged(): void
+    {
+        // Regression: on the common layout where the home/default page lists its
+        // x-default self-entry BEFORE its real language self-entry, selfLang must
+        // still resolve to the real language ("en"), not "x-default" — otherwise the
+        // reciprocal-language check compares de's correct "en" return entry against
+        // the bogus "x-default" selfLang and false-flags a perfectly valid cluster.
+        $this->fakeSitemap();
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com/']);
+
+        $home = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => [
+                ['lang' => 'x-default', 'href' => 'https://example.com/'],
+                ['lang' => 'en', 'href' => 'https://example.com/'],
+                ['lang' => 'de', 'href' => 'https://example.com/de/'],
+            ],
+        ]);
+        $de = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/de/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => [
+                ['lang' => 'de', 'href' => 'https://example.com/de/'],
+                ['lang' => 'en', 'href' => 'https://example.com/'],
+            ],
+        ]);
+
+        $this->link($crawl, $home, 'https://example.com/de/');
+        $this->link($crawl, $de, 'https://example.com/');
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $homeIssues = $home->refresh()->issues;
+        $deIssues = $de->refresh()->issues;
+
+        foreach ([
+            'hreflang_non_200', 'hreflang_missing_return_link', 'hreflang_non_canonical_return_link',
+            'hreflang_inconsistent_language', 'hreflang_noindex_return_link', 'hreflang_unlinked',
+        ] as $code) {
+            $this->assertNotContains($code, $homeIssues, "home should not have {$code}");
+            $this->assertNotContains($code, $deIssues, "de should not have {$code}");
+        }
+    }
+
     public function test_missing_return_link(): void
     {
         $this->fakeSitemap();
