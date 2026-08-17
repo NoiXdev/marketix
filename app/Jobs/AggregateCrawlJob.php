@@ -102,7 +102,10 @@ class AggregateCrawlJob implements ShouldQueue
                 }
                 $hrefNorm = $norm($href);
                 $hreflangAnnotations[] = ['lang' => $lang, 'hrefNorm' => $hrefNorm, 'href' => $href];
-                if ($hrefNorm === $selfUrlNorm) {
+                // First self-matching entry wins (e.g. a page's own "en" entry takes
+                // priority over an "x-default" entry that also happens to point at
+                // itself), matching the semantics this replaces.
+                if ($hrefNorm === $selfUrlNorm && $selfLang === null) {
                     $selfLang = $lang;
                 }
             }
@@ -308,14 +311,9 @@ class AggregateCrawlJob implements ShouldQueue
                 // Cross-page hreflang checks.
                 $hreflangAnnotations = is_array($page->hreflang) ? $page->hreflang : [];
                 if ($hreflangAnnotations !== []) {
-                    $selfLang = null;
-                    foreach ($hreflangAnnotations as $a) {
-                        $href = is_array($a) ? ($a['href'] ?? null) : null;
-                        if ($href !== null && $norm($href) === $key) {
-                            $selfLang = $a['lang'] ?? null;
-                            break;
-                        }
-                    }
+                    // Reuse the self-lang already computed into $pageByUrl (single source
+                    // of truth) rather than re-deriving it from $page->hreflang here.
+                    $selfLang = $pageByUrl[$key]['selfLang'] ?? null;
 
                     foreach ($hreflangAnnotations as $a) {
                         $lang = is_array($a) ? ($a['lang'] ?? null) : null;
@@ -358,10 +356,14 @@ class AggregateCrawlJob implements ShouldQueue
                             $issues[IssueCode::HreflangNon200->value] = true;
                         }
                     }
+                }
 
-                    if (isset($hreflangReferenced[$key]) && $count === 0) {
-                        $issues[IssueCode::HreflangUnlinked->value] = true;
-                    }
+                // "Unlinked Hreflang URLs": a same-host target referenced by someone
+                // else's hreflang annotations with zero <a> inlinks, evaluated for every
+                // page regardless of whether it declares hreflang of its own. Exempt the
+                // crawl seed, same as orphan_page/not_in_sitemap above.
+                if (isset($hreflangReferenced[$key]) && $count === 0 && ! $isStart) {
+                    $issues[IssueCode::HreflangUnlinked->value] = true;
                 }
 
                 if ($page->content_category === 'html') {

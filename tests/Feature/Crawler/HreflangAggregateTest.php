@@ -290,6 +290,77 @@ class HreflangAggregateTest extends TestCase
         $this->assertContains('hreflang_unlinked', $b->refresh()->issues);
     }
 
+    public function test_start_page_is_exempt_from_hreflang_unlinked(): void
+    {
+        $this->fakeSitemap();
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com/en/']);
+
+        // A is the crawl's start page; it declares hreflang and gets zero <a>
+        // inlinks, but must never get hreflang_unlinked — mirrors the ! $isStart
+        // exemption already used by orphan_page/not_in_sitemap.
+        $a = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/en/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => [
+                ['lang' => 'en', 'href' => 'https://example.com/en/'],
+                ['lang' => 'de', 'href' => 'https://example.com/de/'],
+            ],
+        ]);
+        $b = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/de/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => [
+                ['lang' => 'de', 'href' => 'https://example.com/de/'],
+                ['lang' => 'en', 'href' => 'https://example.com/en/'],
+            ],
+        ]);
+
+        // B references A back via hreflang, so A lands in the same-host referenced
+        // set; no <a> link to A anywhere (it's the seed, not linked-to internally).
+        $this->link($crawl, $b, 'https://example.com/en/');
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertNotContains('hreflang_unlinked', $a->refresh()->issues);
+    }
+
+    public function test_hreflang_unlinked_applies_even_without_own_hreflang_annotations(): void
+    {
+        $this->fakeSitemap();
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com/en/']);
+
+        $a = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/en/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => [
+                ['lang' => 'en', 'href' => 'https://example.com/en/'],
+                ['lang' => 'fr', 'href' => 'https://example.com/fr/'],
+            ],
+        ]);
+        // C is referenced by A's hreflang but declares none of its own, isn't the
+        // start page, and has zero <a> inlinks — it must still be flagged; the
+        // unlinked check must not be gated behind the target's own annotations.
+        $c = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/fr/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+            'hreflang' => null,
+        ]);
+
+        // No <a> link to C anywhere.
+
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+
+        $this->assertContains('hreflang_unlinked', $c->refresh()->issues);
+    }
+
     public function test_off_host_target_faked_non_200(): void
     {
         $this->fakeSitemap();
