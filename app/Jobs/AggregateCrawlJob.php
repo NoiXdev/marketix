@@ -39,6 +39,9 @@ class AggregateCrawlJob implements ShouldQueue
     /** Safety cap on how many external resources we probe per crawl. */
     private const MAX_RESOURCE_PROBES = 2000;
 
+    /** Safety cap on how many off-host hreflang targets we probe per crawl. */
+    private const MAX_HREFLANG_PROBES = 2000;
+
     public function __construct(public Crawl $crawl) {}
 
     public function handle(SitemapReader $sitemap): void
@@ -51,7 +54,7 @@ class AggregateCrawlJob implements ShouldQueue
         // avoids hydrating full page models (with their heavier JSON columns) or
         // eager-loading every link relation for the whole crawl at once.
         $identities = $this->crawl->pages()
-            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'content_hash', 'created_at', 'canonical', 'pagination_next', 'pagination_prev', 'status_code', 'is_indexable'])
+            ->select(['id', 'url', 'final_url', 'title', 'meta_description', 'meta_keywords', 'h1', 'content_hash', 'created_at', 'canonical', 'pagination_next', 'pagination_prev', 'status_code', 'is_indexable', 'hreflang'])
             ->get();
 
         // The page that represents the crawl's start/home page. Prefer an exact match
@@ -78,11 +81,40 @@ class AggregateCrawlJob implements ShouldQueue
         $pageByUrl = [];
         $pageIndexableById = [];
         foreach ($identities as $p) {
+            $canonicalNorm = null;
+            if ($p->canonical !== null && trim($p->canonical) !== '') {
+                $resolvedCanonical = $this->resolveUrl($p->canonical, $p->url);
+                if ($resolvedCanonical !== null) {
+                    $canonicalNorm = $norm($resolvedCanonical);
+                }
+            }
+
+            // Hreflang annotations are stored as absolute {lang, href} pairs (T3); just
+            // normalize the href here so cross-page lookups key consistently.
+            $selfUrlNorm = $norm($p->url);
+            $hreflangAnnotations = [];
+            $selfLang = null;
+            foreach ((is_array($p->hreflang) ? $p->hreflang : []) as $a) {
+                $lang = is_array($a) ? ($a['lang'] ?? null) : null;
+                $href = is_array($a) ? ($a['href'] ?? null) : null;
+                if ($lang === null || $href === null || trim($href) === '') {
+                    continue;
+                }
+                $hrefNorm = $norm($href);
+                $hreflangAnnotations[] = ['lang' => $lang, 'hrefNorm' => $hrefNorm, 'href' => $href];
+                if ($hrefNorm === $selfUrlNorm) {
+                    $selfLang = $lang;
+                }
+            }
+
             $entry = [
                 'status' => $p->status_code,
                 'indexable' => (bool) $p->is_indexable,
                 'next' => $p->pagination_next !== null ? $norm($p->pagination_next) : null,
                 'prev' => $p->pagination_prev !== null ? $norm($p->pagination_prev) : null,
+                'canonical' => $canonicalNorm,
+                'hreflang' => $hreflangAnnotations,
+                'selfLang' => $selfLang,
             ];
             $pageByUrl[$norm($p->url)] = $entry;
             if ($norm($p->final_url) !== '') {
@@ -90,6 +122,28 @@ class AggregateCrawlJob implements ShouldQueue
             }
             $pageIndexableById[$p->id] = (bool) $p->is_indexable;
         }
+
+        // Same-host hreflang targets referenced by any page's annotations (for
+        // hreflang_unlinked), and the deduped set of off-host targets to probe.
+        $hreflangReferenced = [];
+        $offHostHrefByNorm = [];
+        foreach ($identities as $p) {
+            $entry = $pageByUrl[$norm($p->url)] ?? null;
+            if ($entry === null) {
+                continue;
+            }
+            foreach ($entry['hreflang'] as $a) {
+                if ($a['hrefNorm'] === '') {
+                    continue;
+                }
+                if (isset($pageByUrl[$a['hrefNorm']])) {
+                    $hreflangReferenced[$a['hrefNorm']] = true;
+                } else {
+                    $offHostHrefByNorm[$a['hrefNorm']] ??= $a['href'];
+                }
+            }
+        }
+        $externalStatus = $this->probeHreflangTargets($offHostHrefByNorm);
 
         // Single lightweight pass over all links: feeds the internal-only inlink counts
         // and BFS adjacency (unchanged), plus per-page outlink stats ($outStats) and
@@ -170,7 +224,7 @@ class AggregateCrawlJob implements ShouldQueue
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $dupHashes, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $dupHashes, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, $hreflangReferenced, $externalStatus, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -248,6 +302,65 @@ class AggregateCrawlJob implements ShouldQueue
                     $nextKey = $norm($page->pagination_next);
                     if (isset($pageByUrl[$nextKey]) && $pageByUrl[$nextKey]['prev'] !== $norm($page->url)) {
                         $issues[IssueCode::PaginationSequenceError->value] = true;
+                    }
+                }
+
+                // Cross-page hreflang checks.
+                $hreflangAnnotations = is_array($page->hreflang) ? $page->hreflang : [];
+                if ($hreflangAnnotations !== []) {
+                    $selfLang = null;
+                    foreach ($hreflangAnnotations as $a) {
+                        $href = is_array($a) ? ($a['href'] ?? null) : null;
+                        if ($href !== null && $norm($href) === $key) {
+                            $selfLang = $a['lang'] ?? null;
+                            break;
+                        }
+                    }
+
+                    foreach ($hreflangAnnotations as $a) {
+                        $lang = is_array($a) ? ($a['lang'] ?? null) : null;
+                        $href = is_array($a) ? ($a['href'] ?? null) : null;
+                        if ($lang === null || $href === null || trim($href) === '') {
+                            continue;
+                        }
+                        $hrefNorm = $norm($href);
+                        if ($hrefNorm === $key) {
+                            continue; // skip the self entry for reciprocity checks
+                        }
+
+                        if (isset($pageByUrl[$hrefNorm])) {
+                            $t = $pageByUrl[$hrefNorm];
+                            if ($t['status'] !== null && $t['status'] !== 200) {
+                                $issues[IssueCode::HreflangNon200->value] = true;
+                            }
+                            if ($t['indexable'] === false) {
+                                $issues[IssueCode::HreflangNoindexReturnLink->value] = true;
+                            }
+                            if ($t['canonical'] !== null && $t['canonical'] !== $hrefNorm) {
+                                $issues[IssueCode::HreflangNonCanonicalReturnLink->value] = true;
+                            }
+
+                            $returnLang = null;
+                            $hasReturn = false;
+                            foreach ($t['hreflang'] as $ta) {
+                                if ($ta['hrefNorm'] === $key) {
+                                    $hasReturn = true;
+                                    $returnLang = $ta['lang'];
+                                    break;
+                                }
+                            }
+                            if (! $hasReturn) {
+                                $issues[IssueCode::HreflangMissingReturnLink->value] = true;
+                            } elseif ($selfLang !== null && $returnLang !== null && $returnLang !== $selfLang) {
+                                $issues[IssueCode::HreflangInconsistentLanguage->value] = true;
+                            }
+                        } elseif (isset($externalStatus[$hrefNorm]) && $externalStatus[$hrefNorm] !== null && $externalStatus[$hrefNorm] !== 200) {
+                            $issues[IssueCode::HreflangNon200->value] = true;
+                        }
+                    }
+
+                    if (isset($hreflangReferenced[$key]) && $count === 0) {
+                        $issues[IssueCode::HreflangUnlinked->value] = true;
                     }
                 }
 
@@ -433,6 +546,43 @@ class AggregateCrawlJob implements ShouldQueue
                 'cap' => self::MAX_RESOURCE_PROBES,
             ]);
         }
+    }
+
+    /**
+     * Probe every off-host hreflang target (SSRF-safe via LinkStatusChecker, capped
+     * exactly like checkBrokenLinks/checkResources) and return its status keyed by the
+     * same normalized URL used elsewhere in this job.
+     *
+     * @param  array<string, string>  $offHostHrefByNorm  normUrl => url to probe
+     * @return array<string, int|null>
+     */
+    protected function probeHreflangTargets(array $offHostHrefByNorm): array
+    {
+        if ($offHostHrefByNorm === []) {
+            return [];
+        }
+
+        $checker = app(LinkStatusChecker::class);
+        $externalStatus = [];
+        $probes = 0;
+
+        foreach ($offHostHrefByNorm as $normUrl => $href) {
+            if ($probes < self::MAX_HREFLANG_PROBES) {
+                $externalStatus[$normUrl] = $checker->status($href);
+                $probes++;
+            } else {
+                $externalStatus[$normUrl] = null;
+            }
+        }
+
+        if ($probes >= self::MAX_HREFLANG_PROBES) {
+            Log::warning('Crawl hreflang check hit the probe cap; some off-host targets were not checked.', [
+                'crawl_id' => $this->crawl->id,
+                'cap' => self::MAX_HREFLANG_PROBES,
+            ]);
+        }
+
+        return $externalStatus;
     }
 
     private function resolveUrl(string $href, string $base): ?string
