@@ -12,6 +12,7 @@ export const CATEGORY_ORDER = [
   'images',
   'canonicals',
   'pagination',
+  'hreflang',
   'links',
   'other',
 ];

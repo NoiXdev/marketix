@@ -32,6 +32,7 @@ interface CrawlPageDetail {
   in_sitemap: boolean;
   inlinks_count: number;
   structured_data: string[];
+  hreflang: { lang: string; href: string }[];
   images_missing_alt: string[];
   issues: string[];
   issue_severities: Record<string, 'error' | 'warning' | 'notice' | 'info'>;
@@ -262,6 +263,27 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           <dd className="text-foreground">{page.meta_robots ?? '—'}</dd>
         </div>
       </dl>
+    </Card>
+  );
+
+  const hreflangCard = (
+    <Card className="p-4">
+      <h3 className="mb-2 font-medium text-foreground">{t('crawler.hreflang')}</h3>
+      <ul className="space-y-1.5 text-sm">
+        {page.hreflang.map((h, i) => (
+          <li key={i} className="flex items-baseline gap-2">
+            <span className="shrink-0 font-mono text-xs text-muted">{h.lang}</span>
+            <a
+              href={h.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="truncate text-accent hover:underline"
+            >
+              {h.href}
+            </a>
+          </li>
+        ))}
+      </ul>
     </Card>
   );
 
@@ -507,6 +529,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
                 {fileCard}
                 {foundOnCard}
                 {isHtml && metaCard}
+                {isHtml && page.hreflang.length > 0 && hreflangCard}
                 {isHtml && headingsCard}
                 {isHtml && outLinksCard}
                 {isHtml && structuredDataCard}
