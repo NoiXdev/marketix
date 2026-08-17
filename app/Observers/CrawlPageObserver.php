@@ -88,13 +88,14 @@ class CrawlPageObserver extends CrawlObserver
 
         [$chain, $finalUrl] = $this->redirects($url, $headers);
         $scheme = strtolower(parse_url($finalUrl ?: $url, PHP_URL_SCHEME) ?: 'https');
+        $linkHeader = $lower['link'][0] ?? null;
 
         $links = [];
         $resources = [];
         $data = [];
 
         if ($category === ResourceClassifier::HTML) {
-            $ctx = new PageContext($url, $status, $this->baseHost, false, $securityHeaders, $scheme);
+            $ctx = new PageContext($url, $status, $this->baseHost, false, $securityHeaders, $scheme, $linkHeader);
             $analysis = $this->analyzer->analyze($body, $ctx);
             foreach ($analysis->issues as $issue) {
                 $issues[] = $issue->value;
