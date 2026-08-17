@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/i18n';
 import { durationBetween, formatDuration } from '@/lib/formatDuration';
 import { formatBytes } from '@/lib/formatBytes';
 import { severityDotClass, severityRank, Severity } from '@/lib/severity';
+import { CATEGORY_ORDER } from '@/lib/crawlerCategories';
 import { CrawlContentCategory, CrawlPageRow, CrawlResourceRow, CrawlSummary, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo } from 'react';
@@ -50,24 +51,6 @@ const statusVariant: Record<CrawlStatus, 'neutral' | 'success' | 'warning' | 'da
   completed: 'success',
   failed: 'danger',
 };
-
-// Fixed tab order matching the catalogue's category order.
-const CATEGORY_ORDER = [
-  'security',
-  'response_codes',
-  'url',
-  'page_title',
-  'meta_description',
-  'meta_keywords',
-  'h1',
-  'h2',
-  'content',
-  'images',
-  'canonicals',
-  'pagination',
-  'links',
-  'other',
-];
 
 export default function CrawlsShow({
   crawl,

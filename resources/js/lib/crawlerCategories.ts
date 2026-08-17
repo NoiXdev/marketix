@@ -1,0 +1,17 @@
+/** Category slugs (App\Crawler\IssueCategory) in display order, security first. */
+export const CATEGORY_ORDER = [
+  'security',
+  'response_codes',
+  'url',
+  'page_title',
+  'meta_description',
+  'meta_keywords',
+  'h1',
+  'h2',
+  'content',
+  'images',
+  'canonicals',
+  'pagination',
+  'links',
+  'other',
+];
