@@ -119,6 +119,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
         shown.add(c.code);
       }
       for (const code of issues) {
+        if ((page.issue_severities[code] ?? 'notice') === 'info') continue;
         if (shown.has(code) || EVIDENCE_CODES.has(code)) continue;
         if (cat[code] !== 'security') continue;
         items.push(failRow(code));
@@ -131,6 +132,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
       if (category === 'security') continue;
       const items: CheckItem[] = [];
       for (const code of issues) {
+        if ((page.issue_severities[code] ?? 'notice') === 'info') continue;
         if (shown.has(code) || EVIDENCE_CODES.has(code)) continue;
         if ((cat[code] ?? 'other') !== category) continue;
         items.push(failRow(code));
