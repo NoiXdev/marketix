@@ -133,6 +133,28 @@ class CrawlControllerTest extends TestCase
             );
     }
 
+    public function test_show_echoes_all_urls_view(): void
+    {
+        // The "All URLs" nav item is a distinct view (view=all) that must survive
+        // the round-trip so the frontend can activate it from a clean Overview state.
+        [$user, $project] = $this->member();
+        $crawl = Crawl::factory()->for($project)->create(['start_url' => 'https://example.com']);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/', 'content_category' => 'html']);
+        CrawlPage::factory()->for($crawl)->create(['url' => 'https://example.com/logo.svg', 'content_category' => 'image']);
+
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id, 'view' => 'all']))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters.view', 'all')
+                ->has('pages.data', 2)
+            );
+
+        // A clean request keeps view null (Overview).
+        $this->actingAs($user)
+            ->get(route('app.project.crawls.show', ['project' => $project->id, 'crawl' => $crawl->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('filters.view', null));
+    }
+
     public function test_show_filters_pages_by_issue(): void
     {
         [$user, $project] = $this->member();

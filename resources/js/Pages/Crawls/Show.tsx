@@ -80,7 +80,8 @@ export default function CrawlsShow({
     return () => clearInterval(id);
   }, [crawl.status]);
 
-  const activeTab = filters.view === 'resources' ? 'resources' : (filters.group ?? (filters.category ? 'all' : 'overview'));
+  const activeTab =
+    filters.view === 'resources' ? 'resources' : (filters.group ?? (filters.view === 'all' || filters.category ? 'all' : 'overview'));
 
   // A category is "planned-only" when none of its checks are implemented yet.
   const hasActiveChecks = (key: string) => (catalog[key]?.checks ?? []).some((c) => c.status === 'active');
@@ -212,7 +213,7 @@ export default function CrawlsShow({
           <CrawlSidebar
             primary={[
               { key: 'overview', label: t('crawler.tab_overview'), active: activeTab === 'overview', onSelect: () => go({}) },
-              { key: 'all', label: t('crawler.all_urls'), active: activeTab === 'all', onSelect: () => go({ category: filters.category }) },
+              { key: 'all', label: t('crawler.all_urls'), active: activeTab === 'all', onSelect: () => go({ view: 'all', category: filters.category }) },
               { key: 'resources', label: t('crawler.tab_resources'), active: activeTab === 'resources', onSelect: () => go({ view: 'resources' }) },
             ]}
             sectionLabel={t('crawler.category_group_section')}
@@ -278,7 +279,7 @@ export default function CrawlsShow({
                 {categories.length > 1 && (
                   <div className="mb-3 flex items-center gap-2">
                     <span className="text-sm text-muted">{t('crawler.filter_type')}</span>
-                    <Select value={filters.category ?? ''} onChange={(e) => go({ category: e.target.value || null })} className="w-48">
+                    <Select value={filters.category ?? ''} onChange={(e) => go({ view: 'all', category: e.target.value || null })} className="w-48">
                       <option value="">{t('crawler.filter_all')}</option>
                       {categories.map((c) => (
                         <option key={c} value={c}>

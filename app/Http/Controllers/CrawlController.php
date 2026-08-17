@@ -204,7 +204,7 @@ class CrawlController extends Controller
                 'category' => is_string($category) && $category !== '' ? $category : null,
                 'group' => is_string($group) && $group !== '' ? $group : null,
                 'issue' => is_string($issue) && $issue !== '' ? $issue : null,
-                'view' => $view === 'resources' ? 'resources' : null,
+                'view' => in_array($view, ['resources', 'all'], true) ? $view : null,
                 'resource_type' => is_string($resourceType) && $resourceType !== '' ? $resourceType : null,
                 'resource' => is_string($resource) && $resource !== '' ? $resource : null,
             ],
