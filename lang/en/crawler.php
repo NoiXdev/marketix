@@ -96,6 +96,8 @@ return [
         'other' => 'Other',
     ],
     'all_urls' => 'All URLs',
+    'category_group_section' => 'Issues by category',
+    'dashboard_top_issues' => 'Most common issues',
     'planned' => 'planned',
     'category_planned_note' => 'These checks are coming in a later release.',
     'category_no_issues' => 'No issues found in this category.',

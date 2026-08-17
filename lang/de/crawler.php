@@ -96,6 +96,8 @@ return [
         'other' => 'Weitere',
     ],
     'all_urls' => 'Alle URLs',
+    'category_group_section' => 'Probleme nach Kategorie',
+    'dashboard_top_issues' => 'Häufigste Probleme',
     'planned' => 'geplant',
     'category_planned_note' => 'Diese Checks kommen in einem späteren Release.',
     'category_no_issues' => 'In dieser Kategorie wurden keine Probleme gefunden.',
