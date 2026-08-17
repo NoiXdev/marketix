@@ -129,7 +129,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
 
     // Every other category: failing detail-less checks as ✗ rows.
     for (const category of CATEGORY_ORDER) {
-      if (category === 'security') continue;
+      if (category === 'security' && isHtml) continue;
       const items: CheckItem[] = [];
       for (const code of issues) {
         if ((page.issue_severities[code] ?? 'notice') === 'info') continue;
