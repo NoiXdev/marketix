@@ -26,7 +26,7 @@ export function CrawlSidebar({
       type="button"
       aria-current={it.active ? 'page' : undefined}
       onClick={it.onSelect}
-      className={`flex w-full items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left text-sm transition ${
+      className={`flex w-full items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
         it.active ? 'bg-accent-soft font-medium text-accent-soft-foreground' : 'text-muted hover:bg-elevated hover:text-foreground'
       } ${it.dimmed ? 'opacity-50' : ''}`}
     >
@@ -40,7 +40,7 @@ export function CrawlSidebar({
 
   return (
     <>
-      <nav className="hidden space-y-0.5 md:block md:w-56 md:flex-none">
+      <nav aria-label="Crawl-Navigation" className="hidden space-y-0.5 md:block md:w-56 md:flex-none">
         {primary.map(item)}
         {sectionLabel && items.length > 0 && (
           <>
@@ -56,8 +56,9 @@ export function CrawlSidebar({
             <button
               key={it.key}
               type="button"
+              aria-current={it.active ? 'page' : undefined}
               onClick={it.onSelect}
-              className={`rounded-md px-3 py-1.5 text-sm ${it.active ? 'bg-accent-soft font-medium text-accent-soft-foreground' : 'text-muted hover:text-foreground'}`}
+              className={`rounded-md px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${it.active ? 'bg-accent-soft font-medium text-accent-soft-foreground' : 'text-muted hover:text-foreground'}`}
             >
               {it.label}
             </button>

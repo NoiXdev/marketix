@@ -275,7 +275,7 @@ export default function CrawlsShow({
                           key={issue.code}
                           type="button"
                           onClick={() => go({ group: issue.category, issue: issue.code })}
-                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm hover:bg-elevated"
+                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
                         >
                           <span className="flex min-w-0 items-center gap-2">
                             <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${severityDotClass(issue.severity)}`} />
