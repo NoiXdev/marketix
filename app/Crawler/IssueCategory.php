@@ -16,6 +16,7 @@ enum IssueCategory: string
     case Images = 'images';
     case Canonicals = 'canonicals';
     case Pagination = 'pagination';
+    case Hreflang = 'hreflang';
     case Links = 'links';
     case Other = 'other';
 

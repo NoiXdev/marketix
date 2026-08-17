@@ -113,6 +113,19 @@ enum IssueCode: string
     case MultiplePaginationUrls = 'multiple_pagination_urls';
     case PaginationLoop = 'pagination_loop';
     case PaginationSequenceError = 'pagination_sequence_error';
+    // hreflang
+    case HreflangIncorrectCodes = 'hreflang_incorrect_codes';
+    case HreflangMultipleEntries = 'hreflang_multiple_entries';
+    case HreflangOutsideHead = 'hreflang_outside_head';
+    case HreflangMissingSelfReference = 'hreflang_missing_self_reference';
+    case HreflangMissingXDefault = 'hreflang_missing_x_default';
+    case HreflangNotUsingCanonical = 'hreflang_not_using_canonical';
+    case HreflangNon200 = 'hreflang_non_200';
+    case HreflangMissingReturnLink = 'hreflang_missing_return_link';
+    case HreflangNonCanonicalReturnLink = 'hreflang_non_canonical_return_link';
+    case HreflangInconsistentLanguage = 'hreflang_inconsistent_language';
+    case HreflangNoindexReturnLink = 'hreflang_noindex_return_link';
+    case HreflangUnlinked = 'hreflang_unlinked';
     // links
     case PagesNonCrawlableInternalOutlinks = 'pages_non_crawlable_internal_outlinks';
     case PagesHighCrawlDepth = 'pages_high_crawl_depth';
@@ -160,7 +173,11 @@ enum IssueCode: string
             self::PagesNonCrawlableInternalOutlinks, self::PagesNoInternalOutlinks,
             self::OnlyInternalNofollowInlinks, self::OutlinksToLocalhost,
             self::OnlyNonIndexableInlinks,
-            self::LoremIpsum, self::ExactDuplicates => 'warning',
+            self::LoremIpsum, self::ExactDuplicates,
+            self::HreflangIncorrectCodes, self::HreflangMultipleEntries, self::HreflangOutsideHead,
+            self::HreflangNotUsingCanonical, self::HreflangNon200, self::HreflangMissingReturnLink,
+            self::HreflangNonCanonicalReturnLink, self::HreflangInconsistentLanguage,
+            self::HreflangNoindexReturnLink => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -180,7 +197,9 @@ enum IssueCode: string
             self::NonDescriptiveAnchorInternalOutlinks, self::PagesManyExternalOutlinks,
             self::PagesManyInternalOutlinks, self::FollowNofollowInternalInlinks,
             self::ImageOver100kb, self::ImageMissingSizeAttributes, self::ImageMissingAltAttribute,
-            self::ImageAltOver100Chars, self::BackgroundImages => 'notice',
+            self::ImageAltOver100Chars, self::BackgroundImages,
+            self::HreflangMissingSelfReference, self::HreflangMissingXDefault,
+            self::HreflangUnlinked => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -216,6 +235,11 @@ enum IssueCode: string
             self::PaginationUrlNotInAnchor, self::PaginationNon200, self::PaginationUnlinked,
             self::PaginationNonIndexable, self::MultiplePaginationUrls, self::PaginationLoop,
             self::PaginationSequenceError => IssueCategory::Pagination,
+            self::HreflangIncorrectCodes, self::HreflangMultipleEntries, self::HreflangOutsideHead,
+            self::HreflangMissingSelfReference, self::HreflangMissingXDefault, self::HreflangNotUsingCanonical,
+            self::HreflangNon200, self::HreflangMissingReturnLink, self::HreflangNonCanonicalReturnLink,
+            self::HreflangInconsistentLanguage, self::HreflangNoindexReturnLink,
+            self::HreflangUnlinked => IssueCategory::Hreflang,
             self::OrphanPage, self::BrokenLink,
             self::PagesNonCrawlableInternalOutlinks, self::PagesHighCrawlDepth,
             self::PagesNoInternalOutlinks, self::InternalNofollowOutlinks,

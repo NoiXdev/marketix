@@ -150,6 +150,20 @@ class CheckCatalog
             ['code' => 'pagination_loop', 'category' => 'pagination', 'severity' => 'error', 'status' => self::A],
             ['code' => 'pagination_sequence_error', 'category' => 'pagination', 'severity' => 'warning', 'status' => self::A],
 
+            // hreflang
+            ['code' => 'hreflang_incorrect_codes', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_multiple_entries', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_outside_head', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_not_using_canonical', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_non_200', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_missing_return_link', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_non_canonical_return_link', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_inconsistent_language', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_noindex_return_link', 'category' => 'hreflang', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'hreflang_missing_self_reference', 'category' => 'hreflang', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'hreflang_missing_x_default', 'category' => 'hreflang', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'hreflang_unlinked', 'category' => 'hreflang', 'severity' => 'notice', 'status' => self::A],
+
             // links
             ['code' => 'orphan_page', 'category' => 'links', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'broken_link', 'category' => 'links', 'severity' => 'warning', 'status' => self::A],

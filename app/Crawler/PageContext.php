@@ -14,5 +14,7 @@ class PageContext
         public bool $robotsBlocked = false,
         public array $securityHeaders = [],
         public string $scheme = 'https',
+        /** Raw HTTP `Link:` header value, if present. */
+        public ?string $linkHeader = null,
     ) {}
 }

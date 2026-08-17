@@ -25,6 +25,7 @@ class CrawlPage extends Model
             'images_missing_alt' => 'array',
             'issues' => 'array',
             'security_headers' => 'array',
+            'hreflang' => 'array',
             'is_indexable' => 'boolean',
             'in_sitemap' => 'boolean',
             'is_orphan' => 'boolean',
