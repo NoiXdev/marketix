@@ -3,10 +3,11 @@ import { Badge, BackLink, Card, PageHeader } from '@/Components/ui';
 import { CrawlSidebar, CrawlNavItem } from '@/Components/CrawlSidebar';
 import { useTranslation } from '@/lib/i18n';
 import { formatBytes } from '@/lib/formatBytes';
-import { severityBadgeVariant, severityDotClass, severityRank } from '@/lib/severity';
+import { severityBadgeVariant, severityDotClass, severityRank, Severity } from '@/lib/severity';
+import { CATEGORY_ORDER } from '@/lib/crawlerCategories';
 import { CrawlContentCategory, PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 type Heading = { level: number; text: string };
 type OutLink = { to_url: string; type: string; anchor: string; status_code: number | null };
@@ -34,6 +35,7 @@ interface CrawlPageDetail {
   images_missing_alt: string[];
   issues: string[];
   issue_severities: Record<string, 'error' | 'warning' | 'notice' | 'info'>;
+  issue_categories: Record<string, string>;
   out_links: OutLink[];
   in_links: InLink[];
   screenshots_enabled: boolean;
@@ -55,12 +57,89 @@ function serpDisplayUrl(url: string): string {
   }
 }
 
+/** Failing codes that have a dedicated evidence card → keep their own sidebar tab. */
+const EVIDENCE_CODES = new Set<string>([
+  'broken_link', 'missing_alt_text', 'redirect_chain', 'missing_structured_data',
+  'missing_h1', 'multiple_h1', 'heading_order_skip',
+  'missing_title', 'title_too_long', 'missing_meta_description', 'duplicate_title', 'duplicate_meta_description',
+  'noindex', 'canonical_mismatch', 'robots_blocked',
+  'orphan_page', 'not_in_sitemap',
+]);
+
+const SECURITY_HEADER_CHECKS: { code: string; labelKey: string; httpsOnly?: boolean }[] = [
+  { code: 'missing_hsts_header', labelKey: 'hsts', httpsOnly: true },
+  { code: 'missing_csp_header', labelKey: 'csp' },
+  { code: 'missing_x_content_type_options', labelKey: 'x_content_type_options' },
+  { code: 'missing_x_frame_options', labelKey: 'x_frame_options' },
+  { code: 'missing_referrer_policy', labelKey: 'referrer_policy' },
+];
+
+type CheckItem = { key: string; label: string; passed: boolean | null; severity?: Severity; help?: string };
+type CheckGroup = { category: string; items: CheckItem[] };
+
 export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: CrawlPageDetail }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
   const isHtml = page.content_category === 'html';
   const brokenLinks = page.out_links.filter((l) => l.status_code != null && l.status_code >= 400);
+
+  const isHttps = (() => {
+    try {
+      return new URL(page.final_url ?? page.url).protocol === 'https:';
+    } catch {
+      return true;
+    }
+  })();
+
+  const checkGroups: CheckGroup[] = useMemo(() => {
+    const issues = page.issues;
+    const cat = page.issue_categories ?? {};
+    const shown = new Set<string>();
+    const groups: CheckGroup[] = [];
+
+    const failRow = (code: string): CheckItem => {
+      shown.add(code);
+      return {
+        key: code,
+        label: t(`crawler.issue.${code}`),
+        passed: false,
+        severity: page.issue_severities[code] ?? 'notice',
+        help: t(`crawler.issue_help.${code}`),
+      };
+    };
+
+    // Security group — HTML pages only: real ✓/✗ audit.
+    if (isHtml) {
+      const items: CheckItem[] = [];
+      items.push({ key: 'https', label: t('crawler.check.https'), passed: isHttps });
+      for (const c of SECURITY_HEADER_CHECKS) {
+        const passed = c.httpsOnly && !isHttps ? null : !issues.includes(c.code);
+        items.push({ key: c.code, label: t(`crawler.check.${c.labelKey}`), passed });
+        shown.add(c.code);
+      }
+      for (const code of issues) {
+        if (shown.has(code) || EVIDENCE_CODES.has(code)) continue;
+        if (cat[code] !== 'security') continue;
+        items.push(failRow(code));
+      }
+      groups.push({ category: 'security', items });
+    }
+
+    // Every other category: failing detail-less checks as ✗ rows.
+    for (const category of CATEGORY_ORDER) {
+      if (category === 'security') continue;
+      const items: CheckItem[] = [];
+      for (const code of issues) {
+        if (shown.has(code) || EVIDENCE_CODES.has(code)) continue;
+        if ((cat[code] ?? 'other') !== category) continue;
+        items.push(failRow(code));
+      }
+      if (items.length) groups.push({ category, items });
+    }
+
+    return groups;
+  }, [page, isHtml, isHttps, t]);
 
   const [tab, setTab] = useState<string>('overview');
   const [shotDevice, setShotDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -308,6 +387,46 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
     </Card>
   );
 
+  const checksCard = checkGroups.length > 0 && (
+    <Card className="p-4 md:col-span-2">
+      <h3 className="mb-3 font-medium text-foreground">{t('crawler.checks')}</h3>
+      <div className="space-y-4">
+        {checkGroups.map((g) => (
+          <div key={g.category}>
+            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">{t(`crawler.category_group.${g.category}`)}</h4>
+            <ul className="divide-y divide-line">
+              {g.items.map((it) => (
+                <li key={it.key} className="flex items-start gap-2 py-1.5 text-sm">
+                  <span
+                    className="mt-0.5 shrink-0 font-semibold"
+                    aria-label={t(it.passed === null ? 'crawler.check_na' : it.passed ? 'crawler.check_passed' : 'crawler.check_failed')}
+                  >
+                    {it.passed === null ? (
+                      <span className="text-muted">—</span>
+                    ) : it.passed ? (
+                      <span className="text-success-foreground">✓</span>
+                    ) : (
+                      <span className="text-danger-foreground">✗</span>
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="text-foreground">{it.label}</span>
+                      {it.passed === false && it.severity && (
+                        <Badge variant={severityBadgeVariant(it.severity)}>{t(`crawler.severity_${it.severity}`)}</Badge>
+                      )}
+                    </span>
+                    {it.passed === false && it.help && <span className="mt-0.5 block text-muted">{it.help}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+
   // The evidence card most relevant to a given issue, shown inside that issue's tab.
   function issueEvidence(code: string) {
     switch (code) {
@@ -364,6 +483,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
             primary={[{ key: 'overview', label: t('crawler.tab_overview'), active: tab === 'overview', onSelect: () => setTab('overview') }]}
             sectionLabel={t('crawler.issues')}
             items={[...page.issues]
+              .filter((code) => EVIDENCE_CODES.has(code))
               .sort((a, b) => severityRank(page.issue_severities[b] ?? 'notice') - severityRank(page.issue_severities[a] ?? 'notice'))
               .map(
                 (code): CrawlNavItem => ({
@@ -381,6 +501,7 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
               <div className="grid gap-4 md:grid-cols-2">
                 {isHtml && serpCard}
                 {isHtml && page.screenshots_enabled && screenshotsCard}
+                {checksCard}
                 {fileCard}
                 {foundOnCard}
                 {isHtml && metaCard}
