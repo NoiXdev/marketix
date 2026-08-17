@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Crawler;
 
+use App\Crawler\CheckCatalog;
 use App\Jobs\RunCrawlJob;
 use App\Models\Crawl;
 use App\Models\CrawlLink;
@@ -249,6 +250,8 @@ class CrawlControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('page.issue_severities.missing_title', 'error')
                 ->where('page.issue_severities.thin_content', 'notice')
+                ->has('page.issue_categories')
+                ->where('page.issue_categories.missing_title', CheckCatalog::categoryOf('missing_title'))
             );
     }
 

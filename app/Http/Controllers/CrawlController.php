@@ -264,6 +264,10 @@ class CrawlController extends Controller
                 'issue_severities' => collect($pageModel->issues ?? [])
                     ->mapWithKeys(fn ($code) => [$code => IssueCode::tryFrom($code)?->severity() ?? 'notice'])
                     ->all(),
+                'issue_categories' => collect($pageModel->issues ?? [])
+                    ->mapWithKeys(fn ($code) => [$code => CheckCatalog::categoryOf($code)])
+                    ->filter()
+                    ->all(),
                 'out_links' => $pageModel->outLinks->map(fn ($l) => [
                     'to_url' => $l->to_url, 'type' => $l->type, 'anchor' => $l->anchor, 'status_code' => $l->status_code,
                 ]),
