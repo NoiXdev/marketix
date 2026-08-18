@@ -72,15 +72,25 @@
         <p>@lang('crawler.report_no_issues')</p>
     @else
         <table>
+            <thead>
+            <tr>
+                <th>@lang('crawler.report_col_severity')</th>
+                <th>@lang('crawler.report_col_issue')</th>
+                <th style="text-align:right">@lang('crawler.report_col_pages')</th>
+                <th>@lang('crawler.report_col_recommendation')</th>
+            </tr>
+            </thead>
             <tbody>
             @foreach ($score['topActions'] as $action)
                 <tr>
                     <td>@lang('crawler.severity_'.$action['severity'])</td>
-                    <td>
-                        <strong>@lang('crawler.issue.'.$action['code'])</strong><br>
-                        <span style="color:#64748b">@lang('crawler.issue_help.'.$action['code'])</span>
-                    </td>
+                    <td>@lang('crawler.issue.'.$action['code'])</td>
                     <td style="text-align:right">{{ $action['count'] }}</td>
+                    <td>
+                        @if (\Illuminate\Support\Facades\Lang::has('crawler.issue_help.'.$action['code']))
+                            @lang('crawler.issue_help.'.$action['code'])
+                        @endif
+                    </td>
                 </tr>
             @endforeach
             </tbody>
