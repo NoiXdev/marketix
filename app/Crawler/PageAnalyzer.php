@@ -4,6 +4,7 @@ namespace App\Crawler;
 
 use App\Crawler\Analyzers\Analyzer;
 use App\Crawler\Analyzers\CanonicalAnalyzer;
+use App\Crawler\Analyzers\GeoAnalyzer;
 use App\Crawler\Analyzers\HeadingAnalyzer;
 use App\Crawler\Analyzers\HreflangAnalyzer;
 use App\Crawler\Analyzers\ImageAnalyzer;
@@ -32,6 +33,7 @@ class PageAnalyzer
             new CanonicalAnalyzer,
             new PaginationAnalyzer,
             new HreflangAnalyzer,
+            new GeoAnalyzer,
             new ResourceExtractor,
         ];
     }
