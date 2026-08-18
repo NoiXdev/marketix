@@ -355,11 +355,11 @@ class DemoSeeder extends Seeder
      * goals, so the analytics dashboard, goals page and events page all
      * have a real story instead of an empty state.
      *
-     * Per-day visit counts are deliberately lower than a real Nordlicht
-     * would see (see the halved weekday/weekend base below) — the original
-     * brief numbers made this loop the slowest part of DemoSeederTest.
-     * The tests only assert lower bounds, not exact totals, so this stays
-     * well within them.
+     * Per-day visit counts (the weekday/weekend base below) are the
+     * brief's unmodified values, kept as given: this loop is the slowest
+     * part of DemoSeederTest, but measured at ~4.5s for the whole file —
+     * well under the brief's ~20s / the task's ~60s slow-seeder budget —
+     * so there was nothing here that actually needed reducing.
      */
     private function seedAnalytics(): void
     {
@@ -517,6 +517,12 @@ class DemoSeeder extends Seeder
                     'type' => 'internal',
                     'status_code' => 404,
                 ]);
+
+                // Keep the 404 page's inlinks_count coherent with the link
+                // just seeded above — otherwise the page-detail "Inlinks"
+                // field and the CSV export would show 0 for a page that
+                // demonstrably has one inlink.
+                $pages[7]->forceFill(['inlinks_count' => 1])->save();
             }
 
             $crawl->update(['summary' => $summary]);
