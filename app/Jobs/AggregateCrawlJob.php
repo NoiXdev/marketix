@@ -3,10 +3,14 @@
 namespace App\Jobs;
 
 use App\Crawler\CheckCatalog;
+use App\Crawler\HtmlText;
 use App\Crawler\IssueCode;
 use App\Crawler\LinkChecks;
 use App\Crawler\LinkStatusChecker;
+use App\Crawler\LlmsTxtReader;
 use App\Crawler\ResourceProbe;
+use App\Crawler\RobotsTxtReader;
+use App\Crawler\SafeBrowsershotRenderer;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Models\Crawl;
@@ -17,7 +21,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Spatie\Browsershot\Browsershot;
 
 class AggregateCrawlJob implements ShouldQueue
 {
@@ -44,7 +50,7 @@ class AggregateCrawlJob implements ShouldQueue
 
     public function __construct(public Crawl $crawl) {}
 
-    public function handle(SitemapReader $sitemap): void
+    public function handle(SitemapReader $sitemap, RobotsTxtReader $robots, LlmsTxtReader $llms): void
     {
         $norm = fn (?string $u) => $u === null ? '' : rtrim($u, '/');
         $start = $norm($this->crawl->start_url);
@@ -228,10 +234,17 @@ class AggregateCrawlJob implements ShouldQueue
         $brokenPageIds = $this->checkBrokenLinks($norm);
         $this->checkResources($norm);
 
+        // Site-level GEO signals: robots.txt AI-bot blocking, llms.txt presence, and a
+        // raw-vs-rendered content diff — all computed once against the crawl's start
+        // URL rather than per-page, and applied only to the start page below.
+        $geoBlockedBots = $startPageId !== null ? $robots->blockedAiBots($this->crawl->start_url) : [];
+        $geoLlmsMissing = $startPageId !== null && ! $llms->exists($this->crawl->start_url);
+        $geoStartJs = $startPageId !== null ? $this->startPageJsDependent($this->crawl->start_url) : null;
+
         $summary = [];
 
         $this->crawl->pages()->chunkById(500, function (Collection $pages) use (
-            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $dupHashes, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, $hreflangReferenced, $externalStatus, &$summary
+            $norm, $inlinks, $depthsById, $sitemapSet, $hasSitemap, $dupTitles, $dupDescriptions, $dupKeywords, $dupH1, $dupHashes, $startPageId, $brokenPageIds, $pageByUrl, $outStats, $inlinkDetail, $emptyStats, $hreflangReferenced, $externalStatus, $geoBlockedBots, $geoLlmsMissing, $geoStartJs, &$summary
         ) {
             foreach ($pages as $page) {
                 $key = $norm($page->url);
@@ -376,6 +389,20 @@ class AggregateCrawlJob implements ShouldQueue
                     }
                     foreach (LinkChecks::inlinkIssues($inlinkDetail[$key] ?? ['count' => 0, 'follow' => false, 'nofollow' => false, 'anyIndexableSource' => false]) as $code) {
                         $issues[$code] = true;
+                    }
+                }
+
+                if ($isStart) {
+                    if ($geoBlockedBots !== []) {
+                        $issues->put(IssueCode::AiCrawlerBlocked->value, true);
+                    }
+                    if ($geoLlmsMissing) {
+                        $issues->put(IssueCode::MissingLlmsTxt->value, true);
+                    }
+                    if ($geoStartJs === true) {
+                        $issues->put(IssueCode::JsDependentContent->value, true);
+                    } elseif ($geoStartJs === false) {
+                        $issues->forget(IssueCode::JsDependentContent->value);
                     }
                 }
 
@@ -589,6 +616,49 @@ class AggregateCrawlJob implements ShouldQueue
         }
 
         return $externalStatus;
+    }
+
+    /**
+     * Compares the start page's raw HTML against its JS-rendered HTML: if the raw
+     * response's visible text is far smaller than the rendered version's, the page's
+     * content is JS-dependent (a crawler that doesn't execute JS would see little).
+     *
+     * @return bool|null true = JS-dependent, false = readable raw, null = undetermined
+     */
+    private function startPageJsDependent(string $startUrl): ?bool
+    {
+        try {
+            $raw = Http::timeout(15)->get($startUrl);
+            if (! $raw->successful()) {
+                return null;
+            }
+        } catch (\Throwable) {
+            return null;
+        }
+
+        $rendered = $this->jsRenderer()->getRenderedHtml($startUrl);
+        if ($rendered === '') {
+            return null; // render failed → keep the per-page heuristic result
+        }
+        $renderedLen = HtmlText::visibleLength($rendered);
+        if ($renderedLen === 0) {
+            return null;
+        }
+
+        return HtmlText::visibleLength($raw->body()) < max(200, (int) ($renderedLen * 0.25));
+    }
+
+    /**
+     * Headless-browser renderer for the start-page JS diff. Configuration mirrors
+     * RunCrawlJob::jsRenderer() exactly (no-sandbox + disable-dev-shm-usage, required
+     * for Chromium to run as root in a container). Kept as its own overridable method
+     * (rather than a container binding) so tests can substitute a deterministic fake
+     * without risking prod resolving an unconfigured Browsershot instance via
+     * container auto-wiring.
+     */
+    protected function jsRenderer(): SafeBrowsershotRenderer
+    {
+        return new SafeBrowsershotRenderer((new Browsershot)->noSandbox()->addChromiumArguments(['disable-dev-shm-usage']));
     }
 
     private function resolveUrl(string $href, string $base): ?string

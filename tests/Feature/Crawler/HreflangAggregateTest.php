@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Crawler;
 
+use App\Crawler\LlmsTxtReader;
+use App\Crawler\RobotsTxtReader;
 use App\Crawler\SitemapReader;
 use App\Jobs\AggregateCrawlJob;
 use App\Models\Crawl;
@@ -68,7 +70,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $en, 'https://example.com/de/');
         $this->link($crawl, $de, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $enIssues = $en->refresh()->issues;
         $deIssues = $de->refresh()->issues;
@@ -117,7 +119,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $home, 'https://example.com/de/');
         $this->link($crawl, $de, 'https://example.com/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $homeIssues = $home->refresh()->issues;
         $deIssues = $de->refresh()->issues;
@@ -160,7 +162,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $a, 'https://example.com/de/');
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_missing_return_link', $a->refresh()->issues);
     }
@@ -194,7 +196,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $a, 'https://example.com/de/');
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_noindex_return_link', $a->refresh()->issues);
     }
@@ -228,7 +230,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $a, 'https://example.com/de/');
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_non_200', $a->refresh()->issues);
     }
@@ -264,7 +266,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $a, 'https://example.com/de/');
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_non_canonical_return_link', $a->refresh()->issues);
     }
@@ -300,7 +302,7 @@ class HreflangAggregateTest extends TestCase
         $this->link($crawl, $a, 'https://example.com/de/');
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_inconsistent_language', $a->refresh()->issues);
     }
@@ -334,7 +336,7 @@ class HreflangAggregateTest extends TestCase
 
         // No <a> link to B anywhere in the crawl.
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_unlinked', $b->refresh()->issues);
     }
@@ -372,7 +374,7 @@ class HreflangAggregateTest extends TestCase
         // set; no <a> link to A anywhere (it's the seed, not linked-to internally).
         $this->link($crawl, $b, 'https://example.com/en/');
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertNotContains('hreflang_unlinked', $a->refresh()->issues);
     }
@@ -405,7 +407,7 @@ class HreflangAggregateTest extends TestCase
 
         // No <a> link to C anywhere.
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_unlinked', $c->refresh()->issues);
     }
@@ -433,7 +435,7 @@ class HreflangAggregateTest extends TestCase
             ],
         ]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class));
+        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
 
         $this->assertContains('hreflang_non_200', $a->refresh()->issues);
     }
