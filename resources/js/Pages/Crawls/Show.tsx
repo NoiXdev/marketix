@@ -196,9 +196,14 @@ export default function CrawlsShow({
             </span>
           }
           action={
-            <LinkButton variant="secondary" href={route('app.project.crawls.export', { project: project!.id, crawl: crawl.id })}>
-              {t('crawler.export_csv')}
-            </LinkButton>
+            <div className="flex items-center gap-2">
+              <LinkButton variant="secondary" href={route('app.project.crawls.export', { project: project!.id, crawl: crawl.id })}>
+                {t('crawler.export_csv')}
+              </LinkButton>
+              <LinkButton variant="secondary" href={route('app.project.crawls.export-xlsx', { project: project!.id, crawl: crawl.id })}>
+                {t('crawler.export_xlsx')}
+              </LinkButton>
+            </div>
           }
         />
         <Flash />
