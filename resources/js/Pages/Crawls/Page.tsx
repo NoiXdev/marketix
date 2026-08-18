@@ -32,6 +32,7 @@ interface CrawlPageDetail {
   in_sitemap: boolean;
   inlinks_count: number;
   structured_data: string[];
+  structured_data_items: { format: string; type: string | null; valid: boolean; missing: string[]; error?: string }[];
   hreflang: { lang: string; href: string }[];
   images_missing_alt: string[];
   issues: string[];
@@ -60,7 +61,7 @@ function serpDisplayUrl(url: string): string {
 
 /** Failing codes that have a dedicated evidence card → keep their own sidebar tab. */
 const EVIDENCE_CODES = new Set<string>([
-  'broken_link', 'missing_alt_text', 'redirect_chain', 'missing_structured_data',
+  'broken_link', 'missing_alt_text', 'redirect_chain',
   'missing_h1', 'multiple_h1', 'heading_order_skip',
   'missing_title', 'title_too_long', 'missing_meta_description', 'duplicate_title', 'duplicate_meta_description',
   'noindex', 'canonical_mismatch', 'robots_blocked',
@@ -317,13 +318,41 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
   const structuredDataCard = (
     <Card className="p-4">
       <h3 className="mb-2 font-medium text-foreground">{t('crawler.structured_data')}</h3>
-      {page.structured_data.length === 0 ? (
-        <p className="text-sm text-muted">—</p>
+      {page.structured_data_items.length === 0 ? (
+        <p className="text-sm text-muted">{t('crawler.structured_data_none')}</p>
       ) : (
-        <ul className="space-y-1 text-sm text-foreground">
-          {page.structured_data.map((type, i) => (
-            <li key={i}>{type}</li>
-          ))}
+        <ul className="divide-y divide-line text-sm">
+          {page.structured_data_items.map((item, i) => {
+            const label =
+              item.error === 'no_type' || item.type === null
+                ? t('crawler.sd_no_type')
+                : item.error === 'parse'
+                  ? t('crawler.sd_parse_error')
+                  : item.type;
+
+            return (
+              <li key={i} className="flex flex-wrap items-start gap-2 py-1.5">
+                <Badge variant="neutral" className="shrink-0">
+                  {item.format}
+                </Badge>
+                <span className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="text-foreground">{label}</span>
+                    {item.valid ? (
+                      <span className="text-success-foreground">✓</span>
+                    ) : (
+                      <span className="text-danger-foreground">✗</span>
+                    )}
+                  </span>
+                  {!item.valid && item.missing.length > 0 && (
+                    <span className="mt-0.5 block text-muted">
+                      {t('crawler.sd_missing_fields')}: {item.missing.join(', ')}
+                    </span>
+                  )}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       )}
     </Card>
@@ -483,8 +512,6 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
         return imagesCard;
       case 'redirect_chain':
         return redirectChainCard;
-      case 'missing_structured_data':
-        return structuredDataCard;
       case 'missing_h1':
       case 'multiple_h1':
       case 'heading_order_skip':

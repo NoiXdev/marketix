@@ -264,6 +264,7 @@ class CrawlController extends Controller
                 'in_sitemap' => $pageModel->in_sitemap,
                 'inlinks_count' => $pageModel->inlinks_count,
                 'structured_data' => $pageModel->structured_data ?? [],
+                'structured_data_items' => $pageModel->structured_data_items ?? [],
                 'hreflang' => $pageModel->hreflang ?? [],
                 'images_missing_alt' => $pageModel->images_missing_alt ?? [],
                 'issues' => $pageModel->issues ?? [],

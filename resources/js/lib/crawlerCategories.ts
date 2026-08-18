@@ -15,5 +15,6 @@ export const CATEGORY_ORDER = [
   'hreflang',
   'links',
   'geo',
+  'structured_data',
   'other',
 ];
