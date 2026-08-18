@@ -324,10 +324,10 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
         <ul className="divide-y divide-line text-sm">
           {page.structured_data_items.map((item, i) => {
             const label =
-              item.error === 'no_type' || item.type === null
-                ? t('crawler.sd_no_type')
-                : item.error === 'parse'
-                  ? t('crawler.sd_parse_error')
+              item.error === 'parse'
+                ? t('crawler.sd_parse_error')
+                : item.error === 'no_type' || item.type === null
+                  ? t('crawler.sd_no_type')
                   : item.type;
 
             return (
