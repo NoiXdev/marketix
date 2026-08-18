@@ -36,7 +36,10 @@ class MailSettingsServiceProvider extends ServiceProvider
             $settings = $this->app->make(MailSettings::class)->refresh();
 
             config([
-                'mail.default' => $settings->default_mailer,
+                // Demo instances must never transmit mail. This sits inside the re-apply
+                // path (boot + JobProcessing + Octane RequestReceived) so every
+                // re-application preserves the override instead of undoing it.
+                'mail.default' => config('demo.enabled') ? 'log' : $settings->default_mailer,
                 'mail.from.address' => $settings->from_address,
                 'mail.from.name' => $settings->from_name,
                 'postal.domain' => $settings->postal_url,
