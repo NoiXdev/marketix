@@ -6,7 +6,7 @@ use App\Models\Crawl;
 
 class CrawlScore
 {
-    private const WEIGHTS = ['error' => 3, 'warning' => 2, 'notice' => 1];
+    private const WEIGHTS = ['error' => 3, 'warning' => 2, 'notice' => 0.5];
 
     /**
      * Per-page penalty budget for a set spanning the whole catalogue (i.e. "overall").

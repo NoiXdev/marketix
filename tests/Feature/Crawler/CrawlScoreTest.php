@@ -25,16 +25,16 @@ class CrawlScoreTest extends TestCase
         $this->assertSame(100, $result['geo']);
     }
 
-    public function test_single_page_single_notice_scores_exactly_94(): void
+    public function test_single_page_single_notice_scores_exactly_97(): void
     {
-        // Per-page budget is a fixed constant (18); one unweighted notice (weight 1) on the
-        // only page: health = 1 - 1/18 = 17/18 -> round(100 * 17/18) = 94.
+        // Per-page budget is a fixed constant (18); one notice (weight 0.5) on the
+        // only page: health = 1 - 0.5/18 = 17.5/18 -> round(100 * 17.5/18) = 97.
         $crawl = Crawl::factory()->create(['pages_crawled' => 1]);
         CrawlPage::factory()->for($crawl)->create(['issues' => ['thin_content']]);
 
         $result = CrawlScore::for($crawl);
 
-        $this->assertSame(94, $result['overall']);
+        $this->assertSame(97, $result['overall']);
     }
 
     public function test_every_active_problem_check_failing_on_the_only_page_tanks_every_score(): void
