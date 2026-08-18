@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Project;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,13 +63,28 @@ class DemoGuard
         'app.auth.reset',
     ];
 
+    /**
+     * Routes that are blocked only when their target IS the demo account or the
+     * demo project. Everything else in user/project administration stays usable —
+     * exercising it is part of what the demo shows, and the nightly reset cleans up.
+     *
+     * @var array<string, string> route name => route parameter name
+     */
+    public const PROTECTED_ROUTES = [
+        'app.admin.users.destroy' => 'user',
+        'app.admin.users.update' => 'user',
+        'app.project.team.members.destroy' => 'user',
+        'app.admin.projects.destroy' => 'project',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
         if (! config('demo.enabled')) {
             return $next($request);
         }
 
-        if (in_array($request->route()?->getName(), self::BLOCKED_ROUTES, true)) {
+        if (in_array($request->route()?->getName(), self::BLOCKED_ROUTES, true)
+            || $this->targetsProtectedRecord($request)) {
             return back()->with('error', __('demo.blocked'));
         }
 
@@ -75,5 +92,26 @@ class DemoGuard
         $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
 
         return $response;
+    }
+
+    private function targetsProtectedRecord(Request $request): bool
+    {
+        $name = $request->route()?->getName();
+
+        if (! isset(self::PROTECTED_ROUTES[$name])) {
+            return false;
+        }
+
+        $value = $request->route(self::PROTECTED_ROUTES[$name]);
+        $id = is_object($value) ? $value->getKey() : $value;
+
+        if (self::PROTECTED_ROUTES[$name] === 'user') {
+            return User::query()->whereKey($id)->where('email', config('demo.email'))->exists();
+        }
+
+        return Project::query()
+            ->whereKey($id)
+            ->whereHas('users', fn ($q) => $q->where('email', config('demo.email')))
+            ->exists();
     }
 }
