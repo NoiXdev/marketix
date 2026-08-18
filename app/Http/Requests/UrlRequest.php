@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
+use App\Rules\DemoAllowedTarget;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class UrlRequest extends FormRequest
         $project = $this->input('project');
         $ignoreId = $this->route('url'); // null on store, the URL id on update
 
-        return array_merge([
+        $rules = array_merge([
             'domain_id' => ['required', 'ulid', Rule::exists('domains', 'id')->where('project_id', $project->id)],
             'slug' => [
                 'required', 'string', 'max:255', 'alpha_dash',
@@ -39,6 +40,37 @@ class UrlRequest extends FormRequest
             'password' => ['nullable', 'string', 'max:255'],
             'expired_at' => ['nullable', 'date'],
         ], self::targetingRules());
+
+        return self::withDemoTargetRules($rules);
+    }
+
+    /**
+     * In demo mode every redirect destination — the link target and each
+     * targeting rule's URL — must point at an allowlisted host. Shared with
+     * QrCodeRequest so the two cannot drift.
+     *
+     * @param  array<string, array<int, mixed>>  $rules
+     * @return array<string, array<int, mixed>>
+     */
+    public static function withDemoTargetRules(array $rules): array
+    {
+        if (! config('demo.enabled')) {
+            return $rules;
+        }
+
+        foreach ([
+            'url',
+            'targeting_geo.*.url',
+            'targeting_device.*.url',
+            'targeting_language.*.url',
+            'targeting_ab.*.url',
+        ] as $field) {
+            if (isset($rules[$field])) {
+                $rules[$field][] = new DemoAllowedTarget;
+            }
+        }
+
+        return $rules;
     }
 
     /**
