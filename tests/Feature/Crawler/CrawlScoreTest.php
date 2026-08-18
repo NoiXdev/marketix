@@ -13,7 +13,7 @@ class CrawlScoreTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_no_issues_gives_perfect_scores(): void
+    public function test_clean_crawl_gives_perfect_scores(): void
     {
         $crawl = Crawl::factory()->create(['pages_crawled' => 3]);
         CrawlPage::factory()->for($crawl)->count(3)->create(['issues' => []]);
@@ -25,11 +25,23 @@ class CrawlScoreTest extends TestCase
         $this->assertSame(100, $result['geo']);
     }
 
+    public function test_single_page_single_notice_scores_exactly_94(): void
+    {
+        // Per-page budget is a fixed constant (18); one unweighted notice (weight 1) on the
+        // only page: health = 1 - 1/18 = 17/18 -> round(100 * 17/18) = 94.
+        $crawl = Crawl::factory()->create(['pages_crawled' => 1]);
+        CrawlPage::factory()->for($crawl)->create(['issues' => ['thin_content']]);
+
+        $result = CrawlScore::for($crawl);
+
+        $this->assertSame(94, $result['overall']);
+    }
+
     public function test_every_active_problem_check_failing_on_the_only_page_tanks_every_score(): void
     {
-        // A single-page crawl where every active, non-info check fails is the worst
-        // possible case for that page: penalty must equal the maximum possible penalty
-        // for every set of categories (overall, seo, geo), so every score bottoms out at 0.
+        // A single-page crawl where every active, non-info check fails drives the per-page
+        // penalty for every set of categories (overall, seo, geo) far past that set's budget,
+        // so every score bottoms out at 0.
         $crawl = Crawl::factory()->create(['pages_crawled' => 1]);
         CrawlPage::factory()->for($crawl)->create(['issues' => CheckCatalog::activeCodes()]);
 
@@ -58,23 +70,21 @@ class CrawlScoreTest extends TestCase
         $this->assertNotContains('missing_meta_keywords', $codes);
     }
 
-    public function test_geo_issue_dips_geo_but_not_seo(): void
+    public function test_geo_only_problem_dips_geo_below_seo_and_below_a_hundred(): void
     {
         $crawl = Crawl::factory()->create(['pages_crawled' => 10]);
-        CrawlPage::factory()->for($crawl)->count(2)->create(['issues' => ['no_semantic_html']]);
-        CrawlPage::factory()->for($crawl)->count(8)->create(['issues' => []]);
+        CrawlPage::factory()->for($crawl)->count(4)->create(['issues' => ['no_semantic_html']]);
+        CrawlPage::factory()->for($crawl)->count(6)->create(['issues' => []]);
 
         $result = CrawlScore::for($crawl);
 
         $this->assertSame(100, $result['seo']);
         $this->assertLessThan(100, $result['geo']);
+        $this->assertLessThan($result['seo'], $result['geo']);
     }
 
-    public function test_seo_issue_dips_seo_but_not_geo(): void
+    public function test_seo_only_problem_dips_seo_but_leaves_geo_perfect(): void
     {
-        // The seo set spans nearly every category (everything except geo), so its maximum
-        // possible weighted penalty is large; every page needs the (error-weighted)
-        // problem to move the ratio enough to register as less than a perfect 100.
         $crawl = Crawl::factory()->create(['pages_crawled' => 10]);
         CrawlPage::factory()->for($crawl)->count(10)->create(['issues' => ['missing_title']]);
 
