@@ -1,5 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Badge, BackLink, Card, PageHeader } from '@/Components/ui';
+import { Badge, BackLink, Card, PageHeader, SlideOver, TableCard } from '@/Components/ui';
 import { CrawlSidebar, CrawlNavItem } from '@/Components/CrawlSidebar';
 import { useTranslation } from '@/lib/i18n';
 import { formatBytes } from '@/lib/formatBytes';
@@ -146,8 +146,18 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
 
   const [tab, setTab] = useState<string>('overview');
   const [shotDevice, setShotDevice] = useState<'desktop' | 'mobile'>('desktop');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const currentShot = page.screenshots[shotDevice] ?? page.screenshots.desktop ?? page.screenshots.mobile ?? null;
+
+  // Image srcs are stored raw (may be relative/protocol-relative); resolve against the page URL for display.
+  const resolveImg = (src: string): string => {
+    try {
+      return new URL(src, page.url).href;
+    } catch {
+      return src;
+    }
+  };
 
   const brokenLinksCard = brokenLinks.length > 0 && (
     <Card className="border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] bg-danger-soft p-4 md:col-span-2">
@@ -320,22 +330,35 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
   );
 
   const imagesCard = (
-    <Card className="p-4">
+    <div className="md:col-span-2">
       <h3 className="mb-2 font-medium text-foreground">
         {t('crawler.images_missing_alt')} ({page.images_missing_alt.length})
       </h3>
-      {page.images_missing_alt.length === 0 ? (
-        <p className="text-sm text-muted">—</p>
+      {page.images_missing_alt.filter(Boolean).length === 0 ? (
+        <Card className="p-4">
+          <p className="text-sm text-muted">—</p>
+        </Card>
       ) : (
-        <ul className="space-y-1 text-sm text-foreground">
-          {page.images_missing_alt.map((src) => (
-            <li key={src} className="truncate">
-              {src}
-            </li>
-          ))}
-        </ul>
+        <TableCard columns={[{ label: '#' }, { label: t('crawler.col_url') }]}>
+          <tbody className="divide-y divide-line">
+            {page.images_missing_alt.filter(Boolean).map((src, i) => (
+              <tr key={`${src}-${i}`} className="hover:bg-elevated">
+                <td className="px-4 py-3 text-muted">{i + 1}</td>
+                <td className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => setImagePreview(src)}
+                    className="break-all text-left text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                  >
+                    {src}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </TableCard>
       )}
-    </Card>
+    </div>
   );
 
   const foundOnCard = (
@@ -551,6 +574,32 @@ export default function CrawlsPage({ crawlId, page }: { crawlId: string; page: C
           </div>
         </div>
       </div>
+
+      <SlideOver
+        open={imagePreview !== null}
+        onClose={() => setImagePreview(null)}
+        title={t('crawler.image_preview')}
+        closeLabel={t('crawler.close')}
+      >
+        {imagePreview && (
+          <div className="space-y-4">
+            <img
+              src={resolveImg(imagePreview)}
+              alt=""
+              className="max-h-[70vh] w-auto max-w-full rounded border border-line"
+            />
+            <div className="break-all text-sm text-muted">{imagePreview}</div>
+            <a
+              href={resolveImg(imagePreview)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-sm text-accent hover:underline"
+            >
+              {t('crawler.open_in_new_tab')}
+            </a>
+          </div>
+        )}
+      </SlideOver>
     </AppLayout>
   );
 }
