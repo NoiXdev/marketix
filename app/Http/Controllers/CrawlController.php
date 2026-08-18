@@ -13,6 +13,7 @@ use App\Jobs\RunCrawlJob;
 use App\Models\Crawl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -344,6 +345,18 @@ class CrawlController extends Controller
             });
             fclose($out);
         }, "crawl-{$model->id}.csv", ['Content-Type' => 'text/csv']);
+    }
+
+    public function report(Request $request, string $crawl)
+    {
+        $project = $request->get('project');
+        $model = $project->crawls()->findOrFail($crawl);
+
+        return Pdf::view('reports.crawl', [
+            'crawl' => $model,
+            'project' => $project,
+            'score' => CrawlScore::for($model),
+        ])->format('a4')->name("crawl-{$model->id}.pdf")->download();
     }
 
     public function exportXlsx(Request $request, string $crawl): BinaryFileResponse

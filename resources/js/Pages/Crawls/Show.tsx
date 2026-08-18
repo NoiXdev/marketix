@@ -227,6 +227,12 @@ export default function CrawlsShow({
               >
                 {t('crawler.export_xlsx')}
               </a>
+              <a
+                href={route('app.project.crawls.report', { project: project!.id, crawl: crawl.id })}
+                className={buttonClasses('secondary', 'md')}
+              >
+                {t('crawler.report_pdf')}
+              </a>
             </div>
           }
         />
