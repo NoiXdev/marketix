@@ -203,6 +203,42 @@ class GeoAggregateTest extends TestCase
         $this->assertContains('js_dependent_content', $start->refresh()->issues);
     }
 
+    public function test_sparse_but_fully_rendered_page_does_not_flag_js_dependent_content(): void
+    {
+        $this->fakeSitemap();
+        // Rendered HTML itself has under 200 visible chars — a genuinely sparse but
+        // fully server-rendered landing page — and the raw body is essentially the
+        // same content (JS added nothing). Without the renderedLen >= 200 floor, the
+        // old comparison (raw < max(200, rendered*0.25)) would false-positive here
+        // purely because raw fell under the flat 200-char floor.
+        $renderer = $this->fakeRenderer('<html><body>Welcome to Acme Inc.</body></html>');
+
+        Http::fake([
+            'example.com/robots.txt' => Http::response('', 404),
+            'example.com/llms.txt' => Http::response('# LLMs\nSome useful content for AI agents.', 200),
+            'example.com/' => Http::response('<html><body>Welcome to Acme Inc.</body></html>', 200),
+        ]);
+
+        $crawl = Crawl::factory()->create(['start_url' => 'https://example.com/']);
+
+        $start = CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+        ]);
+        CrawlPage::factory()->for($crawl)->create([
+            'url' => 'https://example.com/about',
+            'status_code' => 200,
+            'is_indexable' => true,
+            'issues' => [],
+        ]);
+
+        $this->runAggregate($crawl, $renderer);
+
+        $this->assertNotContains('js_dependent_content', $start->refresh()->issues);
+    }
+
     public function test_rich_raw_body_clears_js_dependent_content_on_start_page(): void
     {
         $this->fakeSitemap();

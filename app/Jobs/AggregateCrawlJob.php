@@ -645,7 +645,13 @@ class AggregateCrawlJob implements ShouldQueue
             return null;
         }
 
-        return HtmlText::visibleLength($raw->body()) < max(200, (int) ($renderedLen * 0.25));
+        // Only flag when rendering added substantial content: require the rendered
+        // page to have a non-trivial amount of visible text (>=200 chars) before
+        // judging the raw page "thin" relative to it. Without this floor, a
+        // genuinely sparse but fully server-rendered page (rendered < 200 chars,
+        // raw ≈ rendered) would false-positive purely because raw fell under the
+        // same 200-char floor, even though JS added nothing.
+        return $renderedLen >= 200 && HtmlText::visibleLength($raw->body()) < (int) ($renderedLen * 0.25);
     }
 
     /**
