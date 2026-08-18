@@ -248,25 +248,40 @@ class DemoSeeder extends Seeder
      * no "meta" case — Meta's pixel is the "facebook" provider there, so
      * the pixel keeps the "Meta Pixel" name customers actually use while
      * carrying the "facebook" provider value the app recognises).
+     *
+     * Two of the QR codes ('menu' and 'workshop') are attached to their
+     * matching Url from seedLinks() and marked dynamic: QrCodeController
+     * ::index() computes the list's scans/unique_scans straight from the
+     * backing Url's clicks/unique_clicks (qr_codes itself has no scans
+     * column — see 2026_06_17_000000_link_qr_codes_to_urls.php), so a
+     * dynamic QR on a link that already has 90 days of click history shows
+     * real scan numbers with no separate scan-seeding needed. Leaving every
+     * QR static would make the whole list show a dash in that column, with
+     * nothing to demonstrate QR scan tracking exists.
      */
     private function seedMarketingAssets(): void
     {
         $qrDefinitions = [
-            ['name' => 'Café-Karte (Tischaufsteller)', 'type' => 'link', 'content' => ['url' => 'https://example.com/menu']],
+            ['name' => 'Café-Karte (Tischaufsteller)', 'type' => 'link', 'content' => ['url' => 'https://example.com/menu'], 'attach_slug' => 'menu'],
             ['name' => 'Verpackung — Herkunft', 'type' => 'link', 'content' => ['url' => 'https://example.com/impact']],
-            ['name' => 'Workshop-Anmeldung', 'type' => 'link', 'content' => ['url' => 'https://example.com/workshop']],
+            ['name' => 'Workshop-Anmeldung', 'type' => 'link', 'content' => ['url' => 'https://example.com/workshop'], 'attach_slug' => 'workshop'],
             ['name' => 'Wholesale contact', 'type' => 'email', 'content' => ['email' => 'wholesale@nordlicht.example']],
             ['name' => 'Roastery phone', 'type' => 'phone', 'content' => ['phone' => '+4940123456']],
             ['name' => 'WLAN Gastzugang', 'type' => 'wifi', 'content' => ['ssid' => 'Nordlicht Gast', 'password' => 'espresso', 'encryption' => 'WPA', 'hidden' => 'false']],
         ];
 
         foreach ($qrDefinitions as $definition) {
+            $attachUrl = isset($definition['attach_slug'])
+                ? $this->urls->firstWhere('slug', $definition['attach_slug'])
+                : null;
+
             QrCode::factory()
                 ->forProject($this->project)
                 ->create([
                     'name' => $definition['name'],
                     'type' => $definition['type'],
-                    'is_dynamic' => false,
+                    'is_dynamic' => $attachUrl !== null,
+                    'url_id' => $attachUrl?->id,
                     'content' => $definition['content'],
                 ]);
         }

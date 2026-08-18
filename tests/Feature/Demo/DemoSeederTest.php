@@ -97,5 +97,25 @@ class DemoSeederTest extends TestCase
         $this->assertSame(2, QrTemplate::query()->where('project_id', $project->id)->count());
         $this->assertGreaterThanOrEqual(2, Pixel::query()->where('project_id', $project->id)->count());
         $this->assertSame(2, ScheduledReport::query()->where('project_id', $project->id)->count());
+
+        // At least one QR must be dynamic (and backed by a real link) or the
+        // QR list's "Scans" column is a dash for every row, and the demo
+        // shows no evidence QR scan tracking exists at all.
+        $this->assertTrue(
+            QrCode::query()->where('project_id', $project->id)->where('is_dynamic', true)->whereNotNull('url_id')->exists()
+        );
+
+        // The two pixels must carry distinct providers — a row-count
+        // assertion alone would still pass if both silently fell back to
+        // the factory default provider.
+        $this->assertSame(
+            2,
+            Pixel::query()->where('project_id', $project->id)->distinct('provider')->count('provider')
+        );
+
+        // The WiFi QR's content must actually carry a network name, or it
+        // encodes an empty/broken payload.
+        $wifiQr = QrCode::query()->where('project_id', $project->id)->where('type', 'wifi')->firstOrFail();
+        $this->assertNotEmpty($wifiQr->content['ssid'] ?? null);
     }
 }
