@@ -53,11 +53,27 @@ const statusVariant: Record<CrawlStatus, 'neutral' | 'success' | 'warning' | 'da
   failed: 'danger',
 };
 
+const scoreClasses = (n: number): string =>
+  n >= 80
+    ? 'bg-success-soft text-success-foreground'
+    : n >= 60
+      ? 'bg-warning-soft text-warning-foreground'
+      : 'bg-danger-soft text-danger-foreground';
+
+interface CrawlScore {
+  overall: number;
+  seo: number;
+  geo: number;
+  categories: Record<string, number>;
+  topActions: { code: string; category: string; severity: string; count: number }[];
+}
+
 export default function CrawlsShow({
   crawl,
   pages,
   categories,
   catalog,
+  score,
   resources,
   resourceSummary,
   resourceRefs,
@@ -67,6 +83,7 @@ export default function CrawlsShow({
   pages: Paginated<CrawlPageRow>;
   categories: CrawlContentCategory[];
   catalog: Catalog;
+  score: CrawlScore;
   resources: Paginated<CrawlResourceRow> | null;
   resourceSummary: Record<string, { count: number; total_bytes: number }>;
   resourceRefs: { url: string; pages: Paginated<{ id: string; url: string; status_code: number | null }> } | null;
@@ -245,6 +262,24 @@ export default function CrawlsShow({
           <div className="min-w-0 flex-1">
             {activeTab === 'overview' && (
               <>
+                <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {(
+                    [
+                      ['overall', t('crawler.score_overall')],
+                      ['seo', t('crawler.score_seo')],
+                      ['geo', t('crawler.score_geo')],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <Card key={key} className={`p-4 ${scoreClasses(score[key])}`}>
+                      <div className="text-3xl font-semibold">
+                        {score[key]}
+                        <span className="text-lg">/100</span>
+                      </div>
+                      <div className="text-xs">{label}</div>
+                    </Card>
+                  ))}
+                </div>
+
                 <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <Card className="border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] bg-danger-soft p-4">
                     <div className="text-2xl font-semibold text-danger-foreground">{severityTotals.error}</div>

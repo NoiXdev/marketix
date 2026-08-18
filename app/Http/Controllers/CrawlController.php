@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Crawler\CheckCatalog;
+use App\Crawler\CrawlScore;
 use App\Crawler\Export\CrawlXlsxExporter;
 use App\Crawler\IssueCategory;
 use App\Crawler\IssueCode;
@@ -199,6 +200,7 @@ class CrawlController extends Controller
             'pages' => $pages,
             'categories' => $categories,
             'catalog' => $catalog,
+            'score' => CrawlScore::for($model),
             'resources' => $resources,
             'resourceRefs' => $resourceRefs,
             'resourceSummary' => $resourceSummary,

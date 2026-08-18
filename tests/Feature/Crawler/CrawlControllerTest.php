@@ -121,6 +121,10 @@ class CrawlControllerTest extends TestCase
                 ->component('Crawls/Show')
                 ->where('categories', ['html', 'image'])
                 ->has('pages.data', 2)
+                ->has('score')
+                ->has('score.overall')
+                ->has('score.seo')
+                ->has('score.geo')
             );
 
         // Filtered by image: only the SVG remains.
