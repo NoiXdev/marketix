@@ -5,8 +5,11 @@ namespace Tests\Feature\Demo;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\User;
+use App\Settings\MailSettings;
+use App\Settings\StorageSettings;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DemoSeederTest extends TestCase
@@ -31,8 +34,20 @@ class DemoSeederTest extends TestCase
     {
         // The settings migrations in database/settings/ re-create and seed
         // every property, so a reset never leaves the instance unconfigured.
-        $this->assertNotSame('', app(\App\Settings\MailSettings::class)->from_address);
-        $this->assertNotNull(app(\App\Settings\BrandingSettings::class)->appName());
-        $this->assertNotSame('', app(\App\Settings\StorageSettings::class)->driver);
+        $this->assertNotSame('', app(MailSettings::class)->from_address);
+        $this->assertNotSame('', app(StorageSettings::class)->driver);
+
+        // BrandingSettings::appName() falls back to 'Marketix' whenever
+        // app_name is null — which is also what spatie/laravel-settings
+        // substitutes for a property that was never migrated at all, so
+        // assertNotNull(appName()) can't tell "seeded" apart from "never
+        // existed" (see app/Settings/BrandingSettings.php:27). Assert
+        // directly against the settings table instead: the branding
+        // migration adds exactly 5 rows (database/settings/2026_06_19_000000_create_branding_settings.php),
+        // so their presence is proof the migration actually ran on this reset.
+        $this->assertSame(
+            5,
+            DB::table('settings')->where('group', 'branding')->count(),
+        );
     }
 }
