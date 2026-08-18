@@ -68,6 +68,19 @@ class RobotsTxtReaderTest extends TestCase
         $this->assertContains('ClaudeBot', $blocked);
     }
 
+    public function test_allow_only_group_does_not_leak_into_following_group(): void
+    {
+        Http::fake([
+            'example.com/robots.txt' => Http::response(
+                "User-agent: ChatGPT-User\nAllow: /x\nUser-agent: GPTBot\nDisallow: /", 200
+            ),
+        ]);
+
+        $blocked = (new RobotsTxtReader)->blockedAiBots('https://example.com/');
+
+        $this->assertSame(['GPTBot'], $blocked);
+    }
+
     public function test_invalid_url_returns_empty(): void
     {
         $this->assertSame([], (new RobotsTxtReader)->blockedAiBots('not-a-url'));

@@ -60,10 +60,12 @@ class RobotsTxtReader
                     $afterRule = false;
                 }
                 $current[] = strtolower($value);
-            } elseif ($field === 'disallow') {
+            } else {
                 $afterRule = true;
-                foreach ($current as $ua) {
-                    $groups[$ua][] = $value;
+                if ($field === 'disallow') {
+                    foreach ($current as $ua) {
+                        $groups[$ua][] = $value;
+                    }
                 }
             }
         }
