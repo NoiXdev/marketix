@@ -5,6 +5,7 @@ namespace Tests\Feature\Crawler;
 use App\Crawler\LinkStatusChecker;
 use App\Crawler\LlmsTxtReader;
 use App\Crawler\RobotsTxtReader;
+use App\Crawler\SafeBrowsershotRenderer;
 use App\Crawler\SitemapReader;
 use App\Enums\CrawlStatus;
 use App\Jobs\AggregateCrawlJob;
@@ -33,6 +34,54 @@ class AggregateCrawlJobTest extends TestCase
         });
     }
 
+    /**
+     * These tests predate the site-level GEO pipeline (robots.txt/llms.txt fetch +
+     * a raw-vs-rendered JS diff against the crawl's start_url) and aren't about GEO
+     * at all, but every AggregateCrawlJob::handle() call now runs it regardless.
+     * Several tests here use `https://example.com` as start_url (either explicitly,
+     * or via CrawlFactory's default) — a live, resolvable host — so left unfaked,
+     * handle() would perform real outbound HTTP and, if the raw fetch ever
+     * succeeded, launch a real headless Chromium via the real jsRenderer().
+     *
+     * This helper keeps every call site hermetic:
+     *  - Fakes any example.com request as a 404. Registered here (i.e. after
+     *    whatever fake a test already set up earlier in its own body), so a
+     *    test's own more-specific fake — e.g. the external-resource-probe fake
+     *    in test_checkresources_fills_internal_from_pages_and_probes_external —
+     *    still wins for the paths it cares about (first-registered-match-wins).
+     *  - Stubs jsRenderer() so Browsershot/Chromium is never invoked, regardless
+     *    of what the (now-faked) raw fetch returns.
+     * x.test/external.test hosts used elsewhere in this file are untouched: they
+     * don't resolve, so those calls already fail fast without reaching a fake or
+     * the network (same assumption the rest of this file already relies on).
+     */
+    private function handleAggregate(Crawl $crawl): void
+    {
+        Http::fake(function ($request) {
+            return str_contains($request->url(), 'example.com')
+                ? Http::response('', 404)
+                : null;
+        });
+
+        $job = new class($crawl) extends AggregateCrawlJob
+        {
+            protected function jsRenderer(): SafeBrowsershotRenderer
+            {
+                return new class extends SafeBrowsershotRenderer
+                {
+                    public function __construct() {}
+
+                    public function getRenderedHtml(string $url): string
+                    {
+                        return '';
+                    }
+                };
+            }
+        };
+
+        $job->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+    }
+
     public function test_computes_inlinks_orphans_and_summary(): void
     {
         $this->fakeSitemap(['https://x.test/']);
@@ -44,7 +93,7 @@ class AggregateCrawlJobTest extends TestCase
         // home links to about → about has 1 inlink; nobody links to... about links nowhere
         CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'to_url' => 'https://x.test/about', 'type' => 'internal']);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $about->refresh();
         $home->refresh();
@@ -84,7 +133,7 @@ class AggregateCrawlJobTest extends TestCase
             'type' => 'internal',
         ]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $home->refresh();
         $sub->refresh();
@@ -123,7 +172,7 @@ class AggregateCrawlJobTest extends TestCase
             'type' => 'internal',
         ]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $home->refresh();
         $sub->refresh();
@@ -166,7 +215,7 @@ class AggregateCrawlJobTest extends TestCase
             'to_url' => 'https://external.test/ok', 'type' => 'external',
         ]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $home->refresh();
         $other->refresh();
@@ -206,7 +255,7 @@ class AggregateCrawlJobTest extends TestCase
         $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/b', 'meta_keywords' => 'shoes, boots', 'issues' => []]);
         $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c', 'meta_keywords' => 'unique kw', 'issues' => []]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $this->assertContains('duplicate_meta_keywords', $a->refresh()->issues);
         $this->assertContains('duplicate_meta_keywords', $b->refresh()->issues);
@@ -224,7 +273,7 @@ class AggregateCrawlJobTest extends TestCase
         $d = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/d', 'h1' => null, 'issues' => []]);
         $e = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/e', 'h1' => null, 'issues' => []]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $this->assertContains('duplicate_h1', $a->refresh()->issues);
         $this->assertContains('duplicate_h1', $b->refresh()->issues);
@@ -251,7 +300,7 @@ class AggregateCrawlJobTest extends TestCase
         $p5noindex = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p5-noindex', 'status_code' => 200, 'is_indexable' => false, 'pagination_prev' => 'https://x.test/p5', 'issues' => []]);
         $p5 = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/p5', 'status_code' => 200, 'pagination_next' => 'https://x.test/p5-noindex', 'issues' => []]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $this->assertContains('non_indexable_canonical', $c1->refresh()->issues);
         $this->assertContains('canonical_not_linked', $c2->refresh()->issues);
@@ -277,7 +326,7 @@ class AggregateCrawlJobTest extends TestCase
         // noindex page → target (follow), making target's only follow-inlink source non-indexable.
         CrawlLink::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $noindex->id, 'to_url' => 'https://x.test/target', 'type' => 'internal', 'rel' => null, 'anchor' => 'x']);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $s = $source->refresh()->issues;
         $this->assertContains('internal_nofollow_outlinks', $s);
@@ -299,7 +348,7 @@ class AggregateCrawlJobTest extends TestCase
         $b = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/b', 'content_hash' => 'abc123', 'issues' => []]);
         $c = CrawlPage::factory()->for($crawl)->create(['url' => 'https://x.test/c', 'content_hash' => 'unique-hash', 'issues' => []]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $this->assertContains('exact_duplicates', $a->refresh()->issues);
         $this->assertContains('exact_duplicates', $b->refresh()->issues);
@@ -323,7 +372,7 @@ class AggregateCrawlJobTest extends TestCase
         $external = CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'url' => 'https://example.com/lib.js', 'type' => 'javascript', 'is_internal' => false]);
         $uncrawled = CrawlResource::factory()->create(['crawl_id' => $crawl->id, 'from_page_id' => $home->id, 'url' => 'https://x.test/missing.css', 'type' => 'css', 'is_internal' => true]);
 
-        (new AggregateCrawlJob($crawl))->handle(app(SitemapReader::class), app(RobotsTxtReader::class), app(LlmsTxtReader::class));
+        $this->handleAggregate($crawl);
 
         $this->assertSame(200, $internal->refresh()->status_code);
         $this->assertSame(4096, $internal->size_bytes); // matched via trailing-slash-normalised URL
