@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\DemoGuard;
 use App\Http\Middleware\EnsureProjectAdmin;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\ForcePasswordChange;
@@ -32,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             ForcePasswordChange::class,
+            DemoGuard::class,
         ]);
 
         $middleware->redirectGuestsTo('/auth/login');
