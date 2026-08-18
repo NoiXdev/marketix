@@ -6,4 +6,5 @@ return [
     'locked_hint' => 'Disabled in the demo',
     'start' => 'Start demo',
     'start_hint' => 'No sign-up. All data is reset nightly.',
+    'target_not_allowed' => 'In the demo, links may only point to: :hosts',
 ];

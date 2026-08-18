@@ -6,4 +6,5 @@ return [
     'locked_hint' => 'Désactivé dans la démo',
     'start' => 'Démarrer la démo',
     'start_hint' => "Sans inscription. Toutes les données sont réinitialisées chaque nuit.",
+    'target_not_allowed' => 'Dans la démo, les liens ne peuvent pointer que vers : :hosts',
 ];

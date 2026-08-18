@@ -6,4 +6,5 @@ return [
     'locked_hint' => 'Uitgeschakeld in de demo',
     'start' => 'Demo starten',
     'start_hint' => 'Geen registratie. Alle gegevens worden elke nacht gewist.',
+    'target_not_allowed' => 'In de demo mogen links alleen verwijzen naar: :hosts',
 ];
