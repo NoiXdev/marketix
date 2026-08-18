@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Badge, BackLink, Card, Flash, LinkButton, PageHeader, Pagination, Select, StatusPill, TableCard } from '@/Components/ui';
+import { Badge, BackLink, Card, Flash, PageHeader, Pagination, Select, StatusPill, TableCard } from '@/Components/ui';
+import { buttonClasses } from '@/Components/ui/Button';
 import { CrawlSidebar, CrawlNavItem } from '@/Components/CrawlSidebar';
 import { useTranslation } from '@/lib/i18n';
 import { durationBetween, formatDuration } from '@/lib/formatDuration';
@@ -197,12 +198,18 @@ export default function CrawlsShow({
           }
           action={
             <div className="flex items-center gap-2">
-              <LinkButton variant="secondary" href={route('app.project.crawls.export', { project: project!.id, crawl: crawl.id })}>
+              <a
+                href={route('app.project.crawls.export', { project: project!.id, crawl: crawl.id })}
+                className={buttonClasses('secondary', 'md')}
+              >
                 {t('crawler.export_csv')}
-              </LinkButton>
-              <LinkButton variant="secondary" href={route('app.project.crawls.export-xlsx', { project: project!.id, crawl: crawl.id })}>
+              </a>
+              <a
+                href={route('app.project.crawls.export-xlsx', { project: project!.id, crawl: crawl.id })}
+                className={buttonClasses('secondary', 'md')}
+              >
                 {t('crawler.export_xlsx')}
-              </LinkButton>
+              </a>
             </div>
           }
         />
