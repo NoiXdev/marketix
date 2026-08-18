@@ -14,5 +14,6 @@ export const CATEGORY_ORDER = [
   'pagination',
   'hreflang',
   'links',
+  'geo',
   'other',
 ];
