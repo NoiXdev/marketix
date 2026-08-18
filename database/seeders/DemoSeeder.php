@@ -2,11 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RedirectType;
+use App\Enums\UrlStatus;
 use App\Models\Domain;
 use App\Models\Project;
+use App\Models\Statistic;
+use App\Models\Url;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Builds the demo instance's data: one fictional company, populated so that
@@ -28,10 +34,14 @@ class DemoSeeder extends Seeder
 
     private Domain $domain;
 
+    /** @var Collection<int, Url> */
+    private Collection $urls;
+
     public function run(): void
     {
         $this->seedUsersAndProject();
         $this->seedDomain();
+        $this->seedLinks();
     }
 
     private function seedUsersAndProject(): void
@@ -76,5 +86,124 @@ class DemoSeeder extends Seeder
             'redirect_root' => 'https://example.com/',
             'redirect_not_found' => 'https://example.com/404',
         ]);
+    }
+
+    private function seedLinks(): void
+    {
+        $inventory = [
+            ['slug' => 'sommeraktion', 'name' => 'Sommeraktion 2026', 'url' => 'https://example.com/sommeraktion', 'weight' => 5],
+            ['slug' => 'newsletter', 'name' => 'Newsletter-Anmeldung', 'url' => 'https://example.com/newsletter', 'weight' => 3],
+            ['slug' => 'shop', 'name' => 'Onlineshop', 'url' => 'https://example.com/shop', 'weight' => 4],
+            ['slug' => 'espresso-guide', 'name' => 'Espresso Guide (PDF)', 'url' => 'https://example.com/guides/espresso.pdf', 'weight' => 2],
+            ['slug' => 'wholesale', 'name' => 'Wholesale enquiry', 'url' => 'https://example.com/wholesale', 'weight' => 2],
+            ['slug' => 'instagram', 'name' => 'Instagram', 'url' => 'https://example.com/social/instagram', 'weight' => 3],
+            ['slug' => 'linkedin', 'name' => 'LinkedIn', 'url' => 'https://example.com/social/linkedin', 'weight' => 1],
+            ['slug' => 'roastery-tour', 'name' => 'Röstereiführung buchen', 'url' => 'https://example.com/tour', 'weight' => 2],
+            ['slug' => 'abo', 'name' => 'Kaffee-Abo', 'url' => 'https://example.com/abo', 'weight' => 4],
+            ['slug' => 'karriere', 'name' => 'Karriere', 'url' => 'https://example.com/karriere', 'weight' => 1],
+            ['slug' => 'press-kit', 'name' => 'Press kit', 'url' => 'https://example.com/press', 'weight' => 1],
+            ['slug' => 'menu', 'name' => 'Café-Karte', 'url' => 'https://example.com/menu', 'weight' => 3],
+            ['slug' => 'gutschein', 'name' => 'Geschenkgutschein', 'url' => 'https://example.com/gutschein', 'weight' => 2],
+            ['slug' => 'faq', 'name' => 'FAQ', 'url' => 'https://example.com/faq', 'weight' => 1],
+            ['slug' => 'store-locator', 'name' => 'Store locator', 'url' => 'https://example.com/stores', 'weight' => 2],
+            ['slug' => 'workshop', 'name' => 'Barista-Workshop', 'url' => 'https://example.com/workshop', 'weight' => 2],
+            ['slug' => 'b2b-katalog', 'name' => 'B2B-Katalog', 'url' => 'https://example.com/b2b', 'weight' => 1],
+            ['slug' => 'nachhaltigkeit', 'name' => 'Nachhaltigkeitsbericht', 'url' => 'https://example.com/impact', 'weight' => 1],
+        ];
+
+        $memberIds = $this->project->users()->pluck('users.id')->all();
+
+        $this->urls = collect($inventory)->map(function (array $item) use ($memberIds) {
+            // forceCreate: 'created_at' is intentionally absent from Url::$fillable
+            // (mass-assignment guards timestamps), so create() would silently drop
+            // it and every link would show as created today.
+            $url = Url::forceCreate([
+                'project_id' => $this->project->id,
+                'domain_id' => $this->domain->id,
+                'user_id' => $memberIds[array_rand($memberIds)],
+                'slug' => $item['slug'],
+                'url' => $item['url'],
+                'type' => RedirectType::cases()[0],
+                'status' => UrlStatus::ACTIVATED,
+                'archived' => false,
+                'targeting_geo' => [],
+                'targeting_device' => [],
+                'targeting_language' => [],
+                'targeting_ab' => [],
+                'created_at' => now()->subDays(random_int(95, 140)),
+            ]);
+
+            $this->seedClicks($url, $item['weight']);
+
+            return $url;
+        });
+    }
+
+    /**
+     * 90 days of clicks with a weekday rhythm and one campaign spike, so the
+     * dashboard charts tell a story instead of showing flat noise.
+     */
+    private function seedClicks(Url $url, int $weight): void
+    {
+        $countries = [
+            ['Germany', 'DE', 'Hamburg', 'de'],
+            ['Germany', 'DE', 'Berlin', 'de'],
+            ['Austria', 'AT', 'Vienna', 'de'],
+            ['Switzerland', 'CH', 'Zurich', 'de'],
+            ['Netherlands', 'NL', 'Amsterdam', 'nl'],
+            ['France', 'FR', 'Lyon', 'fr'],
+            ['United Kingdom', 'GB', 'Manchester', 'en'],
+            ['United States', 'US', 'Portland', 'en'],
+        ];
+
+        $browsers = ['Chrome', 'Safari', 'Firefox', 'Edge'];
+        $systems = ['iOS', 'Android', 'macOS', 'Windows'];
+        $referers = [
+            'https://www.google.com/', 'https://www.instagram.com/',
+            'https://www.linkedin.com/', null, null,
+        ];
+
+        $rows = [];
+
+        for ($day = 89; $day >= 0; $day--) {
+            $date = now()->subDays($day);
+            $isWeekend = $date->isWeekend();
+
+            // Campaign spike in the middle of the window.
+            $spike = ($day >= 40 && $day <= 46) ? 3 : 1;
+            $count = (int) round($weight * ($isWeekend ? 1.5 : 3.5) * $spike * (0.6 + lcg_value()));
+
+            for ($i = 0; $i < $count; $i++) {
+                [$country, $code, $city, $language] = $countries[array_rand($countries)];
+                $at = $date->copy()->setTime(random_int(6, 22), random_int(0, 59));
+
+                $rows[] = [
+                    'id' => (string) Str::ulid(),
+                    'project_id' => $this->project->id,
+                    'url_id' => $url->id,
+                    'visitor_hash' => hash('sha256', $url->id.$day.$i),
+                    'country' => $country,
+                    'country_code' => $code,
+                    'city' => $city,
+                    'language' => $language,
+                    'domain' => $this->domain->name,
+                    'referer' => $referers[array_rand($referers)],
+                    'browser' => $browsers[array_rand($browsers)],
+                    'os' => $systems[array_rand($systems)],
+                    'is_bot' => false,
+                    'created_at' => $at,
+                    'updated_at' => $at,
+                ];
+            }
+        }
+
+        foreach (array_chunk($rows, 500) as $chunk) {
+            Statistic::insert($chunk);
+        }
+
+        $url->forceFill([
+            'clicks' => count($rows),
+            'unique_clicks' => (int) round(count($rows) * 0.72),
+        ])->save();
     }
 }

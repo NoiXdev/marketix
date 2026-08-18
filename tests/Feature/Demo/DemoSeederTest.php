@@ -4,6 +4,7 @@ namespace Tests\Feature\Demo;
 
 use App\Models\Domain;
 use App\Models\Project;
+use App\Models\Statistic;
 use App\Models\User;
 use App\Settings\MailSettings;
 use App\Settings\StorageSettings;
@@ -49,5 +50,24 @@ class DemoSeederTest extends TestCase
             5,
             DB::table('settings')->where('group', 'branding')->count(),
         );
+    }
+
+    public function test_it_seeds_links_with_recent_click_history(): void
+    {
+        $this->seed(DemoSeeder::class);
+
+        $project = Project::query()->where('name', DemoSeeder::COMPANY)->firstOrFail();
+
+        $this->assertGreaterThanOrEqual(15, $project->urls()->count());
+
+        $stats = Statistic::query()->where('project_id', $project->id);
+        $this->assertGreaterThan(500, $stats->count());
+
+        // History reaches back roughly 90 days and up to today.
+        $this->assertTrue($stats->clone()->where('created_at', '>=', now()->subDays(2))->exists());
+        $this->assertTrue($stats->clone()->where('created_at', '<=', now()->subDays(80))->exists());
+
+        // Country breakdowns need real ISO codes, not faker noise.
+        $this->assertTrue($stats->clone()->whereNotNull('country_code')->exists());
     }
 }
