@@ -170,6 +170,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/crawls/{crawl}/pages/{page}', [CrawlController::class, 'pageDetail'])->name('app.project.crawls.pages.show');
             Route::get('/crawls/{crawl}/pages/{page}/screenshot/{variant}', [CrawlController::class, 'screenshot'])->name('app.project.crawls.pages.screenshot');
             Route::get('/crawls/{crawl}/export', [CrawlController::class, 'export'])->name('app.project.crawls.export');
+            Route::get('/crawls/{crawl}/export/xlsx', [CrawlController::class, 'exportXlsx'])->name('app.project.crawls.export-xlsx');
             Route::delete('/crawls/{crawl}', [CrawlController::class, 'destroy'])->name('app.project.crawls.destroy');
 
             // Sites (analytics)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Crawler\CheckCatalog;
+use App\Crawler\Export\CrawlXlsxExporter;
 use App\Crawler\IssueCategory;
 use App\Crawler\IssueCode;
 use App\Enums\CrawlMode;
@@ -11,6 +12,7 @@ use App\Jobs\RunCrawlJob;
 use App\Models\Crawl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CrawlController extends Controller
@@ -340,6 +342,19 @@ class CrawlController extends Controller
             });
             fclose($out);
         }, "crawl-{$model->id}.csv", ['Content-Type' => 'text/csv']);
+    }
+
+    public function exportXlsx(Request $request, string $crawl): BinaryFileResponse
+    {
+        $project = $request->get('project');
+        $model = $project->crawls()->findOrFail($crawl);
+
+        $path = tempnam(sys_get_temp_dir(), 'crawl-xlsx-');
+        app(CrawlXlsxExporter::class)->writeToFile($model, $path);
+
+        return response()->download($path, "crawl-{$model->id}.xlsx", [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend();
     }
 
     /**
