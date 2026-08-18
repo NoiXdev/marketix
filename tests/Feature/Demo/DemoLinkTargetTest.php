@@ -79,6 +79,42 @@ class DemoLinkTargetTest extends TestCase
             ->assertSessionHasErrors('targeting_geo.0.url');
     }
 
+    public function test_foreign_device_targeting_destination_is_rejected(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.links.store', ['project' => $this->project->id]),
+                $this->payload(['targeting_device' => [
+                    ['device' => 'mobile', 'url' => 'https://evil-phishing.test/mobile'],
+                ]])
+            )
+            ->assertSessionHasErrors('targeting_device.0.url');
+    }
+
+    public function test_foreign_language_targeting_destination_is_rejected(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.links.store', ['project' => $this->project->id]),
+                $this->payload(['targeting_language' => [
+                    ['language' => 'de', 'url' => 'https://evil-phishing.test/de'],
+                ]])
+            )
+            ->assertSessionHasErrors('targeting_language.0.url');
+    }
+
+    public function test_foreign_ab_targeting_destination_is_rejected(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.links.store', ['project' => $this->project->id]),
+                $this->payload(['targeting_ab' => [
+                    ['url' => 'https://evil-phishing.test/ab', 'weight' => 50],
+                ]])
+            )
+            ->assertSessionHasErrors('targeting_ab.0.url');
+    }
+
     public function test_no_restriction_when_demo_mode_is_off(): void
     {
         config(['demo.enabled' => false]);
