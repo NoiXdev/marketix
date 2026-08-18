@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\UrlStatus;
+use App\Rules\DemoAllowedTarget;
 use App\Support\QrTarget;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -87,10 +88,44 @@ class QrCodeRequest extends FormRequest
             $rules['status'] = ['nullable', 'integer', Rule::in(array_column(UrlStatus::cases(), 'value'))];
             $rules['password'] = ['nullable', 'string', 'max:255'];
             $rules['expired_at'] = ['nullable', 'date'];
-            $rules = array_merge($rules, UrlRequest::targetingRules());
+            $rules = UrlRequest::withDemoTargetRules(array_merge($rules, UrlRequest::targetingRules()));
         }
 
         return $rules;
+    }
+
+    /**
+     * A QR's destination depends on its type, so the allowlist cannot be
+     * attached to a single field. Resolve the effective redirect target with
+     * the same helper the controller uses and validate that one value; new QR
+     * types are then covered automatically.
+     *
+     * @return array<int, callable>
+     */
+    public function after(): array
+    {
+        if (! config('demo.enabled')) {
+            return [];
+        }
+
+        return [
+            function (Validator $validator) {
+                $target = QrTarget::redirectTarget(
+                    (string) $this->input('type'),
+                    (array) $this->input('content', [])
+                );
+
+                if ($target === '') {
+                    return;
+                }
+
+                (new DemoAllowedTarget)->validate(
+                    'content',
+                    $target,
+                    fn (string $message) => $validator->errors()->add('content', $message)
+                );
+            },
+        ];
     }
 
     public function withValidator(Validator $validator): void
