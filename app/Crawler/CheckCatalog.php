@@ -180,6 +180,13 @@ class CheckCatalog
             ['code' => 'outlinks_to_localhost', 'category' => 'links', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'only_non_indexable_inlinks', 'category' => 'links', 'severity' => 'warning', 'status' => self::A],
 
+            // geo
+            ['code' => 'ai_crawler_blocked', 'category' => 'geo', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'missing_llms_txt', 'category' => 'geo', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'no_semantic_html', 'category' => 'geo', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'missing_date_signal', 'category' => 'geo', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'js_dependent_content', 'category' => 'geo', 'severity' => 'warning', 'status' => self::A],
+
             // other (existing checks outside the 13 user categories)
             ['code' => 'noindex', 'category' => 'other', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'missing_structured_data', 'category' => 'other', 'severity' => 'notice', 'status' => self::A],

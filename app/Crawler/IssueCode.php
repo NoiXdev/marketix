@@ -148,6 +148,12 @@ enum IssueCode: string
     case ImageMissingAltAttribute = 'image_missing_alt_attribute';
     case ImageAltOver100Chars = 'image_alt_over_100_chars';
     case BackgroundImages = 'background_images';
+    // geo
+    case AiCrawlerBlocked = 'ai_crawler_blocked';
+    case MissingLlmsTxt = 'missing_llms_txt';
+    case NoSemanticHtml = 'no_semantic_html';
+    case MissingDateSignal = 'missing_date_signal';
+    case JsDependentContent = 'js_dependent_content';
 
     public function severity(): string
     {
@@ -177,7 +183,8 @@ enum IssueCode: string
             self::HreflangIncorrectCodes, self::HreflangMultipleEntries, self::HreflangOutsideHead,
             self::HreflangNotUsingCanonical, self::HreflangNon200, self::HreflangMissingReturnLink,
             self::HreflangNonCanonicalReturnLink, self::HreflangInconsistentLanguage,
-            self::HreflangNoindexReturnLink => 'warning',
+            self::HreflangNoindexReturnLink,
+            self::AiCrawlerBlocked, self::JsDependentContent => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
             self::MissingStructuredData, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
@@ -199,7 +206,8 @@ enum IssueCode: string
             self::ImageOver100kb, self::ImageMissingSizeAttributes, self::ImageMissingAltAttribute,
             self::ImageAltOver100Chars, self::BackgroundImages,
             self::HreflangMissingSelfReference, self::HreflangMissingXDefault,
-            self::HreflangUnlinked => 'notice',
+            self::HreflangUnlinked,
+            self::MissingLlmsTxt, self::NoSemanticHtml, self::MissingDateSignal => 'notice',
             self::HttpsUrls => 'info',
         };
     }
@@ -247,6 +255,8 @@ enum IssueCode: string
             self::PagesManyExternalOutlinks, self::PagesManyInternalOutlinks,
             self::FollowNofollowInternalInlinks, self::OnlyInternalNofollowInlinks,
             self::OutlinksToLocalhost, self::OnlyNonIndexableInlinks => IssueCategory::Links,
+            self::AiCrawlerBlocked, self::MissingLlmsTxt, self::NoSemanticHtml,
+            self::MissingDateSignal, self::JsDependentContent => IssueCategory::Geo,
             self::MissingCspHeader, self::MissingXFrameOptions, self::MissingXContentTypeOptions,
             self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
             self::HttpUrls, self::HttpsUrls, self::MixedContent, self::FormUrlInsecure,

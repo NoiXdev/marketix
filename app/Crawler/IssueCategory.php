@@ -18,6 +18,7 @@ enum IssueCategory: string
     case Pagination = 'pagination';
     case Hreflang = 'hreflang';
     case Links = 'links';
+    case Geo = 'geo';
     case Other = 'other';
 
     public function label(): string
