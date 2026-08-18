@@ -21,6 +21,30 @@ class DemoAllowedTarget implements ValidationRule
             return;
         }
 
+        // Protocol-relative URLs (//example.com) inherit the scheme from the current page.
+        // In a browser, //evil.test resolves to https://evil.test on a secure page.
+        // Treat them as http(s) URLs and validate the host.
+        $isProtocolRelative = str_starts_with($value, '//');
+
+        if ($isProtocolRelative) {
+            // For protocol-relative URLs, extract the host directly.
+            $host = strtolower((string) parse_url($value, PHP_URL_HOST));
+
+            if ($host === '' || ! $this->isAllowed($host)) {
+                $fail(__('demo.target_not_allowed', ['hosts' => implode(', ', $this->allowedHosts())]));
+            }
+
+            return;
+        }
+
+        // Detect malformed URLs where parse_url() completely fails.
+        // Examples: "http:///" "http://@/x" "http:///path"
+        if (parse_url($value) === false) {
+            $fail(__('demo.target_not_allowed', ['hosts' => implode(', ', $this->allowedHosts())]));
+
+            return;
+        }
+
         $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
 
         if (! in_array($scheme, ['http', 'https'], true)) {
