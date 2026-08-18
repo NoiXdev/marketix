@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Demo;
 
+use App\Models\Domain;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +16,8 @@ class DemoQrTargetTest extends TestCase
 
     private Project $project;
 
+    private Domain $domain;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,6 +30,29 @@ class DemoQrTargetTest extends TestCase
         $this->user = User::factory()->create();
         $this->project = Project::create(['name' => 'Demo', 'locked' => false]);
         $this->project->users()->attach($this->user, ['role' => 'admin', 'active' => true]);
+        $this->domain = Domain::create(['project_id' => $this->project->id, 'name' => 'links.example.com']);
+    }
+
+    /**
+     * A dynamic QR is backed by a real, publicly-resolvable short link, which
+     * is the actual abuse vector: domain_id/slug make it create one, and the
+     * targeting_* fields exercise the QrCodeRequest::rules()
+     * UrlRequest::withDemoTargetRules(array_merge(...)) wrap directly.
+     *
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    private function dynamicPayload(array $overrides = []): array
+    {
+        return array_merge(
+            $this->payload('link', ['url' => 'https://example.com/menu']),
+            [
+                'is_dynamic' => true,
+                'domain_id' => $this->domain->id,
+                'slug' => 'promo',
+            ],
+            $overrides
+        );
     }
 
     /** @param array<string, mixed> $content */
@@ -94,6 +120,46 @@ class DemoQrTargetTest extends TestCase
                 $this->payload('phone', ['phone' => '+4915112345678'])
             )
             ->assertSessionHasNoErrors();
+    }
+
+    public function test_foreign_dynamic_targeting_url_is_rejected(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.qrcodes.store', ['project' => $this->project->id]),
+                $this->dynamicPayload([
+                    'targeting_geo' => [
+                        ['country' => 'US', 'state' => '', 'url' => 'https://evil-phishing.test/us'],
+                    ],
+                ])
+            )
+            ->assertSessionHasErrors('targeting_geo.0.url');
+    }
+
+    public function test_allowed_dynamic_targeting_url_is_accepted(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.qrcodes.store', ['project' => $this->project->id]),
+                $this->dynamicPayload([
+                    'targeting_geo' => [
+                        ['country' => 'US', 'state' => '', 'url' => 'https://example.com/us'],
+                    ],
+                ])
+            )
+            ->assertSessionHasNoErrors();
+    }
+
+    public function test_foreign_dynamic_link_target_is_rejected(): void
+    {
+        $this->actingAs($this->user)
+            ->post(
+                route('app.project.qrcodes.store', ['project' => $this->project->id]),
+                $this->dynamicPayload([
+                    'content' => ['url' => 'https://evil-phishing.test/login'],
+                ])
+            )
+            ->assertSessionHasErrors('content');
     }
 
     public function test_no_restriction_when_demo_mode_is_off(): void
