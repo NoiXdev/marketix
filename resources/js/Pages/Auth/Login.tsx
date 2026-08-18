@@ -1,13 +1,15 @@
 import { Button, Checkbox, Field, Input } from '@/Components/ui';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useTranslation } from '@/lib/i18n';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 export default function Login({ status }: { status?: string }) {
   const { t } = useTranslation();
+  const demo = usePage<PageProps>().props.demo;
   const { data, setData, post, processing, errors } = useForm({
     email: '',
     password: '',
@@ -28,6 +30,19 @@ export default function Login({ status }: { status?: string }) {
       <Head title={t('auth.login.head')} />
 
       {status && <div className="mb-4 rounded-[var(--radius-sm)] bg-success-soft px-4 py-3 text-sm text-success-foreground">{status}</div>}
+
+      {demo?.enabled && (
+        <div className="mb-6">
+          <Button
+            type="button"
+            onClick={() => router.post(route('app.demo.login'))}
+            className="w-full justify-center py-2.5"
+          >
+            {t('demo.start')}
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted">{t('demo.start_hint')}</p>
+        </div>
+      )}
 
       <form onSubmit={submit} className="space-y-5">
         <Field label={t('auth.login.email')} htmlFor="email" error={errors.email}>

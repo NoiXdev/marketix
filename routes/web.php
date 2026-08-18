@@ -15,6 +15,7 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrawlController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoLoginController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
 use App\Http\Controllers\ForcePasswordChangeController;
@@ -81,6 +82,12 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::post('/auth/reset-password', [PasswordResetController::class, 'reset'])
             ->middleware('throttle:5,1')
             ->name('app.auth.reset');
+
+        if (config('demo.enabled')) {
+            Route::post('/demo/login', DemoLoginController::class)
+                ->middleware('throttle:20,1')
+                ->name('app.demo.login');
+        }
     });
 
     // Auth-only routes

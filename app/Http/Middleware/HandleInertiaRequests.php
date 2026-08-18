@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
                 'token' => fn () => $request->session()->get('token'),
             ],
             'branding' => $this->branding(),
+            'demo' => config('demo.enabled') ? ['enabled' => true] : null,
             'locale' => App::getLocale(),
             'availableLocales' => Locales::all(),
             'translations' => fn () => Translations::forLocale(App::getLocale()),
