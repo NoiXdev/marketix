@@ -2,12 +2,18 @@
 
 namespace Tests\Feature\Demo;
 
+use App\Models\Crawl;
+use App\Models\CrawlPage;
 use App\Models\Domain;
+use App\Models\Event;
+use App\Models\Goal;
+use App\Models\PageView;
 use App\Models\Pixel;
 use App\Models\Project;
 use App\Models\QrCode;
 use App\Models\QrTemplate;
 use App\Models\ScheduledReport;
+use App\Models\Site;
 use App\Models\Statistic;
 use App\Models\User;
 use App\Settings\MailSettings;
@@ -117,5 +123,29 @@ class DemoSeederTest extends TestCase
         // encodes an empty/broken payload.
         $wifiQr = QrCode::query()->where('project_id', $project->id)->where('type', 'wifi')->firstOrFail();
         $this->assertNotEmpty($wifiQr->content['ssid'] ?? null);
+    }
+
+    public function test_it_seeds_an_analytics_site_with_history(): void
+    {
+        $this->seed(DemoSeeder::class);
+
+        $project = Project::query()->where('name', DemoSeeder::COMPANY)->firstOrFail();
+        $site = Site::query()->where('project_id', $project->id)->firstOrFail();
+
+        $this->assertGreaterThan(200, PageView::query()->where('site_id', $site->id)->count());
+        $this->assertGreaterThan(0, Event::query()->where('site_id', $site->id)->count());
+        $this->assertSame(2, Goal::query()->where('site_id', $site->id)->count());
+    }
+
+    public function test_it_seeds_two_completed_crawls(): void
+    {
+        $this->seed(DemoSeeder::class);
+
+        $project = Project::query()->where('name', DemoSeeder::COMPANY)->firstOrFail();
+        $crawls = Crawl::query()->where('project_id', $project->id)->get();
+
+        $this->assertCount(2, $crawls);
+        $this->assertTrue($crawls->every(fn ($c) => $c->status->value === 'completed'));
+        $this->assertGreaterThan(0, CrawlPage::query()->whereIn('crawl_id', $crawls->pluck('id'))->count());
     }
 }
