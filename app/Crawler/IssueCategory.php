@@ -19,6 +19,7 @@ enum IssueCategory: string
     case Hreflang = 'hreflang';
     case Links = 'links';
     case Geo = 'geo';
+    case StructuredData = 'structured_data';
     case Other = 'other';
 
     public function label(): string

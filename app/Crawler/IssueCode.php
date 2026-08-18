@@ -28,6 +28,9 @@ enum IssueCode: string
     // technik
     case MissingAltText = 'missing_alt_text';
     case MissingStructuredData = 'missing_structured_data';
+    case StructuredDataParseError = 'structured_data_parse_error';
+    case StructuredDataMissingType = 'structured_data_missing_type';
+    case StructuredDataInvalid = 'structured_data_invalid';
     // sitemap
     case NotInSitemap = 'not_in_sitemap';
     // resources (non-HTML files: images, media, …)
@@ -184,9 +187,10 @@ enum IssueCode: string
             self::HreflangNotUsingCanonical, self::HreflangNon200, self::HreflangMissingReturnLink,
             self::HreflangNonCanonicalReturnLink, self::HreflangInconsistentLanguage,
             self::HreflangNoindexReturnLink,
-            self::AiCrawlerBlocked, self::JsDependentContent => 'warning',
+            self::AiCrawlerBlocked, self::JsDependentContent,
+            self::StructuredDataParseError, self::StructuredDataInvalid => 'warning',
             self::TitleTooLong, self::ThinContent, self::MissingAltText,
-            self::MissingStructuredData, self::NotInSitemap,
+            self::MissingStructuredData, self::StructuredDataMissingType, self::NotInSitemap,
             self::MissingCspHeader, self::MissingReferrerPolicy,
             self::ProtocolRelativeResourceLinks,
             self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
@@ -257,6 +261,8 @@ enum IssueCode: string
             self::OutlinksToLocalhost, self::OnlyNonIndexableInlinks => IssueCategory::Links,
             self::AiCrawlerBlocked, self::MissingLlmsTxt, self::NoSemanticHtml,
             self::MissingDateSignal, self::JsDependentContent => IssueCategory::Geo,
+            self::MissingStructuredData, self::StructuredDataParseError,
+            self::StructuredDataMissingType, self::StructuredDataInvalid => IssueCategory::StructuredData,
             self::MissingCspHeader, self::MissingXFrameOptions, self::MissingXContentTypeOptions,
             self::MissingHstsHeader, self::UnsafeCrossOriginLinks, self::MissingReferrerPolicy,
             self::HttpUrls, self::HttpsUrls, self::MixedContent, self::FormUrlInsecure,
@@ -264,7 +270,7 @@ enum IssueCode: string
             self::UrlNonAscii, self::UrlUnderscores, self::UrlUppercase, self::UrlContainsSpace,
             self::UrlMultipleSlashes, self::UrlRepetitivePath, self::UrlGaTrackingParams,
             self::UrlOver115Chars => IssueCategory::Url,
-            self::Noindex, self::MissingStructuredData, self::NotInSitemap,
+            self::Noindex, self::NotInSitemap,
             self::LargeResource, self::OversizedResource => IssueCategory::Other,
         };
     }

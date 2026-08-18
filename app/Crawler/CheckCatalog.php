@@ -187,9 +187,14 @@ class CheckCatalog
             ['code' => 'missing_date_signal', 'category' => 'geo', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'js_dependent_content', 'category' => 'geo', 'severity' => 'warning', 'status' => self::A],
 
+            // structured_data
+            ['code' => 'missing_structured_data', 'category' => 'structured_data', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'structured_data_parse_error', 'category' => 'structured_data', 'severity' => 'warning', 'status' => self::A],
+            ['code' => 'structured_data_missing_type', 'category' => 'structured_data', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'structured_data_invalid', 'category' => 'structured_data', 'severity' => 'warning', 'status' => self::A],
+
             // other (existing checks outside the 13 user categories)
             ['code' => 'noindex', 'category' => 'other', 'severity' => 'warning', 'status' => self::A],
-            ['code' => 'missing_structured_data', 'category' => 'other', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'not_in_sitemap', 'category' => 'other', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'large_resource', 'category' => 'other', 'severity' => 'warning', 'status' => self::A],
             ['code' => 'oversized_resource', 'category' => 'other', 'severity' => 'error', 'status' => self::A],

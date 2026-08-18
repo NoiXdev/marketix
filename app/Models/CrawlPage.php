@@ -22,6 +22,7 @@ class CrawlPage extends Model
             'redirect_chain' => 'array',
             'headings' => 'array',
             'structured_data' => 'array',
+            'structured_data_items' => 'array',
             'images_missing_alt' => 'array',
             'issues' => 'array',
             'security_headers' => 'array',
