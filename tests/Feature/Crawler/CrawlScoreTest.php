@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Crawler;
 
+use App\Crawler\CheckCatalog;
 use App\Crawler\CrawlScore;
 use App\Models\Crawl;
 use App\Models\CrawlPage;
@@ -24,18 +25,37 @@ class CrawlScoreTest extends TestCase
         $this->assertSame(100, $result['geo']);
     }
 
-    public function test_error_on_every_page_tanks_overall_and_its_category(): void
+    public function test_every_active_problem_check_failing_on_the_only_page_tanks_every_score(): void
     {
-        $crawl = Crawl::factory()->create(['pages_crawled' => 4]);
-        CrawlPage::factory()->for($crawl)->count(4)->create(['issues' => ['missing_title']]);
+        // A single-page crawl where every active, non-info check fails is the worst
+        // possible case for that page: penalty must equal the maximum possible penalty
+        // for every set of categories (overall, seo, geo), so every score bottoms out at 0.
+        $crawl = Crawl::factory()->create(['pages_crawled' => 1]);
+        CrawlPage::factory()->for($crawl)->create(['issues' => CheckCatalog::activeCodes()]);
 
         $result = CrawlScore::for($crawl);
 
         $this->assertSame(0, $result['overall']);
-        $this->assertSame(0, $result['categories']['page_title']);
-        // page_title is not geo, so it also drags seo down while geo stays clean.
         $this->assertSame(0, $result['seo']);
+        $this->assertSame(0, $result['geo']);
+    }
+
+    public function test_info_codes_do_not_affect_any_score_or_top_actions(): void
+    {
+        $crawl = Crawl::factory()->create(['pages_crawled' => 5]);
+        CrawlPage::factory()->for($crawl)->count(5)->create([
+            'issues' => ['https_urls', 'missing_meta_keywords'],
+        ]);
+
+        $result = CrawlScore::for($crawl);
+
+        $this->assertSame(100, $result['overall']);
+        $this->assertSame(100, $result['seo']);
         $this->assertSame(100, $result['geo']);
+
+        $codes = array_column($result['topActions'], 'code');
+        $this->assertNotContains('https_urls', $codes);
+        $this->assertNotContains('missing_meta_keywords', $codes);
     }
 
     public function test_geo_issue_dips_geo_but_not_seo(): void
@@ -48,32 +68,35 @@ class CrawlScoreTest extends TestCase
 
         $this->assertSame(100, $result['seo']);
         $this->assertLessThan(100, $result['geo']);
-        $this->assertSame(93, $result['geo']);
     }
 
     public function test_seo_issue_dips_seo_but_not_geo(): void
     {
+        // The seo set spans nearly every category (everything except geo), so its maximum
+        // possible weighted penalty is large; every page needs the (error-weighted)
+        // problem to move the ratio enough to register as less than a perfect 100.
         $crawl = Crawl::factory()->create(['pages_crawled' => 10]);
-        CrawlPage::factory()->for($crawl)->count(2)->create(['issues' => ['missing_title']]);
-        CrawlPage::factory()->for($crawl)->count(8)->create(['issues' => []]);
+        CrawlPage::factory()->for($crawl)->count(10)->create(['issues' => ['missing_title']]);
 
         $result = CrawlScore::for($crawl);
 
         $this->assertSame(100, $result['geo']);
         $this->assertLessThan(100, $result['seo']);
-        $this->assertSame(80, $result['seo']);
     }
 
-    public function test_info_code_does_not_affect_any_score(): void
+    public function test_missing_meta_keywords_never_counts_as_a_problem(): void
     {
-        $crawl = Crawl::factory()->create(['pages_crawled' => 5]);
-        CrawlPage::factory()->for($crawl)->count(5)->create(['issues' => ['https_urls']]);
+        $this->assertFalse(CheckCatalog::isProblemCode('missing_meta_keywords'));
+
+        $crawl = Crawl::factory()->create(['pages_crawled' => 1]);
+        CrawlPage::factory()->for($crawl)->create(['issues' => ['missing_meta_keywords']]);
 
         $result = CrawlScore::for($crawl);
 
         $this->assertSame(100, $result['overall']);
         $this->assertSame(100, $result['seo']);
         $this->assertSame(100, $result['geo']);
+        $this->assertSame([], $result['topActions']);
     }
 
     public function test_top_actions_sorted_by_severity_then_count_and_capped_at_ten(): void
@@ -95,7 +118,8 @@ class CrawlScoreTest extends TestCase
             // notices (only the top 2 by count should survive the cap)
             'title_too_long' => 10,
             'missing_alt_text' => 8,
-            'missing_meta_keywords' => 3,
+            // info: must never appear regardless of how high its count is
+            'missing_meta_keywords' => 10,
             'not_in_sitemap' => 1,
         ];
 
@@ -127,5 +151,29 @@ class CrawlScoreTest extends TestCase
         ];
 
         $this->assertSame($expected, $result['topActions']);
+
+        $codes = array_column($result['topActions'], 'code');
+        $this->assertNotContains('missing_meta_keywords', $codes);
+    }
+
+    public function test_all_scores_are_ints_between_zero_and_a_hundred(): void
+    {
+        $crawl = Crawl::factory()->create(['pages_crawled' => 7]);
+        CrawlPage::factory()->for($crawl)->count(3)->create(['issues' => ['missing_title', 'no_semantic_html']]);
+        CrawlPage::factory()->for($crawl)->count(4)->create(['issues' => []]);
+
+        $result = CrawlScore::for($crawl);
+
+        foreach (['overall', 'seo', 'geo'] as $key) {
+            $this->assertIsInt($result[$key], $key);
+            $this->assertGreaterThanOrEqual(0, $result[$key], $key);
+            $this->assertLessThanOrEqual(100, $result[$key], $key);
+        }
+
+        foreach ($result['categories'] as $category => $score) {
+            $this->assertIsInt($score, $category);
+            $this->assertGreaterThanOrEqual(0, $score, $category);
+            $this->assertLessThanOrEqual(100, $score, $category);
+        }
     }
 }

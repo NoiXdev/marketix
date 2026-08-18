@@ -26,32 +26,61 @@ class CrawlScore
 
         $pages = max(1, (int) $crawl->pages_crawled);
 
-        $penalty = function (callable $inSet) use ($perCode): int {
+        // Severity is sourced once from IssueCode (equal to the catalogue's severity by
+        // invariant) and reused for both the penalty and the maximum-possible-penalty side
+        // of the ratio, so the two are always computed on the same basis.
+        $severityOf = fn (string $code): string => IssueCode::tryFrom($code)?->severity() ?? 'notice';
+
+        $penalty = function (callable $inSet) use ($perCode, $severityOf): int {
             $p = 0;
             foreach ($perCode as $code => $count) {
                 $cat = CheckCatalog::categoryOf($code);
                 if ($cat === null || ! $inSet($cat)) {
                     continue;
                 }
-                $sev = IssueCode::tryFrom($code)?->severity() ?? 'notice';
-                $p += $count * (self::WEIGHTS[$sev] ?? 1);
+                $p += $count * (self::WEIGHTS[$severityOf($code)] ?? 1);
             }
 
             return $p;
         };
 
-        $score = fn (int $pen): int => (int) round(100 * (1 - min(1, $pen / ($pages * 3))));
+        // Maximum possible weighted penalty for a set of categories: every active,
+        // non-info (problem) check in those categories failing on every page.
+        $maxWeight = function (callable $inSet) use ($severityOf): int {
+            $w = 0;
+            foreach (CheckCatalog::all() as $entry) {
+                if ($entry['status'] !== 'active'
+                    || ! CheckCatalog::isProblemCode($entry['code'])
+                    || ! $inSet($entry['category'])
+                ) {
+                    continue;
+                }
+                $w += self::WEIGHTS[$severityOf($entry['code'])] ?? 1;
+            }
 
-        $overall = $score($penalty(fn (string $c) => true));
-        $geo = $score($penalty(fn (string $c) => $c === 'geo'));
-        $seo = $score($penalty(fn (string $c) => $c !== 'geo'));
+            return $w;
+        };
+
+        $score = function (int $pen, int $maxW) use ($pages): int {
+            if ($maxW === 0) {
+                return 100;
+            }
+
+            return (int) round(100 * (1 - min(1, $pen / ($pages * $maxW))));
+        };
+
+        $overall = $score($penalty(fn (string $c) => true), $maxWeight(fn (string $c) => true));
+        $geo = $score($penalty(fn (string $c) => $c === 'geo'), $maxWeight(fn (string $c) => $c === 'geo'));
+        $seo = $score($penalty(fn (string $c) => $c !== 'geo'), $maxWeight(fn (string $c) => $c !== 'geo'));
 
         $categories = [];
         foreach (IssueCategory::cases() as $cat) {
-            if (CheckCatalog::activeCodesForCategory($cat->value) === []) {
+            $inCat = fn (string $c) => $c === $cat->value;
+            $maxW = $maxWeight($inCat);
+            if ($maxW === 0) {
                 continue;
             }
-            $categories[$cat->value] = $score($penalty(fn (string $c) => $c === $cat->value));
+            $categories[$cat->value] = $score($penalty($inCat), $maxW);
         }
 
         $rank = self::WEIGHTS;
@@ -61,7 +90,7 @@ class CrawlScore
             if ($cat === null) {
                 continue;
             }
-            $sev = IssueCode::tryFrom($code)?->severity() ?? 'notice';
+            $sev = $severityOf($code);
             $actions[] = ['code' => $code, 'category' => $cat, 'severity' => $sev, 'count' => $count];
         }
         usort($actions, fn ($a, $b) => (($rank[$b['severity']] ?? 0) <=> ($rank[$a['severity']] ?? 0)) ?: ($b['count'] <=> $a['count']));

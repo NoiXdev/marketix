@@ -195,7 +195,7 @@ enum IssueCode: string
             self::TitleBelow30Chars, self::TitleBelow200px, self::TitleOver561px, self::TitleSameAsH1,
             self::MetaDescriptionOver155Chars, self::MetaDescriptionBelow70Chars,
             self::MetaDescriptionOver985px, self::MetaDescriptionBelow400px,
-            self::MissingMetaKeywords, self::MultipleMetaKeywords, self::DuplicateMetaKeywords,
+            self::MultipleMetaKeywords, self::DuplicateMetaKeywords,
             self::H1Over70Chars, self::AltTextInH1, self::MissingH2, self::DuplicateH2, self::H2Over70Chars,
             self::HasCanonical, self::CanonicalSelfReferencing, self::MissingCanonical,
             self::CanonicalIsRelative, self::CanonicalNotLinked, self::CanonicalFragmentUrl,
@@ -208,7 +208,7 @@ enum IssueCode: string
             self::HreflangMissingSelfReference, self::HreflangMissingXDefault,
             self::HreflangUnlinked,
             self::MissingLlmsTxt, self::NoSemanticHtml, self::MissingDateSignal => 'notice',
-            self::HttpsUrls => 'info',
+            self::HttpsUrls, self::MissingMetaKeywords => 'info',
         };
     }
 

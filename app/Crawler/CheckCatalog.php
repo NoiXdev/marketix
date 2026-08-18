@@ -83,7 +83,7 @@ class CheckCatalog
             ['code' => 'meta_description_outside_head', 'category' => 'meta_description', 'severity' => 'warning', 'status' => self::A],
 
             // meta_keywords
-            ['code' => 'missing_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
+            ['code' => 'missing_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'info', 'status' => self::A],
             ['code' => 'duplicate_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
             ['code' => 'multiple_meta_keywords', 'category' => 'meta_keywords', 'severity' => 'notice', 'status' => self::A],
 
