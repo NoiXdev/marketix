@@ -64,6 +64,38 @@ class StructuredDataAnalyzerTest extends TestCase
         $this->assertSame([], $result->issues);
     }
 
+    public function test_bare_top_level_array_of_nodes_produces_one_item_per_node(): void
+    {
+        $html = '<script type="application/ld+json">'
+            .'[{"@type":"Organization","name":"X"},{"@type":"WebSite","name":"Y","url":"https://x.test"}]'
+            .'</script>';
+
+        $result = $this->runAnalyzer($html);
+
+        $items = $result->data['structured_data_items'];
+        $this->assertCount(2, $items);
+        $this->assertEqualsCanonicalizing(['Organization', 'WebSite'], array_column($items, 'type'));
+        foreach ($items as $item) {
+            $this->assertTrue($item['valid']);
+            $this->assertSame([], $item['missing']);
+        }
+        $this->assertSame([], $result->issues);
+    }
+
+    public function test_node_with_own_type_and_graph_child_produces_both_items(): void
+    {
+        $html = '<script type="application/ld+json">'
+            .'{"@context":"https://schema.org","@type":"WebPage","name":"Home",'
+            .'"@graph":[{"@type":"Organization","name":"X"}]}'
+            .'</script>';
+
+        $result = $this->runAnalyzer($html);
+
+        $items = $result->data['structured_data_items'];
+        $this->assertCount(2, $items);
+        $this->assertEqualsCanonicalizing(['WebPage', 'Organization'], array_column($items, 'type'));
+    }
+
     public function test_product_missing_name_is_invalid(): void
     {
         $html = '<script type="application/ld+json">{"@type":"Product","sku":"123"}</script>';

@@ -103,6 +103,13 @@ class StructuredDataAnalyzer implements Analyzer
                 }
             }
 
+            // A node carrying @graph is normally a pure container, but if it
+            // also declares its own @type it is itself a typed node and must
+            // not be dropped in favour of only its graph children.
+            if (isset($node['@type'])) {
+                $out[] = $node;
+            }
+
             return $out;
         }
 
