@@ -69,5 +69,17 @@ class DemoSeederTest extends TestCase
 
         // Country breakdowns need real ISO codes, not faker noise.
         $this->assertTrue($stats->clone()->whereNotNull('country_code')->exists());
+
+        // Top Referrers needs more than one distinct value, or every link's
+        // chart shows 100% self-referral and 0% Google/Instagram/LinkedIn/direct.
+        $this->assertGreaterThan(1, $stats->clone()->distinct('domain')->count('domain'));
+
+        // Unique clicks must actually be lower than total clicks, or the
+        // list page and the detail page show contradictory numbers.
+        $this->assertLessThan($stats->count(), $stats->clone()->distinct('visitor_hash')->count('visitor_hash'));
+
+        // Clicks must be spread across the whole link inventory, not piled
+        // onto a single URL.
+        $this->assertGreaterThan(1, $stats->clone()->distinct('url_id')->count('url_id'));
     }
 }

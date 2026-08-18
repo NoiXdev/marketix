@@ -163,31 +163,50 @@ class DemoSeeder extends Seeder
             'https://www.linkedin.com/', null, null,
         ];
 
+        // First pass: how many clicks land on each day, using the same
+        // weekday/weekend/spike formula as before. Computed up front (and
+        // reused, not re-rolled) so the total click volume is known before
+        // sizing the returning-visitor pool below.
+        $dailyCounts = [];
+        for ($day = 89; $day >= 0; $day--) {
+            $isWeekend = now()->subDays($day)->isWeekend();
+            $spike = ($day >= 40 && $day <= 46) ? 3 : 1;
+            $dailyCounts[$day] = (int) round($weight * ($isWeekend ? 1.5 : 3.5) * $spike * (0.6 + lcg_value()));
+        }
+
+        $totalClicks = array_sum($dailyCounts);
+
+        // Bounded pool of "returning visitors" per link: drawing from a pool
+        // sized to ~1/0.7 of total volume makes roughly 70% of draws land on
+        // a fresh slot (coupon-collector effect), so real repeat visits occur
+        // instead of every click hashing to a brand-new, never-repeated visitor.
+        $visitorPoolSize = max(5, (int) round($totalClicks / 0.7));
+
         $rows = [];
 
-        for ($day = 89; $day >= 0; $day--) {
+        foreach ($dailyCounts as $day => $count) {
             $date = now()->subDays($day);
-            $isWeekend = $date->isWeekend();
-
-            // Campaign spike in the middle of the window.
-            $spike = ($day >= 40 && $day <= 46) ? 3 : 1;
-            $count = (int) round($weight * ($isWeekend ? 1.5 : 3.5) * $spike * (0.6 + lcg_value()));
 
             for ($i = 0; $i < $count; $i++) {
                 [$country, $code, $city, $language] = $countries[array_rand($countries)];
+                $referer = $referers[array_rand($referers)];
                 $at = $date->copy()->setTime(random_int(6, 22), random_int(0, 59));
 
                 $rows[] = [
                     'id' => (string) Str::ulid(),
                     'project_id' => $this->project->id,
                     'url_id' => $url->id,
-                    'visitor_hash' => hash('sha256', $url->id.$day.$i),
+                    'visitor_hash' => hash('sha256', $url->id.'-visitor-'.random_int(0, $visitorPoolSize - 1)),
                     'country' => $country,
                     'country_code' => $code,
                     'city' => $city,
                     'language' => $language,
-                    'domain' => $this->domain->name,
-                    'referer' => $referers[array_rand($referers)],
+                    // Mirrors RecordClickStatisticJob::handle(): 'domain' is the
+                    // referrer's hostname, not the link's own domain — a link's
+                    // own domain would make every click "self-referred" and
+                    // flatten the Top Referrers breakdown to one value.
+                    'domain' => $referer ? parse_url($referer, PHP_URL_HOST) : null,
+                    'referer' => $referer,
                     'browser' => $browsers[array_rand($browsers)],
                     'os' => $systems[array_rand($systems)],
                     'is_bot' => false,
@@ -201,9 +220,14 @@ class DemoSeeder extends Seeder
             Statistic::insert($chunk);
         }
 
-        $url->forceFill([
+        // Derived from the same rows just inserted (not a fudge factor), so
+        // this denormalized counter can never disagree with the live
+        // distinct-visitor_hash count the link detail page computes.
+        $uniqueClicks = count(array_unique(array_column($rows, 'visitor_hash')));
+
+        $url->fill([
             'clicks' => count($rows),
-            'unique_clicks' => (int) round(count($rows) * 0.72),
+            'unique_clicks' => $uniqueClicks,
         ])->save();
     }
 }
