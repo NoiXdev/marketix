@@ -3,7 +3,11 @@
 namespace Tests\Feature\Demo;
 
 use App\Models\Domain;
+use App\Models\Pixel;
 use App\Models\Project;
+use App\Models\QrCode;
+use App\Models\QrTemplate;
+use App\Models\ScheduledReport;
 use App\Models\Statistic;
 use App\Models\User;
 use App\Settings\MailSettings;
@@ -81,5 +85,17 @@ class DemoSeederTest extends TestCase
         // Clicks must be spread across the whole link inventory, not piled
         // onto a single URL.
         $this->assertGreaterThan(1, $stats->clone()->distinct('url_id')->count('url_id'));
+    }
+
+    public function test_it_seeds_qr_codes_templates_pixels_and_reports(): void
+    {
+        $this->seed(DemoSeeder::class);
+
+        $project = Project::query()->where('name', DemoSeeder::COMPANY)->firstOrFail();
+
+        $this->assertGreaterThanOrEqual(5, QrCode::query()->where('project_id', $project->id)->count());
+        $this->assertSame(2, QrTemplate::query()->where('project_id', $project->id)->count());
+        $this->assertGreaterThanOrEqual(2, Pixel::query()->where('project_id', $project->id)->count());
+        $this->assertSame(2, ScheduledReport::query()->where('project_id', $project->id)->count());
     }
 }

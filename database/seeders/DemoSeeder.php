@@ -5,10 +5,15 @@ namespace Database\Seeders;
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
 use App\Models\Domain;
+use App\Models\Pixel;
 use App\Models\Project;
+use App\Models\QrCode;
+use App\Models\QrTemplate;
+use App\Models\ScheduledReport;
 use App\Models\Statistic;
 use App\Models\Url;
 use App\Models\User;
+use Database\Factories\QrCodeFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
@@ -42,6 +47,7 @@ class DemoSeeder extends Seeder
         $this->seedUsersAndProject();
         $this->seedDomain();
         $this->seedLinks();
+        $this->seedMarketingAssets();
     }
 
     private function seedUsersAndProject(): void
@@ -229,5 +235,90 @@ class DemoSeeder extends Seeder
             'clicks' => count($rows),
             'unique_clicks' => $uniqueClicks,
         ])->save();
+    }
+
+    /**
+     * QR codes, two branded templates, tracking pixels and scheduled
+     * reports, so every "Marketing" menu item has something in it.
+     *
+     * QR `type`/`content` shapes verified against
+     * resources/js/data/qrTypes.ts (the frontend's canonical content
+     * builder) so nothing here encodes to an empty payload. Pixel
+     * `provider` values verified against App\Enums\PixelProvider (there is
+     * no "meta" case — Meta's pixel is the "facebook" provider there, so
+     * the pixel keeps the "Meta Pixel" name customers actually use while
+     * carrying the "facebook" provider value the app recognises).
+     */
+    private function seedMarketingAssets(): void
+    {
+        $qrDefinitions = [
+            ['name' => 'Café-Karte (Tischaufsteller)', 'type' => 'link', 'content' => ['url' => 'https://example.com/menu']],
+            ['name' => 'Verpackung — Herkunft', 'type' => 'link', 'content' => ['url' => 'https://example.com/impact']],
+            ['name' => 'Workshop-Anmeldung', 'type' => 'link', 'content' => ['url' => 'https://example.com/workshop']],
+            ['name' => 'Wholesale contact', 'type' => 'email', 'content' => ['email' => 'wholesale@nordlicht.example']],
+            ['name' => 'Roastery phone', 'type' => 'phone', 'content' => ['phone' => '+4940123456']],
+            ['name' => 'WLAN Gastzugang', 'type' => 'wifi', 'content' => ['ssid' => 'Nordlicht Gast', 'password' => 'espresso', 'encryption' => 'WPA', 'hidden' => 'false']],
+        ];
+
+        foreach ($qrDefinitions as $definition) {
+            QrCode::factory()
+                ->forProject($this->project)
+                ->create([
+                    'name' => $definition['name'],
+                    'type' => $definition['type'],
+                    'is_dynamic' => false,
+                    'content' => $definition['content'],
+                ]);
+        }
+
+        foreach (['Nordlicht Primär', 'Nordlicht Invers'] as $index => $name) {
+            QrTemplate::factory()
+                ->forProject($this->project)
+                ->create([
+                    'name' => $name,
+                    'style' => array_merge(QrCodeFactory::defaultStyle(), [
+                        'foreground' => $index === 0 ? '#1d3b2a' : '#ffffff',
+                        'background' => $index === 0 ? '#ffffff' : '#1d3b2a',
+                        'module_mode' => 'rounded',
+                        'module_rounding' => 0.6,
+                    ]),
+                ]);
+        }
+
+        Pixel::factory()->forProject($this->project)->create([
+            'provider' => 'google_analytics',
+            'name' => 'Google Analytics',
+        ]);
+        Pixel::factory()->forProject($this->project)->create([
+            'provider' => 'facebook',
+            'name' => 'Meta Pixel',
+        ]);
+
+        ScheduledReport::factory()
+            ->forProject($this->project, $this->demoUser)
+            ->create([
+                'name' => 'Wochenreport Marketing',
+                'type' => 'project_summary',
+                'frequency' => 'weekly',
+                'weekday' => 1,
+                'period' => 'last_7_days',
+                'recipients' => ['marketing@nordlicht.example'],
+                'last_sent_at' => now()->subDays(3),
+                'next_run_at' => now()->addDays(4),
+            ]);
+
+        ScheduledReport::factory()
+            ->forProject($this->project, $this->demoUser)
+            ->create([
+                'name' => 'Monthly link performance',
+                'type' => 'link',
+                'subject_id' => $this->urls->first()->id,
+                'frequency' => 'monthly',
+                'weekday' => null,
+                'day_of_month' => 1,
+                'period' => 'previous_month',
+                'recipients' => ['ceo@nordlicht.example'],
+                'next_run_at' => now()->addMonth()->startOfMonth(),
+            ]);
     }
 }
