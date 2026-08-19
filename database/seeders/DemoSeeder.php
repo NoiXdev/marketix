@@ -372,11 +372,17 @@ class DemoSeeder extends Seeder
         ]);
 
         $paths = ['/', '/shop', '/shop/espresso', '/abo', '/workshop', '/menu', '/impact', '/kontakt'];
+        // The 4th element is the referer URL for that source, kept coherent
+        // with its utm_source (an instagram-tagged visit must not carry a
+        // Google referer). Newsletter clicks and the untagged bucket carry
+        // no referer at all — email clients and bookmarked/direct visits
+        // genuinely send none — so referer_domain stays null on roughly
+        // half of all visits, not populated on every row.
         $sources = [
-            ['google', 'organic', null],
-            ['newsletter', 'email', 'sommeraktion'],
-            ['instagram', 'social', 'sommeraktion'],
-            [null, null, null],
+            ['google', 'organic', null, 'https://www.google.com/'],
+            ['newsletter', 'email', 'sommeraktion', null],
+            ['instagram', 'social', 'sommeraktion', 'https://www.instagram.com/'],
+            [null, null, null, null],
         ];
 
         for ($day = 89; $day >= 0; $day--) {
@@ -384,7 +390,10 @@ class DemoSeeder extends Seeder
             $visits = (int) round(($date->isWeekend() ? 6 : 14) * (0.7 + lcg_value()));
 
             for ($v = 0; $v < $visits; $v++) {
-                [$source, $medium, $campaign] = $sources[array_rand($sources)];
+                [$source, $medium, $campaign, $referer] = $sources[array_rand($sources)];
+                // Mirrors RecordPageViewJob::handle(): referer_domain is derived
+                // from the referer URL's host, never stored separately.
+                $refererDomain = $referer !== null ? parse_url($referer, PHP_URL_HOST) : null;
                 $startedAt = $date->copy()->setTime(random_int(7, 21), random_int(0, 59));
 
                 $visit = Visit::factory()->forSite($site)->create([
@@ -392,6 +401,9 @@ class DemoSeeder extends Seeder
                     'last_activity_at' => $startedAt->copy()->addMinutes(random_int(1, 12)),
                     'entry_path' => $paths[array_rand($paths)],
                     'exit_path' => $paths[array_rand($paths)],
+                    // Visit only stores the first-touch referer_domain (see
+                    // VisitResolver::resolve()) — there is no full-URL column.
+                    'referer_domain' => $refererDomain,
                     'utm_source' => $source,
                     'utm_medium' => $medium,
                     'utm_campaign' => $campaign,
@@ -404,6 +416,8 @@ class DemoSeeder extends Seeder
                 for ($p = 0; $p < $views; $p++) {
                     PageView::factory()->forVisit($visit)->create([
                         'path' => $paths[array_rand($paths)],
+                        'referer' => $referer,
+                        'referer_domain' => $refererDomain,
                         'utm_source' => $source,
                         'utm_medium' => $medium,
                         'utm_campaign' => $campaign,

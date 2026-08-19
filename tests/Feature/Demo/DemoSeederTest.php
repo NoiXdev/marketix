@@ -135,6 +135,15 @@ class DemoSeederTest extends TestCase
         $this->assertGreaterThan(200, PageView::query()->where('site_id', $site->id)->count());
         $this->assertGreaterThan(0, Event::query()->where('site_id', $site->id)->count());
         $this->assertSame(2, Goal::query()->where('site_id', $site->id)->count());
+
+        // The referrer breakdown widget reads PageView.referer_domain
+        // (AnalyticsAggregator::topReferrers()). More than one distinct
+        // non-null value is required, or the widget has nothing to
+        // aggregate and renders empty for every seeded page view.
+        $this->assertGreaterThan(
+            1,
+            PageView::query()->where('site_id', $site->id)->whereNotNull('referer_domain')->distinct('referer_domain')->count('referer_domain')
+        );
     }
 
     public function test_it_seeds_two_completed_crawls(): void
