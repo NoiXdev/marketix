@@ -2,100 +2,49 @@
 
 namespace Tests\Feature\Demo;
 
-use App\Console\Commands\DemoResetCommand;
-use App\Console\Commands\DemoSetupCommand;
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Application as SymfonyApplication;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\OutputInterface;
+use App\Models\Project;
+use App\Models\User;
+use Database\Seeders\DemoSeeder;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 /**
- * Both commands discarded the return values of their internal `$this->call()`
- * steps, so a failed `migrate:fresh` would still seed a half-migrated
- * database and report SUCCESS — with no non-zero exit code and no signal
- * anywhere, since both run unattended (the reset runs nightly from the
- * scheduler).
+ * End-to-end coverage for `marketix:demo:reset`: the guard that keeps it
+ * from ever touching a non-demo database, and a real wipe-and-reseed run.
  *
- * Simulating a genuine migrate:fresh failure (breaking the DB connection)
- * does not exercise the fixed code path cleanly: Illuminate\Console\
- * Concerns\CallsCommands::call() resolves and runs the sub-command directly
- * (`$this->resolveCommand($command)->run(...)`), with no exception-catching
- * layer around it — unlike the real `php artisan` front controller, which
- * wraps the whole run in Symfony's Application::run(). So a genuine DB
- * failure throws straight out of `$this->call()`, uncaught, before the
- * command's own `!== self::SUCCESS` check is ever reached. That failure
- * mode was already fine before this change; it isn't what the fix touches.
+ * Uses DatabaseMigrations rather than RefreshDatabase: RefreshDatabase
+ * wraps each test in a transaction, which is incompatible with the
+ * `VACUUM` that `migrate:fresh` issues against `:memory:` SQLite (prior
+ * accepted ruling — see git history for this file).
  *
- * What the fix changes is the OTHER failure mode: a sub-command that
- * completes and returns a non-SUCCESS integer without throwing. To exercise
- * exactly that, a fake `migrate:fresh` Symfony command is registered on a
- * throwaway Application and attached to our command via setApplication() —
- * this is what `resolveCommand()` consults to look up a string command name
- * (see Illuminate\Console\Command::resolveCommand()). It returns FAILURE
- * immediately, touching no database, and the command under test is invoked
- * directly via Symfony's Command::run() rather than Artisan::call(), so
- * db:seed is never reached — proving the early return actually happens.
+ * The exit-code-propagation tests for a failed migrate:fresh/db:seed step
+ * live separately in DemoResetExitCodeTest, which fakes those sub-commands
+ * and so does not want a real migrated database.
  */
 class DemoResetCommandTest extends TestCase
 {
-    private function attachFakeFailingMigrateFresh(Command $command): void
+    use DatabaseMigrations;
+
+    public function test_it_refuses_to_run_outside_demo_mode(): void
     {
-        $app = new SymfonyApplication;
-        $app->addCommand(new class extends \Symfony\Component\Console\Command\Command
-        {
-            protected function configure(): void
-            {
-                $this->setName('migrate:fresh')->addOption('force');
-            }
+        config(['demo.enabled' => false]);
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
-            {
-                return Command::FAILURE;
-            }
-        });
-        // Registered so that, without the fix, the un-guarded second
-        // $this->call() has something real to reach and succeed against —
-        // making the pre-fix behaviour a clean "exits SUCCESS anyway"
-        // rather than an unrelated "unknown command" error.
-        $app->addCommand(new class extends \Symfony\Component\Console\Command\Command
-        {
-            protected function configure(): void
-            {
-                $this->setName('db:seed')->addOption('class')->addOption('force');
-            }
+        $this->artisan('marketix:demo:reset')->assertExitCode(1);
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
-            {
-                return Command::SUCCESS;
-            }
-        });
-
-        $command->setLaravel($this->app);
-        $command->setApplication($app);
+        $this->assertDatabaseCount('projects', 0);
     }
 
-    public function test_demo_reset_fails_when_migrate_fresh_fails(): void
+    public function test_it_wipes_and_reseeds_in_demo_mode(): void
     {
         config(['demo.enabled' => true]);
 
-        $command = $this->app->make(DemoResetCommand::class);
-        $this->attachFakeFailingMigrateFresh($command);
+        // Pre-existing junk a visitor might have left behind.
+        Project::create(['name' => 'Junk left by a visitor', 'locked' => false]);
 
-        $exitCode = $command->run(new ArrayInput([], $command->getDefinition()), new BufferedOutput);
+        $this->artisan('marketix:demo:reset')->assertExitCode(0);
 
-        $this->assertSame(Command::FAILURE, $exitCode);
-    }
-
-    public function test_demo_setup_fails_when_migrate_fresh_fails(): void
-    {
-        $command = $this->app->make(DemoSetupCommand::class);
-        $this->attachFakeFailingMigrateFresh($command);
-
-        $exitCode = $command->run(new ArrayInput(['--force' => true], $command->getDefinition()), new BufferedOutput);
-
-        $this->assertSame(Command::FAILURE, $exitCode);
+        $this->assertDatabaseMissing('projects', ['name' => 'Junk left by a visitor']);
+        $this->assertDatabaseHas('projects', ['name' => DemoSeeder::COMPANY]);
+        $this->assertNotNull(User::query()->where('email', config('demo.email'))->first());
     }
 }
