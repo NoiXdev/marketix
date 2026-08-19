@@ -7,6 +7,7 @@ use App\Enums\CrawlStatus;
 use App\Enums\GoalType;
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
+use App\Models\Activity;
 use App\Models\Crawl;
 use App\Models\CrawlLink;
 use App\Models\CrawlPage;
@@ -24,9 +25,11 @@ use App\Models\Statistic;
 use App\Models\Url;
 use App\Models\User;
 use App\Models\Visit;
+use App\Support\ActivityRecorder;
 use Database\Factories\QrCodeFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -61,6 +64,7 @@ class DemoSeeder extends Seeder
         $this->seedMarketingAssets();
         $this->seedAnalytics();
         $this->seedCrawls();
+        $this->seedActivity();
     }
 
     private function seedUsersAndProject(): void
@@ -475,12 +479,21 @@ class DemoSeeder extends Seeder
      * `crawl_links` also gets one real row (Presse & News → the 404 page)
      * so "Broken link" has an actual reference to show, matching how
      * AggregateCrawlJob::checkBrokenLinks() would have recorded it.
+     *
+     * The two runs are seeded against DIFFERENT allowlisted hosts
+     * (config('demo.allowed_target_hosts')). DemoCrawlQuota counts crawls
+     * per host, so two runs against the same host would burn 2 of the
+     * visitor's 5-per-host allowance before they ever start one — leaving
+     * only 3 of the promised 5. Using two hosts (the main site, plus a
+     * wholesale portal on a second allowlisted domain, which is a
+     * realistic thing for this company to also run) keeps every host's
+     * quota fully available.
      */
     private function seedCrawls(): void
     {
         $runs = [
             ['url' => 'https://example.com', 'pages' => 24, 'finished' => 3],
-            ['url' => 'https://example.com/shop', 'pages' => 18, 'finished' => 21],
+            ['url' => 'https://example.org/shop', 'pages' => 18, 'finished' => 21],
         ];
 
         foreach ($runs as $run) {
@@ -644,5 +657,98 @@ class DemoSeeder extends Seeder
             'in_sitemap' => true,
             'issues' => $issues,
         ];
+    }
+
+    /**
+     * The spec lists the activity log as "populated as a side effect of the
+     * seeding above" — but this seeder uses WithoutModelEvents, which
+     * suppresses the model events the LogsActivity trait on Url, QrCode,
+     * Domain, Project, Pixel and Site hooks, so nothing was ever actually
+     * recorded and both /project/{p}/activity and /admin/activity rendered
+     * empty. This calls ActivityRecorder explicitly — the same entry point
+     * every real controller action uses (TeamController,
+     * InvitationController, ForcePasswordChangeController, …) — for a
+     * realistic handful of events, backdated across the same 90-day window
+     * as the click/visit history so the feed reads as one coherent
+     * timeline rather than everything landing "now".
+     */
+    private function seedActivity(): void
+    {
+        $teammates = $this->project->users()->get()->reject(fn (User $u) => $u->id === $this->demoUser->id)->values();
+
+        $this->backdateActivity(
+            ActivityRecorder::project('project', 'created', $this->project->id, $this->demoUser, $this->project),
+            now()->subDays(142)
+        );
+
+        $this->backdateActivity(
+            ActivityRecorder::project('domain', 'created', $this->project->id, $this->demoUser, $this->domain, [
+                'attributes' => ['name' => $this->domain->name],
+            ]),
+            now()->subDays(141)
+        );
+
+        // Teammates joining, mirroring InvitationController::accept()'s shape.
+        foreach ($teammates as $i => $mate) {
+            $this->backdateActivity(
+                ActivityRecorder::project('invitation', 'invitation_accepted', $this->project->id, $mate, $this->project, [
+                    'email' => $mate->email,
+                ]),
+                now()->subDays(140 - $i * 3)
+            );
+        }
+
+        // One teammate promoted, mirroring TeamController::updateMember()'s shape.
+        if ($promoted = $teammates->first()) {
+            $this->backdateActivity(
+                ActivityRecorder::project('membership', 'role_changed', $this->project->id, $this->demoUser, $this->project, [
+                    'user_id' => $promoted->id,
+                    'role' => 'admin',
+                ]),
+                now()->subDays(95)
+            );
+        }
+
+        // A handful of link creations, each dated at that link's own
+        // created_at so the feed stays coherent with the link inventory.
+        foreach ($this->urls->take(6) as $url) {
+            $this->backdateActivity(
+                ActivityRecorder::project('url', 'created', $this->project->id, $url->user, $url, [
+                    'attributes' => ['slug' => $url->slug, 'url' => $url->url],
+                ]),
+                $url->created_at
+            );
+        }
+
+        foreach (QrCode::query()->where('project_id', $this->project->id)->limit(3)->get() as $qr) {
+            $this->backdateActivity(
+                ActivityRecorder::project('qrcode', 'created', $this->project->id, $this->demoUser, $qr, [
+                    'attributes' => ['name' => $qr->name, 'type' => $qr->type],
+                ]),
+                now()->subDays(random_int(30, 80))
+            );
+        }
+
+        foreach (Pixel::query()->where('project_id', $this->project->id)->get() as $pixel) {
+            $this->backdateActivity(
+                ActivityRecorder::project('pixel', 'created', $this->project->id, $this->demoUser, $pixel, [
+                    'attributes' => ['provider' => $pixel->provider, 'name' => $pixel->name],
+                ]),
+                now()->subDays(random_int(80, 90))
+            );
+        }
+
+        // Security trail: a spread of recent logins by the shared account.
+        foreach ([1, 4, 9, 15] as $daysAgo) {
+            $this->backdateActivity(
+                ActivityRecorder::security('login', $this->demoUser),
+                now()->subDays($daysAgo)
+            );
+        }
+    }
+
+    private function backdateActivity(?Activity $activity, Carbon $when): void
+    {
+        $activity?->forceFill(['created_at' => $when, 'updated_at' => $when])->save();
     }
 }

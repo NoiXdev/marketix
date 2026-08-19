@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Demo;
 
+use App\Models\Activity;
 use App\Models\Crawl;
 use App\Models\CrawlPage;
 use App\Models\Domain;
@@ -156,5 +157,49 @@ class DemoSeederTest extends TestCase
         $this->assertCount(2, $crawls);
         $this->assertTrue($crawls->every(fn ($c) => $c->status->value === 'completed'));
         $this->assertGreaterThan(0, CrawlPage::query()->whereIn('crawl_id', $crawls->pluck('id'))->count());
+    }
+
+    public function test_it_seeds_two_completed_crawls_against_different_hosts(): void
+    {
+        // DemoCrawlQuota counts crawls per host, truncated only on reset —
+        // seeding both runs against the same host would burn 2 of a
+        // visitor's 5-per-host allowance before they ever start one.
+        $this->seed(DemoSeeder::class);
+
+        $hosts = Crawl::query()
+            ->pluck('start_url')
+            ->map(fn (string $url): string => (string) parse_url($url, PHP_URL_HOST))
+            ->unique();
+
+        $this->assertCount(2, $hosts);
+    }
+
+    public function test_it_seeds_activity_log_entries(): void
+    {
+        // The spec's demo-data list ends with "Activity log — populated as
+        // a side effect of the seeding above." This seeder uses
+        // WithoutModelEvents, which suppresses the LogsActivity hooks on
+        // Url/QrCode/Domain/Project/Pixel/Site, so without an explicit
+        // seedActivity() step this table stays empty and both
+        // /project/{p}/activity and /admin/activity render empty on every
+        // fresh demo.
+        $this->seed(DemoSeeder::class);
+
+        $project = Project::query()->where('name', DemoSeeder::COMPANY)->firstOrFail();
+
+        $this->assertGreaterThan(0, Activity::query()->forProject($project)->count());
+
+        // A real spread of log names, not one event type repeated — or the
+        // activity feed's log-name filter has nothing to demonstrate.
+        $this->assertGreaterThan(
+            3,
+            Activity::query()->forProject($project)->distinct('log_name')->count('log_name')
+        );
+
+        // Backdated across the same ~90-day window as the rest of the
+        // demo data, not everything stamped "now" by the seeder run.
+        $this->assertTrue(
+            Activity::query()->forProject($project)->where('created_at', '<=', now()->subDays(60))->exists()
+        );
     }
 }

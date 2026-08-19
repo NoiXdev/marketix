@@ -33,8 +33,12 @@ class DemoGuard
         'passkey.confirm-options',
         'passkey.destroy',
         'app.passkeys.rename',
-        // ProfileController::update changes only the password.
+        // ProfileController::update and ForcePasswordChangeController::update
+        // both change the shared account's password — either one, left open,
+        // is a one-request lockout of every later visitor until the nightly
+        // reset.
         'app.profile.update',
+        'app.password.change.update',
 
         // Access that would outlive the nightly reset.
         'app.profile.tokens.store',
@@ -61,6 +65,23 @@ class DemoGuard
         'app.admin.users.send-password-reset',
         'app.auth.forgot',
         'app.auth.reset',
+
+        // Pixel tags load third-party script (e.g. a GTM container id) on
+        // the demo's own short-link domain, ahead of every redirect that
+        // carries the pixel — see RedirectController::resolveAndRespond()
+        // and resources/views/redirect/pixels.blade.php. An attacker-owned
+        // GTM container attached to an otherwise-allowlisted short link is
+        // a full bypass of the link-target allowlist, so pixel creation and
+        // editing are blocked even though the two seeded pixels stay
+        // visible and deletable.
+        'app.project.pixels.store',
+        'app.project.pixels.update',
+
+        // The crawls table is the per-host quota counter (see
+        // DemoCrawlQuota); deleting rows would let a visitor reset it and
+        // crawl a host without bound. The nightly reset already clears the
+        // table, so blocking deletion here costs the demo nothing.
+        'app.project.crawls.destroy',
     ];
 
     /**
@@ -85,7 +106,10 @@ class DemoGuard
 
         if (in_array($request->route()?->getName(), self::BLOCKED_ROUTES, true)
             || $this->targetsProtectedRecord($request)) {
-            return back()->with('error', __('demo.blocked'));
+            $response = back()->with('error', __('demo.blocked'));
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+            return $response;
         }
 
         $response = $next($request);

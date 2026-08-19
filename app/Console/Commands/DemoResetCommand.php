@@ -24,8 +24,17 @@ class DemoResetCommand extends Command
             return self::FAILURE;
         }
 
-        $this->call('migrate:fresh', ['--force' => true]);
-        $this->call('db:seed', ['--class' => DemoSeeder::class, '--force' => true]);
+        if ($this->call('migrate:fresh', ['--force' => true]) !== self::SUCCESS) {
+            $this->error('Refusing to seed: migrate:fresh failed.');
+
+            return self::FAILURE;
+        }
+
+        if ($this->call('db:seed', ['--class' => DemoSeeder::class, '--force' => true]) !== self::SUCCESS) {
+            $this->error('Demo reset failed: seeding did not complete.');
+
+            return self::FAILURE;
+        }
 
         $this->info('Demo instance reset.');
 

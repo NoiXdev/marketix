@@ -19,8 +19,17 @@ class DemoSetupCommand extends Command
             }
         }
 
-        $this->call('migrate:fresh', ['--force' => true]);
-        $this->call('db:seed', ['--class' => DemoSeeder::class, '--force' => true]);
+        if ($this->call('migrate:fresh', ['--force' => true]) !== self::SUCCESS) {
+            $this->error('Refusing to seed: migrate:fresh failed.');
+
+            return self::FAILURE;
+        }
+
+        if ($this->call('db:seed', ['--class' => DemoSeeder::class, '--force' => true]) !== self::SUCCESS) {
+            $this->error('Local demo fixture rebuild failed: seeding did not complete.');
+
+            return self::FAILURE;
+        }
 
         $this->info('Local demo fixture rebuilt.');
 
