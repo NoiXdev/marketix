@@ -2,12 +2,16 @@ import { Badge, Button, Field, Flash, FormSection, IconButton, Input, PageHeader
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { PageProps, ProjectInvitation, ProjectMember } from '@/types';
 import { router, useForm, usePage } from '@inertiajs/react';
 import { Mail, Send, Trash2, UserPlus } from 'lucide-react';
 
 export default function TeamIndex({ members, invitations }: { members: ProjectMember[]; invitations: ProjectInvitation[] }) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const inviteLocked = isBlocked('app.project.team.invitations.store');
+  const resendLocked = isBlocked('app.project.team.invitations.resend');
   const { project, auth } = usePage<PageProps>().props;
   const invite = useForm({ email: '', role: 'member' });
 
@@ -75,7 +79,12 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
                   <option value="admin">{t('common.roles.admin')}</option>
                 </Select>
               </div>
-              <Button type="submit" loading={invite.processing}>
+              <Button
+                type="submit"
+                loading={invite.processing}
+                disabled={inviteLocked}
+                title={inviteLocked ? t('demo.locked_hint') : undefined}
+              >
                 <UserPlus className="h-4 w-4" />
                 {t('team.invite.submit')}
               </Button>
@@ -140,8 +149,14 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
                       <div className="flex items-center justify-end gap-1">
                         <IconButton
                           icon={Send}
-                          label={inv.can_resend ? t('team.invitations.resend_title') : t('team.invitations.resend_disabled_title')}
-                          disabled={!inv.can_resend}
+                          label={
+                            resendLocked
+                              ? t('demo.locked_hint')
+                              : inv.can_resend
+                                ? t('team.invitations.resend_title')
+                                : t('team.invitations.resend_disabled_title')
+                          }
+                          disabled={!inv.can_resend || resendLocked}
                           onClick={() => resend(inv)}
                         />
                         <IconButton icon={Trash2} label={t('team.confirm.revoke_button')} variant="danger" onClick={() => revoke(inv)} />

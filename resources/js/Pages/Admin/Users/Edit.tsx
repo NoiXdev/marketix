@@ -2,6 +2,7 @@ import { Button, Checkbox, EmptyState, Field, Flash, FormSection, IconButton, In
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { ProjectRole } from '@/types';
 import { Link, router, useForm } from '@inertiajs/react';
 import { Trash2, Users } from 'lucide-react';
@@ -35,6 +36,8 @@ export default function AdminUsersEdit({
   availableProjects: AvailableProject[];
 }) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const sendResetLocked = isBlocked('app.admin.users.send-password-reset');
   const account = useForm({
     name: user.name,
     email: user.email,
@@ -124,7 +127,12 @@ export default function AdminUsersEdit({
         <div className="mb-8 max-w-2xl">
           <FormSection title={t('admin.users.sections.security')}>
             <p className="text-sm text-muted">{t('admin.users.security.reset_description')}</p>
-            <Button variant="secondary" onClick={sendPasswordReset}>
+            <Button
+              variant="secondary"
+              onClick={sendPasswordReset}
+              disabled={sendResetLocked}
+              title={sendResetLocked ? t('demo.locked_hint') : undefined}
+            >
               {t('admin.users.security.send_reset')}
             </Button>
           </FormSection>

@@ -157,5 +157,5 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   availableLocales: { code: string; label: string }[];
   translations: Record<string, unknown>;
   navCounts?: Record<string, number>;
-  demo: { enabled: boolean; blockedRoutes?: string[]; resetAt?: string } | null;
+  demo: { enabled: boolean; blockedRoutes: string[]; resetAt: string } | null;
 };

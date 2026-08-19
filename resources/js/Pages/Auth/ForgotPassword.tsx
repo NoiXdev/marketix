@@ -1,11 +1,14 @@
 import { Button, Field, Input } from '@/Components/ui';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { t } = useTranslation();
+    const { isBlocked } = useDemo();
+    const locked = isBlocked('app.auth.forgot');
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
@@ -40,7 +43,13 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     />
                 </Field>
 
-                <Button type="submit" loading={processing} className="w-full justify-center">
+                <Button
+                    type="submit"
+                    loading={processing}
+                    disabled={locked}
+                    title={locked ? t('demo.locked_hint') : undefined}
+                    className="w-full justify-center"
+                >
                     {t('auth.forgot.submit')}
                 </Button>
             </form>

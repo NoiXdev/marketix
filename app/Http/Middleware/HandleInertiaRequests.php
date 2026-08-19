@@ -35,7 +35,11 @@ class HandleInertiaRequests extends Middleware
                 'token' => fn () => $request->session()->get('token'),
             ],
             'branding' => $this->branding(),
-            'demo' => config('demo.enabled') ? ['enabled' => true] : null,
+            'demo' => config('demo.enabled') ? [
+                'enabled' => true,
+                'blockedRoutes' => DemoGuard::BLOCKED_ROUTES,
+                'resetAt' => config('demo.reset_at'),
+            ] : null,
             'locale' => App::getLocale(),
             'availableLocales' => Locales::all(),
             'translations' => fn () => Translations::forLocale(App::getLocale()),

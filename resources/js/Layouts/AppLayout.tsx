@@ -1,3 +1,4 @@
+import DemoBanner from '@/Components/DemoBanner';
 import Sidebar from '@/Components/Sidebar';
 import Topbar from '@/Components/Topbar';
 import { PageProps } from '@/types';
@@ -20,6 +21,7 @@ export default function AppLayout({ children, title }: PropsWithChildren<AppLayo
       {title && <Head title={title} />}
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
+        <DemoBanner />
         <Topbar title={title} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

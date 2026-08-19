@@ -2,6 +2,7 @@ import ActivityHistory from '@/Components/ActivityHistory';
 import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, Field, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { ActivityEntry, Domain, PageProps } from '@/types';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { RefreshCw } from 'lucide-react';
@@ -12,6 +13,9 @@ import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 export default function DomainsEdit({ domain, appDomain, history }: { domain: Domain; appDomain: string; history?: ActivityEntry[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const updateLocked = isBlocked('app.project.domains.update');
+  const checkLocked = isBlocked('app.project.domains.check');
 
   const { data, setData, put, processing, errors } = useForm({
     name: domain.name,
@@ -51,7 +55,13 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
           <FormSection>
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-foreground">{t('domains.form.status_title')}</h2>
-              <Button variant="secondary" size="sm" onClick={check} disabled={checking}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={check}
+                disabled={checking || checkLocked}
+                title={checkLocked ? t('demo.locked_hint') : undefined}
+              >
                 <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
                 {t('domains.form.check_now')}
               </Button>
@@ -83,7 +93,14 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
             </FormSection>
 
             <div className="flex items-center gap-3">
-              <Button type="submit" loading={processing}>{t('domains.form.save_submit')}</Button>
+              <Button
+                type="submit"
+                loading={processing}
+                disabled={updateLocked}
+                title={updateLocked ? t('demo.locked_hint') : undefined}
+              >
+                {t('domains.form.save_submit')}
+              </Button>
               <Link href={route('app.project.domains.index', { project: project!.id })} className="text-sm text-muted transition-colors hover:text-foreground">
                 {t('common.actions.cancel')}
               </Link>

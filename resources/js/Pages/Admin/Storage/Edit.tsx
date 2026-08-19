@@ -1,6 +1,7 @@
 import { Button, Checkbox, Field, Flash, Input, PageHeader, Select } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { router, useForm } from '@inertiajs/react';
 
 interface StorageSettings {
@@ -19,6 +20,9 @@ interface Props {
 
 export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const saveLocked = isBlocked('app.admin.storage.update');
+  const testLocked = isBlocked('app.admin.storage.test');
   const { data, setData, put, processing, errors } = useForm({
     driver: settings.driver,
     s3_key: settings.s3_key,
@@ -117,10 +121,21 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
           )}
 
           <div className="flex items-center gap-3">
-            <Button type="submit" loading={processing}>
+            <Button
+              type="submit"
+              loading={processing}
+              disabled={saveLocked}
+              title={saveLocked ? t('demo.locked_hint') : undefined}
+            >
               {t('common.actions.save')}
             </Button>
-            <Button type="button" variant="secondary" onClick={testConnection}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={testConnection}
+              disabled={testLocked}
+              title={testLocked ? t('demo.locked_hint') : undefined}
+            >
               {t('admin.storage.test_connection')}
             </Button>
           </div>

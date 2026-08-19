@@ -1,6 +1,7 @@
 import { Button, Card, Field, IconButton, Input } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { router, useForm } from '@inertiajs/react';
 import { Check, Copy, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -37,6 +38,8 @@ function CopyButton({ text }: { text: string }) {
 
 export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToken[]; newToken?: string | null }) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const createLocked = isBlocked('app.profile.tokens.store');
   const { data, setData, post, processing, errors, reset } = useForm({ name: '' });
 
   const endpoint = `${typeof window !== 'undefined' ? window.location.origin : ''}/mcp/marketix`;
@@ -143,7 +146,12 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
             />
           </Field>
         </div>
-        <Button type="submit" loading={processing} disabled={!data.name.trim()}>
+        <Button
+          type="submit"
+          loading={processing}
+          disabled={!data.name.trim() || createLocked}
+          title={createLocked ? t('demo.locked_hint') : undefined}
+        >
           {t('profile.tokens.create')}
         </Button>
       </form>

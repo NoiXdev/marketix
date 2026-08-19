@@ -1,5 +1,6 @@
 import { Button, Card, Field, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { router, useForm } from '@inertiajs/react';
 
 interface TwoFactorSetup {
@@ -16,6 +17,8 @@ interface Props {
 
 export default function TwoFactorSection({ enabled, pending, setup, recoveryCodes }: Props) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const enableLocked = isBlocked('app.profile.two-factor.enable');
   const confirmForm = useForm({ code: '' });
   const passwordForm = useForm({ current_password: '' });
 
@@ -59,7 +62,11 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
         </div>
       )}
 
-      {!enabled && !pending && <Button onClick={enable}>{t('profile.two_factor.enable')}</Button>}
+      {!enabled && !pending && (
+        <Button onClick={enable} disabled={enableLocked} title={enableLocked ? t('demo.locked_hint') : undefined}>
+          {t('profile.two_factor.enable')}
+        </Button>
+      )}
 
       {pending && setup && (
         <form onSubmit={confirm} className="space-y-3">

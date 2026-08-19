@@ -1,5 +1,6 @@
 import { Button, Card, Field, Flash, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import ProfileLayout from '@/Layouts/ProfileLayout';
 import ApiTokensSection from '@/Pages/Profile/partials/ApiTokensSection';
 import PasskeysSection from '@/Pages/Profile/partials/PasskeysSection';
@@ -52,6 +53,8 @@ export default function ProfileEdit({
   tokens,
 }: Props) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const passwordLocked = isBlocked('app.profile.update');
   const { flash } = usePage<PageProps>().props;
   const { data, setData, put, processing, errors, reset } = useForm({
     current_password: '',
@@ -110,7 +113,12 @@ export default function ProfileEdit({
               onChange={(e) => setData('password_confirmation', e.target.value)}
             />
           </Field>
-          <Button type="submit" loading={processing}>
+          <Button
+            type="submit"
+            loading={processing}
+            disabled={passwordLocked}
+            title={passwordLocked ? t('demo.locked_hint') : undefined}
+          >
             {t('profile.password.submit')}
           </Button>
         </FormSection>

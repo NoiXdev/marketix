@@ -1,6 +1,7 @@
 import { Button, Checkbox, Field, Flash, Input, PageHeader } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { useForm } from '@inertiajs/react';
 
 interface Props {
@@ -15,6 +16,8 @@ type ImageField = 'logo_light' | 'logo_dark' | 'logo_email' | 'favicon';
 
 export default function AdminBrandingEdit(props: Props) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const saveLocked = isBlocked('app.admin.branding.update');
 
   const currentUrl: Record<ImageField, string | null> = {
     logo_light: props.logo_light_url,
@@ -89,7 +92,12 @@ export default function AdminBrandingEdit(props: Props) {
             </Field>
           ))}
 
-          <Button type="submit" loading={processing}>
+          <Button
+            type="submit"
+            loading={processing}
+            disabled={saveLocked}
+            title={saveLocked ? t('demo.locked_hint') : undefined}
+          >
             {t('common.actions.save')}
           </Button>
         </form>

@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, Field, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -9,6 +10,8 @@ import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
 export default function DomainsCreate({ appDomain }: { appDomain: string }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const createLocked = isBlocked('app.project.domains.store');
 
   const { data, setData, post, processing, errors } = useForm({
     name: '',
@@ -48,7 +51,14 @@ export default function DomainsCreate({ appDomain }: { appDomain: string }) {
             </FormSection>
 
             <div className="flex items-center gap-3">
-              <Button type="submit" loading={processing}>{t('domains.form.create_submit')}</Button>
+              <Button
+                type="submit"
+                loading={processing}
+                disabled={createLocked}
+                title={createLocked ? t('demo.locked_hint') : undefined}
+              >
+                {t('domains.form.create_submit')}
+              </Button>
               <Link href={route('app.project.domains.index', { project: project!.id })} className="text-sm text-muted transition-colors hover:text-foreground">
                 {t('common.actions.cancel')}
               </Link>

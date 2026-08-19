@@ -1,6 +1,7 @@
 import { Button, Field, Flash, FormSection, Input, PageHeader, Select } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { useForm } from '@inertiajs/react';
 
 interface MailerSettings {
@@ -22,6 +23,9 @@ interface Props {
 
 export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_password }: Props) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const saveLocked = isBlocked('app.admin.mailer.update');
+  const testLocked = isBlocked('app.admin.mailer.test');
   const { data, setData, put, processing, errors } = useForm({
     default_mailer: settings.default_mailer,
     from_address: settings.from_address,
@@ -139,7 +143,12 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
             </fieldset>
           )}
 
-          <Button type="submit" loading={processing}>
+          <Button
+            type="submit"
+            loading={processing}
+            disabled={saveLocked}
+            title={saveLocked ? t('demo.locked_hint') : undefined}
+          >
             {t('common.actions.save')}
           </Button>
         </form>
@@ -154,7 +163,13 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
                 onChange={(e) => testForm.setData('test_email', e.target.value)}
               />
             </Field>
-            <Button type="submit" variant="secondary" loading={testForm.processing}>
+            <Button
+              type="submit"
+              variant="secondary"
+              loading={testForm.processing}
+              disabled={testLocked}
+              title={testLocked ? t('demo.locked_hint') : undefined}
+            >
               {t('admin.mailer.test.send_button')}
             </Button>
           </FormSection>

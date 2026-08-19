@@ -1,5 +1,6 @@
 import { Button, Card, Field, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { router } from '@inertiajs/react';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
 import { useState } from 'react';
@@ -14,6 +15,8 @@ interface Passkey {
 
 export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const registerLocked = isBlocked('passkey.store');
   const [name, setName] = useState('');
   const { register, isLoading, error, isSupported } = usePasskeyRegister({
     onSuccess: () => {
@@ -71,7 +74,12 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
               />
             </Field>
           </div>
-          <Button type="submit" loading={isLoading} disabled={!name.trim()}>
+          <Button
+            type="submit"
+            loading={isLoading}
+            disabled={!name.trim() || registerLocked}
+            title={registerLocked ? t('demo.locked_hint') : undefined}
+          >
             {t('profile.passkeys.add')}
           </Button>
         </form>

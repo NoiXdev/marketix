@@ -2,6 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { Domain, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -22,6 +23,9 @@ function relativeTime(iso: string | null, locale: string, neverLabel: string): s
 export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain: string }) {
   const { project } = usePage<PageProps>().props;
   const { t, locale } = useTranslation();
+  const { isBlocked } = useDemo();
+  const checkLocked = isBlocked('app.project.domains.check');
+  const destroyLocked = isBlocked('app.project.domains.destroy');
   const [checking, setChecking] = useState<string | null>(null);
 
   async function destroy(domain: Domain) {
@@ -92,9 +96,21 @@ export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain
                     </div>
                   </td>
                   <RowActions>
-                    <IconButton icon={RefreshCw} label={t('domains.actions.check')} onClick={() => check(domain)} disabled={checking === domain.id} spinning={checking === domain.id} />
+                    <IconButton
+                      icon={RefreshCw}
+                      label={checkLocked ? t('demo.locked_hint') : t('domains.actions.check')}
+                      onClick={() => check(domain)}
+                      disabled={checking === domain.id || checkLocked}
+                      spinning={checking === domain.id}
+                    />
                     <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} />
-                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(domain)} />
+                    <IconButton
+                      icon={Trash2}
+                      label={destroyLocked ? t('demo.locked_hint') : t('common.actions.delete')}
+                      variant="danger"
+                      onClick={() => destroy(domain)}
+                      disabled={destroyLocked}
+                    />
                   </RowActions>
                 </tr>
               ))}

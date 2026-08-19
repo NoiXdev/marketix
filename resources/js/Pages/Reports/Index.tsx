@@ -2,6 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, StatusPill, TableCard } from '@/Components/ui';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { useDemo } from '@/lib/useDemo';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { FileBarChart, Pencil, Plus, Send, Trash2 } from 'lucide-react';
@@ -18,6 +19,8 @@ interface ReportRow {
 export default function ReportsIndex({ reports }: { reports: ReportRow[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const { isBlocked } = useDemo();
+  const sendNowLocked = isBlocked('app.project.reports.send-now');
 
   async function destroy(report: ReportRow) {
     const confirmed = await confirmDelete({
@@ -103,7 +106,12 @@ export default function ReportsIndex({ reports }: { reports: ReportRow[] }) {
                     </button>
                   </td>
                   <RowActions>
-                    <IconButton icon={Send} label={t('reports.index.actions.send_now')} onClick={() => sendNow(report)} />
+                    <IconButton
+                      icon={Send}
+                      label={sendNowLocked ? t('demo.locked_hint') : t('reports.index.actions.send_now')}
+                      onClick={() => sendNow(report)}
+                      disabled={sendNowLocked}
+                    />
                     <IconButton
                       icon={Pencil}
                       label={t('reports.index.actions.edit')}
