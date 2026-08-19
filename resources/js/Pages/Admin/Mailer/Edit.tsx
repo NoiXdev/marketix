@@ -146,8 +146,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           <Button
             type="submit"
             loading={processing}
-            disabled={saveLocked}
-            title={saveLocked ? t('demo.locked_hint') : undefined}
+            lockedHint={saveLocked ? t('demo.locked_hint') : undefined}
           >
             {t('common.actions.save')}
           </Button>
@@ -167,8 +166,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
               type="submit"
               variant="secondary"
               loading={testForm.processing}
-              disabled={testLocked}
-              title={testLocked ? t('demo.locked_hint') : undefined}
+              lockedHint={testLocked ? t('demo.locked_hint') : undefined}
             >
               {t('admin.mailer.test.send_button')}
             </Button>

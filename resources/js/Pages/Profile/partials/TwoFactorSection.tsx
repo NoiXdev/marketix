@@ -19,6 +19,8 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
   const { t } = useTranslation();
   const { isBlocked } = useDemo();
   const enableLocked = isBlocked('app.profile.two-factor.enable');
+  const disableLocked = isBlocked('app.profile.two-factor.disable');
+  const regenerateLocked = isBlocked('app.profile.two-factor.recovery-codes');
   const confirmForm = useForm({ code: '' });
   const passwordForm = useForm({ current_password: '' });
 
@@ -63,7 +65,7 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
       )}
 
       {!enabled && !pending && (
-        <Button onClick={enable} disabled={enableLocked} title={enableLocked ? t('demo.locked_hint') : undefined}>
+        <Button onClick={enable} lockedHint={enableLocked ? t('demo.locked_hint') : undefined}>
           {t('profile.two_factor.enable')}
         </Button>
       )}
@@ -106,10 +108,23 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
               </Field>
             </div>
             <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-2">
-              <Button type="submit" size={'sm'} variant="danger" disabled={passwordForm.processing}>
+              <Button
+                type="submit"
+                size={'sm'}
+                variant="danger"
+                disabled={passwordForm.processing}
+                lockedHint={disableLocked ? t('demo.locked_hint') : undefined}
+              >
                 {t('profile.two_factor.disable')}
               </Button>
-              <Button type="button" size={'sm'} variant="secondary" onClick={regenerate} disabled={passwordForm.processing}>
+              <Button
+                type="button"
+                size={'sm'}
+                variant="secondary"
+                onClick={regenerate}
+                disabled={passwordForm.processing}
+                lockedHint={regenerateLocked ? t('demo.locked_hint') : undefined}
+              >
                 {t('profile.two_factor.regenerate')}
               </Button>
             </div>

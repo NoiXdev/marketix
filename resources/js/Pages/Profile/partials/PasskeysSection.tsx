@@ -17,6 +17,7 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
   const { t } = useTranslation();
   const { isBlocked } = useDemo();
   const registerLocked = isBlocked('passkey.store');
+  const removeLocked = isBlocked('passkey.destroy');
   const [name, setName] = useState('');
   const { register, isLoading, error, isSupported } = usePasskeyRegister({
     onSuccess: () => {
@@ -53,7 +54,12 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
                   {p.last_used_at ? ` · ${t('profile.passkeys.last_used')} ${p.last_used_at}` : ''}
                 </p>
               </div>
-              <Button size="sm" variant="danger" onClick={() => remove(p.id)}>
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={() => remove(p.id)}
+                lockedHint={removeLocked ? t('demo.locked_hint') : undefined}
+              >
                 {t('profile.passkeys.remove')}
               </Button>
             </li>
@@ -77,8 +83,8 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
           <Button
             type="submit"
             loading={isLoading}
-            disabled={!name.trim() || registerLocked}
-            title={registerLocked ? t('demo.locked_hint') : undefined}
+            disabled={!name.trim()}
+            lockedHint={registerLocked ? t('demo.locked_hint') : undefined}
           >
             {t('profile.passkeys.add')}
           </Button>

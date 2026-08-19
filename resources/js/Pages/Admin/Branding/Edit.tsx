@@ -95,8 +95,7 @@ export default function AdminBrandingEdit(props: Props) {
           <Button
             type="submit"
             loading={processing}
-            disabled={saveLocked}
-            title={saveLocked ? t('demo.locked_hint') : undefined}
+            lockedHint={saveLocked ? t('demo.locked_hint') : undefined}
           >
             {t('common.actions.save')}
           </Button>

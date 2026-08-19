@@ -69,8 +69,7 @@ export default function ResetPassword({
                 <Button
                     type="submit"
                     loading={processing}
-                    disabled={locked}
-                    title={locked ? t('demo.locked_hint') : undefined}
+                    lockedHint={locked ? t('demo.locked_hint') : undefined}
                     className="w-full justify-center"
                 >
                     {t('auth.reset.submit')}

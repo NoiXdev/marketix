@@ -54,8 +54,7 @@ export default function DomainsCreate({ appDomain }: { appDomain: string }) {
               <Button
                 type="submit"
                 loading={processing}
-                disabled={createLocked}
-                title={createLocked ? t('demo.locked_hint') : undefined}
+                lockedHint={createLocked ? t('demo.locked_hint') : undefined}
               >
                 {t('domains.form.create_submit')}
               </Button>

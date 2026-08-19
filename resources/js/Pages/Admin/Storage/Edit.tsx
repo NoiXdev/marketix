@@ -124,8 +124,7 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
             <Button
               type="submit"
               loading={processing}
-              disabled={saveLocked}
-              title={saveLocked ? t('demo.locked_hint') : undefined}
+              lockedHint={saveLocked ? t('demo.locked_hint') : undefined}
             >
               {t('common.actions.save')}
             </Button>
@@ -133,8 +132,7 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
               type="button"
               variant="secondary"
               onClick={testConnection}
-              disabled={testLocked}
-              title={testLocked ? t('demo.locked_hint') : undefined}
+              lockedHint={testLocked ? t('demo.locked_hint') : undefined}
             >
               {t('admin.storage.test_connection')}
             </Button>

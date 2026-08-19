@@ -59,8 +59,8 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
                 variant="secondary"
                 size="sm"
                 onClick={check}
-                disabled={checking || checkLocked}
-                title={checkLocked ? t('demo.locked_hint') : undefined}
+                disabled={checking}
+                lockedHint={checkLocked ? t('demo.locked_hint') : undefined}
               >
                 <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
                 {t('domains.form.check_now')}
@@ -96,8 +96,7 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
               <Button
                 type="submit"
                 loading={processing}
-                disabled={updateLocked}
-                title={updateLocked ? t('demo.locked_hint') : undefined}
+                lockedHint={updateLocked ? t('demo.locked_hint') : undefined}
               >
                 {t('domains.form.save_submit')}
               </Button>

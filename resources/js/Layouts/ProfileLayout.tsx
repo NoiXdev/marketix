@@ -1,4 +1,5 @@
 import Brand from '@/Components/Brand';
+import DemoBanner from '@/Components/DemoBanner';
 import { BackLink } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { Head } from '@inertiajs/react';
@@ -14,6 +15,7 @@ export default function ProfileLayout({ children, title }: PropsWithChildren<Pro
   return (
     <div className="min-h-screen bg-canvas text-foreground">
       {title && <Head title={title} />}
+      <DemoBanner />
       <header className="flex h-14 items-center border-b border-line bg-surface px-4">
         <Brand />
       </header>

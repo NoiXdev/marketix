@@ -130,8 +130,7 @@ export default function AdminUsersEdit({
             <Button
               variant="secondary"
               onClick={sendPasswordReset}
-              disabled={sendResetLocked}
-              title={sendResetLocked ? t('demo.locked_hint') : undefined}
+              lockedHint={sendResetLocked ? t('demo.locked_hint') : undefined}
             >
               {t('admin.users.security.send_reset')}
             </Button>

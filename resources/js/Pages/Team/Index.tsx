@@ -82,8 +82,7 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
               <Button
                 type="submit"
                 loading={invite.processing}
-                disabled={inviteLocked}
-                title={inviteLocked ? t('demo.locked_hint') : undefined}
+                lockedHint={inviteLocked ? t('demo.locked_hint') : undefined}
               >
                 <UserPlus className="h-4 w-4" />
                 {t('team.invite.submit')}

@@ -116,8 +116,7 @@ export default function ProfileEdit({
           <Button
             type="submit"
             loading={processing}
-            disabled={passwordLocked}
-            title={passwordLocked ? t('demo.locked_hint') : undefined}
+            lockedHint={passwordLocked ? t('demo.locked_hint') : undefined}
           >
             {t('profile.password.submit')}
           </Button>

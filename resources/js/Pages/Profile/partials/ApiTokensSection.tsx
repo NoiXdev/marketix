@@ -40,6 +40,7 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
   const { t } = useTranslation();
   const { isBlocked } = useDemo();
   const createLocked = isBlocked('app.profile.tokens.store');
+  const revokeLocked = isBlocked('app.profile.tokens.destroy');
   const { data, setData, post, processing, errors, reset } = useForm({ name: '' });
 
   const endpoint = `${typeof window !== 'undefined' ? window.location.origin : ''}/mcp/marketix`;
@@ -126,7 +127,13 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
                   {tok.last_used_at ? `${t('profile.tokens.last_used')} ${tok.last_used_at}` : t('profile.tokens.never')}
                 </p>
               </div>
-              <IconButton icon={Trash2} label={t('profile.tokens.revoke')} variant="danger" onClick={() => void revoke(tok.id)} />
+              <IconButton
+                icon={Trash2}
+                label={revokeLocked ? t('demo.locked_hint') : t('profile.tokens.revoke')}
+                variant="danger"
+                onClick={() => void revoke(tok.id)}
+                disabled={revokeLocked}
+              />
             </li>
           ))}
         </ul>
@@ -149,8 +156,8 @@ export default function ApiTokensSection({ tokens, newToken }: { tokens: ApiToke
         <Button
           type="submit"
           loading={processing}
-          disabled={!data.name.trim() || createLocked}
-          title={createLocked ? t('demo.locked_hint') : undefined}
+          disabled={!data.name.trim()}
+          lockedHint={createLocked ? t('demo.locked_hint') : undefined}
         >
           {t('profile.tokens.create')}
         </Button>
