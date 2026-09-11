@@ -36,6 +36,8 @@ x-app-env: &app-env
   MAIL_SCHEME: null
   VITE_APP_NAME: 'marketix'
   OCTANE_SERVER: 'frankenphp'
+  MAXMIND_ACCOUNT_ID: ${MAXMIND_ACCOUNT_ID}
+  MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY}
   # RegenerateTraefikConfigJob writes the dynamic file provider config here;
   # the path is shared with the traefik container via the traefik_dynamic volume.
   TRAEFIK_DYNAMIC_FILE: /traefik/custom-domains.yml

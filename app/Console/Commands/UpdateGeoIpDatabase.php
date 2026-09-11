@@ -7,13 +7,22 @@ use Illuminate\Support\Facades\Http;
 
 class UpdateGeoIpDatabase extends Command
 {
+    public const DOWNLOAD_URL = 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz';
+
     protected $signature = 'marketix:geoip:update';
 
     protected $description = 'Download the MaxMind GeoLite2-City database';
 
     public function handle(): int
     {
+        $accountId = config('services.maxmind.account_id');
         $licenseKey = config('services.maxmind.license_key');
+
+        if (! $accountId) {
+            $this->error('MAXMIND_ACCOUNT_ID is not configured in .env');
+
+            return self::FAILURE;
+        }
 
         if (! $licenseKey) {
             $this->error('MAXMIND_LICENSE_KEY is not configured in .env');
@@ -28,15 +37,13 @@ class UpdateGeoIpDatabase extends Command
 
         $this->info('Downloading GeoLite2-City database…');
 
-        $downloadUrl = sprintf(
-            'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=%s&suffix=tar.gz',
-            $licenseKey,
-        );
-
         // Stream download to a temp file
         $tmpFile = tempnam(sys_get_temp_dir(), 'geoip').'.tar.gz';
 
-        $response = Http::withOptions(['sink' => $tmpFile])->timeout(120)->get($downloadUrl);
+        $response = Http::withBasicAuth($accountId, $licenseKey)
+            ->withOptions(['sink' => $tmpFile])
+            ->timeout(120)
+            ->get(self::DOWNLOAD_URL);
 
         if (! $response->successful()) {
             $this->error("Download failed: HTTP {$response->status()}");
