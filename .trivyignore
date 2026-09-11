@@ -7,10 +7,13 @@
 # is picked up automatically once `dunglas/frankenphp` publishes a patched
 # `1-php8.4` image (CI builds with `--pull`). They affect `main` identically.
 #
-# Both live in FrankenPHP's optional OpenAPI/admin surface, which Marketix does
-# not use (FrankenPHP runs only as the Octane app server). Accepted as a
-# documented, temporary exception — re-check and remove once the base image is
-# rebuilt.
+# All of them live in FrankenPHP/Caddy surfaces Marketix does not use
+# (OpenAPI validation, gRPC/xDS, SSH) — FrankenPHP runs only as the Octane app
+# server. Accepted as a documented, temporary exception — re-check and remove
+# once the base image is rebuilt.
+#
+# Entries carry an `exp:` date so CI fails again once it passes and forces a
+# re-check instead of silently ignoring them forever.
 
 # github.com/getkin/kin-openapi — ValidationHandler.Load() fail-open auth bypass
 # (fixed upstream in 0.144.0; present in the base image's frankenphp binary)
@@ -19,3 +22,18 @@ GHSA-r277-6w6q-xmqw
 # google.golang.org/grpc — xDS RBAC and HTTP/2 vulnerabilities
 # (fixed upstream in 1.82.1; present in the base image's frankenphp binary)
 GHSA-hrxh-6v49-42gf
+
+# github.com/getkin/kin-openapi v0.140.0 — DoS via malformed multipart/form-data
+# body (fixed in 0.141.0) and via deepObject query parsing (fixed in 0.142.0).
+# Upstream FrankenPHP main already ships 0.146.0; not yet released (v1.12.7).
+CVE-2026-76905 exp:2026-10-31
+CVE-2026-77354 exp:2026-10-31
+
+# golang.org/x/crypto v0.54.0 — x/crypto/ssh auth bypass via unenforced
+# source-address restrictions (fixed in 0.55.0). No SSH server in the image.
+CVE-2026-56854 exp:2026-10-31
+
+# google.golang.org/grpc v1.81.1 — gRPC-Go vulnerability (fixed in 1.83.1) and
+# xDS server DoS (fixed in 1.82.2 / 1.83.2). Still 1.81.1 on FrankenPHP main.
+CVE-2026-84304 exp:2026-10-31
+CVE-2026-84445 exp:2026-10-31
