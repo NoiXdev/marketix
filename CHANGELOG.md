@@ -1,4 +1,12 @@
-## [2.0.1](https://github.com/NoiXdev/marketix/compare/v2.0.0...v) (2026-08-09)
+## [2.0.2](https://github.com/NoiXdev/marketix/compare/v2.0.1...v) (2026-09-11)
+
+
+### Bug Fixes
+
+* **deps:** patch league/commonmark CVEs and bundle dependabot updates ([d6b4014](https://github.com/NoiXdev/marketix/commit/d6b4014f73e6dad663e14169a7316ee7255b066b)), closes [#74](https://github.com/NoiXdev/marketix/issues/74) [#75](https://github.com/NoiXdev/marketix/issues/75) [#76](https://github.com/NoiXdev/marketix/issues/76) [#77](https://github.com/NoiXdev/marketix/issues/77) [#73](https://github.com/NoiXdev/marketix/issues/73) [#72](https://github.com/NoiXdev/marketix/issues/72) [#63](https://github.com/NoiXdev/marketix/issues/63) [#60](https://github.com/NoiXdev/marketix/issues/60) [#53](https://github.com/NoiXdev/marketix/issues/53) [#54](https://github.com/NoiXdev/marketix/issues/54)
+* **geoip:** require MaxMind account ID for GeoLite2 database download ([8e63329](https://github.com/NoiXdev/marketix/commit/8e6332902fa8753c50d262b1f9e0afd3648939e9))
+
+## [2.0.1](https://github.com/NoiXdev/marketix/compare/v2.0.0...v2.0.1) (2026-08-09)
 
 
 ### Bug Fixes
