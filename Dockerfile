@@ -32,7 +32,15 @@ RUN install-php-extensions \
     pcntl \
     zip
 
-RUN apt-get update \
+# Busted daily by the CI workflow (and on every local build that passes a new
+# value) so `apt-get upgrade` actually re-runs. Without this the layer is served
+# from the BuildKit cache indefinitely and the image silently keeps shipping
+# Debian packages with published CVEs, even though the upgrade step is right
+# here — which is exactly what the Trivy gate caught.
+ARG APT_REFRESH=0
+
+RUN echo "apt refresh: ${APT_REFRESH}" \
+    && apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         git \
