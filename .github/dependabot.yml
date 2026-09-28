@@ -32,6 +32,18 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # ESLint majors are blocked upstream and the PRs can only ever be red:
+      # `eslint-plugin-react` (latest 7.37.5) still caps its peer range at
+      # `eslint@^9.7`, so `npm ci` dies with ERESOLVE before any CI job runs.
+      # On top of that ESLint 10 dropped `.eslintrc` support, which this repo
+      # still uses. Both need to be resolved by hand — a flat-config migration
+      # plus a react-plugin release that supports ESLint 10 — so drop this
+      # ignore only when that work is actually being done. Minor and patch
+      # updates keep flowing through the js-minor-patch group.
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: docker
     directory: /

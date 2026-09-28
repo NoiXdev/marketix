@@ -67,7 +67,17 @@ RUN echo "apt refresh: ${APT_REFRESH}" \
 # Skip Puppeteer's own Chromium download — we use the system chromium above
 # (config chrome_path=/usr/bin/chromium, no_sandbox=true).
 ENV PUPPETEER_SKIP_DOWNLOAD=true
-RUN npm install -g puppeteer \
+
+# Pin to the exact version the app resolves to, instead of whatever `latest`
+# happens to be at build time. Two reasons: the global install must not drift to
+# a different major than the `puppeteer` dependency Browsershot is tested
+# against, and an unpinned install breaks the build whenever npm serves a
+# release whose `puppeteer-core` pin is not published yet — that race turned CI
+# red once already (ETARGET: no matching version for puppeteer-core@25.12.0).
+# Reading the lockfile keeps this in sync automatically on every npm bump.
+COPY package.json package-lock.json ./
+RUN PUPPETEER_VERSION="$(node -p "require('./package-lock.json').packages['node_modules/puppeteer'].version")" \
+    && npm install -g "puppeteer@${PUPPETEER_VERSION}" \
     && npm cache clean --force
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
