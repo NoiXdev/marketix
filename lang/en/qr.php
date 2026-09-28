@@ -142,6 +142,16 @@ return [
         'load_error' => "Couldn't load templates.",
         'save_error' => "Couldn't save the template.",
         'delete_error' => "Couldn't delete the template.",
+        'manage' => 'Manage templates',
+        'apply_hint' => 'Applying a template copies its settings into this form — you can still change everything afterwards.',
+        'page_title' => 'QR templates',
+        'page_subtitle' => 'Saved style templates for this project’s new QR codes.',
+        'back' => 'Back to QR codes',
+        'new' => 'New template',
+        'name_label' => 'Name',
+        'update' => 'Update template',
+        'updated' => 'Template updated.',
+        'update_hint' => 'Changes only affect new QR codes — existing ones stay as they are.',
     ],
 
     'export' => [

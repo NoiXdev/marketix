@@ -8,13 +8,17 @@ use Illuminate\Http\Request;
 
 class QrTemplateController extends Controller
 {
-    // Templates are not a standalone Inertia page — they back a panel embedded
-    // in the QR code editor (Task 10), so index/store/destroy are plain JSON
-    // rather than inertia() responses, matching the pattern used elsewhere in
-    // this app for supporting resources that aren't full-page views (e.g.
-    // TwoFactorPasskeyController).
+    // Mutations and the template list are plain JSON: they back both the panel
+    // embedded in the QR code editor and the management page, which keep their
+    // own client-side state instead of round-tripping through Inertia. Only
+    // index() — the management page shell — is an inertia() response.
 
-    public function index(Request $request)
+    public function index()
+    {
+        return inertia('QrCodes/Templates/Index');
+    }
+
+    public function list(Request $request)
     {
         $project = $request->get('project');
 
@@ -39,13 +43,30 @@ class QrTemplateController extends Controller
         ], 201);
     }
 
+    public function update(QrTemplateRequest $request, string $qrTemplate)
+    {
+        $template = $this->findInProject($request, $qrTemplate);
+
+        // A template is a copy-on-apply preset: updating it never rewrites the
+        // style already stored on existing QR codes.
+        $template->update($request->validated());
+
+        return response()->json([
+            'template' => $template->only(['id', 'name', 'style']),
+        ]);
+    }
+
     public function destroy(Request $request, string $qrTemplate)
+    {
+        $this->findInProject($request, $qrTemplate)->delete();
+
+        return response()->json(null, 204);
+    }
+
+    private function findInProject(Request $request, string $qrTemplate): QrTemplate
     {
         $project = $request->get('project');
 
-        $template = QrTemplate::where('project_id', $project->id)->findOrFail($qrTemplate);
-        $template->delete();
-
-        return response()->json(null, 204);
+        return QrTemplate::where('project_id', $project->id)->findOrFail($qrTemplate);
     }
 }

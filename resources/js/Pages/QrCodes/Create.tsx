@@ -65,6 +65,7 @@ export default function QrCodesCreate({
           attachLink={attachUrl ? { domainName: attachUrl.domain_name ?? '', slug: attachUrl.slug, target: attachUrl.target } : null}
           pixels={pixels}
           linkHasPassword={attachUrl?.has_password ?? false}
+          showTemplates
           onSubmit={e => { e.preventDefault(); post(route('app.project.qrcodes.store', { project: project!.id })); }}
         />
       </div>

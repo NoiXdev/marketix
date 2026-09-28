@@ -19,7 +19,8 @@ class QrTemplateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'style' => ['required', 'array'],
+            // Optional on update so a template can be renamed without resending its style.
+            'style' => [$this->isMethod('put') ? 'sometimes' : 'required', 'array'],
         ];
     }
 }

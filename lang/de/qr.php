@@ -142,6 +142,16 @@ return [
         'load_error' => 'Vorlagen konnten nicht geladen werden.',
         'save_error' => 'Vorlage konnte nicht gespeichert werden.',
         'delete_error' => 'Vorlage konnte nicht gelöscht werden.',
+        'manage' => 'Vorlagen verwalten',
+        'apply_hint' => 'Eine Vorlage übernimmt ihre Einstellungen in dieses Formular – du kannst sie danach frei anpassen.',
+        'page_title' => 'QR-Vorlagen',
+        'page_subtitle' => 'Gespeicherte Style-Vorlagen für neue QR-Codes dieses Projekts.',
+        'back' => 'Zurück zu den QR-Codes',
+        'new' => 'Neue Vorlage',
+        'name_label' => 'Name',
+        'update' => 'Vorlage aktualisieren',
+        'updated' => 'Vorlage aktualisiert.',
+        'update_hint' => 'Änderungen gelten nur für neue QR-Codes – bestehende bleiben unverändert.',
     ],
 
     'export' => [
