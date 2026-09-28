@@ -301,7 +301,12 @@ jobs:
         # A notification is the least important thing this workflow does and
         # must never fail the release.
         continue-on-error: true
-        uses: NoiXdev/github-workflows/actions/announce-release@main
+        # This repo enforces `sha_pinning_required`, so a `@main` reference is
+        # rejected at job setup — before `continue-on-error` can apply, which is
+        # why v2.0.3 shipped without an announcement. github-workflows publishes
+        # no tags, so this SHA tracks its main branch and has to be bumped by
+        # hand when that action changes.
+        uses: NoiXdev/github-workflows/actions/announce-release@7f018cafcf5abac73bcd4a720c938d2e11b1c5af # main
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_RELEASE_NOTIFICATION }}
           tag: ${{ needs.release.outputs.tag }}
