@@ -1,4 +1,16 @@
-## [2.0.3](https://github.com/NoiXdev/marketix/compare/v2.0.2...v) (2026-09-28)
+## [2.0.4](https://github.com/NoiXdev/marketix/compare/v2.0.3...v) (2026-09-28)
+
+
+### Bug Fixes
+
+* **release:** pin the announce action to a commit SHA ([e79101d](https://github.com/NoiXdev/marketix/commit/e79101d4f5053e9d99a46976e41abed460600a14))
+
+
+### Reverts
+
+* **release:** track [@main](https://github.com/main) for the announce action again ([96149bc](https://github.com/NoiXdev/marketix/commit/96149bc9b8a6aff83b1c76c6037fc0dbb9e1d14b))
+
+## [2.0.3](https://github.com/NoiXdev/marketix/compare/v2.0.2...v2.0.3) (2026-09-28)
 
 
 ### Features
