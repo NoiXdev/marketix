@@ -1,4 +1,19 @@
-## [2.0.2](https://github.com/NoiXdev/marketix/compare/v2.0.1...v) (2026-09-11)
+## [2.0.3](https://github.com/NoiXdev/marketix/compare/v2.0.2...v) (2026-09-28)
+
+
+### Features
+
+* **deps:** upgrade Inertia.js to v3 (client + Laravel adapter) ([c71bb89](https://github.com/NoiXdev/marketix/commit/c71bb895250aab4fac5b10e47b01a1be6a5ee9ca)), closes [#53](https://github.com/NoiXdev/marketix/issues/53) [#53](https://github.com/NoiXdev/marketix/issues/53)
+* **release:** announce releases on Discord ([3949985](https://github.com/NoiXdev/marketix/commit/3949985f056cb39dd5d7c7288641b733b982f406))
+
+
+### Bug Fixes
+
+* **ci:** pin Puppeteer to the lockfile version, ignore ESLint majors ([bb4654f](https://github.com/NoiXdev/marketix/commit/bb4654f5b3b8e7ebc40f3eb5d383403fbe3aae68)), closes [#85](https://github.com/NoiXdev/marketix/issues/85) [#54](https://github.com/NoiXdev/marketix/issues/54) [#83](https://github.com/NoiXdev/marketix/issues/83)
+* **docker:** stop serving the apt layer from a stale build cache ([f9d4e97](https://github.com/NoiXdev/marketix/commit/f9d4e9714c45b79fe79ef17f097f96f53061bf1d))
+* **inertia:** pin page path to resources/js/Pages for v3 ([90a2e25](https://github.com/NoiXdev/marketix/commit/90a2e2570f8befdeee18a68ccd3e9cd88c955ef6))
+
+## [2.0.2](https://github.com/NoiXdev/marketix/compare/v2.0.1...v2.0.2) (2026-09-11)
 
 
 ### Bug Fixes
