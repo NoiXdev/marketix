@@ -2,16 +2,11 @@ import { Button, IconButton, Input } from '@/Components/ui';
 import { QrStyle } from '@/data/qrTypes';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
+import { QrTemplate, createQrTemplate, deleteQrTemplate, listQrTemplates } from '@/lib/qrTemplates';
 import { PageProps } from '@/types';
-import { usePage } from '@inertiajs/react';
-import { Check, Trash2 } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Check, Settings2, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
-
-interface QrTemplate {
-  id: string;
-  name: string;
-  style: QrStyle;
-}
 
 interface Props {
   style: QrStyle;
@@ -32,9 +27,8 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
   useEffect(() => {
     if (!currentProject) return;
 
-    window.axios
-      .get<{ templates: QrTemplate[] }>(route('app.project.qr-templates.index', { project: currentProject.id }))
-      .then(res => setTemplates(res.data.templates))
+    listQrTemplates(currentProject.id)
+      .then(setTemplates)
       .catch(() => setStatus({ kind: 'error', message: t('qr.template.load_error') }));
   }, [currentProject]);
 
@@ -44,13 +38,9 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
 
     setSaving(true);
     setStatus(null);
-    window.axios
-      .post<{ template: QrTemplate }>(route('app.project.qr-templates.store', { project: currentProject.id }), {
-        name: name.trim(),
-        style,
-      })
-      .then(res => {
-        setTemplates(prev => [res.data.template, ...prev]);
+    createQrTemplate(currentProject.id, name.trim(), style)
+      .then(template => {
+        setTemplates(prev => [template, ...prev]);
         setName('');
         setStatus({ kind: 'success', message: t('qr.template.saved') });
       })
@@ -70,8 +60,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
 
     setDeletingId(template.id);
     setStatus(null);
-    window.axios
-      .delete(route('app.project.qr-templates.destroy', { project: currentProject.id, qrTemplate: template.id }))
+    deleteQrTemplate(currentProject.id, template.id)
       .then(() => {
         setTemplates(prev => prev.filter(tpl => tpl.id !== template.id));
         setStatus({ kind: 'success', message: t('qr.template.deleted') });
@@ -82,7 +71,18 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
 
   return (
     <div className="space-y-3 border-t border-line pt-4">
-      <h3 className="text-sm font-semibold text-foreground">{t('qr.template.title')}</h3>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold text-foreground">{t('qr.template.title')}</h3>
+        {currentProject && (
+          <Link
+            href={route('app.project.qr-templates.index', { project: currentProject.id })}
+            className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent-soft-foreground"
+          >
+            <Settings2 className="h-3.5 w-3.5" /> {t('qr.template.manage')}
+          </Link>
+        )}
+      </div>
+      <p className="text-xs text-muted">{t('qr.template.apply_hint')}</p>
 
       {status && (
         <p className={`text-xs ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>

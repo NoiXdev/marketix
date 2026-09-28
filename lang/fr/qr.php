@@ -142,6 +142,16 @@ return [
         'load_error' => 'Impossible de charger les modèles.',
         'save_error' => "Impossible d'enregistrer le modèle.",
         'delete_error' => 'Impossible de supprimer le modèle.',
+        'manage' => 'Gérer les modèles',
+        'apply_hint' => 'Appliquer un modèle copie ses réglages dans ce formulaire — vous pouvez tout modifier ensuite.',
+        'page_title' => 'Modèles QR',
+        'page_subtitle' => 'Modèles de style enregistrés pour les nouveaux QR codes de ce projet.',
+        'back' => 'Retour aux QR codes',
+        'new' => 'Nouveau modèle',
+        'name_label' => 'Nom',
+        'update' => 'Mettre à jour le modèle',
+        'updated' => 'Modèle mis à jour.',
+        'update_hint' => 'Les modifications ne concernent que les nouveaux QR codes — les existants restent inchangés.',
     ],
 
     'export' => [

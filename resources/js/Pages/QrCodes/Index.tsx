@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/i18n';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
+import { Palette, Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
 
 interface QrRow {
   id: string;
@@ -27,9 +27,14 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
   }
 
   const createBtn = (
-    <LinkButton href={route('app.project.qrcodes.create', { project: project!.id })}>
-      <Plus className="h-4 w-4" /> {t('qrcodes.create')}
-    </LinkButton>
+    <div className="flex items-center gap-2">
+      <LinkButton variant="secondary" href={route('app.project.qr-templates.index', { project: project!.id })}>
+        <Palette className="h-4 w-4" /> {t('qr.template.manage')}
+      </LinkButton>
+      <LinkButton href={route('app.project.qrcodes.create', { project: project!.id })}>
+        <Plus className="h-4 w-4" /> {t('qrcodes.create')}
+      </LinkButton>
+    </div>
   );
 
   return (

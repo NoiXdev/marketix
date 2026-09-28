@@ -46,10 +46,14 @@ interface Props {
   attachLink?: { domainName: string; slug: string; target: string } | null;
   pixels: PixelOption[];
   linkHasPassword?: boolean;
+  // Presets seed a *new* QR code's style; they are hidden when editing an
+  // existing one so an applied preset can never silently restyle it.
+  showTemplates?: boolean;
 }
 
 export default function QrEditor({
   data, setData, errors, processing, submitLabel, cancelHref, onSubmit, domains, dynamicUrl, attachLink, pixels, linkHasPassword,
+  showTemplates = false,
 }: Props) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<'content' | 'style'>('content');
@@ -185,7 +189,7 @@ export default function QrEditor({
               </div>
               <div className="p-5">
                 <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
-                <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
+                {showTemplates && <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />}
               </div>
             </div>
           ) : (
@@ -204,7 +208,7 @@ export default function QrEditor({
                   : (
                     <>
                       <QrStyleForm style={data.style} onChange={s => setData('style', s)} />
-                      <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />
+                      {showTemplates && <QrTemplatePanel style={data.style} onApply={s => setData('style', s)} />}
                     </>
                   )}
               </div>

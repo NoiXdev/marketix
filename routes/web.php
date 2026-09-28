@@ -150,7 +150,9 @@ Route::group(['domain' => config('app.domain')], function () {
 
             // QR brand templates
             Route::get('/qr-templates', [QrTemplateController::class, 'index'])->name('app.project.qr-templates.index');
+            Route::get('/qr-templates/list', [QrTemplateController::class, 'list'])->name('app.project.qr-templates.list');
             Route::post('/qr-templates', [QrTemplateController::class, 'store'])->name('app.project.qr-templates.store');
+            Route::put('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'update'])->name('app.project.qr-templates.update');
             Route::delete('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'destroy'])->name('app.project.qr-templates.destroy');
 
             // Pixels

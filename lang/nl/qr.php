@@ -142,6 +142,16 @@ return [
         'load_error' => 'Sjablonen konden niet worden geladen.',
         'save_error' => 'Sjabloon kon niet worden opgeslagen.',
         'delete_error' => 'Sjabloon kon niet worden verwijderd.',
+        'manage' => 'Sjablonen beheren',
+        'apply_hint' => 'Een sjabloon toepassen kopieert de instellingen naar dit formulier — je kunt daarna alles aanpassen.',
+        'page_title' => 'QR-sjablonen',
+        'page_subtitle' => 'Opgeslagen stijlsjablonen voor nieuwe QR-codes in dit project.',
+        'back' => 'Terug naar QR-codes',
+        'new' => 'Nieuw sjabloon',
+        'name_label' => 'Naam',
+        'update' => 'Sjabloon bijwerken',
+        'updated' => 'Sjabloon bijgewerkt.',
+        'update_hint' => 'Wijzigingen gelden alleen voor nieuwe QR-codes — bestaande blijven ongewijzigd.',
     ],
 
     'export' => [
