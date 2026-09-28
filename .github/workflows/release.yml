@@ -32,6 +32,12 @@ jobs:
     name: Release ${{ inputs.bump }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Step outputs are job-local, so everything the announce job needs has to be
+    # re-exported here — otherwise `needs.release.outputs.*` is silently empty.
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+      notes: ${{ steps.changelog.outputs.clean_changelog }}
+      release_url: ${{ steps.gh_release.outputs.url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -252,6 +258,7 @@ jobs:
           git push origin "${{ steps.bump.outputs.tag }}"
 
       - name: Create GitHub Release
+        id: gh_release
         if: ${{ inputs.dry_run == false }}
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
@@ -281,3 +288,23 @@ jobs:
             echo "${{ steps.meta.outputs.tags }}"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  announce:
+    name: Announce the release
+    needs: [release]
+    # No `always()`: when the release job fails nothing shipped, so a skipped
+    # announcement is the correct outcome. Dry runs create no release either.
+    if: ${{ inputs.dry_run == false }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        # A notification is the least important thing this workflow does and
+        # must never fail the release.
+        continue-on-error: true
+        uses: NoiXdev/github-workflows/actions/announce-release@main
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_RELEASE_NOTIFICATION }}
+          tag: ${{ needs.release.outputs.tag }}
+          body: ${{ needs.release.outputs.notes }}
+          url: ${{ needs.release.outputs.release_url }}
+          product-name: Marketix
