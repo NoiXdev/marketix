@@ -80,3 +80,7 @@ Every page receives:
 ### Observer pattern
 
 `UrlObserver` auto-sets `user_id` on URL creation. Register new observers in `AppServiceProvider` via `#[ObservedBy]` attribute on the model.
+
+## Code Styling + Rules
+
+Always write scripts/files/docs in English 
