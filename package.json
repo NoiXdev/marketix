@@ -16,7 +16,7 @@
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.3.3",
         "@types/d3-geo": "^3.1.1",
-        "@types/node": "^26.6.2",
+        "@types/node": "^26.6.3",
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.7",
         "@types/topojson-client": "^3.1.5",
