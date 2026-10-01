@@ -47,4 +47,10 @@ return [
         'app_url' => env('TRAEFIK_APP_URL', 'http://app:8000'),
     ],
 
+    'favicon' => [
+        // Disk the referrer favicon cache is stored on. Null uses the default
+        // filesystem disk (FILESYSTEM_DISK); set FAVICON_DISK to pin another.
+        'disk' => env('FAVICON_DISK'),
+    ],
+
 ];
