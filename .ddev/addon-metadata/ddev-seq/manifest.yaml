@@ -1,0 +1,10 @@
+name: ddev-seq
+repository: happiness/ddev-seq
+version: 1.0.2
+install_date: "2026-10-01T19:26:23+02:00"
+project_files:
+    - config.ddev-seq.yaml
+    - docker-compose.seq.yaml
+    - .env.seq
+global_files: []
+removal_actions: []

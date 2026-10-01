@@ -20,6 +20,7 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "pragmarx/google2fa-qrcode": "^4.0",
+        "schaefersoft/laravel-seq": "^2.0",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-pdf": "^2.12",

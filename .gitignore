@@ -34,3 +34,6 @@ frankenphp-worker.php
 /docs/superpowers
 
 custom-domains.yml
+
+# DDEV Seq add-on runtime data volume (not the addon config files in .ddev/)
+/.ddev/seq/

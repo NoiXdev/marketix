@@ -1,0 +1,9 @@
+# Local-only override for the Seq add-on.
+# Current datalust/seq images refuse to start without a first-run admin
+# password or an explicit opt-out. For a local DDEV instance we opt out of
+# authentication so Seq boots and accepts ingestion without an API key.
+# Kept in a separate file so the #ddev-generated addon compose stays pristine.
+services:
+  seq:
+    environment:
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
