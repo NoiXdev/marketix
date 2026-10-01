@@ -1,6 +1,7 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import AppLayout from '@/Layouts/AppLayout';
+import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { useTranslation } from '@/lib/i18n';
@@ -31,9 +32,10 @@ const RANGES = [7, 30, 90];
 function ClicksBars({ data, clicksLabel }: { data: DayClicks[]; clicksLabel: string }) {
   const max = Math.max(...data.map((d) => d.clicks), 1);
   return (
-    <div className="flex h-32 items-end gap-px">
+    <div>
+      <div className="flex h-32 items-end gap-px">
       {data.map((d) => (
-        <div key={d.date} className="group relative flex flex-1 flex-col items-center">
+        <div key={d.date} className="group relative flex h-full flex-1 flex-col items-center justify-end">
           <div
             className="w-full rounded-t bg-accent transition-all"
             style={{ height: `${Math.max((d.clicks / max) * 100, d.clicks > 0 ? 4 : 1)}%` }}
@@ -45,6 +47,8 @@ function ClicksBars({ data, clicksLabel }: { data: DayClicks[]; clicksLabel: str
           </div>
         </div>
       ))}
+      </div>
+      <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" />
     </div>
   );
 }
@@ -115,10 +119,6 @@ export default function StatisticsIndex({
             {t('statistics.clicks_over_time')} <span className="font-normal text-muted">{t('statistics.last_days', { days: String(days) })}</span>
           </h2>
           <ClicksBars data={clicksByDay} clicksLabel={t('statistics.clicks')} />
-          <div className="mt-2 flex justify-between text-xs text-subtle">
-            <span>{clicksByDay[0]?.date}</span>
-            <span>{clicksByDay[clicksByDay.length - 1]?.date}</span>
-          </div>
         </section>
 
         {/* Top links */}

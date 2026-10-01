@@ -1,3 +1,4 @@
+import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { useTranslation } from '@/lib/i18n';
 
 interface DayClicks { date: string; clicks: number; unique: number }
@@ -6,9 +7,10 @@ export default function ClicksChart({ data }: { data: DayClicks[] }) {
   const { t } = useTranslation();
   const max = Math.max(...data.map((d) => Math.max(d.clicks, d.unique)), 1);
   return (
-    <div className="flex h-[170px] items-end gap-[3px]">
+    <div>
+      <div className="flex h-[170px] items-end gap-[3px]">
       {data.map((d) => (
-        <div key={d.date} className="group relative flex flex-1 flex-col-reverse gap-[2px]">
+        <div key={d.date} className="group relative flex h-full flex-1 flex-col-reverse gap-[2px]">
           <div
             className="rounded-t-[3px] bg-[color:color-mix(in_srgb,var(--accent)_40%,var(--surface))]"
             style={{ height: `${Math.max((d.unique / max) * 100, d.unique > 0 ? 4 : 0)}%` }}
@@ -25,6 +27,8 @@ export default function ClicksChart({ data }: { data: DayClicks[] }) {
           </div>
         </div>
       ))}
+      </div>
+      <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-[3px]" />
     </div>
   );
 }
