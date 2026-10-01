@@ -11,7 +11,10 @@ mkdir -p \
     storage/framework/testing \
     storage/logs \
     storage/app/gitdumper \
+    storage/app/public \
     bootstrap/cache
+
+php artisan storage:link --force
 
 if [ -n "${DB_HOST:-}" ]; then
     echo "Waiting for database at ${DB_HOST}:${DB_PORT:-3306}..."
