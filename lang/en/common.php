@@ -12,11 +12,13 @@ return [
         'activity' => 'Activity',
         'team' => 'Team',
         'reports' => 'Reports',
+        'data_privacy' => 'Data Privacy',
         'groups' => [
             'overview' => 'Overview',
             'links_codes' => 'Links & Codes',
             'insights' => 'Insights',
             'management' => 'Management',
+            'docs_help' => 'Docs & Help',
         ],
     ],
     'user_menu' => [
