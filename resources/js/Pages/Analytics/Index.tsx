@@ -4,6 +4,7 @@ import { BackLink } from '@/Components/ui';
 import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { Favicon } from '@/Components/icons/Favicon';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
+import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { useTranslation } from '@/lib/i18n';
@@ -111,6 +112,7 @@ export default function AnalyticsIndex({
   topPaths,
   topReferrers,
   countries,
+  clicksByCountry,
   browsers,
   operatingSystems,
   devices,
@@ -134,6 +136,7 @@ export default function AnalyticsIndex({
   topPaths: Rank[];
   topReferrers: Rank[];
   countries: Rank[];
+  clicksByCountry: CountryDatum[];
   browsers: Rank[];
   operatingSystems: Rank[];
   devices: Rank[];
@@ -187,6 +190,11 @@ export default function AnalyticsIndex({
           <h2 className="mb-4 text-sm font-semibold text-foreground">{t('analytics.dashboard.chart_title')}</h2>
           <VisitorsBars data={pageViewsByDay} max={maxViews} viewsLabel={t('analytics.dashboard.kpi.page_views')} />
         </section>
+
+        {/* Visitors by country map */}
+        <div className="mb-6">
+          <WorldMap data={clicksByCountry} />
+        </div>
 
         {/* Breakdowns */}
         <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
