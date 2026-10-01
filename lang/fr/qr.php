@@ -155,6 +155,7 @@ return [
     ],
 
     'export' => [
+        'download' => 'Télécharger',
         'png' => 'PNG',
         'svg' => 'SVG',
         'pdf' => 'PDF',

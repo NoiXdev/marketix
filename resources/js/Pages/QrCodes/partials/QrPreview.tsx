@@ -1,7 +1,7 @@
 import { Button } from '@/Components/ui';
 import { QrStyle } from '@/data/qrTypes';
 import { useTranslation } from '@/lib/i18n';
-import { downloadBlob, toPdfBlob, toPngBlob, toSvgBlob } from '@/lib/qr/export';
+import { downloadQr } from '@/lib/qr/download';
 import { renderQr } from '@/lib/qr/render';
 import { Download } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -27,25 +27,11 @@ export default function QrPreview({ data, style, name = 'qr-code' }: Props) {
     return () => window.clearTimeout(id);
   }, [immediate]);
 
-  const { svg, width, height } = result;
+  const { svg } = result;
 
-  function downloadSvg() {
-    downloadBlob(toSvgBlob(svg), `${name}.svg`);
-  }
-
-  async function downloadPng() {
+  async function download(format: 'png' | 'svg' | 'pdf') {
     try {
-      const blob = await toPngBlob(svg, width, height, 8);
-      downloadBlob(blob, `${name}.png`);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async function downloadPdf() {
-    try {
-      const blob = await toPdfBlob(svg, width, height);
-      downloadBlob(blob, `${name}.pdf`);
+      await downloadQr(format, data, style, name);
     } catch (e) {
       console.error(e);
     }
@@ -59,13 +45,13 @@ export default function QrPreview({ data, style, name = 'qr-code' }: Props) {
         dangerouslySetInnerHTML={{ __html: svg }}
       />
       <div className="flex gap-2">
-        <Button type="button" variant="secondary" size="sm" onClick={downloadPng}>
+        <Button type="button" variant="secondary" size="sm" onClick={() => download('png')}>
           <Download className="h-3.5 w-3.5" /> {t('qr.export.png')}
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={downloadSvg}>
+        <Button type="button" variant="secondary" size="sm" onClick={() => download('svg')}>
           <Download className="h-3.5 w-3.5" /> {t('qr.export.svg')}
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={downloadPdf}>
+        <Button type="button" variant="secondary" size="sm" onClick={() => download('pdf')}>
           <Download className="h-3.5 w-3.5" /> {t('qr.export.pdf')}
         </Button>
       </div>
