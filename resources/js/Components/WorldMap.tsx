@@ -14,9 +14,10 @@ export interface CountryDatum {
   count: number;
 }
 
-// 5-step fill ramp, light → teal (matches the app accent). Fixed data-viz
-// hues (legible on both light and dark surfaces); no-data uses a theme token.
-const BUCKETS = ['#d5f0ea', '#8fddcf', '#43c2ac', '#0d9488', '#0a6b60'];
+// 5-step teal fill ramp, fewest → most clicks, defined per theme in app.css:
+// light mode runs light → dark, dark mode dark → light, so the most clicks
+// always get the strongest contrast. No-data uses a theme token as well.
+const BUCKETS = ['var(--map-1)', 'var(--map-2)', 'var(--map-3)', 'var(--map-4)', 'var(--map-5)'];
 const NO_DATA = 'var(--elevated)';
 
 const projection = geoNaturalEarth1();
