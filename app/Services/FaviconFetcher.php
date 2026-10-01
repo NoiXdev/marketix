@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Fetches and caches website favicons on local disk, without involving any
- * third party. The favicon is retrieved directly from the referrer's own
- * origin (either /favicon.ico or the first <link rel="icon"> declared in its
- * homepage) so no outside service ever learns which domains are stored.
+ * Fetches and caches website favicons without involving any third party. The
+ * favicon is retrieved directly from the referrer's own origin (either
+ * /favicon.ico or the first <link rel="icon"> declared in its homepage) so no
+ * outside service ever learns which domains are stored.
  *
- * Results — hits and misses alike — are cached to keep the analytics pages
- * from re-probing the same hosts on every render. All outbound requests are
- * SSRF-guarded: the host must resolve to a public IP and redirects are not
+ * Results — hits and misses alike — are cached on the configured filesystem
+ * disk (FILESYSTEM_DISK, overridable via FAVICON_DISK) to keep the analytics
+ * pages from re-probing the same hosts on every render. All outbound requests
+ * are SSRF-guarded: the host must resolve to a public IP and redirects are not
  * followed automatically.
  */
 class FaviconFetcher
 {
-    private const DISK = 'local';
-
     private const DIR = 'favicons';
 
     private const MAX_BYTES = 102_400;        // 100 KB cap on a favicon
@@ -38,6 +38,15 @@ class FaviconFetcher
     ) {}
 
     /**
+     * The filesystem disk favicons are cached on: FAVICON_DISK when configured,
+     * otherwise the application's default disk (FILESYSTEM_DISK).
+     */
+    private function disk(): Filesystem
+    {
+        return Storage::disk(config('services.favicon.disk'));
+    }
+
+    /**
      * Return the cached favicon for a host as [bytes, contentType], or null if
      * the host has (recently) no retrievable icon. Fetches and caches on a miss.
      *
@@ -50,7 +59,7 @@ class FaviconFetcher
             return null;
         }
 
-        $disk = Storage::disk(self::DISK);
+        $disk = $this->disk();
         $base = self::DIR.'/'.sha1($host);
         $binPath = $base.'.bin';
         $ctPath = $base.'.ct';

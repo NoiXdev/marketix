@@ -18,7 +18,8 @@ class FaviconEndpointTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        // Fake the default disk — the fetcher caches on the configured disk.
+        Storage::fake();
     }
 
     private function resolveTo(array $map): void
@@ -57,6 +58,22 @@ class FaviconEndpointTest extends TestCase
         // Second request is served from the disk cache — no extra HTTP call.
         $this->actingAs($user)->get(route('app.favicon.show', ['domain' => 'example.com']))->assertOk();
         Http::assertSentCount(1);
+    }
+
+    public function test_it_caches_on_the_configured_disk(): void
+    {
+        config(['services.favicon.disk' => 'favicons']);
+        Storage::fake('favicons');
+        $this->resolveTo(['example.net' => ['93.184.216.34']]);
+        Http::fake([
+            'https://example.net/favicon.ico' => Http::response(self::PNG, 200, ['Content-Type' => 'image/png']),
+        ]);
+
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('app.favicon.show', ['domain' => 'example.net']))->assertOk();
+
+        // The favicon was cached on the configured disk, not hardcoded local.
+        $this->assertNotEmpty(Storage::disk('favicons')->allFiles('favicons'));
     }
 
     public function test_it_refuses_to_probe_private_addresses(): void
