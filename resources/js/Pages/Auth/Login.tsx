@@ -15,6 +15,9 @@ export default function Login({ status }: { status?: string }) {
   });
 
   const passkey = usePasskeyVerify({
+    // Forward the "remember me" checkbox so passkey logins honor it too. The
+    // hook refreshes this each render, so the value is read live at verify time.
+    remember: data.remember,
     onSuccess: (response) => router.visit(response.redirect ?? '/'),
   });
 
