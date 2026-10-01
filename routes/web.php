@@ -14,6 +14,7 @@ use App\Http\Controllers\AnalyticsIngestionController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
 use App\Http\Controllers\FaviconController;
@@ -108,6 +109,7 @@ Route::group(['domain' => config('app.domain')], function () {
         ->prefix('/project/{project}')
         ->group(function () {
             Route::get('/dashboard', [DashboardController::class, 'show'])->name('app.project.dashboard');
+            Route::get('/docs/data-privacy', [DocsController::class, 'dataPrivacy'])->name('app.project.docs.privacy');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
             Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
