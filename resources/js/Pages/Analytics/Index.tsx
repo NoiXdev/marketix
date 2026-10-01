@@ -1,12 +1,16 @@
 import AppLayout from '@/Layouts/AppLayout';
 import RangeTabs from '@/Pages/Analytics/RangeTabs';
 import { BackLink } from '@/Components/ui';
+import { CountryFlag } from '@/Components/icons/CountryFlag';
+import { Favicon } from '@/Components/icons/Favicon';
+import { PlatformIcon } from '@/Components/icons/PlatformIcon';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Clock, Megaphone, MousePointerClick, Users } from 'lucide-react';
+import { ReactNode } from 'react';
 
 type Series = { date: string; views: number; visitors: number };
 type Rank = Record<string, string | number> & { count: number };
@@ -40,7 +44,19 @@ function VisitorsBars({ data, max, viewsLabel }: { data: Series[]; max: number; 
   );
 }
 
-function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows: Rank[]; labelKey: string; emptyLabel: string }) {
+function Breakdown({
+  title,
+  rows,
+  labelKey,
+  emptyLabel,
+  prefix,
+}: {
+  title: string;
+  rows: Rank[];
+  labelKey: string;
+  emptyLabel: string;
+  prefix?: (row: Rank) => ReactNode;
+}) {
   return (
     <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
       <div className="border-b border-line px-4 py-3">
@@ -48,7 +64,12 @@ function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows:
       </div>
       <RankedList
         emptyLabel={emptyLabel}
-        rows={rows.map((r, i) => ({ key: `${String(r[labelKey] ?? '')}-${i}`, label: String(r[labelKey] || '—'), value: r.count }))}
+        rows={rows.map((r, i) => ({
+          key: `${String(r[labelKey] ?? '')}-${i}`,
+          label: String(r[labelKey] || '—'),
+          value: r.count,
+          prefix: prefix?.(r),
+        }))}
       />
     </section>
   );
@@ -175,11 +196,36 @@ export default function AnalyticsIndex({
             rows={topReferrers}
             labelKey="referer_domain"
             emptyLabel={t('analytics.dashboard.no_data')}
+            prefix={(r) => <Favicon domain={String(r.referer_domain ?? '')} />}
           />
-          <Breakdown title={t('analytics.dashboard.breakdown.countries')} rows={countries} labelKey="country" emptyLabel={t('analytics.dashboard.no_data')} />
-          <Breakdown title={t('analytics.dashboard.breakdown.browsers')} rows={browsers} labelKey="browser" emptyLabel={t('analytics.dashboard.no_data')} />
-          <Breakdown title={t('analytics.dashboard.breakdown.os')} rows={operatingSystems} labelKey="os" emptyLabel={t('analytics.dashboard.no_data')} />
-          <Breakdown title={t('analytics.dashboard.breakdown.devices')} rows={devices} labelKey="device" emptyLabel={t('analytics.dashboard.no_data')} />
+          <Breakdown
+            title={t('analytics.dashboard.breakdown.countries')}
+            rows={countries}
+            labelKey="country"
+            emptyLabel={t('analytics.dashboard.no_data')}
+            prefix={(r) => <CountryFlag code={String(r.country_code ?? '')} />}
+          />
+          <Breakdown
+            title={t('analytics.dashboard.breakdown.browsers')}
+            rows={browsers}
+            labelKey="browser"
+            emptyLabel={t('analytics.dashboard.no_data')}
+            prefix={(r) => <PlatformIcon kind="browser" name={String(r.browser ?? '')} />}
+          />
+          <Breakdown
+            title={t('analytics.dashboard.breakdown.os')}
+            rows={operatingSystems}
+            labelKey="os"
+            emptyLabel={t('analytics.dashboard.no_data')}
+            prefix={(r) => <PlatformIcon kind="os" name={String(r.os ?? '')} />}
+          />
+          <Breakdown
+            title={t('analytics.dashboard.breakdown.devices')}
+            rows={devices}
+            labelKey="device"
+            emptyLabel={t('analytics.dashboard.no_data')}
+            prefix={(r) => <PlatformIcon kind="device" name={String(r.device ?? '')} />}
+          />
         </div>
 
         {/* Campaigns */}

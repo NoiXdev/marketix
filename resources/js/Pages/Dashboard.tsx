@@ -6,7 +6,7 @@ import RankedList from '@/Pages/Dashboard/RankedList';
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import { LinkButton } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
-import { flagFromCode } from '@/lib/format';
+import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -101,7 +101,7 @@ export default function Dashboard({ days, kpis, clicksByDay, topLinks, topCountr
               <Link href={route('app.project.statistics', { project: project.id })} className="text-[12.5px] font-semibold text-accent-soft-foreground hover:underline">{t('common.dashboard.statistics')} →</Link>
             </div>
             <RankedList emptyLabel={t('common.dashboard.no_data')}
-              rows={topCountries.map((c) => ({ key: c.country_code || c.country, prefix: <span className="text-[15px]">{flagFromCode(c.country_code)}</span>, label: c.country ?? c.country_code, value: Number(c.count) }))} />
+              rows={topCountries.map((c) => ({ key: c.country_code || c.country, prefix: <CountryFlag code={c.country_code} />, label: c.country ?? c.country_code, value: Number(c.count) }))} />
           </section>
           <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
             <div className="flex items-center justify-between border-b border-line px-4 py-3.5">

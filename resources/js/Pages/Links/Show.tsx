@@ -1,5 +1,8 @@
 import ReportDownloadButton from '@/Components/ReportDownloadButton';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
+import { CountryFlag } from '@/Components/icons/CountryFlag';
+import { Favicon } from '@/Components/icons/Favicon';
+import { PlatformIcon } from '@/Components/icons/PlatformIcon';
 import AppLayout from '@/Layouts/AppLayout';
 import ClicksChart from '@/Pages/Dashboard/ClicksChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
@@ -10,7 +13,7 @@ import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { BarChart3, Calendar, Check, Copy, ExternalLink, MousePointerClick, Pencil, QrCode as QrCodeIcon, RotateCcw } from 'lucide-react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
 interface DayClicks { date: string; clicks: number; unique: number }
 interface BreakdownRow { count: number; [key: string]: string | number }
@@ -44,7 +47,7 @@ interface Props {
   rangeClicks: number;
   rangeUnique: number;
   clicksByDay: DayClicks[];
-  topCountries: (BreakdownRow & { country: string })[];
+  topCountries: (BreakdownRow & { country: string; country_code: string })[];
   clicksByCountry: CountryDatum[];
   topCities: (BreakdownRow & { city: string })[];
   topBrowsers: (BreakdownRow & { browser: string })[];
@@ -77,7 +80,19 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows: BreakdownRow[]; labelKey: string; emptyLabel: string }) {
+function Breakdown({
+  title,
+  rows,
+  labelKey,
+  emptyLabel,
+  prefix,
+}: {
+  title: string;
+  rows: BreakdownRow[];
+  labelKey: string;
+  emptyLabel: string;
+  prefix?: (row: BreakdownRow) => ReactNode;
+}) {
   return (
     <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
       <div className="border-b border-line px-4 py-3">
@@ -85,7 +100,12 @@ function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows:
       </div>
       <RankedList
         emptyLabel={emptyLabel}
-        rows={rows.map((r, i) => ({ key: `${String(r[labelKey] ?? '')}-${i}`, label: String(r[labelKey] || '—'), value: r.count }))}
+        rows={rows.map((r, i) => ({
+          key: `${String(r[labelKey] ?? '')}-${i}`,
+          label: String(r[labelKey] || '—'),
+          value: r.count,
+          prefix: prefix?.(r),
+        }))}
       />
     </section>
   );
@@ -217,11 +237,35 @@ export default function LinksShow({
 
         {/* Breakdowns */}
         <div className="mb-6 grid grid-cols-1 gap-3.5 md:grid-cols-2">
-          <Breakdown title={t('links.show.breakdown.countries')} rows={topCountries} labelKey="country" emptyLabel={t('links.show.no_data')} />
+          <Breakdown
+            title={t('links.show.breakdown.countries')}
+            rows={topCountries}
+            labelKey="country"
+            emptyLabel={t('links.show.no_data')}
+            prefix={(r) => <CountryFlag code={String(r.country_code ?? '')} />}
+          />
           <Breakdown title={t('links.show.breakdown.cities')} rows={topCities} labelKey="city" emptyLabel={t('links.show.no_data')} />
-          <Breakdown title={t('links.show.breakdown.browsers')} rows={topBrowsers} labelKey="browser" emptyLabel={t('links.show.no_data')} />
-          <Breakdown title={t('links.show.breakdown.os')} rows={topOs} labelKey="os" emptyLabel={t('links.show.no_data')} />
-          <Breakdown title={t('links.show.breakdown.referrers')} rows={topReferrers} labelKey="domain" emptyLabel={t('links.show.no_data')} />
+          <Breakdown
+            title={t('links.show.breakdown.browsers')}
+            rows={topBrowsers}
+            labelKey="browser"
+            emptyLabel={t('links.show.no_data')}
+            prefix={(r) => <PlatformIcon kind="browser" name={String(r.browser ?? '')} />}
+          />
+          <Breakdown
+            title={t('links.show.breakdown.os')}
+            rows={topOs}
+            labelKey="os"
+            emptyLabel={t('links.show.no_data')}
+            prefix={(r) => <PlatformIcon kind="os" name={String(r.os ?? '')} />}
+          />
+          <Breakdown
+            title={t('links.show.breakdown.referrers')}
+            rows={topReferrers}
+            labelKey="domain"
+            emptyLabel={t('links.show.no_data')}
+            prefix={(r) => <Favicon domain={String(r.domain ?? '')} />}
+          />
         </div>
 
         {/* Recent clicks */}
