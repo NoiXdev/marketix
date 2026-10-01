@@ -1,4 +1,16 @@
-## [2.0.4](https://github.com/NoiXdev/marketix/compare/v2.0.3...v) (2026-09-28)
+## [2.1.0](https://github.com/NoiXdev/marketix/compare/v2.0.4...v) (2026-10-01)
+
+
+### Features
+
+* **qr:** manage QR style presets per project ([1902270](https://github.com/NoiXdev/marketix/commit/1902270aa3128dfb35f3df86b12db1d52ad5f94a))
+
+
+### Bug Fixes
+
+* create storage symlink on container start ([9a98980](https://github.com/NoiXdev/marketix/commit/9a989809e5a26435e735f88cccb7dcc8bc98c8ca))
+
+## [2.0.4](https://github.com/NoiXdev/marketix/compare/v2.0.3...v2.0.4) (2026-09-28)
 
 
 ### Bug Fixes
