@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26dcc45bf7ef88273a35c748d09d3d84",
+    "content-hash": "6debd2ed4b3a6e84bb61b2b07f28e355",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5087,6 +5087,79 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.2"
             },
             "time": "2025-12-14T04:43:48+00:00"
+        },
+        {
+            "name": "schaefersoft/laravel-seq",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/schaefersoft/laravel-seq.git",
+                "reference": "96aab62903258aa0b9d4269d0e536c410064bd67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/schaefersoft/laravel-seq/zipball/96aab62903258aa0b9d4269d0e536c410064bd67",
+                "reference": "96aab62903258aa0b9d4269d0e536c410064bd67",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/cache": "^12.0|^13.0",
+                "illuminate/console": "^12.0|^13.0",
+                "illuminate/contracts": "^12.0|^13.0",
+                "illuminate/http": "^12.0|^13.0",
+                "illuminate/log": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "monolog/monolog": "^3.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.18",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0|^5.0",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "SchaeferSoft\\Seq\\SeqServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SchaeferSoft\\Seq\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luca Schäfer",
+                    "email": "lschaefer@schaefersoft.ch",
+                    "homepage": "https://schaefersoft.ch"
+                }
+            ],
+            "description": "Structured logging to Seq for Laravel. Ships batched CLEF events after the response is sent.",
+            "homepage": "https://github.com/schaefersoft/laravel-seq",
+            "keywords": [
+                "Datalust",
+                "clef",
+                "laravel",
+                "logging",
+                "monolog",
+                "seq",
+                "structured-logging"
+            ],
+            "support": {
+                "issues": "https://github.com/schaefersoft/laravel-seq/issues",
+                "source": "https://github.com/schaefersoft/laravel-seq/tree/v2.0.0"
+            },
+            "time": "2026-09-29T06:00:14+00:00"
         },
         {
             "name": "spatie/browsershot",

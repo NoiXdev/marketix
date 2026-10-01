@@ -1,0 +1,2 @@
+webimage_extra_packages: ["php${DDEV_PHP_VERSION}-opentelemetry"]
+ddev_version_constraint: '>=v1.23.5'
