@@ -88,4 +88,13 @@ return [
         'admin' => 'Admin',
         'member' => 'Membre',
     ],
+    'map' => [
+        'title' => 'Clics par pays',
+        'no_data' => 'Pas encore de données de localisation',
+        'legend_less' => 'Moins',
+        'legend_more' => 'Plus',
+        'zoom_in' => 'Zoom avant',
+        'zoom_out' => 'Zoom arrière',
+        'reset' => 'Réinitialiser la vue',
+    ],
 ];

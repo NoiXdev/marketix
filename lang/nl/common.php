@@ -88,4 +88,13 @@ return [
         'admin' => 'Beheerder',
         'member' => 'Lid',
     ],
+    'map' => [
+        'title' => 'Klikken per land',
+        'no_data' => 'Nog geen locatiegegevens',
+        'legend_less' => 'Minder',
+        'legend_more' => 'Meer',
+        'zoom_in' => 'Inzoomen',
+        'zoom_out' => 'Uitzoomen',
+        'reset' => 'Weergave resetten',
+    ],
 ];

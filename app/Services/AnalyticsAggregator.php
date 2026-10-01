@@ -138,6 +138,25 @@ class AnalyticsAggregator
             ->groupBy('country')->orderByDesc('count')->limit($limit)->get();
     }
 
+    /**
+     * Click counts grouped by ISO country_code, with a representative country
+     * name per code — feeds the world-map choropleth. The high default limit
+     * returns every country so the map is complete.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function breakdownByCountryCode(string $siteId, int $days, int $limit = 250): Collection
+    {
+        return $this->base($siteId, $days)
+            ->whereNotNull('country_code')->where('country_code', '!=', '')
+            ->select(
+                'country_code',
+                DB::raw('MAX(country) as country'),
+                DB::raw('COUNT(*) as count'),
+            )
+            ->groupBy('country_code')->orderByDesc('count')->limit($limit)->get();
+    }
+
     /** @return Collection<int, \stdClass> */
     public function utmBreakdown(string $siteId, string $column, int $days, int $limit = 8): Collection
     {
