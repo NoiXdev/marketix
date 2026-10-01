@@ -5,6 +5,7 @@ import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { Favicon } from '@/Components/icons/Favicon';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
+import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { useTranslation } from '@/lib/i18n';
@@ -26,9 +27,10 @@ type GoalCard = {
 
 function VisitorsBars({ data, max, viewsLabel }: { data: Series[]; max: number; viewsLabel: string }) {
   return (
-    <div className="flex h-40 items-end gap-px">
+    <div>
+      <div className="flex h-40 items-end gap-px">
       {data.map((d) => (
-        <div key={d.date} className="group relative flex flex-1 flex-col items-center">
+        <div key={d.date} className="group relative flex h-full flex-1 flex-col items-center justify-end">
           <div
             className="w-full rounded-t bg-accent transition-all"
             style={{ height: `${Math.max((d.views / max) * 100, d.views > 0 ? 4 : 1)}%` }}
@@ -41,6 +43,8 @@ function VisitorsBars({ data, max, viewsLabel }: { data: Series[]; max: number; 
           </div>
         </div>
       ))}
+      </div>
+      <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" />
     </div>
   );
 }
