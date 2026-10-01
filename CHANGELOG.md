@@ -1,4 +1,23 @@
-## [2.1.0](https://github.com/NoiXdev/marketix/compare/v2.0.4...v) (2026-10-01)
+## [2.2.0](https://github.com/NoiXdev/marketix/compare/v2.1.0...v) (2026-10-01)
+
+
+### Features
+
+* **analytics:** icon prefixes for country/platform/referrer breakdowns ([0a157ce](https://github.com/NoiXdev/marketix/commit/0a157ce03d642fe251312ecd33c1ca0ec2520093))
+* **analytics:** zoomable country map, added to the analytics page ([3974cf0](https://github.com/NoiXdev/marketix/commit/3974cf0f3658e9d3efae33acec9297420786d569))
+* **docs:** add Docs & Help nav group with a Data Privacy page ([0cb4489](https://github.com/NoiXdev/marketix/commit/0cb4489d1a6be71a5850f473824b9ac2e3a71d6f))
+* **qrcodes:** per-row download dropdown in the QR list ([f78356d](https://github.com/NoiXdev/marketix/commit/f78356db6081696765cf3fc977c4bc6326eb2c5b))
+* **statistics:** theme-aware world map color ramp ([206240e](https://github.com/NoiXdev/marketix/commit/206240e48e61b7e459db5dd39ebae45a5a61ed05))
+
+
+### Bug Fixes
+
+* **auth:** honor "remember me" on passkey login ([c5dc14e](https://github.com/NoiXdev/marketix/commit/c5dc14e2ff981bf8ca77503dd77360bd0ba69527))
+* **charts:** render bars and add a vertical date axis ([4366d1d](https://github.com/NoiXdev/marketix/commit/4366d1dd27997a518c267eb46c4508d5083d8037))
+* **deps:** bump league/commonmark to 2.10.3 (GHSA-3q6v-r5mr-hxv8) ([76e0d96](https://github.com/NoiXdev/marketix/commit/76e0d964ca9325f31897f4e7f3c854e4c7be9e73))
+* **favicon:** cache on the configured filesystem disk ([0091600](https://github.com/NoiXdev/marketix/commit/0091600ebe46fca83890e184592a46f8395ad98f))
+
+## [2.1.0](https://github.com/NoiXdev/marketix/compare/v2.0.4...v2.1.0) (2026-10-01)
 
 
 ### Features
