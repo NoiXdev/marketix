@@ -52,7 +52,7 @@ class QrCodeController extends Controller
         $project = $request->get('project');
 
         return inertia('QrCodes/Index', [
-            'qrCodes' => $project->qrCodes()->with('url')->latest()->get()->map(fn ($q) => [
+            'qrCodes' => $project->qrCodes()->with('url.domain')->latest()->get()->map(fn ($q) => [
                 'id' => $q->id,
                 'name' => $q->name,
                 'type' => $q->type,
@@ -60,6 +60,13 @@ class QrCodeController extends Controller
                 'scans' => $q->url?->clicks ?? 0,
                 'unique_scans' => $q->url?->unique_clicks ?? 0,
                 'created_at' => $q->created_at->toISOString(),
+                // Content + style let the list render and download the QR
+                // client-side without opening the editor.
+                'content' => $q->content,
+                'style' => $q->style,
+                'dynamic_url' => $q->url && $q->url->domain
+                    ? 'https://'.$q->url->domain->name.'/'.$q->url->slug
+                    : null,
             ]),
         ]);
     }

@@ -1,5 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Badge, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import QrDownloadMenu from '@/Pages/QrCodes/partials/QrDownloadMenu';
+import { QrStyle, QrType } from '@/data/qrTypes';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
@@ -10,11 +12,14 @@ import { Palette, Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
 interface QrRow {
   id: string;
   name: string;
-  type: string;
+  type: QrType;
   is_dynamic: boolean;
   scans: number;
   unique_scans: number;
   created_at: string;
+  content: Record<string, string>;
+  style: QrStyle;
+  dynamic_url: string | null;
 }
 
 export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
@@ -84,6 +89,14 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums text-muted">{qr.is_dynamic ? qr.scans.toLocaleString() : '—'}</td>
                   <RowActions>
+                    <QrDownloadMenu
+                      name={qr.name}
+                      type={qr.type}
+                      isDynamic={qr.is_dynamic}
+                      content={qr.content}
+                      dynamicUrl={qr.dynamic_url}
+                      style={qr.style}
+                    />
                     <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} />
                     <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(qr)} />
                   </RowActions>
