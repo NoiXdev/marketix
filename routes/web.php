@@ -16,6 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
+use App\Http\Controllers\FaviconController;
 use App\Http\Controllers\ForcePasswordChangeController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
@@ -97,6 +98,9 @@ Route::group(['domain' => config('app.domain')], function () {
         Route::get('/password/change', [ForcePasswordChangeController::class, 'show'])->name('app.password.change.show');
         Route::put('/password/change', [ForcePasswordChangeController::class, 'update'])->name('app.password.change.update');
         Route::get('/projects', [ProjectChooserController::class, 'index'])->name('app.projects.choose');
+        Route::get('/favicon/{domain}', [FaviconController::class, 'show'])
+            ->where('domain', '[A-Za-z0-9.\-]+')
+            ->name('app.favicon.show');
     });
 
     // Project tenant routes

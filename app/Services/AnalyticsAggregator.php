@@ -119,6 +119,25 @@ class AnalyticsAggregator
             ->groupBy($column)->orderByDesc('count')->limit($limit)->get();
     }
 
+    /**
+     * Countries grouped by name (so counts match the generic breakdown and rows
+     * without an ISO code are kept), carrying a representative country_code per
+     * name so the UI can render a flag alongside the label.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function countriesWithCode(string $siteId, int $days, int $limit = 8): Collection
+    {
+        return $this->base($siteId, $days)
+            ->whereNotNull('country')->where('country', '!=', '')
+            ->select(
+                'country',
+                DB::raw('MAX(country_code) as country_code'),
+                DB::raw('COUNT(*) as count'),
+            )
+            ->groupBy('country')->orderByDesc('count')->limit($limit)->get();
+    }
+
     /** @return Collection<int, \stdClass> */
     public function utmBreakdown(string $siteId, string $column, int $days, int $limit = 8): Collection
     {

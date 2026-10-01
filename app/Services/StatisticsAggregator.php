@@ -169,6 +169,31 @@ class StatisticsAggregator
     }
 
     /**
+     * Top countries grouped by name (so counts match the generic breakdown and
+     * rows without an ISO code are kept), carrying a representative country_code
+     * per name so the UI can render a flag. Ordered by count desc.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function topCountriesWithCode(string $projectId, ?string $urlId, Carbon|CarbonImmutable|null $since = null, Carbon|CarbonImmutable|null $until = null, int $limit = 8): Collection
+    {
+        return $this->base($projectId, $urlId)
+            ->when($since, fn (Builder $q) => $q->where('created_at', '>=', $since))
+            ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
+            ->whereNotNull('country')
+            ->where('country', '!=', '')
+            ->select(
+                'country',
+                DB::raw('MAX(country_code) as country_code'),
+                DB::raw('COUNT(*) as count'),
+            )
+            ->groupBy('country')
+            ->orderByDesc('count')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * The most recent individual clicks, latest first.
      *
      * @return Collection<int, Statistic>

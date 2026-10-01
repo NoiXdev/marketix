@@ -31,7 +31,7 @@ class AnalyticsController extends Controller
             'pageViewsByDay' => $agg->pageViewsByDay($model->id, $days),
             'topPaths' => $agg->topPaths($model->id, $days),
             'topReferrers' => $agg->topReferrers($model->id, $days),
-            'countries' => $agg->breakdown($model->id, 'country', $days),
+            'countries' => $agg->countriesWithCode($model->id, $days),
             'browsers' => $agg->breakdown($model->id, 'browser', $days),
             'operatingSystems' => $agg->breakdown($model->id, 'os', $days),
             'devices' => $agg->breakdown($model->id, 'device', $days),
