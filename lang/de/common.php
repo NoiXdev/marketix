@@ -98,5 +98,6 @@ return [
         'zoom_in' => 'Vergrößern',
         'zoom_out' => 'Verkleinern',
         'reset' => 'Ansicht zurücksetzen',
+        'zoom_hint' => 'Strg halten und scrollen zum Zoomen',
     ],
 ];

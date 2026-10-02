@@ -98,5 +98,6 @@ return [
         'zoom_in' => 'Zoom avant',
         'zoom_out' => 'Zoom arrière',
         'reset' => 'Réinitialiser la vue',
+        'zoom_hint' => 'Maintenez Ctrl et faites défiler pour zoomer',
     ],
 ];

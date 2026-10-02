@@ -98,5 +98,6 @@ return [
         'zoom_in' => 'Inzoomen',
         'zoom_out' => 'Uitzoomen',
         'reset' => 'Weergave resetten',
+        'zoom_hint' => 'Houd Ctrl ingedrukt en scroll om te zoomen',
     ],
 ];

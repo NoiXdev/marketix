@@ -103,11 +103,14 @@ export default function WorldMap({ data, title }: Props) {
     });
   }
 
-  // Wheel zoom (attached natively so we can preventDefault the page scroll).
+  // Wheel zoom — only when Ctrl/Cmd is held (trackpad pinch also reports
+  // ctrlKey), so a plain scroll over the map keeps scrolling the page.
+  // Attached natively so we can preventDefault only in the zoom case.
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       const { vx, vy } = toView(e.clientX, e.clientY);
       zoomAt(vx, vy, e.deltaY < 0 ? 1.2 : 1 / 1.2);
@@ -152,14 +155,18 @@ export default function WorldMap({ data, title }: Props) {
     <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">{title ?? t('common.map.title')}</h2>
-        {!hasData && <span className="text-xs text-subtle">{t('common.map.no_data')}</span>}
+        {hasData ? (
+          <span className="hidden text-xs text-subtle sm:inline">{t('common.map.zoom_hint')}</span>
+        ) : (
+          <span className="text-xs text-subtle">{t('common.map.no_data')}</span>
+        )}
       </div>
 
       <div className="relative overflow-hidden rounded-lg">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          className={`h-auto w-full touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          className={`h-auto w-full select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           role="img"
           aria-label="World map of clicks by country"
           onMouseDown={startDrag}

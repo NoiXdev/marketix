@@ -98,5 +98,6 @@ return [
         'zoom_in' => 'Zoom in',
         'zoom_out' => 'Zoom out',
         'reset' => 'Reset view',
+        'zoom_hint' => 'Hold Ctrl and scroll to zoom',
     ],
 ];
