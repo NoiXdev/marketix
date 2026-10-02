@@ -35,5 +35,6 @@ return [
         'limit' => 'Limiet',
         'days' => 'Periode',
         'days_value' => 'Laatste :days dagen',
+        'hide_frame' => 'Kaartframe verbergen',
     ],
 ];

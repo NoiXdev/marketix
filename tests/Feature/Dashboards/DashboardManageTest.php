@@ -43,6 +43,25 @@ class DashboardManageTest extends TestCase
         $this->assertLessThanOrEqual(4, $w['layout']['h']); // kpi maxH
     }
 
+    public function test_update_persists_hide_frame_config(): void
+    {
+        [$user, $project] = $this->member();
+
+        $this->actingAs($user)->post(route('app.project.dashboards.store', ['project' => $project->id]), ['name' => 'Bare'])->assertRedirect();
+        $dashboard = $user->dashboards()->where('project_id', $project->id)->where('name', 'Bare')->firstOrFail();
+
+        $this->actingAs($user)->put(route('app.project.dashboards.update', ['project' => $project->id, 'dashboard' => $dashboard->id]), [
+            'name' => 'Bare',
+            'widgets' => [[
+                'id' => 'w1', 'type' => 'kpi',
+                'config' => ['metric' => 'clicks', 'days' => 30, 'title' => null, 'hide_frame' => true],
+                'layout' => ['x' => 0, 'y' => 0, 'w' => 3, 'h' => 2],
+            ]],
+        ])->assertRedirect();
+
+        $this->assertTrue($dashboard->fresh()->widgets[0]['config']['hide_frame']);
+    }
+
     public function test_update_rejects_unknown_widget_type(): void
     {
         [$user, $project] = $this->member();

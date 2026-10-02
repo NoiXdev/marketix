@@ -35,5 +35,6 @@ return [
         'limit' => 'Limite',
         'days' => 'Période',
         'days_value' => ':days derniers jours',
+        'hide_frame' => 'Masquer le cadre de la carte',
     ],
 ];

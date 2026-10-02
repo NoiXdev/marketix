@@ -35,5 +35,6 @@ return [
         'limit' => 'Limit',
         'days' => 'Date range',
         'days_value' => 'Last :days days',
+        'hide_frame' => 'Hide card frame',
     ],
 ];
