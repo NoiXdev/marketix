@@ -6,6 +6,8 @@ export interface WidgetConfig {
   limit?: number;
   days?: number;
   title?: string | null;
+  /** Render the widget without the card frame (title bar + border). */
+  hide_frame?: boolean;
 }
 
 export interface WidgetLayout {

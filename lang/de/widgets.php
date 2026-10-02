@@ -35,5 +35,6 @@ return [
         'limit' => 'Anzahl',
         'days' => 'Zeitraum',
         'days_value' => 'Letzte :days Tage',
+        'hide_frame' => 'Kartenrahmen ausblenden',
     ],
 ];

@@ -1,4 +1,4 @@
-import { Button, Field, Input, Select } from '@/Components/ui';
+import { Button, Checkbox, Field, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { WIDGET_DEFS, type Widget as W, type WidgetConfig } from '@/lib/widgets/schema';
 import { X } from 'lucide-react';
@@ -35,6 +35,7 @@ export default function WidgetConfigForm({ widget, onSave, onClose }: Props) {
   const [metric, setMetric] = useState(widget.config.metric ?? def.metric ?? 'clicks');
   const [dimension, setDimension] = useState(widget.config.dimension ?? def.dimension ?? 'links');
   const [limit, setLimit] = useState(widget.config.limit ?? def.limit ?? 5);
+  const [hideFrame, setHideFrame] = useState(!!widget.config.hide_frame);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -51,6 +52,7 @@ export default function WidgetConfigForm({ widget, onSave, onClose }: Props) {
     if (fields.includes('metric')) config.metric = metric;
     if (fields.includes('dimension')) config.dimension = dimension;
     if (fields.includes('limit')) config.limit = Math.min(20, Math.max(1, Number(limit)));
+    config.hide_frame = hideFrame;
     onSave(config);
   }
 
@@ -116,6 +118,11 @@ export default function WidgetConfigForm({ widget, onSave, onClose }: Props) {
               </Select>
             </Field>
           )}
+
+          <label className="flex items-center gap-2 text-sm text-muted">
+            <Checkbox checked={hideFrame} onChange={(e) => setHideFrame(e.target.checked)} />
+            {t('widgets.config.hide_frame')}
+          </label>
 
           <div className="mt-4 flex justify-end gap-2">
             <Button type="button" variant="secondary" size="sm" onClick={onClose}>

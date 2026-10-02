@@ -13,7 +13,7 @@ export default function KpiWidget({ config, editing, onConfigure, onRemove }: { 
   const title = config.title || t(`widgets.metric.${config.metric}`);
 
   return (
-    <WidgetFrame title={title} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove}>
+    <WidgetFrame title={title} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
       {data && <KpiTile label={title} value={data.value} deltaPct={data.deltaPct} icon={BarChart3} />}
     </WidgetFrame>
   );

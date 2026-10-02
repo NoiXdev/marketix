@@ -9,7 +9,7 @@ export default function QuickActionsWidget({ config, editing, onConfigure, onRem
   const { t } = useTranslation();
   const project = usePage<PageProps>().props.project!;
   return (
-    <WidgetFrame title={config.title || t('widgets.types.quick_actions')} editing={editing} onConfigure={onConfigure} onRemove={onRemove}>
+    <WidgetFrame title={config.title || t('widgets.types.quick_actions')} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
       <QuickActions projectId={project.id} />
     </WidgetFrame>
   );

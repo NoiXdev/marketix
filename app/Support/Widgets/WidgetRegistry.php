@@ -14,18 +14,21 @@ class WidgetRegistry
 
     private const TITLE = ['nullable', 'string', 'max:60'];
 
+    // UI-only preference shared by every widget type: render without the card frame.
+    private const HIDE_FRAME = ['nullable', 'boolean'];
+
     public function __construct(private StatisticsAggregator $stats) {}
 
     /** @return array<string, array<int, string>> */
     public function configRules(WidgetType $type): array
     {
         return match ($type) {
-            WidgetType::Kpi => ['metric' => ['required', 'string', 'in:clicks,unique_visitors,active_links,avg_per_link'], 'days' => self::DAYS, 'title' => self::TITLE],
-            WidgetType::Timeseries => ['days' => self::DAYS, 'title' => self::TITLE],
-            WidgetType::TopList => ['dimension' => ['required', 'string', 'in:links,countries,cities,browsers,os,referrers'], 'limit' => ['required', 'integer', 'min:1', 'max:20'], 'days' => self::DAYS, 'title' => self::TITLE],
-            WidgetType::GeoMap => ['days' => self::DAYS, 'title' => self::TITLE],
-            WidgetType::Activity => ['limit' => ['required', 'integer', 'min:1', 'max:20'], 'title' => self::TITLE],
-            WidgetType::QuickActions => ['title' => self::TITLE],
+            WidgetType::Kpi => ['metric' => ['required', 'string', 'in:clicks,unique_visitors,active_links,avg_per_link'], 'days' => self::DAYS, 'title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
+            WidgetType::Timeseries => ['days' => self::DAYS, 'title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
+            WidgetType::TopList => ['dimension' => ['required', 'string', 'in:links,countries,cities,browsers,os,referrers'], 'limit' => ['required', 'integer', 'min:1', 'max:20'], 'days' => self::DAYS, 'title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
+            WidgetType::GeoMap => ['days' => self::DAYS, 'title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
+            WidgetType::Activity => ['limit' => ['required', 'integer', 'min:1', 'max:20'], 'title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
+            WidgetType::QuickActions => ['title' => self::TITLE, 'hide_frame' => self::HIDE_FRAME],
         };
     }
 

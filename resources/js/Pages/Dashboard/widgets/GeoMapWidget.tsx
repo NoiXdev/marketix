@@ -8,7 +8,7 @@ export default function GeoMapWidget({ config, editing, onConfigure, onRemove }:
   const { t } = useTranslation();
   const { data, loading, error, reload } = useWidgetData<{ data: CountryDatum[] }>('geo_map', config);
   return (
-    <WidgetFrame title={config.title || t('widgets.types.geo_map')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove}>
+    <WidgetFrame title={config.title || t('widgets.types.geo_map')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
       {data && <WorldMap data={data.data} title={config.title ?? undefined} bare />}
     </WidgetFrame>
   );

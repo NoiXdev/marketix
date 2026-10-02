@@ -10,7 +10,7 @@ export default function TimeseriesWidget({ config, editing, onConfigure, onRemov
   const { t } = useTranslation();
   const { data, loading, error, reload } = useWidgetData<Series>('timeseries', config);
   return (
-    <WidgetFrame title={config.title || t('widgets.types.timeseries')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove}>
+    <WidgetFrame title={config.title || t('widgets.types.timeseries')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
       {data && <ClicksChart data={data.series} />}
     </WidgetFrame>
   );
