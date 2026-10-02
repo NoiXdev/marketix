@@ -40,6 +40,7 @@ use App\Http\Controllers\TwoFactorChallengeController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\TwoFactorPasskeyController;
 use App\Http\Controllers\UrlController;
+use App\Http\Controllers\WidgetDataController;
 use App\Http\Middleware\ProjectBindingMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -114,6 +115,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::patch('/dashboards/reorder', [DashboardManageController::class, 'reorder'])->name('app.project.dashboards.reorder');
             Route::put('/dashboards/{dashboard}', [DashboardManageController::class, 'update'])->name('app.project.dashboards.update');
             Route::delete('/dashboards/{dashboard}', [DashboardManageController::class, 'destroy'])->name('app.project.dashboards.destroy');
+            Route::get('/widgets/data', [WidgetDataController::class, 'show'])->middleware('throttle:120,1')->name('app.project.widgets.data');
             Route::get('/docs/data-privacy', [DocsController::class, 'dataPrivacy'])->name('app.project.docs.privacy');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
