@@ -108,7 +108,7 @@ Route::group(['domain' => config('app.domain')], function () {
     Route::middleware(['auth', ProjectBindingMiddleware::class])
         ->prefix('/project/{project}')
         ->group(function () {
-            Route::get('/dashboard', [DashboardController::class, 'show'])->name('app.project.dashboard');
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('app.project.dashboard');
             Route::get('/docs/data-privacy', [DocsController::class, 'dataPrivacy'])->name('app.project.docs.privacy');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
