@@ -153,103 +153,117 @@ export default function WorldMap({ data, title, bare }: Props) {
   const zoomBtn =
     'flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface text-muted shadow-[var(--shadow-sm)] transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] disabled:opacity-40';
 
-  const content = (
+  const titleRow = (
     <>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-foreground">{title ?? t('common.map.title')}</h2>
-        {hasData ? (
-          <span className="hidden text-xs text-subtle sm:inline">{t('common.map.zoom_hint')}</span>
-        ) : (
-          <span className="text-xs text-subtle">{t('common.map.no_data')}</span>
-        )}
-      </div>
-
-      <div className="relative overflow-hidden rounded-lg">
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          className={`h-auto w-full select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-          role="img"
-          aria-label="World map of clicks by country"
-          onMouseDown={startDrag}
-        >
-          <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
-            {countries.features.map((geo, i) => {
-              const numericId = String((geo as unknown as { id: string }).id);
-              const alpha2 = numericToAlpha2(numericId);
-              const datum = alpha2 ? byAlpha2.get(alpha2.toUpperCase()) : undefined;
-              const d = pathGen(geo) ?? undefined;
-              return (
-                <path
-                  key={i}
-                  d={d}
-                  className="stroke-[color:var(--surface)]"
-                  strokeWidth={0.4}
-                  vectorEffect="non-scaling-stroke"
-                  fill={datum ? fillFor(datum.count) : NO_DATA}
-                  onMouseEnter={(e) =>
-                    datum &&
-                    !isDragging &&
-                    setHover({
-                      name: datum.country,
-                      count: datum.count,
-                      x: e.nativeEvent.offsetX,
-                      y: e.nativeEvent.offsetY,
-                    })
-                  }
-                  onMouseMove={(e) =>
-                    datum &&
-                    !isDragging &&
-                    setHover((h) => (h ? { ...h, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY } : h))
-                  }
-                  onMouseLeave={() => setHover(null)}
-                />
-              );
-            })}
-          </g>
-        </svg>
-
-        {/* Zoom controls */}
-        <div className="absolute right-2 top-2 flex flex-col gap-1">
-          <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_in')} title={t('common.map.zoom_in')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1.4)}>
-            <Plus className="h-4 w-4" />
-          </button>
-          <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_out')} title={t('common.map.zoom_out')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1 / 1.4)}>
-            <Minus className="h-4 w-4" />
-          </button>
-          <button type="button" className={zoomBtn} aria-label={t('common.map.reset')} title={t('common.map.reset')} disabled={view.k === 1 && view.x === 0 && view.y === 0} onClick={() => setView(IDENTITY)}>
-            <RotateCcw className="h-4 w-4" />
-          </button>
-        </div>
-
-        {hover && (
-          <div
-            className="pointer-events-none absolute z-10 rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
-            style={{ left: hover.x + 12, top: hover.y + 12 }}
-          >
-            {hover.name}: {hover.count.toLocaleString()}
-          </div>
-        )}
-      </div>
-
-      {/* Legend */}
-      {hasData && (
-        <div className="mt-4 flex items-center gap-2 text-xs text-subtle">
-          <span>{t('common.map.legend_less')}</span>
-          {BUCKETS.map((c) => (
-            <span key={c} className="inline-block h-3 w-6 rounded-sm" style={{ backgroundColor: c }} />
-          ))}
-          <span>{t('common.map.legend_more')}</span>
-        </div>
+      <h2 className="text-sm font-semibold text-foreground">{title ?? t('common.map.title')}</h2>
+      {hasData ? (
+        <span className="hidden text-xs text-subtle sm:inline">{t('common.map.zoom_hint')}</span>
+      ) : (
+        <span className="text-xs text-subtle">{t('common.map.no_data')}</span>
       )}
     </>
   );
 
-  if (bare) return content;
+  // `svgClass` lets the bare (dashboard widget) rendering fill the available
+  // height (`h-full`, letterboxed to fit) while the page rendering keeps its
+  // width-driven aspect ratio (`h-auto`).
+  const mapSvg = (svgClass: string) => (
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+      preserveAspectRatio="xMidYMid meet"
+      className={`${svgClass} select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+      role="img"
+      aria-label="World map of clicks by country"
+      onMouseDown={startDrag}
+    >
+      <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
+        {countries.features.map((geo, i) => {
+          const numericId = String((geo as unknown as { id: string }).id);
+          const alpha2 = numericToAlpha2(numericId);
+          const datum = alpha2 ? byAlpha2.get(alpha2.toUpperCase()) : undefined;
+          const d = pathGen(geo) ?? undefined;
+          return (
+            <path
+              key={i}
+              d={d}
+              className="stroke-[color:var(--surface)]"
+              strokeWidth={0.4}
+              vectorEffect="non-scaling-stroke"
+              fill={datum ? fillFor(datum.count) : NO_DATA}
+              onMouseEnter={(e) =>
+                datum &&
+                !isDragging &&
+                setHover({ name: datum.country, count: datum.count, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })
+              }
+              onMouseMove={(e) =>
+                datum && !isDragging && setHover((h) => (h ? { ...h, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY } : h))
+              }
+              onMouseLeave={() => setHover(null)}
+            />
+          );
+        })}
+      </g>
+    </svg>
+  );
+
+  const controls = (
+    <div className="absolute right-2 top-2 flex flex-col gap-1">
+      <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_in')} title={t('common.map.zoom_in')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1.4)}>
+        <Plus className="h-4 w-4" />
+      </button>
+      <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_out')} title={t('common.map.zoom_out')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1 / 1.4)}>
+        <Minus className="h-4 w-4" />
+      </button>
+      <button type="button" className={zoomBtn} aria-label={t('common.map.reset')} title={t('common.map.reset')} disabled={view.k === 1 && view.x === 0 && view.y === 0} onClick={() => setView(IDENTITY)}>
+        <RotateCcw className="h-4 w-4" />
+      </button>
+    </div>
+  );
+
+  const hoverTip = hover && (
+    <div
+      className="pointer-events-none absolute z-10 rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
+      style={{ left: hover.x + 12, top: hover.y + 12 }}
+    >
+      {hover.name}: {hover.count.toLocaleString()}
+    </div>
+  );
+
+  const legendInner = (
+    <>
+      <span>{t('common.map.legend_less')}</span>
+      {BUCKETS.map((c) => (
+        <span key={c} className="inline-block h-3 w-6 rounded-sm" style={{ backgroundColor: c }} />
+      ))}
+      <span>{t('common.map.legend_more')}</span>
+    </>
+  );
+
+  // Bare: fill the cell (title + flex map area + legend), so the map never scrolls.
+  if (bare) {
+    return (
+      <div className="flex h-full flex-col">
+        <div className="mb-2 flex shrink-0 items-center justify-between">{titleRow}</div>
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-lg">
+          {mapSvg('h-full w-full')}
+          {controls}
+          {hoverTip}
+        </div>
+        {hasData && <div className="mt-2 flex shrink-0 items-center gap-2 text-xs text-subtle">{legendInner}</div>}
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
-      {content}
+      <div className="mb-4 flex items-center justify-between">{titleRow}</div>
+      <div className="relative overflow-hidden rounded-lg">
+        {mapSvg('h-auto w-full')}
+        {controls}
+        {hoverTip}
+      </div>
+      {hasData && <div className="mt-4 flex items-center gap-2 text-xs text-subtle">{legendInner}</div>}
     </div>
   );
 }

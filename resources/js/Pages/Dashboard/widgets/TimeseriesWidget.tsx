@@ -11,7 +11,7 @@ export default function TimeseriesWidget({ config, editing, onConfigure, onRemov
   const { data, loading, error, reload } = useWidgetData<Series>('timeseries', config);
   return (
     <WidgetFrame title={config.title || t('widgets.types.timeseries')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
-      {data && <ClicksChart data={data.series} />}
+      {data && <ClicksChart data={data.series} fill />}
     </WidgetFrame>
   );
 }
