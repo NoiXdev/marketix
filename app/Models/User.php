@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passkeys\Contracts\PasskeyUser;
@@ -34,6 +35,11 @@ class User extends Authenticatable implements HasLocalePreference, PasskeyUser
             ->withPivot('role', 'active')
             ->withTimestamps()
             ->using(ProjectUser::class);
+    }
+
+    public function dashboards(): HasMany
+    {
+        return $this->hasMany(Dashboard::class);
     }
 
     public function roleInProject(Model $project): ?ProjectRole

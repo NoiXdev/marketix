@@ -83,6 +83,11 @@ class Project extends Model
         return $this->hasMany(ScheduledReport::class);
     }
 
+    public function dashboards(): HasMany
+    {
+        return $this->hasMany(Dashboard::class);
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id')
