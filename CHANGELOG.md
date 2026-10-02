@@ -1,4 +1,34 @@
-## [2.2.0](https://github.com/NoiXdev/marketix/compare/v2.1.0...v) (2026-10-01)
+## [2.3.0](https://github.com/NoiXdev/marketix/compare/v2.2.0...v) (2026-10-02)
+
+
+### Features
+
+* **dashboards:** CRUD + reorder with widget sanitize/clamp ([bdf1d80](https://github.com/NoiXdev/marketix/commit/bdf1d8012e3ca286cc2ee1f3c00e736c4491543d))
+* **dashboards:** dashboard index lists user dashboards + active ([ee7d83b](https://github.com/NoiXdev/marketix/commit/ee7d83b26e8023508e486f01ea6a694603ca3d1e))
+* **dashboards:** dashboards table + model ([2373e64](https://github.com/NoiXdev/marketix/commit/2373e649c8c2d88153d9d06dc2802bc98dedea72))
+* **dashboards:** edit mode — drag/resize/add/remove/configure autosave ([cbcb8e1](https://github.com/NoiXdev/marketix/commit/cbcb8e11126df774b190da6736c5f549ab9b6ba4))
+* **dashboards:** grid page shell + dashboard switcher (view mode) ([bc8c757](https://github.com/NoiXdev/marketix/commit/bc8c757329b073ba2ba914ea0a4ff08f03774767))
+* **dashboards:** i18n for widgets + dashboard UI (en/de/fr/nl) ([e5e6d88](https://github.com/NoiXdev/marketix/commit/e5e6d889259d2d004a0954ca6b1aefc5baf5aed6))
+* **dashboards:** lazy default dashboard resolver ([b24c60f](https://github.com/NoiXdev/marketix/commit/b24c60f5fb9be95b52bff85e14ac6dcc85cdacf1))
+* **dashboards:** per-widget "hide card frame" option ([0ab191c](https://github.com/NoiXdev/marketix/commit/0ab191c15781c77569e1ba9a891b43fafe0a6e7f))
+* **dashboards:** react-grid-layout + widget schema ([16b1782](https://github.com/NoiXdev/marketix/commit/16b1782b5c48be942ac92ce9e769d576f60014d1))
+* **dashboards:** remaining widgets + dispatcher ([10c2267](https://github.com/NoiXdev/marketix/commit/10c22676e6cb601419ad8176492f2e1f9be7cc6b))
+* **dashboards:** stateless widget data endpoint ([dd85314](https://github.com/NoiXdev/marketix/commit/dd85314f6d2cca4b3e84666bc01d050691cdccf2))
+* **dashboards:** widget data hook, frame, KPI widget ([66019df](https://github.com/NoiXdev/marketix/commit/66019df27cd33f7461aa4ac5e7f1ca20b0056e27))
+* **dashboards:** widget type registry + data handlers ([96833e9](https://github.com/NoiXdev/marketix/commit/96833e9cb89176a79aaa56f4e83514ad87410874))
+* **map:** require Ctrl/Cmd for wheel-zoom so the page can scroll past it ([2a208ea](https://github.com/NoiXdev/marketix/commit/2a208eadfc9287f7f8cc2608a33b62c66c7c39d7))
+* show indicator when a new app version is available ([d3b3a61](https://github.com/NoiXdev/marketix/commit/d3b3a61921ed4d3fd4251ae7cccc98c001509401))
+
+
+### Bug Fixes
+
+* dashboard manage controller redirect, partial-update, and invariants ([748b782](https://github.com/NoiXdev/marketix/commit/748b782466a52beb207861c0edfde21efb598389))
+* **dashboards:** guard useWidgetData retry against stale responses ([4b97387](https://github.com/NoiXdev/marketix/commit/4b9738764378d3e482906bb7115c50aae9dc32d4))
+* **dashboards:** make widgets fit their grid cells ([89f4817](https://github.com/NoiXdev/marketix/commit/89f4817b22c5d56c2b4fb0524884236c32a9cedc))
+* **dashboards:** persist finite bottom-Y on add, exclude QuickActions links from drag ([fe6ffbd](https://github.com/NoiXdev/marketix/commit/fe6ffbd44af0ed76410b1bae849cc8a7477c8637))
+* keep dashboard editing desktop-only, default GeoMap widget title ([3978924](https://github.com/NoiXdev/marketix/commit/3978924e80e7e07743b993b20c78d93b55d8fd4e))
+
+## [2.2.0](https://github.com/NoiXdev/marketix/compare/v2.1.0...v2.2.0) (2026-10-01)
 
 
 ### Features
