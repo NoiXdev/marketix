@@ -33,6 +33,10 @@ export default function Dashboard({ dashboards, active }: Props) {
   const [widgets, setWidgets] = useState<W[]>(active.widgets);
   const [picking, setPicking] = useState(false);
   const [configuring, setConfiguring] = useState<W | null>(null);
+  // Tracks the RGL breakpoint actually in effect. Editing is a desktop-only
+  // action: below `lg` the grid collapses to a single derived column, and
+  // persisting that collapsed layout would clobber the saved desktop layout.
+  const [breakpoint, setBreakpoint] = useState('lg');
 
   // Reset local edit state whenever the active dashboard changes (switcher navigation).
   useEffect(() => {
@@ -41,6 +45,14 @@ export default function Dashboard({ dashboards, active }: Props) {
     setPicking(false);
     setConfiguring(null);
   }, [active.id]);
+
+  // If the viewport shrinks below `lg` while editing, drop out of edit mode —
+  // editing is desktop-only.
+  useEffect(() => {
+    if (breakpoint !== 'lg' && editing) {
+      setEditing(false);
+    }
+  }, [breakpoint, editing]);
 
   function save(next: W[]) {
     setWidgets(next);
@@ -55,6 +67,10 @@ export default function Dashboard({ dashboards, active }: Props) {
 
   function onLayoutChange(l: Layout) {
     if (!editing) return;
+    // Never persist a layout derived from a non-desktop breakpoint — RGL
+    // hands back a collapsed 1-column layout (x:0, w:1 per item) below `lg`,
+    // which would overwrite the stored desktop arrangement.
+    if (breakpoint !== 'lg') return;
     const byId = new Map(l.map((it) => [it.i, it]));
     save(
       widgets.map((w) => {
@@ -102,10 +118,14 @@ export default function Dashboard({ dashboards, active }: Props) {
                 {t('dashboards.add_widget')}
               </Button>
             )}
-            <Button variant={editing ? 'primary' : 'secondary'} size="sm" onClick={() => setEditing((e) => !e)}>
-              {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-              {editing ? t('dashboards.done_editing') : t('dashboards.edit')}
-            </Button>
+            {/* Editing is a desktop-only action: hidden below `lg` so a narrow
+                viewport can never enter edit mode and save a collapsed layout. */}
+            <div className="hidden lg:block">
+              <Button variant={editing ? 'primary' : 'secondary'} size="sm" onClick={() => setEditing((e) => !e)}>
+                {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                {editing ? t('dashboards.done_editing') : t('dashboards.edit')}
+              </Button>
+            </div>
           </div>
         </div>
         <Grid
@@ -118,6 +138,7 @@ export default function Dashboard({ dashboards, active }: Props) {
           isResizable={editing}
           draggableCancel=".widget-no-drag"
           margin={[14, 14]}
+          onBreakpointChange={(bp) => setBreakpoint(bp)}
           onDragStop={(l) => onLayoutChange(l)}
           onResizeStop={(l) => onLayoutChange(l)}
         >
