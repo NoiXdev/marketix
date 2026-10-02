@@ -1,10 +1,16 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { Button } from '@/Components/ui';
+import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Responsive, WidthProvider, type Layout } from 'react-grid-layout/legacy';
-import type { Widget as W } from '@/lib/widgets/schema';
+import { Check, Pencil, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { WIDGET_DEFS, newWidget, type Widget as W, type WidgetConfig } from '@/lib/widgets/schema';
 import Widget from '@/Pages/Dashboard/widgets/Widget';
 import DashboardSwitcher from '@/Pages/Dashboard/DashboardSwitcher';
+import AddWidgetPicker from '@/Pages/Dashboard/AddWidgetPicker';
+import WidgetConfigForm from '@/Pages/Dashboard/WidgetConfigForm';
 
 const Grid = WidthProvider(Responsive);
 
@@ -21,14 +27,79 @@ interface Props {
 
 export default function Dashboard({ dashboards, active }: Props) {
   const project = usePage<PageProps>().props.project!;
-  const layout: Layout = active.widgets.map((w) => ({ i: w.id, ...w.layout }));
+  const { t } = useTranslation();
+
+  const [editing, setEditing] = useState(false);
+  const [widgets, setWidgets] = useState<W[]>(active.widgets);
+  const [picking, setPicking] = useState(false);
+  const [configuring, setConfiguring] = useState<W | null>(null);
+
+  // Reset local edit state whenever the active dashboard changes (switcher navigation).
+  useEffect(() => {
+    setWidgets(active.widgets);
+    setEditing(false);
+    setPicking(false);
+    setConfiguring(null);
+  }, [active.id]);
+
+  function save(next: W[]) {
+    setWidgets(next);
+    router.put(
+      route('app.project.dashboards.update', { project: project.id, dashboard: active.id }),
+      // next is already plain JSON-safe data; round-trip it so its structural
+      // type matches Inertia's FormDataConvertible payload shape.
+      { name: active.name, widgets: JSON.parse(JSON.stringify(next)) },
+      { preserveScroll: true, preserveState: true },
+    );
+  }
+
+  function onLayoutChange(l: Layout) {
+    if (!editing) return;
+    const byId = new Map(l.map((it) => [it.i, it]));
+    save(
+      widgets.map((w) => {
+        const it = byId.get(w.id);
+        return it ? { ...w, layout: { x: it.x, y: it.y, w: it.w, h: it.h } } : w;
+      }),
+    );
+  }
+
+  function addWidget(type: W['type']) {
+    save([...widgets, newWidget(type)]);
+    setPicking(false);
+  }
+
+  function removeWidget(id: string) {
+    save(widgets.filter((w) => w.id !== id));
+  }
+
+  function configureWidget(id: string, config: WidgetConfig) {
+    save(widgets.map((w) => (w.id === id ? { ...w, config } : w)));
+    setConfiguring(null);
+  }
+
+  const layout: Layout = widgets.map((w) => {
+    const def = WIDGET_DEFS[w.type].defaultLayout;
+    return { i: w.id, x: w.layout.x, y: w.layout.y, w: w.layout.w, h: w.layout.h, minW: def.minW, minH: def.minH, maxH: def.maxH };
+  });
 
   return (
     <AppLayout title={project.name}>
       <div className="px-8 py-6">
         <div className="mb-4 flex items-center justify-between gap-3">
           <DashboardSwitcher dashboards={dashboards} active={active} />
-          {/* Edit toggle added in Task 11 */}
+          <div className="flex items-center gap-2">
+            {editing && (
+              <Button variant="secondary" size="sm" onClick={() => setPicking(true)}>
+                <Plus className="h-4 w-4" />
+                {t('dashboards.add_widget')}
+              </Button>
+            )}
+            <Button variant={editing ? 'primary' : 'secondary'} size="sm" onClick={() => setEditing((e) => !e)}>
+              {editing ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+              {editing ? t('dashboards.done_editing') : t('dashboards.edit')}
+            </Button>
+          </div>
         </div>
         <Grid
           className="layout"
@@ -36,17 +107,25 @@ export default function Dashboard({ dashboards, active }: Props) {
           breakpoints={{ lg: 1024, xs: 0 }}
           cols={{ lg: 12, xs: 1 }}
           rowHeight={64}
-          isDraggable={false}
-          isResizable={false}
+          isDraggable={editing}
+          isResizable={editing}
+          draggableCancel=".widget-no-drag"
           margin={[14, 14]}
+          onDragStop={(l) => onLayoutChange(l)}
+          onResizeStop={(l) => onLayoutChange(l)}
         >
-          {active.widgets.map((w) => (
+          {widgets.map((w) => (
             <div key={w.id}>
-              <Widget widget={w} editing={false} onConfigure={() => {}} onRemove={() => {}} />
+              <Widget widget={w} editing={editing} onConfigure={() => setConfiguring(w)} onRemove={() => removeWidget(w.id)} />
             </div>
           ))}
         </Grid>
       </div>
+
+      {picking && <AddWidgetPicker onPick={addWidget} onClose={() => setPicking(false)} />}
+      {configuring && (
+        <WidgetConfigForm widget={configuring} onSave={(config) => configureWidget(configuring.id, config)} onClose={() => setConfiguring(null)} />
+      )}
     </AppLayout>
   );
 }
