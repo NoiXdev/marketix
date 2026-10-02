@@ -28,6 +28,7 @@ return [
         'docs' => 'Documentatie',
         'admin_docs' => 'Admin-docs',
     ],
+    'update_available' => 'Update beschikbaar: v:version',
     'language' => [
         'label' => 'Taal',
     ],

@@ -1,9 +1,10 @@
 import Brand from '@/Components/Brand';
 import UserMenu from '@/Components/UserMenu';
+import VersionLabel from '@/Components/VersionLabel';
 import { Badge, EmptyState, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
-import { PageProps, ProjectRole } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { ProjectRole } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import { FolderKanban, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -14,7 +15,6 @@ interface ChooserProject {
 }
 
 export default function ChooseProject({ projects }: { projects: ChooserProject[] }) {
-  const { version } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
 
@@ -83,7 +83,7 @@ export default function ChooseProject({ projects }: { projects: ChooserProject[]
             </>
           )}
 
-          <p className="mt-10 text-center text-xs text-subtle">v{version}</p>
+          <VersionLabel className="mt-10 text-center text-xs text-subtle" />
         </div>
       </main>
     </div>

@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, ChevronDown, LogOut, Shield, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
+import VersionLabel from './VersionLabel';
 
 function initials(name: string): string {
     return name
@@ -14,7 +15,7 @@ function initials(name: string): string {
 }
 
 export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'down' } = {}) {
-    const { auth, version } = usePage<PageProps>().props;
+    const { auth } = usePage<PageProps>().props;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
     const { t } = useTranslation();
@@ -110,7 +111,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                             <LogOut className="h-4 w-4 text-danger-foreground" />
                             {t('common.user_menu.logout')}
                         </Link>
-                        <p className="border-t border-line px-3 pt-2 pb-1 text-center text-[11px] text-subtle">v{version}</p>
+                        <VersionLabel className="border-t border-line px-3 pt-2 pb-1 text-center text-[11px] text-subtle" />
                     </div>
             )}
         </div>

@@ -28,6 +28,7 @@ return [
         'docs' => 'Documentation',
         'admin_docs' => 'Doc admin',
     ],
+    'update_available' => 'Mise à jour disponible : v:version',
     'language' => [
         'label' => 'Langue',
     ],
