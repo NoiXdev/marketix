@@ -1,9 +1,9 @@
 import { useTranslation } from '@/lib/i18n';
-import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Activity, ArrowLeft, ChevronLeft, FolderKanban, HardDrive, Mail, Palette, ScrollText, Users } from 'lucide-react';
 import { useState } from 'react';
 import Brand from './Brand';
+import VersionLabel from './VersionLabel';
 
 type NavItem = { key: string; icon: typeof Users; routeName?: string; href?: string };
 type NavGroup = { labelKey: string; items: NavItem[] };
@@ -37,7 +37,6 @@ const stripHost = (href: string) => '/' + href.replace(/^https?:\/\/[^/]+\//, ''
 
 export default function AdminSidebar() {
   const { url } = usePage();
-  const { version } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
   const [collapsed, setCollapsed] = useState<boolean>(() => {
@@ -155,7 +154,7 @@ export default function AdminSidebar() {
 
       {/* Footer: version */}
       <div className="border-t border-line px-3 py-2">
-        <p className={`text-[11px] text-subtle ${collapsed ? 'text-center' : ''}`}>v{version}</p>
+        <VersionLabel className={`text-[11px] text-subtle ${collapsed ? 'text-center' : ''}`} />
       </div>
     </aside>
   );

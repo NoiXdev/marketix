@@ -53,4 +53,9 @@ return [
         'disk' => env('FAVICON_DISK'),
     ],
 
+    'github' => [
+        'repository' => env('UPDATE_CHECK_REPOSITORY', 'NoiXdev/marketix'),
+        'update_check' => env('UPDATE_CHECK_ENABLED', true),
+    ],
+
 ];

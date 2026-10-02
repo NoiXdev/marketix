@@ -103,6 +103,7 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   project?: Project;
   currentProjectRole?: ProjectRole | null;
   version: string;
+  updateAvailable: { version: string; url: string } | null;
   branding: {
     appName: string;
     logoLight: string | null;

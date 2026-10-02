@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\UpdateChecker;
 use App\Settings\BrandingSettings;
 use App\Support\Locales;
 use App\Support\Translations;
@@ -21,13 +22,15 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $updates = app(UpdateChecker::class);
 
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $user,
             ],
-            'version' => json_decode(file_get_contents(base_path('package.json')))->version,
+            'version' => $updates->currentVersion(),
+            'updateAvailable' => fn () => $user ? $updates->availableUpdate() : null,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

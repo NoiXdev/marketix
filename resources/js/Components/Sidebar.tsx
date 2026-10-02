@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import Brand from './Brand';
+import VersionLabel from './VersionLabel';
 
 type NavItem = { key: string; icon: typeof LinkIcon; routeName: string; countKey?: string };
 type NavGroup = { labelKey: string; items: NavItem[] };
@@ -35,7 +36,7 @@ const groups: NavGroup[] = [
 ];
 
 export default function Sidebar() {
-  const { project, navCounts, currentProjectRole, auth, version } = usePage<PageProps>().props;
+  const { project, navCounts, currentProjectRole, auth } = usePage<PageProps>().props;
   const isProjectAdmin = auth.user.super_admin || currentProjectRole === 'admin';
   const { t } = useTranslation();
 
@@ -145,7 +146,7 @@ export default function Sidebar() {
 
       {/* Footer: version only */}
       <div className="border-t border-line px-3 py-2">
-        <p className={`text-[11px] text-subtle ${collapsed ? 'text-center' : ''}`}>v{version}</p>
+        <VersionLabel className={`text-[11px] text-subtle ${collapsed ? 'text-center' : ''}`} />
       </div>
     </aside>
   );
