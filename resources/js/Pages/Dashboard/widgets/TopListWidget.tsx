@@ -27,7 +27,7 @@ export default function TopListWidget({ config, editing, onConfigure, onRemove }
   }
 
   return (
-    <WidgetFrame title={config.title || t(`widgets.dimension.${dim}`)} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
+    <WidgetFrame title={config.title || t(`widgets.dimension.${dim}`)} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame} scroll>
       {data && <RankedList emptyLabel={t('widgets.no_data')} rows={data.rows.map(toRow)} />}
     </WidgetFrame>
   );

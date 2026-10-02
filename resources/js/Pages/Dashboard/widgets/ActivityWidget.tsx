@@ -8,7 +8,7 @@ export default function ActivityWidget({ config, editing, onConfigure, onRemove 
   const { t } = useTranslation();
   const { data, loading, error, reload } = useWidgetData<{ items: FeedItem[] }>('activity', config);
   return (
-    <WidgetFrame title={config.title || t('widgets.types.activity')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame}>
+    <WidgetFrame title={config.title || t('widgets.types.activity')} loading={loading} error={error} onReload={reload} editing={editing} onConfigure={onConfigure} onRemove={onRemove} frameless={!!config.hide_frame} scroll>
       {data && <ActivityFeed items={data.items} emptyLabel={t('widgets.no_data')} />}
     </WidgetFrame>
   );

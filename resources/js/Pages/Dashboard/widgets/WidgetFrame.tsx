@@ -12,11 +12,14 @@ interface Props {
   onRemove?: () => void;
   /** Render the content without the card frame (title bar + border/background). */
   frameless?: boolean;
+  /** Allow the content to scroll inside the widget (for lists that can exceed the cell). */
+  scroll?: boolean;
   children: ReactNode;
 }
 
-export default function WidgetFrame({ title, loading, error, onReload, editing, onConfigure, onRemove, frameless, children }: Props) {
+export default function WidgetFrame({ title, loading, error, onReload, editing, onConfigure, onRemove, frameless, scroll, children }: Props) {
   const { t } = useTranslation();
+  const overflow = scroll ? 'overflow-auto' : 'overflow-hidden';
 
   const body = loading ? (
     <div className="flex h-full items-center justify-center text-subtle">
@@ -48,13 +51,13 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
   // controls so the widget stays configurable/removable and draggable.
   if (frameless) {
     return (
-      <div className={`relative h-full overflow-auto ${editing ? 'rounded-[var(--radius)] border border-dashed border-line' : ''}`}>
+      <div className={`relative flex h-full flex-col ${overflow} ${editing ? 'rounded-[var(--radius)] border border-dashed border-line' : ''}`}>
         {editing && (
           <div className="absolute right-1 top-1 z-10 rounded-md border border-line bg-surface/90 p-0.5 shadow-[var(--shadow-sm)] backdrop-blur-sm">
             {controls}
           </div>
         )}
-        <div className="h-full">{body}</div>
+        <div className="min-h-0 flex-1">{body}</div>
       </div>
     );
   }
@@ -65,7 +68,7 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
         <h3 className="truncate text-xs font-semibold text-foreground">{title}</h3>
         {editing && controls}
       </div>
-      <div className="relative min-h-0 flex-1 overflow-auto p-3">{body}</div>
+      <div className={`min-h-0 flex-1 p-3 ${overflow}`}>{body}</div>
     </div>
   );
 }
