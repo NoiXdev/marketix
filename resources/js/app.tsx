@@ -1,5 +1,7 @@
 import '../css/app.css';
 import 'flag-icons/css/flag-icons.min.css';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import './bootstrap';
 
 import { createInertiaApp } from '@inertiajs/react';
