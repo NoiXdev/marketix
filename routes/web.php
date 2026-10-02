@@ -14,6 +14,7 @@ use App\Http\Controllers\AnalyticsIngestionController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardManageController;
 use App\Http\Controllers\DocsController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
@@ -109,6 +110,10 @@ Route::group(['domain' => config('app.domain')], function () {
         ->prefix('/project/{project}')
         ->group(function () {
             Route::get('/dashboard', [DashboardController::class, 'index'])->name('app.project.dashboard');
+            Route::post('/dashboards', [DashboardManageController::class, 'store'])->name('app.project.dashboards.store');
+            Route::patch('/dashboards/reorder', [DashboardManageController::class, 'reorder'])->name('app.project.dashboards.reorder');
+            Route::put('/dashboards/{dashboard}', [DashboardManageController::class, 'update'])->name('app.project.dashboards.update');
+            Route::delete('/dashboards/{dashboard}', [DashboardManageController::class, 'destroy'])->name('app.project.dashboards.destroy');
             Route::get('/docs/data-privacy', [DocsController::class, 'dataPrivacy'])->name('app.project.docs.privacy');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
