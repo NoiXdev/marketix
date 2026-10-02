@@ -30,34 +30,47 @@ class DashboardPageTest extends TestCase
         return [$user, $project];
     }
 
-    public function test_dashboard_renders_with_overview_props(): void
+    public function test_dashboard_renders_default_dashboard_with_widgets(): void
     {
         [$user, $project] = $this->ctx();
 
         $this->actingAs($user)
-            ->get(route('app.project.dashboard', ['project' => $project->id]).'?days=30')
+            ->get(route('app.project.dashboard', ['project' => $project->id]))
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $p) => $p
                 ->component('Dashboard')
-                ->where('days', 30)
-                ->where('kpis.clicks.value', 4)
-                ->where('kpis.activeLinks.value', 1)
-                ->has('kpis.uniqueVisitors')
-                ->has('kpis.avgPerLink')
-                ->has('clicksByDay', 30)
-                ->has('topLinks', 1)
-                ->has('topCountries')
-                ->has('recentActivity')
+                ->has('dashboards', 1)
+                ->where('dashboards.0.is_default', true)
+                ->has('active.id')
+                ->where('active.name', 'Overview')
+                ->has('active.widgets')
             );
     }
 
-    public function test_invalid_days_clamps_to_30(): void
+    public function test_dashboard_query_param_selects_requested_dashboard(): void
     {
         [$user, $project] = $this->ctx();
+
+        // The first visit seeds the default dashboard; add a second one to switch to.
+        $this->actingAs($user)->get(route('app.project.dashboard', ['project' => $project->id]));
+        $second = $user->dashboards()->create([
+            'project_id' => $project->id,
+            'name' => 'Second',
+            'is_default' => false,
+            'position' => 1,
+            'widgets' => [],
+        ]);
+
         $this->actingAs($user)
-            ->get(route('app.project.dashboard', ['project' => $project->id]).'?days=999')
+            ->get(route('app.project.dashboard', ['project' => $project->id]).'?dashboard='.$second->id)
             ->assertOk()
-            ->assertInertia(fn (AssertableInertia $p) => $p->where('days', 30));
+            ->assertInertia(fn (AssertableInertia $p) => $p
+                ->component('Dashboard')
+                ->has('dashboards', 2)
+                ->where('active.id', $second->id)
+                ->where('active.name', 'Second')
+                ->where('active.widgets', [])
+            );
     }
 
     public function test_guest_redirected_to_login(): void
