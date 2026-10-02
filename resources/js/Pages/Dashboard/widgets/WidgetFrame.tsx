@@ -20,7 +20,7 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
       <div className="flex items-center justify-between border-b border-line px-3 py-2">
         <h3 className="truncate text-xs font-semibold text-foreground">{title}</h3>
         {editing && (
-          <div className="flex items-center gap-1">
+          <div className="widget-no-drag flex items-center gap-1">
             <button type="button" onClick={onConfigure} aria-label={t('widgets.configure')} className="rounded p-1 text-subtle hover:bg-elevated hover:text-foreground"><Settings2 className="h-3.5 w-3.5" /></button>
             <button type="button" onClick={onRemove} aria-label={t('widgets.remove')} className="rounded p-1 text-subtle hover:bg-danger-soft hover:text-danger-foreground"><X className="h-3.5 w-3.5" /></button>
           </div>
@@ -32,7 +32,7 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
         ) : error ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-xs text-subtle">
             <span>{t('widgets.load_error')}</span>
-            <button type="button" onClick={onReload} className="inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 hover:bg-elevated"><RefreshCw className="h-3 w-3" /> {t('widgets.retry')}</button>
+            <button type="button" onClick={onReload} className="widget-no-drag inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 hover:bg-elevated"><RefreshCw className="h-3 w-3" /> {t('widgets.retry')}</button>
           </div>
         ) : (
           children
