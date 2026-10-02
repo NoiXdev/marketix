@@ -2,65 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
-use App\Services\StatisticsAggregator;
+use App\Actions\ResolveDefaultDashboard;
+use App\Models\Dashboard;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function show(Request $request, StatisticsAggregator $stats)
+    public function index(Request $request, ResolveDefaultDashboard $resolveDefault)
     {
         $project = $request->get('project');
+        $user = $request->user();
 
-        $days = (int) $request->input('days', 30);
-        $days = in_array($days, [7, 30, 90, 365], true) ? $days : 30;
+        $default = $resolveDefault($user, $project);
 
-        $now = now();
-        $since = $now->copy()->subDays($days - 1)->startOfDay();
-        $until = $now;
-        $prevSince = $since->copy()->subDays($days);
-        $prevUntil = $since->copy()->subSecond();
+        $dashboards = $user->dashboards()->where('project_id', $project->id)->orderBy('position')->get();
 
-        $curClicks = $stats->totalClicks($project->id, null, $since, $until);
-        $prevClicks = $stats->totalClicks($project->id, null, $prevSince, $prevUntil);
-        $curUnique = $stats->uniqueClicks($project->id, null, $since, $until);
-        $prevUnique = $stats->uniqueClicks($project->id, null, $prevSince, $prevUntil);
-
-        $linksNow = $project->urls()->count();
-        $linksBefore = $project->urls()->where('created_at', '<', $since)->count();
-        $linksPrevEnd = $project->urls()->where('created_at', '<=', $prevUntil)->count();
-        $avgCur = $linksNow > 0 ? (int) round($curClicks / $linksNow) : 0;
-        $avgPrev = $linksPrevEnd > 0 ? (int) round($prevClicks / $linksPrevEnd) : 0;
+        $active = null;
+        if ($id = $request->query('dashboard')) {
+            $active = $dashboards->firstWhere('id', $id);
+        }
+        $active ??= $dashboards->firstWhere('id', $default->id) ?? $default;
 
         return inertia('Dashboard', [
-            'days' => $days,
-            'kpis' => [
-                'clicks' => ['value' => $curClicks, 'deltaPct' => $this->pct($curClicks, $prevClicks)],
-                'uniqueVisitors' => ['value' => $curUnique, 'deltaPct' => $this->pct($curUnique, $prevUnique)],
-                'activeLinks' => [
-                    'value' => $linksNow,
-                    'deltaPct' => $this->pct($linksNow, $linksBefore),
-                    'newInPeriod' => $project->urls()->where('created_at', '>=', $since)->count(),
-                    'domains' => $project->domains()->count(),
-                    'qrCodes' => $project->qrCodes()->count(),
-                ],
-                'avgPerLink' => ['value' => $avgCur, 'deltaPct' => $this->pct($avgCur, $avgPrev)],
-            ],
-            'clicksByDay' => $stats->clicksByDay($project->id, null, $days),
-            'topLinks' => $stats->topLinks($project->id, $since, $until, 5),
-            'topCountries' => $stats->breakdownByCountryCode($project->id, null, $since, $until, 5),
-            'recentActivity' => Activity::query()
-                ->forProject($project)
-                ->with('causer')
-                ->latest('id')
-                ->limit(6)
-                ->get()
-                ->map(fn (Activity $a) => $a->toFeedArray()),
+            'dashboards' => $dashboards->map(fn (Dashboard $d) => ['id' => $d->id, 'name' => $d->name, 'is_default' => $d->is_default, 'position' => $d->position])->values(),
+            'active' => ['id' => $active->id, 'name' => $active->name, 'widgets' => $active->widgets],
         ]);
-    }
-
-    private function pct(int $cur, int $prev): ?float
-    {
-        return $prev > 0 ? round(($cur - $prev) / $prev * 100, 1) : null;
     }
 }
