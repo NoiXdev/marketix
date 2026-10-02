@@ -65,7 +65,14 @@ export default function Dashboard({ dashboards, active }: Props) {
   }
 
   function addWidget(type: W['type']) {
-    save([...widgets, newWidget(type)]);
+    // newWidget() sets layout.y = Infinity so RGL drops it at the bottom on
+    // first render, but Infinity round-trips through JSON as null, which the
+    // backend then coalesces to 0 — colliding with existing widgets on
+    // reload. Compute a real, finite bottom-Y up front instead.
+    const bottomY = widgets.reduce((m, w) => Math.max(m, w.layout.y + w.layout.h), 0);
+    const w = newWidget(type);
+    w.layout = { ...w.layout, x: 0, y: bottomY };
+    save([...widgets, w]);
     setPicking(false);
   }
 
