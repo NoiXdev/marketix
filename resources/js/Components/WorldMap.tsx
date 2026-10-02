@@ -40,6 +40,8 @@ const countries = feature(
 interface Props {
   data: CountryDatum[];
   title?: string;
+  /** When true, renders the map content without the outer card wrapper so it nests inside another container (e.g. WidgetFrame). */
+  bare?: boolean;
 }
 
 interface View {
@@ -59,7 +61,7 @@ function clampView(k: number, x: number, y: number): View {
   };
 }
 
-export default function WorldMap({ data, title }: Props) {
+export default function WorldMap({ data, title, bare }: Props) {
   const { t } = useTranslation();
   const [hover, setHover] = useState<{ name: string; count: number; x: number; y: number } | null>(null);
   const [view, setView] = useState<View>(IDENTITY);
@@ -151,8 +153,8 @@ export default function WorldMap({ data, title }: Props) {
   const zoomBtn =
     'flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface text-muted shadow-[var(--shadow-sm)] transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] disabled:opacity-40';
 
-  return (
-    <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+  const content = (
+    <>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">{title ?? t('common.map.title')}</h2>
         {hasData ? (
@@ -240,6 +242,14 @@ export default function WorldMap({ data, title }: Props) {
           <span>{t('common.map.legend_more')}</span>
         </div>
       )}
+    </>
+  );
+
+  if (bare) return content;
+
+  return (
+    <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+      {content}
     </div>
   );
 }
