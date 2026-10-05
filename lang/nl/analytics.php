@@ -63,6 +63,21 @@ return [
         'range_today' => 'Vandaag',
         'chart_title' => 'Bezoekers over tijd',
         'no_data' => 'Geen gegevens',
+        'map_title' => 'Bezoekers per land',
+
+        'chart' => [
+            'show_table' => 'Als tabel tonen',
+            'show_chart' => 'Als grafiek tonen',
+            'date' => 'Datum',
+            'hour' => 'Tijd',
+            'select_metric' => 'Selecteer minstens één metriek.',
+            'scale_hint' => 'Paginaweergaven en unieke bezoekers delen één schaal; elke lijn is geschaald naar zijn piek in deze periode. Exacte waarden in de tooltip of de tabel.',
+        ],
+
+        'live' => [
+            'count' => ':count online',
+            'hint' => 'Bezoekers actief in de laatste 5 minuten',
+        ],
 
         'kpi' => [
             'page_views' => 'Paginaweergaven',
@@ -79,6 +94,56 @@ return [
             'browsers' => 'Browsers',
             'os' => 'Besturingssystemen',
             'devices' => 'Apparaten',
+            'pages' => "Pagina's",
+            'entry_pages' => "Instappagina's",
+            'exit_pages' => "Uitstappagina's",
+            'bounce_sub' => ':rate % bounce',
+            'sources' => 'Bronnen',
+            'channels' => 'Kanalen',
+            'locations' => 'Locaties',
+            'languages' => 'Talen',
+            'technology' => 'Technologie',
+        ],
+
+        'channels' => [
+            'direct' => 'Direct',
+            'organic_search' => 'Organisch zoeken',
+            'paid' => 'Betaald',
+            'social' => 'Sociale media',
+            'email' => 'E-mail',
+            'referral' => 'Verwijzingen',
+            'campaign' => 'Overige campagnes',
+        ],
+
+        'filters' => [
+            'title' => 'Filters',
+            'apply' => 'Klik om op deze waarde te filteren',
+            'remove' => 'Filter “:name” verwijderen',
+            'clear' => 'Alle filters wissen',
+            'keys' => [
+                'path' => 'Pagina',
+                'entry_path' => 'Instappagina',
+                'exit_path' => 'Uitstappagina',
+                'referer_domain' => 'Verwijzer',
+                'channel' => 'Kanaal',
+                'country_code' => 'Land',
+                'browser' => 'Browser',
+                'os' => 'Besturingssysteem',
+                'device' => 'Apparaat',
+                'language' => 'Taal',
+                'utm_source' => 'Bron',
+                'utm_medium' => 'Medium',
+                'utm_campaign' => 'Campagne',
+            ],
+        ],
+
+        'heatmap' => [
+            'title' => 'Activiteit per weekdag en uur',
+            'timezone' => 'Tijdzone: :zone',
+            'cell' => ':day, :hours: :count sessies',
+            'peak' => 'Drukst: :day, :hours',
+            'less' => 'Minder',
+            'more' => 'Meer',
         ],
 
         'campaigns' => [

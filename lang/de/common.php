@@ -51,7 +51,7 @@ return [
         'vs_previous' => 'vs. Vorperiode',
         'new_in_period' => ':n neu',
         'clicks' => 'Klicks',
-        'unique_visitors' => 'Unique Visitors',
+        'unique_visitors' => 'Eindeutige Besucher',
         'active_links' => 'Aktive Links',
         'avg_per_link' => 'Ø Klicks / Link',
         'bots_excluded' => 'Bots ausgeschlossen',
@@ -76,7 +76,7 @@ return [
         'no_activity' => 'Noch keine Aktivität',
         'range_days' => 'T',
         'range_year' => '1J',
-        'unique' => 'Unique',
+        'unique' => 'eindeutig',
     ],
     'report' => [
         'download_pdf' => 'PDF herunterladen',

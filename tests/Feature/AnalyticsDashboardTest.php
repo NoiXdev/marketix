@@ -36,12 +36,59 @@ class AnalyticsDashboardTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Analytics/Index')
                 ->where('days', 7)
-                ->where('totalPageViews', 2)
-                ->where('uniqueVisitors', 1)
-                ->has('pageViewsByDay', 7)
+                ->where('summary.page_views', 2)
+                ->where('summary.visitors', 1)
+                ->where('previousSummary.page_views', 0)
+                ->has('timeseries', 7)
                 ->has('topPaths')
+                ->has('entryPages')
+                ->has('exitPages')
                 ->has('topReferrers')
+                ->has('channels')
                 ->has('countries')
+                ->has('languages')
+                ->has('heatmap', 7)
+                ->has('liveVisitors')
+            );
+    }
+
+    public function test_today_range_uses_hourly_buckets(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=1')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('days', 1)
+                ->has('timeseries', 24)
+            );
+    }
+
+    public function test_filters_scope_the_dashboard_and_unknown_keys_are_dropped(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = Site::factory()->forProject($project)->create();
+
+        $de = Visit::factory()->forSite($site)->create(['visitor_hash' => 'de', 'country_code' => 'DE']);
+        PageView::factory()->forVisit($de)->create(['visitor_hash' => 'de', 'country_code' => 'DE']);
+        $ch = Visit::factory()->forSite($site)->create(['visitor_hash' => 'ch', 'country_code' => 'CH']);
+        PageView::factory()->forVisit($ch)->count(2)->create(['visitor_hash' => 'ch', 'country_code' => 'CH']);
+
+        $url = route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]);
+
+        $this->actingAs($user)
+            ->get($url.'?days=30&filters[country_code]=CH&filters[evil]=x')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('filters', ['country_code' => 'CH'])
+                ->where('summary.page_views', 2)
+                ->where('summary.sessions', 1)
             );
     }
 
@@ -60,8 +107,8 @@ class AnalyticsDashboardTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Analytics/Index')
-                ->where('campaignShare.total', 2)
-                ->where('campaignShare.from_campaigns', 1)
+                ->where('summary.sessions', 2)
+                ->where('summary.campaign_share', fn ($share) => (float) $share === 50.0)
                 ->has('utmSources')
                 ->has('utmMediums')
                 ->has('utmCampaigns')

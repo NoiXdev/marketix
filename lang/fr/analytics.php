@@ -63,6 +63,21 @@ return [
         'range_today' => "Aujourd'hui",
         'chart_title' => 'Visiteurs dans le temps',
         'no_data' => 'Aucune donnée',
+        'map_title' => 'Visiteurs par pays',
+
+        'chart' => [
+            'show_table' => 'Afficher en tableau',
+            'show_chart' => 'Afficher en graphique',
+            'date' => 'Date',
+            'hour' => 'Heure',
+            'select_metric' => 'Sélectionnez au moins une métrique.',
+            'scale_hint' => 'Pages vues et visiteurs uniques partagent une échelle ; chaque ligne est mise à l’échelle de son maximum sur la période. Valeurs exactes dans l’infobulle ou le tableau.',
+        ],
+
+        'live' => [
+            'count' => ':count en ligne',
+            'hint' => 'Visiteurs actifs au cours des 5 dernières minutes',
+        ],
 
         'kpi' => [
             'page_views' => 'Pages vues',
@@ -79,6 +94,56 @@ return [
             'browsers' => 'Navigateurs',
             'os' => "Systèmes d'exploitation",
             'devices' => 'Appareils',
+            'pages' => 'Pages',
+            'entry_pages' => "Pages d'entrée",
+            'exit_pages' => 'Pages de sortie',
+            'bounce_sub' => ':rate % de rebond',
+            'sources' => 'Sources',
+            'channels' => 'Canaux',
+            'locations' => 'Localisations',
+            'languages' => 'Langues',
+            'technology' => 'Technologie',
+        ],
+
+        'channels' => [
+            'direct' => 'Direct',
+            'organic_search' => 'Recherche organique',
+            'paid' => 'Payant',
+            'social' => 'Réseaux sociaux',
+            'email' => 'E-mail',
+            'referral' => 'Sites référents',
+            'campaign' => 'Autres campagnes',
+        ],
+
+        'filters' => [
+            'title' => 'Filtres',
+            'apply' => 'Cliquer pour filtrer sur cette valeur',
+            'remove' => 'Retirer le filtre « :name »',
+            'clear' => 'Effacer tous les filtres',
+            'keys' => [
+                'path' => 'Page',
+                'entry_path' => "Page d'entrée",
+                'exit_path' => 'Page de sortie',
+                'referer_domain' => 'Référent',
+                'channel' => 'Canal',
+                'country_code' => 'Pays',
+                'browser' => 'Navigateur',
+                'os' => "Système d'exploitation",
+                'device' => 'Appareil',
+                'language' => 'Langue',
+                'utm_source' => 'Source',
+                'utm_medium' => 'Support',
+                'utm_campaign' => 'Campagne',
+            ],
+        ],
+
+        'heatmap' => [
+            'title' => 'Activité par jour et heure',
+            'timezone' => 'Fuseau horaire : :zone',
+            'cell' => ':day, :hours : :count sessions',
+            'peak' => 'Pic d’activité : :day, :hours',
+            'less' => 'Moins',
+            'more' => 'Plus',
         ],
 
         'campaigns' => [
