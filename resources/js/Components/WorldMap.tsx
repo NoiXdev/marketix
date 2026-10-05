@@ -5,6 +5,8 @@ import type { FeatureCollection, Geometry } from 'geojson';
 import { numericToAlpha2 } from 'i18n-iso-countries';
 import worldData from 'world-atlas/countries-110m.json';
 import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { CountryFlag } from '@/Components/icons/CountryFlag';
+import { countryName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 
 // Minimal local type for topojson-specification's Topology (not directly importable)
@@ -62,8 +64,8 @@ function clampView(k: number, x: number, y: number): View {
 }
 
 export default function WorldMap({ data, title, bare }: Props) {
-  const { t } = useTranslation();
-  const [hover, setHover] = useState<{ name: string; count: number; x: number; y: number } | null>(null);
+  const { t, locale } = useTranslation();
+  const [hover, setHover] = useState<{ code: string; name: string; count: number; x: number; y: number; right: number | null } | null>(null);
   const [view, setView] = useState<View>(IDENTITY);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -144,6 +146,12 @@ export default function WorldMap({ data, title, bare }: Props) {
     };
   }, [isDragging]);
 
+  function pointer(e: ReactMouseEvent) {
+    const x = e.nativeEvent.offsetX;
+    const width = svgRef.current?.clientWidth ?? 0;
+    return { x, y: e.nativeEvent.offsetY, right: x > width / 2 ? width - x : null };
+  }
+
   function startDrag(e: ReactMouseEvent) {
     dragFrom.current = { x: e.clientX, y: e.clientY };
     setIsDragging(true);
@@ -174,7 +182,7 @@ export default function WorldMap({ data, title, bare }: Props) {
       preserveAspectRatio="xMidYMid meet"
       className={`${svgClass} select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
       role="img"
-      aria-label="World map of clicks by country"
+      aria-label={title ?? t('common.map.title')}
       onMouseDown={startDrag}
     >
       <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
@@ -194,11 +202,9 @@ export default function WorldMap({ data, title, bare }: Props) {
               onMouseEnter={(e) =>
                 datum &&
                 !isDragging &&
-                setHover({ name: datum.country, count: datum.count, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY })
+                setHover({ code: datum.country_code, name: countryName(datum.country_code, locale, datum.country), count: datum.count, ...pointer(e) })
               }
-              onMouseMove={(e) =>
-                datum && !isDragging && setHover((h) => (h ? { ...h, x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY } : h))
-              }
+              onMouseMove={(e) => datum && !isDragging && setHover((h) => (h ? { ...h, ...pointer(e) } : h))}
               onMouseLeave={() => setHover(null)}
             />
           );
@@ -223,10 +229,11 @@ export default function WorldMap({ data, title, bare }: Props) {
 
   const hoverTip = hover && (
     <div
-      className="pointer-events-none absolute z-10 rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
-      style={{ left: hover.x + 12, top: hover.y + 12 }}
+      className="pointer-events-none absolute z-10 inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
+      style={{ top: hover.y + 12, ...(hover.right !== null ? { right: hover.right + 12 } : { left: hover.x + 12 }) }}
     >
-      {hover.name}: {hover.count.toLocaleString()}
+      <CountryFlag code={hover.code} />
+      {hover.name}: {hover.count.toLocaleString(locale)}
     </div>
   );
 
