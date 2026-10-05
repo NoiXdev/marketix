@@ -7,6 +7,7 @@ use App\Models\Site;
 use App\Models\Visit;
 use App\Support\Analytics\AnalyticsQuery;
 use App\Support\Analytics\ChannelClassifier;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -392,23 +393,22 @@ class AnalyticsAggregator
             ->groupBy('country_code')->orderByDesc('count')->limit($limit)->get();
     }
 
-    /** @return list<list<int>> */
-    public function weekdayHourHeatmap(string $siteId, AnalyticsQuery|int $range): array
+    /** @return list<array{0: int, 1: int}> */
+    public function hourlyActivity(string $siteId, AnalyticsQuery|int $range): array
     {
-        [$weekday, $hour] = $this->isSqlite()
-            ? ["(CAST(strftime('%w', started_at) AS INTEGER) + 6) % 7", "CAST(strftime('%H', started_at) AS INTEGER)"]
-            : ['WEEKDAY(started_at)', 'HOUR(started_at)'];
+        $bucket = $this->isSqlite()
+            ? "strftime('%Y-%m-%d %H', started_at)"
+            : "DATE_FORMAT(started_at, '%Y-%m-%d %H')";
+        $timezone = config('app.timezone');
 
-        $rows = $this->visitBase($siteId, $range)
-            ->select(DB::raw("{$weekday} as weekday"), DB::raw("{$hour} as hour"), DB::raw('COUNT(*) as count'))
-            ->groupBy('weekday', 'hour')->get();
-
-        $grid = array_fill(0, 7, array_fill(0, 24, 0));
-        foreach ($rows as $row) {
-            $grid[(int) $row->weekday][(int) $row->hour] = (int) $row->count;
-        }
-
-        return $grid;
+        return $this->visitBase($siteId, $range)
+            ->select(DB::raw("{$bucket} as bucket"), DB::raw('COUNT(*) as count'))
+            ->groupBy('bucket')->orderBy('bucket')->get()
+            ->map(fn ($row) => [
+                CarbonImmutable::parse($row->bucket.':00:00', $timezone)->getTimestamp(),
+                (int) $row->count,
+            ])
+            ->all();
     }
 
     /** @return Collection<int, \stdClass> */

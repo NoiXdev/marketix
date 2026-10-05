@@ -142,8 +142,6 @@ return [
             'timezone' => 'Fuseau horaire : :zone',
             'cell' => ':day, :hours : :count sessions',
             'peak' => 'Pic d’activité : :day, :hours',
-            'less' => 'Moins',
-            'more' => 'Plus',
         ],
 
         'campaigns' => [

@@ -1,21 +1,20 @@
+import ScaleLegend from '@/Components/ScaleLegend';
+import { scaleFill } from '@/lib/colorScale';
+import { browserTimeZone, HourBucket, weekdayHourGrid } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const HOURS = Array.from({ length: 24 }, (_, h) => h);
-const LEGEND_STEPS = [0, 0.25, 0.5, 0.75, 1];
-
-function cellColor(ratio: number) {
-  if (ratio <= 0) return 'var(--elevated)';
-  return `color-mix(in srgb, var(--accent) ${Math.round(6 + Math.pow(ratio, 1.4) * 94)}%, var(--elevated))`;
-}
 
 function hourRange(hour: number) {
   return `${String(hour).padStart(2, '0')}:00 – ${String((hour + 1) % 24).padStart(2, '0')}:00`;
 }
 
-export default function ActivityHeatmap({ grid, timezone }: { grid: number[][]; timezone: string }) {
+export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) {
   const { t, locale } = useTranslation();
   const [hovered, setHovered] = useState<{ day: number; hour: number } | null>(null);
+  const timezone = useMemo(() => browserTimeZone(), []);
+  const grid = useMemo(() => weekdayHourGrid(buckets, timezone), [buckets, timezone]);
 
   const weekdays = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }));
   const max = Math.max(0, ...grid.flat());
@@ -57,8 +56,8 @@ export default function ActivityHeatmap({ grid, timezone }: { grid: number[][]; 
                   role="img"
                   aria-label={t('analytics.dashboard.heatmap.cell', { day: weekdays[day], hours: hourRange(hour), count: value })}
                   onMouseEnter={() => setHovered({ day, hour })}
-                  className={`h-5 rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-[color:var(--foreground)]' : ''}`}
-                  style={{ background: cellColor(max > 0 ? value / max : 0) }}
+                  className={`h-5 rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-inset ring-[color:var(--foreground)]' : ''}`}
+                  style={{ background: scaleFill(value, max) }}
                 />
               ))}
             </div>
@@ -66,15 +65,9 @@ export default function ActivityHeatmap({ grid, timezone }: { grid: number[][]; 
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-subtle">
-        <span>{t('analytics.dashboard.heatmap.timezone', { zone: timezone })}</span>
-        <span className="inline-flex items-center gap-1.5">
-          {t('analytics.dashboard.heatmap.less')}
-          {LEGEND_STEPS.map((step) => (
-            <span key={step} className="h-3 w-3 rounded-[3px]" style={{ background: cellColor(step) }} />
-          ))}
-          {t('analytics.dashboard.heatmap.more')}
-        </span>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        {max > 0 ? <ScaleLegend /> : <span />}
+        <span className="text-xs text-subtle">{t('analytics.dashboard.heatmap.timezone', { zone: timezone })}</span>
       </div>
     </section>
   );

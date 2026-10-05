@@ -163,19 +163,32 @@ class AnalyticsInsightsTest extends TestCase
         $this->assertSame(1, $this->agg->liveVisitors($site->id));
     }
 
-    public function test_heatmap_groups_sessions_by_weekday_and_hour(): void
+    public function test_hourly_activity_returns_absolute_hour_buckets(): void
     {
         $site = Site::factory()->create();
         $tuesday = CarbonImmutable::parse('2026-10-06 14:20:00');
         $this->visit($site, ['started_at' => $tuesday]);
         $this->visit($site, ['started_at' => $tuesday->addMinutes(10)]);
+        $this->visit($site, ['started_at' => $tuesday->addHours(3)]);
 
-        $grid = $this->agg->weekdayHourHeatmap($site->id, 7);
+        $buckets = $this->agg->hourlyActivity($site->id, 7);
 
-        $this->assertCount(7, $grid);
-        $this->assertCount(24, $grid[0]);
-        $this->assertSame(2, $grid[1][14]);
-        $this->assertSame(2, array_sum(array_map('array_sum', $grid)));
+        $this->assertSame([
+            [CarbonImmutable::parse('2026-10-06 14:00:00', 'UTC')->getTimestamp(), 2],
+            [CarbonImmutable::parse('2026-10-06 17:00:00', 'UTC')->getTimestamp(), 1],
+        ], $buckets);
+    }
+
+    public function test_hourly_activity_interprets_buckets_in_the_app_timezone(): void
+    {
+        config(['app.timezone' => 'Europe/Zurich']);
+        $site = Site::factory()->create();
+        $this->visit($site, ['started_at' => '2026-10-06 14:20:00']);
+
+        $this->assertSame(
+            CarbonImmutable::parse('2026-10-06 12:00:00', 'UTC')->getTimestamp(),
+            $this->agg->hourlyActivity($site->id, 7)[0][0],
+        );
     }
 
     public function test_path_filter_scopes_page_views_and_sessions(): void

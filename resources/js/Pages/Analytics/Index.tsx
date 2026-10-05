@@ -14,6 +14,7 @@ import KpiTile from '@/Pages/Dashboard/KpiTile';
 import { RankRow } from '@/Pages/Dashboard/RankedList';
 import { countryName, languageName } from '@/lib/displayNames';
 import { formatDuration, percentChange } from '@/lib/format';
+import { HourBucket } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -116,8 +117,7 @@ export default function AnalyticsIndex({
   browsers,
   operatingSystems,
   devices,
-  heatmap,
-  timezone,
+  hourlyActivity,
   utmSources,
   utmMediums,
   utmCampaigns,
@@ -145,8 +145,7 @@ export default function AnalyticsIndex({
   browsers: Rank[];
   operatingSystems: Rank[];
   devices: Rank[];
-  heatmap: number[][];
-  timezone: string;
+  hourlyActivity: HourBucket[];
   utmSources: CampaignRow[];
   utmMediums: CampaignRow[];
   utmCampaigns: CampaignRow[];
@@ -365,7 +364,7 @@ export default function AnalyticsIndex({
             />
           </div>
 
-          {days >= 7 && <ActivityHeatmap grid={heatmap} timezone={timezone} />}
+          {days >= 7 && <ActivityHeatmap buckets={hourlyActivity} />}
 
           <h2 className="mb-1 mt-8 text-sm font-semibold uppercase tracking-wide text-muted">{t('analytics.dashboard.campaigns.title')}</h2>
           <p className="mb-4 text-xs text-subtle">{t('analytics.dashboard.campaigns.hint')}</p>
