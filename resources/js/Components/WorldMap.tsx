@@ -1,4 +1,6 @@
 import { type MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import ScaleLegend from '@/Components/ScaleLegend';
+import { SCALE_EMPTY, scaleFill } from '@/lib/colorScale';
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { FeatureCollection, Geometry } from 'geojson';
@@ -16,11 +18,7 @@ export interface CountryDatum {
   count: number;
 }
 
-// 5-step teal fill ramp, fewest → most clicks, defined per theme in app.css:
-// light mode runs light → dark, dark mode dark → light, so the most clicks
-// always get the strongest contrast. No-data uses a theme token as well.
-const BUCKETS = ['var(--map-1)', 'var(--map-2)', 'var(--map-3)', 'var(--map-4)', 'var(--map-5)'];
-const NO_DATA = 'var(--elevated)';
+const NO_DATA = SCALE_EMPTY;
 
 const VIEW_W = 960;
 const VIEW_H = 500;
@@ -79,12 +77,8 @@ export default function WorldMap({ data, title, bare }: Props) {
   const max = useMemo(() => data.reduce((acc, d) => Math.max(acc, d.count), 0), [data]);
   const hasData = max > 0;
 
-  // Quantize a count into one of BUCKETS by share of the max.
   function fillFor(count: number): string {
-    if (max === 0 || count === 0) return NO_DATA;
-    const ratio = count / max;
-    const idx = Math.min(BUCKETS.length - 1, Math.floor(ratio * BUCKETS.length));
-    return BUCKETS[idx];
+    return scaleFill(count, max);
   }
 
   // Convert client coords to the map's viewBox coordinate system.
@@ -230,16 +224,6 @@ export default function WorldMap({ data, title, bare }: Props) {
     </div>
   );
 
-  const legendInner = (
-    <>
-      <span>{t('common.map.legend_less')}</span>
-      {BUCKETS.map((c) => (
-        <span key={c} className="inline-block h-3 w-6 rounded-sm" style={{ backgroundColor: c }} />
-      ))}
-      <span>{t('common.map.legend_more')}</span>
-    </>
-  );
-
   // Bare: fill the cell (title + flex map area + legend), so the map never scrolls.
   if (bare) {
     return (
@@ -250,7 +234,7 @@ export default function WorldMap({ data, title, bare }: Props) {
           {controls}
           {hoverTip}
         </div>
-        {hasData && <div className="mt-2 flex shrink-0 items-center gap-2 text-xs text-subtle">{legendInner}</div>}
+        {hasData && <ScaleLegend className="mt-2 shrink-0" />}
       </div>
     );
   }
@@ -263,7 +247,7 @@ export default function WorldMap({ data, title, bare }: Props) {
         {controls}
         {hoverTip}
       </div>
-      {hasData && <div className="mt-4 flex items-center gap-2 text-xs text-subtle">{legendInner}</div>}
+      {hasData && <ScaleLegend className="mt-4" />}
     </div>
   );
 }

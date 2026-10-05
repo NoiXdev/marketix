@@ -47,7 +47,7 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('channels')
                 ->has('countries')
                 ->has('languages')
-                ->has('heatmap', 7)
+                ->has('hourlyActivity', 1)
                 ->has('liveVisitors')
             );
     }

@@ -142,8 +142,6 @@ return [
             'timezone' => 'Time zone: :zone',
             'cell' => ':day, :hours: :count sessions',
             'peak' => 'Busiest: :day, :hours',
-            'less' => 'Less',
-            'more' => 'More',
         ],
 
         'campaigns' => [

@@ -142,8 +142,6 @@ return [
             'timezone' => 'Tijdzone: :zone',
             'cell' => ':day, :hours: :count sessies',
             'peak' => 'Drukst: :day, :hours',
-            'less' => 'Minder',
-            'more' => 'Meer',
         ],
 
         'campaigns' => [
