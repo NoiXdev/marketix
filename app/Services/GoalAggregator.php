@@ -28,6 +28,30 @@ class GoalAggregator
             ->groupBy('name')->orderByDesc('count')->limit($limit)->get();
     }
 
+    /** @return Collection<int, \stdClass> */
+    public function eventBreakdown(string $siteId, AnalyticsQuery|int $range, string $event, ?string $property = null, int $limit = 10): Collection
+    {
+        if ($property !== null && preg_match('/^[A-Za-z0-9_]+$/', $property) !== 1) {
+            throw new \InvalidArgumentException("Invalid event property: {$property}");
+        }
+
+        $query = AnalyticsQuery::from($range);
+        $value = match (true) {
+            $property === null => 'path',
+            DB::connection()->getDriverName() === 'sqlite' => "json_extract(props, '$.{$property}')",
+            default => "JSON_UNQUOTE(JSON_EXTRACT(props, '$.{$property}'))",
+        };
+
+        return $this->scoped(Event::query(), $siteId, $query)
+            ->where('site_id', $siteId)
+            ->where('is_bot', false)
+            ->whereBetween('created_at', [$query->from, $query->to])
+            ->where('name', $event)
+            ->whereRaw("{$value} IS NOT NULL")
+            ->select(DB::raw("{$value} as value"), DB::raw('COUNT(*) as count'), DB::raw('COUNT(DISTINCT visitor_hash) as visitors'))
+            ->groupBy('value')->orderByDesc('count')->limit($limit)->get();
+    }
+
     /**
      * Base query of the rows (events or page_views) that satisfy a goal, in range, bot-excluded.
      */

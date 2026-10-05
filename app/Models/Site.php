@@ -32,6 +32,9 @@ class Site extends Model
         'consent_mode',
         'consent_signal',
         'respect_dnt',
+        'track_outbound_links',
+        'track_file_downloads',
+        'site_search_params',
         'retention_days',
     ];
 
@@ -57,7 +60,7 @@ class Site extends Model
     {
         return LogOptions::defaults()
             ->useLogName('site')
-            ->logOnly(['name', 'domain', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'retention_days'])
+            ->logOnly(['name', 'domain', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
@@ -93,7 +96,15 @@ class Site extends Model
             'tracking_mode' => TrackingMode::class,
             'consent_mode' => ConsentMode::class,
             'respect_dnt' => 'boolean',
+            'track_outbound_links' => 'boolean',
+            'track_file_downloads' => 'boolean',
             'retention_days' => 'integer',
         ];
+    }
+
+    /** @return list<string> */
+    public function searchParams(): array
+    {
+        return array_values(array_filter(array_map('trim', explode(',', (string) $this->site_search_params))));
     }
 }

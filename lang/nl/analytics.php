@@ -29,6 +29,17 @@ return [
             'respect_dnt' => 'Do-Not-Track-header respecteren',
         ],
 
+        'measurement' => [
+            'title' => 'Uitgebreide meting',
+            'description' => 'Paginawissels in single-page-apps, actieve tijd op de pagina en scrolldiepte worden automatisch gemeten.',
+            'outbound_links' => 'Klikken op uitgaande links meten',
+            'file_downloads' => 'Bestandsdownloads meten (PDF, ZIP, Office-bestanden …)',
+            'search_params' => 'Zoekparameters van de website (optioneel)',
+            'search_params_placeholder' => 'q, s, search',
+            'search_params_hint' => 'Kommagescheiden URL-parameters waaruit zoektermen worden gelezen. Leeg laten om geen zoektermen op te slaan – zoektermen kunnen persoonsgegevens bevatten.',
+            'not_found_hint' => "Om 404-pagina's te meten, roept u dit aan op uw foutpagina:",
+        ],
+
         'snippet_title' => 'Trackingsnippet',
         'snippet_hint' => 'Plak dit in de <head> van :domain.',
         'copy' => 'Snippet kopiëren',
@@ -103,6 +114,19 @@ return [
             'locations' => 'Locaties',
             'languages' => 'Talen',
             'technology' => 'Technologie',
+            'engagement' => 'Gem. :time actief · :scroll % gescrold',
+            'engagement_time' => 'Gem. :time actief',
+        ],
+
+        'interactions' => [
+            'title' => 'Interacties',
+            'outbound' => 'Uitgaande links',
+            'downloads' => 'Downloads',
+            'search_title' => "Zoeken & foutpagina's",
+            'searches' => 'Zoektermen',
+            'not_found' => "404-pagina's",
+            'search_disabled' => 'Zoektermen worden voor deze website niet gemeten. U kunt dit inschakelen in de website-instellingen onder „Uitgebreide meting”.',
+            'not_found_hint' => "Nog geen 404-pagina's gemeten. Roep marketix('404') aan op uw foutpagina.",
         ],
 
         'channels' => [

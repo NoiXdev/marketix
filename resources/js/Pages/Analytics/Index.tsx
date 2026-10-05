@@ -18,7 +18,7 @@ import { HourBucket } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { BarChart3, Clock, Megaphone, MousePointerClick, Users } from 'lucide-react';
+import { BarChart3, Clock, FileDown, FileX, Megaphone, MousePointerClick, Search, Users } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 type FilterKey =
@@ -40,6 +40,8 @@ type Summary = { page_views: number; visitors: number; sessions: number; bounce_
 type Rank = Record<string, string | number> & { count: number };
 type CampaignRow = { value: string; sessions: number; visitors: number };
 type EventRow = { name: string; count: number; visitors: number };
+type ValueRow = { value: string; count: number; visitors: number };
+type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
 type GoalCard = {
   id: string; name: string; type: string; match_value: string;
   conversions: number; visitors: number; rate: number;
@@ -125,16 +127,17 @@ export default function AnalyticsIndex({
   utmTerms,
   utmContents,
   topEvents,
+  interactions,
   goals,
 }: {
-  site: { id: string; name: string; domain: string };
+  site: { id: string; name: string; domain: string; search_enabled: boolean };
   days: number;
   filters: Filters;
   summary: Summary;
   previousSummary: Summary;
   liveVisitors: number;
   timeseries: SeriesPoint[];
-  topPaths: Rank[];
+  topPaths: (Rank & { avg_engaged: number | null; avg_scroll: number | null })[];
   entryPages: (Rank & { bounce_rate: number })[];
   exitPages: Rank[];
   topReferrers: Rank[];
@@ -153,6 +156,7 @@ export default function AnalyticsIndex({
   utmTerms: CampaignRow[];
   utmContents: CampaignRow[];
   topEvents: EventRow[];
+  interactions: Interactions;
   goals: GoalCard[];
 }) {
   const { project } = usePage<PageProps>().props;
@@ -226,6 +230,17 @@ export default function AnalyticsIndex({
     });
   }
 
+  function valueRows(items: ValueRow[], extra: (row: ValueRow) => Partial<RankRow> = () => ({})): RankRow[] {
+    return items.map((r, i) => ({ key: `${r.value}-${i}`, label: r.value, value: Number(r.count), ...extra(r) }));
+  }
+
+  function engagementSub(seconds: number | null, scroll: number | null): string | undefined {
+    if (seconds === null) return undefined;
+    return scroll === null
+      ? t('analytics.dashboard.breakdown.engagement_time', { time: formatDuration(seconds) })
+      : t('analytics.dashboard.breakdown.engagement', { time: formatDuration(seconds), scroll });
+  }
+
   const noData = t('analytics.dashboard.no_data');
   const delta = (key: keyof Summary) => percentChange(summary[key], previousSummary[key]);
 
@@ -285,7 +300,11 @@ export default function AnalyticsIndex({
               title={t('analytics.dashboard.breakdown.pages')}
               emptyLabel={noData}
               tabs={[
-                { key: 'top', label: t('analytics.dashboard.breakdown.top_pages'), rows: rows(topPaths, 'path', 'path') },
+                {
+                  key: 'top',
+                  label: t('analytics.dashboard.breakdown.top_pages'),
+                  rows: rows(topPaths, 'path', 'path', (r) => ({ sub: engagementSub(r.avg_engaged, r.avg_scroll) })),
+                },
                 {
                   key: 'entry',
                   label: t('analytics.dashboard.breakdown.entry_pages'),
@@ -359,6 +378,47 @@ export default function AnalyticsIndex({
                   key: 'os',
                   label: t('analytics.dashboard.breakdown.os'),
                   rows: rows(operatingSystems, 'os', 'os', (r) => ({ prefix: <PlatformIcon kind="os" name={String(r.os ?? '')} /> })),
+                },
+              ]}
+            />
+          </div>
+
+          <div className="mb-6 grid grid-cols-1 gap-3.5 md:grid-cols-2">
+            <BreakdownCard
+              title={t('analytics.dashboard.interactions.title')}
+              emptyLabel={noData}
+              tabs={[
+                {
+                  key: 'outbound',
+                  label: t('analytics.dashboard.interactions.outbound'),
+                  rows: valueRows(interactions.outbound, (r) => ({ prefix: <Favicon domain={r.value.split('/')[0]} /> })),
+                },
+                {
+                  key: 'downloads',
+                  label: t('analytics.dashboard.interactions.downloads'),
+                  rows: valueRows(interactions.downloads, (r) => ({
+                    label: r.value.split('/').pop() || r.value,
+                    sub: r.value,
+                    prefix: <FileDown className="mx-auto h-4 w-4 text-subtle" />,
+                  })),
+                },
+              ]}
+            />
+            <BreakdownCard
+              title={t('analytics.dashboard.interactions.search_title')}
+              emptyLabel={noData}
+              tabs={[
+                {
+                  key: 'searches',
+                  label: t('analytics.dashboard.interactions.searches'),
+                  rows: valueRows(interactions.searches, () => ({ prefix: <Search className="mx-auto h-4 w-4 text-subtle" /> })),
+                  emptyLabel: site.search_enabled ? noData : t('analytics.dashboard.interactions.search_disabled'),
+                },
+                {
+                  key: 'not_found',
+                  label: t('analytics.dashboard.interactions.not_found'),
+                  rows: valueRows(interactions.notFound, () => ({ prefix: <FileX className="mx-auto h-4 w-4 text-subtle" /> })),
+                  emptyLabel: t('analytics.dashboard.interactions.not_found_hint'),
                 },
               ]}
             />

@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, Checkbox, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import EnhancedMeasurementSection from '@/Pages/Sites/partials/EnhancedMeasurementSection';
 import { PageProps, Site } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { Check, Copy } from 'lucide-react';
@@ -52,6 +53,9 @@ export default function SitesEdit({
     consent_mode: site.consent_mode,
     consent_signal: site.consent_signal ?? '',
     respect_dnt: site.respect_dnt ?? false,
+    track_outbound_links: site.track_outbound_links ?? true,
+    track_file_downloads: site.track_file_downloads ?? true,
+    site_search_params: site.site_search_params ?? '',
     retention_days: site.retention_days ?? ('' as string | number),
   });
 
@@ -147,6 +151,8 @@ export default function SitesEdit({
                 {t('analytics.sites.form.respect_dnt')}
               </label>
             </FormSection>
+
+            <EnhancedMeasurementSection values={data} onChange={(patch) => setData({ ...data, ...patch })} error={errors.site_search_params} />
 
             <Button type="submit" loading={processing}>
               {t('common.actions.save')}

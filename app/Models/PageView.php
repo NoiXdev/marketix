@@ -37,6 +37,8 @@ class PageView extends Model
         'os',
         'device',
         'language',
+        'engaged_seconds',
+        'scroll_depth',
         'is_bot',
         'created_at',
     ];
@@ -56,6 +58,8 @@ class PageView extends Model
         return [
             'created_at' => 'datetime',
             'is_bot' => 'boolean',
+            'engaged_seconds' => 'integer',
+            'scroll_depth' => 'integer',
         ];
     }
 }

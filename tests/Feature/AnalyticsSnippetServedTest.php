@@ -31,6 +31,16 @@ class AnalyticsSnippetServedTest extends TestCase
         $this->assertStringContainsString('window.marketix', $contents);
         $this->assertStringContainsString('marketix.q', $contents);
         $this->assertStringContainsString("'event'", $contents);
+        $this->assertStringContainsString("'404'", $contents);
+
+        // SPA navigation, engagement and enhanced measurement
+        $this->assertStringContainsString('pushState', $contents);
+        $this->assertStringContainsString('popstate', $contents);
+        $this->assertStringContainsString('visibilitychange', $contents);
+        $this->assertStringContainsString("type: 'engagement'", $contents);
+        $this->assertStringContainsString("'outbound_click'", $contents);
+        $this->assertStringContainsString("'file_download'", $contents);
+        $this->assertStringContainsString("'site_search'", $contents);
     }
 
     public function test_snippet_is_served_with_js_content_type_and_cache_headers(): void

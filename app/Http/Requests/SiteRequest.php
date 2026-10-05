@@ -23,7 +23,21 @@ class SiteRequest extends FormRequest
             'consent_mode' => ['required', Rule::in(ConsentMode::selectableValues())],
             'consent_signal' => ['nullable', 'string', 'max:255'],
             'respect_dnt' => ['boolean'],
+            'track_outbound_links' => ['boolean'],
+            'track_file_downloads' => ['boolean'],
+            'site_search_params' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_\-\[\]]+(,[A-Za-z0-9_\-\[\]]+)*$/'],
             'retention_days' => ['nullable', 'integer', 'min:1', 'max:3650'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('site_search_params')) {
+            return;
+        }
+
+        $params = array_filter(array_map('trim', explode(',', (string) $this->input('site_search_params'))));
+
+        $this->merge(['site_search_params' => $params === [] ? null : implode(',', array_unique($params))]);
     }
 }

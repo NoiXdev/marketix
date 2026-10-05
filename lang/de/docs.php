@@ -15,6 +15,8 @@ return [
             'referrer' => 'Referrer-Domain – die Website, von der eine besuchende Person kam.',
             'utm' => 'Kampagnenparameter (UTM-Tags), die im Link enthalten sind.',
             'timestamp' => 'Datum und Uhrzeit des Klicks bzw. Seitenaufrufs.',
+            'engagement' => 'Interaktionen auf getrackten Seiten: aktive Verweildauer, Scrolltiefe sowie Klicks auf externe Links und Datei-Downloads (nur die Zieladresse ohne Query-Parameter).',
+            'search' => 'Suchbegriffe der Website-Suche – nur wenn Sie dies pro Website ausdrücklich aktivieren.',
         ],
 
         'modes' => [

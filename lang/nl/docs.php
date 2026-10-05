@@ -15,6 +15,8 @@ return [
             'referrer' => 'Referrer-domein — de website waar een bezoeker vandaan kwam.',
             'utm' => 'Campagneparameters (UTM-tags) die in de link aanwezig zijn.',
             'timestamp' => 'De datum en tijd van de klik of paginaweergave.',
+            'engagement' => 'Interacties op gemeten pagina’s: actieve tijd op de pagina, scrolldiepte en klikken op uitgaande links en bestandsdownloads (alleen het doeladres, zonder queryparameters).',
+            'search' => 'Zoektermen van de websitezoekfunctie – alleen als u dit per website uitdrukkelijk inschakelt.',
         ],
 
         'modes' => [

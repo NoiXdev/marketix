@@ -15,6 +15,8 @@ return [
             'referrer' => 'Referrer domain — the website a visitor arrived from.',
             'utm' => 'Campaign parameters (UTM tags) that are present on the link.',
             'timestamp' => 'The date and time of the click or page view.',
+            'engagement' => 'Interactions on tracked pages: active time on page, scroll depth, and clicks on outbound links and file downloads (target address only, without query parameters).',
+            'search' => 'Site search terms – only if you explicitly enable this per site.',
         ],
 
         'modes' => [

@@ -29,6 +29,17 @@ return [
             'respect_dnt' => "Respecter l'en-tête Do-Not-Track",
         ],
 
+        'measurement' => [
+            'title' => 'Mesure avancée',
+            'description' => 'Les changements de page des applications monopage, le temps actif sur la page et la profondeur de défilement sont mesurés automatiquement.',
+            'outbound_links' => 'Mesurer les clics sur les liens sortants',
+            'file_downloads' => 'Mesurer les téléchargements de fichiers (PDF, ZIP, fichiers Office …)',
+            'search_params' => 'Paramètres de recherche du site (optionnel)',
+            'search_params_placeholder' => 'q, s, search',
+            'search_params_hint' => 'Paramètres d’URL séparés par des virgules dont les termes de recherche sont extraits. Laissez vide pour ne stocker aucun terme – les termes de recherche peuvent contenir des données personnelles.',
+            'not_found_hint' => 'Pour analyser les pages 404, appelez ceci sur votre page d’erreur :',
+        ],
+
         'snippet_title' => 'Snippet de suivi',
         'snippet_hint' => 'Collez ceci dans le <head> de :domain.',
         'copy' => "Copier l'extrait",
@@ -103,6 +114,19 @@ return [
             'locations' => 'Localisations',
             'languages' => 'Langues',
             'technology' => 'Technologie',
+            'engagement' => 'Moy. :time actif · :scroll % défilé',
+            'engagement_time' => 'Moy. :time actif',
+        ],
+
+        'interactions' => [
+            'title' => 'Interactions',
+            'outbound' => 'Liens sortants',
+            'downloads' => 'Téléchargements',
+            'search_title' => 'Recherche & pages d’erreur',
+            'searches' => 'Termes de recherche',
+            'not_found' => 'Pages 404',
+            'search_disabled' => 'Les termes de recherche ne sont pas mesurés pour ce site. Vous pouvez les activer dans les paramètres du site sous « Mesure avancée ».',
+            'not_found_hint' => "Aucune page 404 mesurée. Appelez marketix('404') sur votre page d’erreur.",
         ],
 
         'channels' => [

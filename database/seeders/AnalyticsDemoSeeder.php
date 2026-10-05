@@ -35,7 +35,7 @@ class AnalyticsDemoSeeder extends Seeder
     private const ENTRY_PAGES = [
         '/' => 40, '/blog/perfekter-espresso' => 10, '/produkte' => 10, '/produkte/kaffeemaschine-pro' => 8,
         '/blog/latte-art-guide' => 7, '/preise' => 6, '/blog/entkalken' => 5, '/produkte/bohnen-espresso' => 4,
-        '/faq' => 3, '/jobs' => 1,
+        '/faq' => 3, '/jobs' => 1, '/sommer-sale-2025' => 1, '/shop/espresso-maschine' => 1,
     ];
 
     private const COUNTRIES = [
@@ -84,6 +84,12 @@ class AnalyticsDemoSeeder extends Seeder
 
     private const REFERRAL_SITES = ['www.kaffee-magazin.ch' => 30, 'www.watson.ch' => 20, 'www.blick.ch' => 15, 'medium.com' => 15, 'www.heise.de' => 10, 'github.com' => 10];
 
+    private const NOT_FOUND_PAGES = ['/sommer-sale-2025', '/shop/espresso-maschine'];
+
+    private const SEARCH_TERMS = ['espressomaschine', 'entkalker', 'milchschäumer', 'bohnen', 'siebträger', 'reparatur', 'gutschein', 'tamper'];
+
+    private const OUTBOUND_URLS = ['www.instagram.com/demoshop', 'www.youtube.com/@demoshop', 'www.kaffee-magazin.ch/test', 'github.com/demoshop'];
+
     private const PRODUCTS = [
         ['Kaffeemaschine Pro', 899], ['Milchschäumer', 89], ['Espresso Bohnen 1 kg', 39], ['Entkalker-Set', 19], ['Tamper Edelstahl', 49],
     ];
@@ -131,6 +137,7 @@ class AnalyticsDemoSeeder extends Seeder
         if ($site !== null) {
             DB::table('visits')->where('site_id', $site->id)->delete();
             $site->goals()->withTrashed()->forceDelete();
+            $site->update(['site_search_params' => 'q']);
 
             return $site;
         }
@@ -143,6 +150,7 @@ class AnalyticsDemoSeeder extends Seeder
             'tracking_mode' => TrackingMode::Cookieless,
             'consent_mode' => ConsentMode::Immediate,
             'respect_dnt' => false,
+            'site_search_params' => 'q',
         ]);
     }
 
@@ -299,13 +307,24 @@ class AnalyticsDemoSeeder extends Seeder
         }
         $paths = array_slice($paths, 0, count($times));
 
+        $engaged = [];
+        foreach ($paths as $i => $path) {
+            $engaged[$i] = isset($times[$i + 1])
+                ? (int) round($times[$i]->diffInSeconds($times[$i + 1]) * $this->random(0.6, 0.95))
+                : (str_starts_with($path, '/blog/') ? mt_rand(40, 420) : mt_rand(5, 180));
+        }
+        $lastActivity = end($times)->addSeconds(end($engaged));
+        if ($lastActivity->gt($this->now)) {
+            $lastActivity = $this->now;
+        }
+
         $this->visits[] = [
             'id' => $visitId,
             'site_id' => $this->site->id,
             'project_id' => $this->site->project_id,
             'visitor_hash' => $visitor,
             'started_at' => $start,
-            'last_activity_at' => end($times),
+            'last_activity_at' => $lastActivity,
             'pageview_count' => count($paths),
             'entry_path' => $paths[0],
             'exit_path' => end($paths),
@@ -321,7 +340,7 @@ class AnalyticsDemoSeeder extends Seeder
             'utm_content' => $source['utm_content'] ?? null,
             'is_bot' => false,
             'created_at' => $start,
-            'updated_at' => end($times),
+            'updated_at' => $lastActivity,
         ];
 
         $city = $this->pick($cities);
@@ -348,6 +367,8 @@ class AnalyticsDemoSeeder extends Seeder
                 'os' => $os,
                 'device' => $device,
                 'language' => $language,
+                'engaged_seconds' => $engaged[$i],
+                'scroll_depth' => str_starts_with($path, '/blog/') ? mt_rand(35, 100) : mt_rand(15, 100),
                 'is_bot' => false,
                 'created_at' => $times[$i],
             ];
@@ -377,7 +398,7 @@ class AnalyticsDemoSeeder extends Seeder
             'referer_domain' => null, 'utm_source' => null, 'utm_medium' => null, 'utm_campaign' => null,
             'utm_term' => null, 'utm_content' => null, 'country' => 'United States', 'country_code' => 'US',
             'city' => 'Ashburn', 'browser' => 'Other', 'os' => 'Linux', 'device' => 'Desktop', 'language' => 'en',
-            'is_bot' => true, 'created_at' => $start,
+            'engaged_seconds' => null, 'scroll_depth' => null, 'is_bot' => true, 'created_at' => $start,
         ];
     }
 
@@ -398,10 +419,13 @@ class AnalyticsDemoSeeder extends Seeder
         $events = match (true) {
             $path === '/warenkorb' => [['add_to_cart', $this->productProps()]],
             $path === '/newsletter' && mt_rand(1, 100) <= 45 => [['newsletter_subscribe', ['source' => 'newsletter-page']]],
-            $path === '/preise' && mt_rand(1, 100) <= 15 => [['download', ['file' => 'preisliste-2026.pdf']]],
+            in_array($path, self::NOT_FOUND_PAGES, true) => [['not_found', null]],
+            $path === '/preise' && mt_rand(1, 100) <= 15 => [['file_download', ['url' => self::DOMAIN.'/downloads/preisliste-2026.pdf']]],
+            str_starts_with($path, '/produkte/') && mt_rand(1, 100) <= 6 => [['file_download', ['url' => self::DOMAIN.'/downloads/'.$this->pick(['bedienungsanleitung.pdf', 'datenblatt.pdf', 'garantie.pdf'])]]],
             $path === '/kontakt' && mt_rand(1, 100) <= 30 => [['contact_form', ['topic' => $this->pick(['Beratung', 'Reparatur', 'Bestellung'])]]],
+            str_starts_with($path, '/produkte') && mt_rand(1, 100) <= 9 => [['site_search', ['term' => $this->pick(self::SEARCH_TERMS)]]],
             str_starts_with($path, '/produkte/') && mt_rand(1, 100) <= 12 => [['add_to_cart', $this->productProps()]],
-            str_starts_with($path, '/blog/') && mt_rand(1, 100) <= 3 => [['outbound_click', ['url' => $this->pick(['instagram.com', 'youtube.com'])]]],
+            (str_starts_with($path, '/blog/') || $path === '/ueber-uns') && mt_rand(1, 100) <= 6 => [['outbound_click', ['url' => $this->pick(self::OUTBOUND_URLS)]]],
             default => [],
         };
 
@@ -417,7 +441,7 @@ class AnalyticsDemoSeeder extends Seeder
                 'project_id' => $this->site->project_id,
                 'visitor_hash' => $visitor,
                 'name' => $name,
-                'props' => json_encode($props),
+                'props' => $props === null ? null : json_encode($props),
                 'path' => $path,
                 'is_bot' => false,
                 'created_at' => $at,

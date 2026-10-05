@@ -29,6 +29,17 @@ return [
             'respect_dnt' => 'Do-Not-Track-Header berücksichtigen',
         ],
 
+        'measurement' => [
+            'title' => 'Erweiterte Messung',
+            'description' => 'Seitenwechsel in Single-Page-Apps, die aktive Verweildauer und die Scrolltiefe werden automatisch erfasst.',
+            'outbound_links' => 'Klicks auf externe Links erfassen',
+            'file_downloads' => 'Datei-Downloads erfassen (PDF, ZIP, Office-Dateien …)',
+            'search_params' => 'Suchparameter der Website-Suche (optional)',
+            'search_params_placeholder' => 'q, s, search',
+            'search_params_hint' => 'Kommagetrennte URL-Parameter, aus denen Suchbegriffe erfasst werden. Leer lassen, um keine Suchbegriffe zu speichern – Suchbegriffe können personenbezogene Daten enthalten.',
+            'not_found_hint' => 'Um 404-Seiten auszuwerten, rufen Sie auf Ihrer Fehlerseite Folgendes auf:',
+        ],
+
         'snippet_title' => 'Tracking-Snippet',
         'snippet_hint' => 'Fügen Sie dies in den <head> von :domain ein.',
         'copy' => 'Snippet kopieren',
@@ -70,7 +81,7 @@ return [
             'show_chart' => 'Als Diagramm anzeigen',
             'date' => 'Datum',
             'hour' => 'Uhrzeit',
-            'select_metric' => 'Wähle mindestens eine Metrik aus.',
+            'select_metric' => 'Wählen Sie mindestens eine Metrik aus.',
             'scale_hint' => 'Seitenaufrufe und eindeutige Besucher teilen sich eine Skala, jede Linie ist auf ihren Höchstwert im Zeitraum skaliert. Genaue Werte im Tooltip oder in der Tabelle.',
         ],
 
@@ -103,6 +114,19 @@ return [
             'locations' => 'Standorte',
             'languages' => 'Sprachen',
             'technology' => 'Technik',
+            'engagement' => 'Ø :time aktiv · :scroll % gescrollt',
+            'engagement_time' => 'Ø :time aktiv',
+        ],
+
+        'interactions' => [
+            'title' => 'Interaktionen',
+            'outbound' => 'Ausgehende Links',
+            'downloads' => 'Downloads',
+            'search_title' => 'Suche & Fehlerseiten',
+            'searches' => 'Suchbegriffe',
+            'not_found' => '404-Seiten',
+            'search_disabled' => 'Suchbegriffe werden für diese Website nicht erfasst. Sie können das in den Website-Einstellungen unter „Erweiterte Messung“ aktivieren.',
+            'not_found_hint' => "Keine 404-Seiten erfasst. Rufen Sie auf Ihrer Fehlerseite marketix('404') auf.",
         ],
 
         'channels' => [

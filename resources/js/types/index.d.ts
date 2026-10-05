@@ -51,6 +51,9 @@ export interface Site {
   consent_mode: string;
   consent_signal?: string | null;
   respect_dnt?: boolean;
+  track_outbound_links?: boolean;
+  track_file_downloads?: boolean;
+  site_search_params?: string | null;
   retention_days?: number | null;
   created_at?: string;
 }

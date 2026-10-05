@@ -296,8 +296,18 @@ class AnalyticsAggregator
     public function topPaths(string $siteId, AnalyticsQuery|int $range, int $limit = 10): Collection
     {
         return $this->base($siteId, $range)
-            ->select('path', DB::raw('COUNT(*) as count'), DB::raw('COUNT(DISTINCT visitor_hash) as visitors'))
-            ->groupBy('path')->orderByDesc('count')->limit($limit)->get();
+            ->select(
+                'path',
+                DB::raw('COUNT(*) as count'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as visitors'),
+                DB::raw('AVG(engaged_seconds) as avg_engaged'),
+                DB::raw('AVG(scroll_depth) as avg_scroll'),
+            )
+            ->groupBy('path')->orderByDesc('count')->limit($limit)->get()
+            ->each(function ($row) {
+                $row->avg_engaged = $row->avg_engaged === null ? null : (int) round((float) $row->avg_engaged);
+                $row->avg_scroll = $row->avg_scroll === null ? null : (int) round((float) $row->avg_scroll);
+            });
     }
 
     /** @return Collection<int, \stdClass> */
