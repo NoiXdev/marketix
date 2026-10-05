@@ -9,6 +9,7 @@ import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { Button, LinkButton, StatusPill } from '@/Components/ui';
 import { confirmTyped } from '@/lib/confirm';
+import { countryName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
@@ -117,7 +118,7 @@ export default function LinksShow({
   clicksByCountry,
 }: Props) {
   const { project } = usePage<PageProps>().props;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const shortUrl = link.domain ? `https://${link.domain.name}/${link.slug}` : link.slug;
 
@@ -239,7 +240,7 @@ export default function LinksShow({
         <div className="mb-6 grid grid-cols-1 gap-3.5 md:grid-cols-2">
           <Breakdown
             title={t('links.show.breakdown.countries')}
-            rows={topCountries}
+            rows={topCountries.map((r) => ({ ...r, country: countryName(String(r.country_code ?? ''), locale, String(r.country ?? '')) }))}
             labelKey="country"
             emptyLabel={t('links.show.no_data')}
             prefix={(r) => <CountryFlag code={String(r.country_code ?? '')} />}
