@@ -1,4 +1,16 @@
-## [2.3.0](https://github.com/NoiXdev/marketix/compare/v2.2.0...v) (2026-10-02)
+## [2.4.0](https://github.com/NoiXdev/marketix/compare/v2.3.0...v) (2026-10-05)
+
+
+### Features
+
+* **analytics:** add chart metric toggles, dashboard filters, period comparison and new insights ([715cc7f](https://github.com/NoiXdev/marketix/commit/715cc7f800f2ce8aac2fe75ddcb5cafbddf44e5e))
+* **analytics:** add custom date ranges, year-over-year comparison and chart intervals ([d30e184](https://github.com/NoiXdev/marketix/commit/d30e184d489c8e3b06975d3e6ecb1cd90ee8cf97))
+* **analytics:** render heatmap in viewer timezone and share the map color scale ([632c8ff](https://github.com/NoiXdev/marketix/commit/632c8ffb997210bc5baaecc848a689e0bfaa7f57))
+* **analytics:** track SPA navigation, engagement and enhanced measurement events ([c5b2df0](https://github.com/NoiXdev/marketix/commit/c5b2df096380c4acf8d935ef6394e8383f8d7846))
+* localize country names and show flags in world map tooltips ([8b8ad6f](https://github.com/NoiXdev/marketix/commit/8b8ad6f8898e27ce1351287e9c28d2af12e1610a))
+* **seeders:** add analytics demo data seeder ([f3b172c](https://github.com/NoiXdev/marketix/commit/f3b172cfa2c63aebc26aa5af26bed122a4acdfd3))
+
+## [2.3.0](https://github.com/NoiXdev/marketix/compare/v2.2.0...v2.3.0) (2026-10-02)
 
 
 ### Features
