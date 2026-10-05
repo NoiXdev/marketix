@@ -35,7 +35,10 @@ class AnalyticsDashboardTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Analytics/Index')
-                ->where('days', 7)
+                ->where('period.range', '7d')
+                ->where('period.days', 7)
+                ->where('period.interval', 'day')
+                ->where('period.compare', 'previous')
                 ->where('summary.page_views', 2)
                 ->where('summary.visitors', 1)
                 ->where('previousSummary.page_views', 0)
@@ -68,8 +71,50 @@ class AnalyticsDashboardTest extends TestCase
             ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=1')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->where('days', 1)
+                ->where('period.range', 'today')
+                ->where('period.interval', 'hour')
                 ->has('timeseries', 24)
+            );
+    }
+
+    public function test_custom_range_with_weekly_interval_and_year_comparison(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 7)->setTime(12, 0));
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?range=custom&from=2026-09-01&to=2026-09-30&interval=week&compare=year')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('period.range', 'custom')
+                ->where('period.from', '2026-09-01')
+                ->where('period.to', '2026-09-30')
+                ->where('period.interval', 'week')
+                ->where('period.intervals', ['day', 'week'])
+                ->where('period.compare_from', '2025-09-01')
+                ->has('timeseries', 5)
+                ->where('timeseries.0.date', '2026-08-31')
+                ->has('previousSummary')
+            );
+    }
+
+    public function test_comparison_can_be_disabled(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create(['name' => 'Acme']);
+        $user->projects()->attach($project);
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?range=12m&compare=none')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('period.compare', 'none')
+                ->where('period.compare_from', null)
+                ->where('previousSummary', null)
             );
     }
 

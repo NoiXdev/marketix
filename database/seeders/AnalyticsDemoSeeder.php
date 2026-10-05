@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class AnalyticsDemoSeeder extends Seeder
 {
-    private const DAYS = 180;
+    private const DAYS = 400;
 
     private const BASE_DAILY_VISITS = 140;
 

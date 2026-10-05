@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Goal;
 use App\Services\AnalyticsAggregator;
 use App\Services\GoalAggregator;
-use App\Support\Analytics\AnalyticsQuery;
+use App\Support\Analytics\PeriodResolver;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
@@ -15,11 +15,13 @@ class AnalyticsController extends Controller
         $project = $request->get('project');
         $model = $project->sites()->findOrFail($site);
 
-        $days = (int) $request->input('days', 30);
-        $days = in_array($days, [1, 7, 30, 90], true) ? $days : 30;
-
         $filters = $request->input('filters');
-        $query = AnalyticsQuery::lastDays($days, is_array($filters) ? $filters : []);
+        $period = PeriodResolver::resolve(
+            $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
+            is_array($filters) ? $filters : [],
+        );
+        $query = $period->query;
+        $comparison = $period->comparison();
         $id = $model->id;
 
         return inertia('Analytics/Index', [
@@ -29,10 +31,10 @@ class AnalyticsController extends Controller
                 'domain' => $model->domain,
                 'search_enabled' => $model->searchParams() !== [],
             ],
-            'days' => $days,
+            'period' => $period->toArray(),
             'filters' => (object) $query->filters,
             'summary' => fn () => $agg->summary($id, $query),
-            'previousSummary' => fn () => $agg->summary($id, $query->previous()),
+            'previousSummary' => fn () => $comparison === null ? null : $agg->summary($id, $comparison),
             'liveVisitors' => fn () => $agg->liveVisitors($id),
             'timeseries' => fn () => $agg->timeseries($id, $query),
             'topPaths' => fn () => $agg->topPaths($id, $query),

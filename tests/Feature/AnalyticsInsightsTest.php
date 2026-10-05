@@ -79,6 +79,59 @@ class AnalyticsInsightsTest extends TestCase
         $this->assertSame(2, $series[9]['views']);
     }
 
+    public function test_weekly_buckets_start_on_monday(): void
+    {
+        $site = Site::factory()->create();
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-09-16 10:00:00')], 2);
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-09-20 10:00:00')], 1);
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-09-21 10:00:00')], 4);
+
+        $query = AnalyticsQuery::between(CarbonImmutable::parse('2026-09-15'), CarbonImmutable::parse('2026-09-27 23:59:59'), [], 'week');
+        $series = $this->agg->timeseries($site->id, $query);
+
+        $this->assertSame(['2026-09-14', '2026-09-21'], array_column($series, 'date'));
+        $this->assertSame([3, 4], array_column($series, 'views'));
+        $this->assertSame([2, 1], array_column($series, 'sessions'));
+    }
+
+    public function test_monthly_buckets(): void
+    {
+        $site = Site::factory()->create();
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-08-31 23:00:00')], 1);
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-09-01 00:30:00')], 2);
+
+        $query = AnalyticsQuery::between(CarbonImmutable::parse('2026-06-15'), CarbonImmutable::now(), [], 'month');
+        $series = $this->agg->timeseries($site->id, $query);
+
+        $this->assertSame('month', $query->interval);
+        $this->assertSame(['2026-06-01', '2026-07-01', '2026-08-01', '2026-09-01', '2026-10-01'], array_column($series, 'date'));
+        $this->assertSame([0, 0, 1, 2, 0], array_column($series, 'views'));
+    }
+
+    public function test_hourly_buckets_span_several_days(): void
+    {
+        $site = Site::factory()->create();
+        $this->visit($site, ['started_at' => CarbonImmutable::parse('2026-10-06 22:10:00')], 1);
+
+        $query = AnalyticsQuery::between(CarbonImmutable::parse('2026-10-06'), CarbonImmutable::now(), [], 'hour');
+        $series = $this->agg->timeseries($site->id, $query);
+
+        $this->assertCount(48, $series);
+        $this->assertSame('2026-10-06 22:00', $series[22]['date']);
+        $this->assertSame(1, $series[22]['views']);
+    }
+
+    public function test_previous_year_comparison(): void
+    {
+        $site = Site::factory()->create();
+        $this->visit($site, ['started_at' => CarbonImmutable::now()->subYear()->subDays(3)], 3);
+        $this->visit($site, ['started_at' => CarbonImmutable::now()->subYear()->subDays(10)], 5);
+
+        $query = AnalyticsQuery::lastDays(7);
+
+        $this->assertSame(3, $this->agg->summary($site->id, $query->previousYear())['page_views']);
+    }
+
     public function test_previous_period_is_the_window_before(): void
     {
         $site = Site::factory()->create();
