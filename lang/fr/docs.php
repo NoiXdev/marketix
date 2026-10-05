@@ -15,6 +15,8 @@ return [
             'referrer' => 'Domaine référent — le site depuis lequel le visiteur est arrivé.',
             'utm' => 'Paramètres de campagne (balises UTM) présents sur le lien.',
             'timestamp' => 'La date et l’heure du clic ou de la vue de page.',
+            'engagement' => 'Interactions sur les pages suivies : temps actif sur la page, profondeur de défilement ainsi que clics sur les liens sortants et téléchargements de fichiers (adresse cible uniquement, sans paramètres de requête).',
+            'search' => 'Termes de recherche du site – uniquement si vous l’activez explicitement pour un site.',
         ],
 
         'modes' => [

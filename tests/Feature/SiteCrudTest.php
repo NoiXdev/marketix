@@ -105,6 +105,43 @@ class SiteCrudTest extends TestCase
         $this->assertDatabaseHas('sites', ['id' => $site->id, 'tracking_mode' => 'cookie', 'consent_signal' => 'UC_UI']);
     }
 
+    public function test_update_saves_enhanced_measurement_settings(): void
+    {
+        [$user, $project] = $this->userWithProject();
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->put(route('app.project.sites.update', ['project' => $project->id, 'site' => $site->id]), [
+                'name' => $site->name,
+                'domain' => $site->domain,
+                'tracking_mode' => 'cookieless',
+                'consent_mode' => 'immediate',
+                'track_outbound_links' => false,
+                'track_file_downloads' => true,
+                'site_search_params' => ' q , search,, q ',
+            ])
+            ->assertRedirect();
+
+        $site->refresh();
+        $this->assertFalse($site->track_outbound_links);
+        $this->assertTrue($site->track_file_downloads);
+        $this->assertSame('q,search', $site->site_search_params);
+        $this->assertSame(['q', 'search'], $site->searchParams());
+    }
+
+    public function test_blank_search_params_disable_site_search_and_invalid_ones_are_rejected(): void
+    {
+        [$user, $project] = $this->userWithProject();
+        $site = Site::factory()->forProject($project)->create(['site_search_params' => 'q']);
+        $route = route('app.project.sites.update', ['project' => $project->id, 'site' => $site->id]);
+        $payload = ['name' => $site->name, 'domain' => $site->domain, 'tracking_mode' => 'cookieless', 'consent_mode' => 'immediate'];
+
+        $this->actingAs($user)->put($route, $payload + ['site_search_params' => 'q=1&x'])->assertSessionHasErrors('site_search_params');
+
+        $this->actingAs($user)->put($route, $payload + ['site_search_params' => '  '])->assertRedirect();
+        $this->assertNull($site->refresh()->site_search_params);
+    }
+
     public function test_destroy_deletes_site(): void
     {
         [$user, $project] = $this->userWithProject();

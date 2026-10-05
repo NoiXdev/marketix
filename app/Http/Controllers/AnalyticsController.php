@@ -27,6 +27,7 @@ class AnalyticsController extends Controller
                 'id' => $model->id,
                 'name' => $model->name,
                 'domain' => $model->domain,
+                'search_enabled' => $model->searchParams() !== [],
             ],
             'days' => $days,
             'filters' => (object) $query->filters,
@@ -53,6 +54,12 @@ class AnalyticsController extends Controller
             'utmTerms' => fn () => $agg->utmBreakdown($id, 'utm_term', $query),
             'utmContents' => fn () => $agg->utmBreakdown($id, 'utm_content', $query),
             'topEvents' => fn () => $goalAgg->topEvents($id, $query),
+            'interactions' => fn () => [
+                'outbound' => $goalAgg->eventBreakdown($id, $query, 'outbound_click', 'url'),
+                'downloads' => $goalAgg->eventBreakdown($id, $query, 'file_download', 'url'),
+                'searches' => $goalAgg->eventBreakdown($id, $query, 'site_search', 'term'),
+                'notFound' => $goalAgg->eventBreakdown($id, $query, 'not_found'),
+            ],
             'goals' => fn () => $model->goals()->get()->map(fn (Goal $g) => array_merge([
                 'id' => $g->id,
                 'name' => $g->name,

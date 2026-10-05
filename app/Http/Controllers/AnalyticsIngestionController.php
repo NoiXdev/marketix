@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TrackingMode;
+use App\Jobs\RecordEngagementJob;
 use App\Jobs\RecordEventJob;
 use App\Jobs\RecordPageViewJob;
 use App\Models\Site;
@@ -25,6 +26,9 @@ class AnalyticsIngestionController extends Controller
             'consent_mode' => $site->consent_mode->value,
             'consent_signal' => $site->consent_signal,
             'respect_dnt' => (bool) $site->respect_dnt,
+            'outbound_links' => (bool) $site->track_outbound_links,
+            'file_downloads' => (bool) $site->track_file_downloads,
+            'search_params' => $site->searchParams(),
         ])->header('Cache-Control', 'public, max-age=300');
     }
 
@@ -81,9 +85,11 @@ class AnalyticsIngestionController extends Controller
             'utm.campaign' => ['nullable', 'string', 'max:255'],
             'utm.term' => ['nullable', 'string', 'max:255'],
             'utm.content' => ['nullable', 'string', 'max:255'],
-            'type' => ['nullable', 'in:pageview,event'],
+            'type' => ['nullable', 'in:pageview,event,engagement'],
             'name' => ['nullable', 'required_if:type,event', 'string', 'max:255'],
             'props' => ['nullable', 'array'],
+            'engaged_ms' => ['nullable', 'integer', 'min:0', 'max:86400000'],
+            'scroll' => ['nullable', 'integer', 'min:0', 'max:100'],
         ]);
 
         $noop = response('', 204);
@@ -112,6 +118,18 @@ class AnalyticsIngestionController extends Controller
 
         // Path only, query string stripped for privacy.
         $path = '/'.ltrim(parse_url($data['path'], PHP_URL_PATH) ?: '/', '/');
+
+        if (($data['type'] ?? 'pageview') === 'engagement') {
+            RecordEngagementJob::dispatch(
+                $site->id,
+                $visitorHash,
+                $path,
+                intdiv((int) ($data['engaged_ms'] ?? 0), 1000),
+                isset($data['scroll']) ? (int) $data['scroll'] : null,
+            );
+
+            return response('', 202);
+        }
 
         if (($data['type'] ?? 'pageview') === 'event') {
             $props = $data['props'] ?? null;

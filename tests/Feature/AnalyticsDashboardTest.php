@@ -48,6 +48,11 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('countries')
                 ->has('languages')
                 ->has('hourlyActivity', 1)
+                ->has('interactions.outbound')
+                ->has('interactions.downloads')
+                ->has('interactions.searches')
+                ->has('interactions.notFound')
+                ->where('site.search_enabled', false)
                 ->has('liveVisitors')
             );
     }

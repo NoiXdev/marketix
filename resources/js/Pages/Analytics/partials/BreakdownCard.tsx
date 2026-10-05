@@ -1,7 +1,7 @@
 import RankedList, { RankRow } from '@/Pages/Dashboard/RankedList';
 import { useState } from 'react';
 
-export type BreakdownTab = { key: string; label: string; rows: RankRow[] };
+export type BreakdownTab = { key: string; label: string; rows: RankRow[]; emptyLabel?: string };
 
 export default function BreakdownCard({ title, tabs, emptyLabel }: { title: string; tabs: BreakdownTab[]; emptyLabel: string }) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
@@ -31,7 +31,7 @@ export default function BreakdownCard({ title, tabs, emptyLabel }: { title: stri
         )}
       </div>
       <div role="tabpanel">
-        <RankedList rows={active?.rows ?? []} emptyLabel={emptyLabel} />
+        <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
       </div>
     </section>
   );

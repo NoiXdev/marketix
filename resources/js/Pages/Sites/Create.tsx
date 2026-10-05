@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, Checkbox, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import EnhancedMeasurementSection from '@/Pages/Sites/partials/EnhancedMeasurementSection';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
@@ -17,6 +18,9 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
     consent_mode: 'immediate',
     consent_signal: '',
     respect_dnt: false,
+    track_outbound_links: true,
+    track_file_downloads: true,
+    site_search_params: '',
     retention_days: '' as string | number,
   });
 
@@ -111,6 +115,8 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
                 {t('analytics.sites.form.respect_dnt')}
               </label>
             </FormSection>
+
+            <EnhancedMeasurementSection values={data} onChange={(patch) => setData({ ...data, ...patch })} error={errors.site_search_params} />
 
             <Button type="submit" loading={processing}>
               {t('analytics.sites.create')}

@@ -70,6 +70,8 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
                 t('docs.privacy.collect.referrer'),
                 t('docs.privacy.collect.utm'),
                 t('docs.privacy.collect.timestamp'),
+                t('docs.privacy.collect.engagement'),
+                t('docs.privacy.collect.search'),
               ]}
             />
           </Section>

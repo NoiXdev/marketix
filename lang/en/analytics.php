@@ -29,6 +29,17 @@ return [
             'respect_dnt' => 'Respect Do-Not-Track header',
         ],
 
+        'measurement' => [
+            'title' => 'Enhanced measurement',
+            'description' => 'Page changes in single-page apps, active time on page and scroll depth are tracked automatically.',
+            'outbound_links' => 'Track clicks on outbound links',
+            'file_downloads' => 'Track file downloads (PDF, ZIP, Office files …)',
+            'search_params' => 'Site search parameters (optional)',
+            'search_params_placeholder' => 'q, s, search',
+            'search_params_hint' => 'Comma-separated URL parameters to read search terms from. Leave empty to store no search terms – search terms may contain personal data.',
+            'not_found_hint' => 'To report 404 pages, call this on your error page:',
+        ],
+
         'snippet_title' => 'Tracking snippet',
         'snippet_hint' => 'Paste this into the <head> of :domain.',
         'copy' => 'Copy snippet',
@@ -103,6 +114,19 @@ return [
             'locations' => 'Locations',
             'languages' => 'Languages',
             'technology' => 'Technology',
+            'engagement' => 'Avg. :time active · :scroll % scrolled',
+            'engagement_time' => 'Avg. :time active',
+        ],
+
+        'interactions' => [
+            'title' => 'Interactions',
+            'outbound' => 'Outbound links',
+            'downloads' => 'Downloads',
+            'search_title' => 'Search & error pages',
+            'searches' => 'Search terms',
+            'not_found' => '404 pages',
+            'search_disabled' => 'Search terms are not tracked for this site. You can enable them in the site settings under “Enhanced measurement”.',
+            'not_found_hint' => "No 404 pages tracked yet. Call marketix('404') on your error page.",
         ],
 
         'channels' => [
