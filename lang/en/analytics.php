@@ -63,6 +63,21 @@ return [
         'range_today' => 'Today',
         'chart_title' => 'Visitors over time',
         'no_data' => 'No data',
+        'map_title' => 'Visitors by country',
+
+        'chart' => [
+            'show_table' => 'Show as table',
+            'show_chart' => 'Show as chart',
+            'date' => 'Date',
+            'hour' => 'Time',
+            'select_metric' => 'Select at least one metric.',
+            'scale_hint' => 'Page views and unique visitors share one scale; each line is scaled to its peak in this period. Exact values in the tooltip or the table.',
+        ],
+
+        'live' => [
+            'count' => ':count online',
+            'hint' => 'Visitors active in the last 5 minutes',
+        ],
 
         'kpi' => [
             'page_views' => 'Page views',
@@ -79,6 +94,56 @@ return [
             'browsers' => 'Browsers',
             'os' => 'Operating systems',
             'devices' => 'Devices',
+            'pages' => 'Pages',
+            'entry_pages' => 'Entry pages',
+            'exit_pages' => 'Exit pages',
+            'bounce_sub' => ':rate % bounce rate',
+            'sources' => 'Sources',
+            'channels' => 'Channels',
+            'locations' => 'Locations',
+            'languages' => 'Languages',
+            'technology' => 'Technology',
+        ],
+
+        'channels' => [
+            'direct' => 'Direct',
+            'organic_search' => 'Organic search',
+            'paid' => 'Paid',
+            'social' => 'Social',
+            'email' => 'Email',
+            'referral' => 'Referral',
+            'campaign' => 'Other campaigns',
+        ],
+
+        'filters' => [
+            'title' => 'Filters',
+            'apply' => 'Click to filter by this value',
+            'remove' => 'Remove filter “:name”',
+            'clear' => 'Clear all filters',
+            'keys' => [
+                'path' => 'Page',
+                'entry_path' => 'Entry page',
+                'exit_path' => 'Exit page',
+                'referer_domain' => 'Referrer',
+                'channel' => 'Channel',
+                'country_code' => 'Country',
+                'browser' => 'Browser',
+                'os' => 'Operating system',
+                'device' => 'Device',
+                'language' => 'Language',
+                'utm_source' => 'Source',
+                'utm_medium' => 'Medium',
+                'utm_campaign' => 'Campaign',
+            ],
+        ],
+
+        'heatmap' => [
+            'title' => 'Activity by weekday & hour',
+            'timezone' => 'Time zone: :zone',
+            'cell' => ':day, :hours: :count sessions',
+            'peak' => 'Busiest: :day, :hours',
+            'less' => 'Less',
+            'more' => 'More',
         ],
 
         'campaigns' => [
