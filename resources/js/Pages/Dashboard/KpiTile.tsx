@@ -5,9 +5,9 @@ import { LucideIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 export default function KpiTile({
-  label, value, deltaPct, subtitle, icon: Icon, compact = true, lowerIsBetter = false,
+  label, value, deltaPct, deltaLabel, subtitle, icon: Icon, compact = true, lowerIsBetter = false,
 }: {
-  label: string; value: number | string; deltaPct?: number | null; subtitle?: ReactNode; icon: LucideIcon; compact?: boolean; lowerIsBetter?: boolean;
+  label: string; value: number | string; deltaPct?: number | null; deltaLabel?: string; subtitle?: ReactNode; icon: LucideIcon; compact?: boolean; lowerIsBetter?: boolean;
 }) {
   const { t } = useTranslation();
   const showDelta = deltaPct !== undefined;
@@ -29,7 +29,7 @@ export default function KpiTile({
       {showDelta && (
         <p className={`mt-0.5 inline-flex items-center gap-1 text-xs font-bold ${deltaPct === null || deltaPct === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}>
           {deltaPct === null ? '—' : deltaPct === 0 ? '± 0 %' : `${up ? '▲' : '▼'} ${Math.abs(deltaPct)} %`}
-          <span className="font-medium text-muted">{t('common.dashboard.vs_previous')}</span>
+          <span className="font-medium text-muted">{deltaLabel ?? t('common.dashboard.vs_previous')}</span>
         </p>
       )}
       {subtitle && <p className="mt-2 text-xs text-muted">{subtitle}</p>}

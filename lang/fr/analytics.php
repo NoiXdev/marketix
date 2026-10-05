@@ -79,10 +79,41 @@ return [
         'chart' => [
             'show_table' => 'Afficher en tableau',
             'show_chart' => 'Afficher en graphique',
-            'date' => 'Date',
-            'hour' => 'Heure',
+            'week_of' => 'Semaine du :date',
             'select_metric' => 'Sélectionnez au moins une métrique.',
             'scale_hint' => 'Pages vues et visiteurs uniques partagent une échelle ; chaque ligne est mise à l’échelle de son maximum sur la période. Valeurs exactes dans l’infobulle ou le tableau.',
+        ],
+
+        'range' => [
+            'today' => "Aujourd'hui",
+            'yesterday' => 'Hier',
+            '7d' => '7 derniers jours',
+            '30d' => '30 derniers jours',
+            '90d' => '90 derniers jours',
+            'month' => 'Ce mois-ci',
+            'last_month' => 'Mois dernier',
+            'year' => 'Cette année',
+            '12m' => '12 derniers mois',
+            'custom' => 'Période personnalisée',
+            'from' => 'Du',
+            'to' => 'Au',
+            'apply' => 'Appliquer la période',
+        ],
+
+        'compare' => [
+            'label' => 'Comparaison',
+            'previous' => 'vs période précédente',
+            'year' => 'vs année précédente',
+            'none' => 'Aucune comparaison',
+            'vs_year' => 'vs année précédente',
+        ],
+
+        'interval' => [
+            'label' => 'Intervalle',
+            'hour' => 'Heure',
+            'day' => 'Jour',
+            'week' => 'Semaine',
+            'month' => 'Mois',
         ],
 
         'live' => [

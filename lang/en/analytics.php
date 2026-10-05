@@ -79,10 +79,41 @@ return [
         'chart' => [
             'show_table' => 'Show as table',
             'show_chart' => 'Show as chart',
-            'date' => 'Date',
-            'hour' => 'Time',
+            'week_of' => 'Week of :date',
             'select_metric' => 'Select at least one metric.',
             'scale_hint' => 'Page views and unique visitors share one scale; each line is scaled to its peak in this period. Exact values in the tooltip or the table.',
+        ],
+
+        'range' => [
+            'today' => 'Today',
+            'yesterday' => 'Yesterday',
+            '7d' => 'Last 7 days',
+            '30d' => 'Last 30 days',
+            '90d' => 'Last 90 days',
+            'month' => 'This month',
+            'last_month' => 'Last month',
+            'year' => 'This year',
+            '12m' => 'Last 12 months',
+            'custom' => 'Custom range',
+            'from' => 'From',
+            'to' => 'To',
+            'apply' => 'Apply range',
+        ],
+
+        'compare' => [
+            'label' => 'Comparison',
+            'previous' => 'vs. previous period',
+            'year' => 'vs. previous year',
+            'none' => 'No comparison',
+            'vs_year' => 'vs. previous year',
+        ],
+
+        'interval' => [
+            'label' => 'Interval',
+            'hour' => 'Hour',
+            'day' => 'Day',
+            'week' => 'Week',
+            'month' => 'Month',
         ],
 
         'live' => [

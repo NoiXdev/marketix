@@ -1,40 +1,29 @@
-import AppLayout from '@/Layouts/AppLayout';
-import RangeTabs from '@/Pages/Analytics/RangeTabs';
-import ActivityHeatmap from '@/Pages/Analytics/partials/ActivityHeatmap';
-import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
-import FilterBar, { ActiveFilter } from '@/Pages/Analytics/partials/FilterBar';
-import LiveVisitors from '@/Pages/Analytics/partials/LiveVisitors';
-import VisitorsChart, { SeriesPoint } from '@/Pages/Analytics/partials/VisitorsChart';
-import { BackLink } from '@/Components/ui';
 import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { Favicon } from '@/Components/icons/Favicon';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
+import { BackLink } from '@/Components/ui';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
-import KpiTile from '@/Pages/Dashboard/KpiTile';
-import { RankRow } from '@/Pages/Dashboard/RankedList';
+import AppLayout from '@/Layouts/AppLayout';
 import { countryName, languageName } from '@/lib/displayNames';
 import { formatDuration, percentChange } from '@/lib/format';
 import { HourBucket } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
+import ActivityHeatmap from '@/Pages/Analytics/partials/ActivityHeatmap';
+import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
+import DateRangePicker from '@/Pages/Analytics/partials/DateRangePicker';
+import FilterBar, { ActiveFilter } from '@/Pages/Analytics/partials/FilterBar';
+import LiveVisitors from '@/Pages/Analytics/partials/LiveVisitors';
+import { COMPARISONS, Comparison, Interval, Period } from '@/Pages/Analytics/partials/period';
+import VisitorsChart, { SeriesPoint } from '@/Pages/Analytics/partials/VisitorsChart';
+import KpiTile from '@/Pages/Dashboard/KpiTile';
+import { RankRow } from '@/Pages/Dashboard/RankedList';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Clock, FileDown, FileX, Megaphone, MousePointerClick, Search, Users } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 type FilterKey =
-  | 'path'
-  | 'entry_path'
-  | 'exit_path'
-  | 'referer_domain'
-  | 'channel'
-  | 'country_code'
-  | 'browser'
-  | 'os'
-  | 'device'
-  | 'language'
-  | 'utm_source'
-  | 'utm_medium'
-  | 'utm_campaign';
+  'path' | 'entry_path' | 'exit_path' | 'referer_domain' | 'channel' | 'country_code' | 'browser' | 'os' | 'device' | 'language' | 'utm_source' | 'utm_medium' | 'utm_campaign';
 type Filters = Partial<Record<FilterKey, string>>;
 type Summary = { page_views: number; visitors: number; sessions: number; bounce_rate: number; avg_duration: number; campaign_share: number };
 type Rank = Record<string, string | number> & { count: number };
@@ -43,38 +32,33 @@ type EventRow = { name: string; count: number; visitors: number };
 type ValueRow = { value: string; count: number; visitors: number };
 type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
 type GoalCard = {
-  id: string; name: string; type: string; match_value: string;
-  conversions: number; visitors: number; rate: number;
+  id: string;
+  name: string;
+  type: string;
+  match_value: string;
+  conversions: number;
+  visitors: number;
+  rate: number;
   byCampaign: { value: string; conversions: number }[];
 };
 
-function CampaignList({
-  title,
-  rows,
-  emptyLabel,
-  onSelect,
-}: {
-  title: string;
-  rows: CampaignRow[];
-  emptyLabel: string;
-  onSelect?: (value: string) => void;
-}) {
+function CampaignList({ title, rows, emptyLabel, onSelect }: { title: string; rows: CampaignRow[]; emptyLabel: string; onSelect?: (value: string) => void }) {
   return (
-    <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+      <div className="border-line border-b px-4 py-3">
+        <h2 className="text-foreground text-sm font-semibold">{title}</h2>
       </div>
       {rows.length === 0 ? (
-        <p className="px-4 py-6 text-center text-sm text-subtle">{emptyLabel}</p>
+        <p className="text-subtle px-4 py-6 text-center text-sm">{emptyLabel}</p>
       ) : (
         <ul className="p-1.5">
           {rows.map((r, i) => {
             const content = (
               <>
-                <span className="truncate text-[13.5px] font-semibold text-foreground">{r.value}</span>
-                <span className="whitespace-nowrap text-sm font-bold tabular-nums text-foreground">
+                <span className="text-foreground truncate text-[13.5px] font-semibold">{r.value}</span>
+                <span className="text-foreground text-sm font-bold whitespace-nowrap tabular-nums">
                   {r.sessions.toLocaleString()}
-                  <span className="ml-1 text-xs font-normal text-subtle">({r.visitors.toLocaleString()})</span>
+                  <span className="text-subtle ml-1 text-xs font-normal">({r.visitors.toLocaleString()})</span>
                 </span>
               </>
             );
@@ -84,12 +68,12 @@ function CampaignList({
                   <button
                     type="button"
                     onClick={() => onSelect(r.value)}
-                    className="flex w-full items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                    className="hover:bg-elevated flex w-full items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
                   >
                     {content}
                   </button>
                 ) : (
-                  <div className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 hover:bg-elevated">{content}</div>
+                  <div className="hover:bg-elevated flex items-center justify-between gap-3 rounded-lg px-2.5 py-2">{content}</div>
                 )}
               </li>
             );
@@ -102,7 +86,7 @@ function CampaignList({
 
 export default function AnalyticsIndex({
   site,
-  days,
+  period,
   filters,
   summary,
   previousSummary,
@@ -131,10 +115,10 @@ export default function AnalyticsIndex({
   goals,
 }: {
   site: { id: string; name: string; domain: string; search_enabled: boolean };
-  days: number;
+  period: Period;
   filters: Filters;
   summary: Summary;
-  previousSummary: Summary;
+  previousSummary: Summary | null;
   liveVisitors: number;
   timeseries: SeriesPoint[];
   topPaths: (Rank & { avg_engaged: number | null; avg_scroll: number | null })[];
@@ -174,16 +158,30 @@ export default function AnalyticsIndex({
     };
   }, []);
 
-  function go(nextDays: number, nextFilters: Filters) {
-    router.get(
-      route('app.project.analytics.show', { project: project!.id, site: site.id }),
-      Object.keys(nextFilters).length > 0 ? { days: nextDays, filters: nextFilters } : { days: nextDays },
-      { preserveState: true, preserveScroll: true },
-    );
+  function go(next: { range?: string; from?: string; to?: string; compare?: Comparison; interval?: Interval; filters?: Filters }) {
+    const range = next.range ?? period.range;
+    const rangeChanged = next.range !== undefined && (next.range !== period.range || range === 'custom');
+    const nextFilters = next.filters ?? filters;
+    const compare = next.compare ?? period.compare;
+    const params: Record<string, string | Filters> = { range };
+
+    if (range === 'custom') {
+      params.from = next.from ?? period.from;
+      params.to = next.to ?? period.to;
+    }
+    const interval = next.interval ?? (rangeChanged ? null : period.interval);
+    if (compare !== 'previous') params.compare = compare;
+    if (interval) params.interval = interval;
+    if (Object.keys(nextFilters).length > 0) params.filters = nextFilters;
+
+    router.get(route('app.project.analytics.show', { project: project!.id, site: site.id }), params, {
+      preserveState: true,
+      preserveScroll: true,
+    });
   }
 
-  const addFilter = (key: FilterKey, value: string) => go(days, { ...filters, [key]: value });
-  const removeFilter = (key: string) => go(days, Object.fromEntries(Object.entries(filters).filter(([k]) => k !== key)));
+  const addFilter = (key: FilterKey, value: string) => go({ filters: { ...filters, [key]: value } });
+  const removeFilter = (key: string) => go({ filters: Object.fromEntries(Object.entries(filters).filter(([k]) => k !== key)) });
 
   const channelLabel = (channel: string) => t(`analytics.dashboard.channels.${channel}`);
 
@@ -211,12 +209,7 @@ export default function AnalyticsIndex({
     value: filterValue(key, value),
   }));
 
-  function rows<T extends Rank>(
-    items: T[],
-    labelKey: string,
-    filterKey: FilterKey | null,
-    extra: (row: T) => Partial<RankRow> = () => ({}),
-  ): RankRow[] {
+  function rows<T extends Rank>(items: T[], labelKey: string, filterKey: FilterKey | null, extra: (row: T) => Partial<RankRow> = () => ({})): RankRow[] {
     return items.map((r, i) => {
       const raw = String(r[labelKey] ?? '');
       return {
@@ -242,7 +235,8 @@ export default function AnalyticsIndex({
   }
 
   const noData = t('analytics.dashboard.no_data');
-  const delta = (key: keyof Summary) => percentChange(summary[key], previousSummary[key]);
+  const delta = (key: keyof Summary) => (previousSummary ? percentChange(summary[key], previousSummary[key]) : undefined);
+  const deltaLabel = t(period.compare === 'year' ? 'analytics.dashboard.compare.vs_year' : 'common.dashboard.vs_previous');
 
   return (
     <AppLayout title={t('analytics.dashboard.title', { name: site.name })}>
@@ -251,25 +245,54 @@ export default function AnalyticsIndex({
           <div>
             <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.dashboard.back')}</BackLink>
             <div className="mt-1 flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">{site.name}</h1>
+              <h1 className="text-foreground text-2xl font-bold tracking-tight">{site.name}</h1>
               <LiveVisitors count={liveVisitors} />
             </div>
-            <p className="mt-1 text-sm text-muted">{site.domain}</p>
+            <p className="text-muted mt-1 text-sm">{site.domain}</p>
           </div>
-          <RangeTabs days={days} onChange={(d) => go(d, filters)} />
+          <div className="flex flex-wrap items-center gap-2">
+            <DateRangePicker period={period} onSelect={(range, custom) => go({ range, ...custom })} />
+            <select
+              aria-label={t('analytics.dashboard.compare.label')}
+              value={period.compare}
+              onChange={(e) => go({ compare: e.target.value as Comparison })}
+              className="rounded-lg border border-line bg-surface py-1.5 pl-3 pr-8 text-sm font-semibold text-foreground shadow-[var(--shadow-sm)] hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+            >
+              {COMPARISONS.map((option) => (
+                <option key={option} value={option}>
+                  {t(`analytics.dashboard.compare.${option}`)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <FilterBar items={activeFilters} onRemove={removeFilter} onClear={() => go(days, {})} />
+        <FilterBar items={activeFilters} onRemove={removeFilter} onClear={() => go({ filters: {} })} />
 
         <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
           <div className="mb-6 grid grid-cols-2 gap-3.5 md:grid-cols-5">
-            <KpiTile compact={false} label={t('analytics.dashboard.kpi.page_views')} value={summary.page_views} deltaPct={delta('page_views')} icon={BarChart3} />
-            <KpiTile compact={false} label={t('analytics.dashboard.kpi.unique_visitors')} value={summary.visitors} deltaPct={delta('visitors')} icon={Users} />
+            <KpiTile
+              compact={false}
+              label={t('analytics.dashboard.kpi.page_views')}
+              value={summary.page_views}
+              deltaPct={delta('page_views')}
+              deltaLabel={deltaLabel}
+              icon={BarChart3}
+            />
+            <KpiTile
+              compact={false}
+              label={t('analytics.dashboard.kpi.unique_visitors')}
+              value={summary.visitors}
+              deltaPct={delta('visitors')}
+              deltaLabel={deltaLabel}
+              icon={Users}
+            />
             <KpiTile
               compact={false}
               label={t('analytics.dashboard.kpi.bounce_rate')}
               value={`${summary.bounce_rate} %`}
               deltaPct={delta('bounce_rate')}
+              deltaLabel={deltaLabel}
               lowerIsBetter
               icon={MousePointerClick}
             />
@@ -278,6 +301,7 @@ export default function AnalyticsIndex({
               label={t('analytics.dashboard.kpi.avg_duration')}
               value={formatDuration(summary.avg_duration)}
               deltaPct={delta('avg_duration')}
+              deltaLabel={deltaLabel}
               icon={Clock}
             />
             <KpiTile
@@ -285,11 +309,18 @@ export default function AnalyticsIndex({
               label={t('analytics.dashboard.kpi.from_campaigns')}
               value={`${summary.campaign_share} %`}
               deltaPct={delta('campaign_share')}
+              deltaLabel={deltaLabel}
               icon={Megaphone}
             />
           </div>
 
-          <VisitorsChart title={t('analytics.dashboard.chart_title')} data={timeseries} />
+          <VisitorsChart
+            title={t('analytics.dashboard.chart_title')}
+            data={timeseries}
+            interval={period.interval}
+            intervals={period.intervals}
+            onIntervalChange={(interval) => go({ interval })}
+          />
 
           <div className="mb-6">
             <WorldMap data={clicksByCountry} title={t('analytics.dashboard.map_title')} />
@@ -399,7 +430,7 @@ export default function AnalyticsIndex({
                   rows: valueRows(interactions.downloads, (r) => ({
                     label: r.value.split('/').pop() || r.value,
                     sub: r.value,
-                    prefix: <FileDown className="mx-auto h-4 w-4 text-subtle" />,
+                    prefix: <FileDown className="text-subtle mx-auto h-4 w-4" />,
                   })),
                 },
               ]}
@@ -411,23 +442,23 @@ export default function AnalyticsIndex({
                 {
                   key: 'searches',
                   label: t('analytics.dashboard.interactions.searches'),
-                  rows: valueRows(interactions.searches, () => ({ prefix: <Search className="mx-auto h-4 w-4 text-subtle" /> })),
+                  rows: valueRows(interactions.searches, () => ({ prefix: <Search className="text-subtle mx-auto h-4 w-4" /> })),
                   emptyLabel: site.search_enabled ? noData : t('analytics.dashboard.interactions.search_disabled'),
                 },
                 {
                   key: 'not_found',
                   label: t('analytics.dashboard.interactions.not_found'),
-                  rows: valueRows(interactions.notFound, () => ({ prefix: <FileX className="mx-auto h-4 w-4 text-subtle" /> })),
+                  rows: valueRows(interactions.notFound, () => ({ prefix: <FileX className="text-subtle mx-auto h-4 w-4" /> })),
                   emptyLabel: t('analytics.dashboard.interactions.not_found_hint'),
                 },
               ]}
             />
           </div>
 
-          {days >= 7 && <ActivityHeatmap buckets={hourlyActivity} />}
+          {period.days >= 7 && <ActivityHeatmap buckets={hourlyActivity} />}
 
-          <h2 className="mb-1 mt-8 text-sm font-semibold uppercase tracking-wide text-muted">{t('analytics.dashboard.campaigns.title')}</h2>
-          <p className="mb-4 text-xs text-subtle">{t('analytics.dashboard.campaigns.hint')}</p>
+          <h2 className="text-muted mt-8 mb-1 text-sm font-semibold tracking-wide uppercase">{t('analytics.dashboard.campaigns.title')}</h2>
+          <p className="text-subtle mb-4 text-xs">{t('analytics.dashboard.campaigns.hint')}</p>
           <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
             <CampaignList
               title={t('analytics.dashboard.campaigns.sources')}
@@ -447,32 +478,28 @@ export default function AnalyticsIndex({
               emptyLabel={t('analytics.dashboard.campaigns.no_data')}
               onSelect={(v) => addFilter('utm_campaign', v)}
             />
-            <CampaignList
-              title={t('analytics.dashboard.campaigns.source_medium')}
-              rows={utmSourceMediums}
-              emptyLabel={t('analytics.dashboard.campaigns.no_data')}
-            />
+            <CampaignList title={t('analytics.dashboard.campaigns.source_medium')} rows={utmSourceMediums} emptyLabel={t('analytics.dashboard.campaigns.no_data')} />
             <CampaignList title={t('analytics.dashboard.campaigns.terms')} rows={utmTerms} emptyLabel={t('analytics.dashboard.campaigns.no_data')} />
             <CampaignList title={t('analytics.dashboard.campaigns.content')} rows={utmContents} emptyLabel={t('analytics.dashboard.campaigns.no_data')} />
           </div>
 
-          <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wide text-muted">{t('analytics.dashboard.events.title')}</h2>
-          <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
+          <h2 className="text-muted mt-8 mb-3 text-sm font-semibold tracking-wide uppercase">{t('analytics.dashboard.events.title')}</h2>
+          <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
             {topEvents.length === 0 ? (
-              <p className="px-4 py-6 text-center text-sm text-subtle">{t('analytics.dashboard.events.empty')}</p>
+              <p className="text-subtle px-4 py-6 text-center text-sm">{t('analytics.dashboard.events.empty')}</p>
             ) : (
               <ul className="p-1.5">
                 {topEvents.map((e, i) => (
-                  <li key={i} className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-2 hover:bg-elevated">
+                  <li key={i} className="hover:bg-elevated flex items-center justify-between gap-3 rounded-lg px-2.5 py-2">
                     <Link
                       href={route('app.project.analytics.events.show', { project: project!.id, site: site.id, name: e.name })}
-                      className="truncate font-mono text-[13.5px] font-semibold text-accent-soft-foreground hover:underline"
+                      className="text-accent-soft-foreground truncate font-mono text-[13.5px] font-semibold hover:underline"
                     >
                       {e.name}
                     </Link>
-                    <span className="whitespace-nowrap text-sm font-bold tabular-nums text-foreground">
+                    <span className="text-foreground text-sm font-bold whitespace-nowrap tabular-nums">
                       {e.count.toLocaleString()}
-                      <span className="ml-1 text-xs font-normal text-subtle">({e.visitors.toLocaleString()})</span>
+                      <span className="text-subtle ml-1 text-xs font-normal">({e.visitors.toLocaleString()})</span>
                     </span>
                   </li>
                 ))}
@@ -480,43 +507,36 @@ export default function AnalyticsIndex({
             )}
           </section>
 
-          <div className="mb-3 mt-8 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{t('analytics.dashboard.goals.title')}</h2>
-            <Link
-              href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })}
-              className="text-sm text-accent-soft-foreground hover:underline"
-            >
+          <div className="mt-8 mb-3 flex items-center justify-between">
+            <h2 className="text-muted text-sm font-semibold tracking-wide uppercase">{t('analytics.dashboard.goals.title')}</h2>
+            <Link href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })} className="text-accent-soft-foreground text-sm hover:underline">
               {t('analytics.dashboard.goals.manage')}
             </Link>
           </div>
           {goals.length === 0 ? (
-            <p className="text-sm text-muted">
+            <p className="text-muted text-sm">
               {t('analytics.dashboard.goals.empty')}{' '}
-              <Link
-                href={route('app.project.analytics.goals.create', { project: project!.id, site: site.id })}
-                className="text-accent-soft-foreground hover:underline"
-              >
+              <Link href={route('app.project.analytics.goals.create', { project: project!.id, site: site.id })} className="text-accent-soft-foreground hover:underline">
                 {t('analytics.dashboard.goals.create_one')}
               </Link>
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
               {goals.map((g) => (
-                <div key={g.id} className="rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow-sm)]">
+                <div key={g.id} className="border-line bg-surface rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)]">
                   <div className="mb-2 flex items-baseline justify-between">
-                    <h3 className="text-sm font-semibold text-foreground">{g.name}</h3>
-                    <span className="text-2xl font-bold tabular-nums text-foreground">{g.rate} %</span>
+                    <h3 className="text-foreground text-sm font-semibold">{g.name}</h3>
+                    <span className="text-foreground text-2xl font-bold tabular-nums">{g.rate} %</span>
                   </div>
-                  <p className="mb-3 text-xs text-muted">
-                    {t('analytics.dashboard.goals.stats', { conversions: g.conversions, visitors: g.visitors })}{' '}
-                    <span className="font-mono">{g.match_value}</span>
+                  <p className="text-muted mb-3 text-xs">
+                    {t('analytics.dashboard.goals.stats', { conversions: g.conversions, visitors: g.visitors })} <span className="font-mono">{g.match_value}</span>
                   </p>
                   {g.byCampaign.length > 0 && (
-                    <ul className="space-y-1 border-t border-line pt-2">
+                    <ul className="border-line space-y-1 border-t pt-2">
                       {g.byCampaign.map((c, i) => (
-                        <li key={i} className="flex justify-between text-xs text-muted">
+                        <li key={i} className="text-muted flex justify-between text-xs">
                           <span className="truncate">{c.value}</span>
-                          <span className="font-semibold text-foreground">{c.conversions}</span>
+                          <span className="text-foreground font-semibold">{c.conversions}</span>
                         </li>
                       ))}
                     </ul>

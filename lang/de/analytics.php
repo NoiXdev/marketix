@@ -79,10 +79,41 @@ return [
         'chart' => [
             'show_table' => 'Als Tabelle anzeigen',
             'show_chart' => 'Als Diagramm anzeigen',
-            'date' => 'Datum',
-            'hour' => 'Uhrzeit',
+            'week_of' => 'Woche ab :date',
             'select_metric' => 'Wählen Sie mindestens eine Metrik aus.',
             'scale_hint' => 'Seitenaufrufe und eindeutige Besucher teilen sich eine Skala, jede Linie ist auf ihren Höchstwert im Zeitraum skaliert. Genaue Werte im Tooltip oder in der Tabelle.',
+        ],
+
+        'range' => [
+            'today' => 'Heute',
+            'yesterday' => 'Gestern',
+            '7d' => 'Letzte 7 Tage',
+            '30d' => 'Letzte 30 Tage',
+            '90d' => 'Letzte 90 Tage',
+            'month' => 'Dieser Monat',
+            'last_month' => 'Letzter Monat',
+            'year' => 'Dieses Jahr',
+            '12m' => 'Letzte 12 Monate',
+            'custom' => 'Benutzerdefiniert',
+            'from' => 'Von',
+            'to' => 'Bis',
+            'apply' => 'Zeitraum anwenden',
+        ],
+
+        'compare' => [
+            'label' => 'Vergleich',
+            'previous' => 'vs. Vorperiode',
+            'year' => 'vs. Vorjahr',
+            'none' => 'Kein Vergleich',
+            'vs_year' => 'vs. Vorjahr',
+        ],
+
+        'interval' => [
+            'label' => 'Intervall',
+            'hour' => 'Stunde',
+            'day' => 'Tag',
+            'week' => 'Woche',
+            'month' => 'Monat',
         ],
 
         'live' => [

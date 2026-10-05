@@ -79,10 +79,41 @@ return [
         'chart' => [
             'show_table' => 'Als tabel tonen',
             'show_chart' => 'Als grafiek tonen',
-            'date' => 'Datum',
-            'hour' => 'Tijd',
+            'week_of' => 'Week van :date',
             'select_metric' => 'Selecteer minstens één metriek.',
             'scale_hint' => 'Paginaweergaven en unieke bezoekers delen één schaal; elke lijn is geschaald naar zijn piek in deze periode. Exacte waarden in de tooltip of de tabel.',
+        ],
+
+        'range' => [
+            'today' => 'Vandaag',
+            'yesterday' => 'Gisteren',
+            '7d' => 'Laatste 7 dagen',
+            '30d' => 'Laatste 30 dagen',
+            '90d' => 'Laatste 90 dagen',
+            'month' => 'Deze maand',
+            'last_month' => 'Vorige maand',
+            'year' => 'Dit jaar',
+            '12m' => 'Laatste 12 maanden',
+            'custom' => 'Aangepaste periode',
+            'from' => 'Van',
+            'to' => 'Tot',
+            'apply' => 'Periode toepassen',
+        ],
+
+        'compare' => [
+            'label' => 'Vergelijking',
+            'previous' => 't.o.v. vorige periode',
+            'year' => 't.o.v. vorig jaar',
+            'none' => 'Geen vergelijking',
+            'vs_year' => 't.o.v. vorig jaar',
+        ],
+
+        'interval' => [
+            'label' => 'Interval',
+            'hour' => 'Uur',
+            'day' => 'Dag',
+            'week' => 'Week',
+            'month' => 'Maand',
         ],
 
         'live' => [

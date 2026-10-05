@@ -1,4 +1,5 @@
 import { Checkbox } from '@/Components/ui';
+import { Interval, parseDate } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { formatDuration } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
@@ -57,7 +58,19 @@ function barHeight(value: number | null, max: number) {
   return `max(2px, ${(value / max) * 100}%)`;
 }
 
-export default function VisitorsChart({ title, data }: { title: string; data: SeriesPoint[] }) {
+export default function VisitorsChart({
+  title,
+  data,
+  interval,
+  intervals,
+  onIntervalChange,
+}: {
+  title: string;
+  data: SeriesPoint[];
+  interval: Interval;
+  intervals: Interval[];
+  onIntervalChange: (interval: Interval) => void;
+}) {
   const { t, locale } = useTranslation();
   const [selection, setSelection] = useState<MetricKey[]>(loadSelection);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -67,7 +80,7 @@ export default function VisitorsChart({ title, data }: { title: string; data: Se
   const plotRef = useRef<HTMLDivElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
 
-  const hourly = data.length > 0 && data[0].date.length > 10;
+  const multiDay = data.length > 0 && data[0].date.slice(0, 10) !== data[data.length - 1].date.slice(0, 10);
   const count = (n: number) => n.toLocaleString(locale);
   const percent = (n: number) => `${n.toLocaleString(locale)} %`;
 
@@ -141,13 +154,35 @@ export default function VisitorsChart({ title, data }: { title: string; data: Se
     setSelection((current) => (current.includes(key) ? current.filter((k) => k !== key) : METRIC_KEYS.filter((k) => k === key || current.includes(k))));
   }
 
-  function formatBucket(date: string) {
-    if (hourly) {
-      const hour = Number(date.slice(11, 13));
-      return `${String(hour).padStart(2, '0')}:00 – ${String((hour + 1) % 24).padStart(2, '0')}:00`;
+  function formatBucket(key: string) {
+    const date = parseDate(key);
+    switch (interval) {
+      case 'hour': {
+        const hour = Number(key.slice(11, 13));
+        const hours = `${String(hour).padStart(2, '0')}:00 – ${String((hour + 1) % 24).padStart(2, '0')}:00`;
+        return multiDay ? `${date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}, ${hours}` : hours;
+      }
+      case 'week':
+        return t('analytics.dashboard.chart.week_of', {
+          date: date.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }),
+        });
+      case 'month':
+        return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+      default:
+        return date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     }
-    const [y, m, d] = date.split('-').map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function formatAxis(key: string) {
+    const date = parseDate(key);
+    switch (interval) {
+      case 'hour':
+        return multiDay ? `${date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })} ${key.slice(11, 16)}` : key.slice(11, 16);
+      case 'month':
+        return date.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+      default:
+        return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+    }
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
@@ -166,13 +201,32 @@ export default function VisitorsChart({ title, data }: { title: string; data: Se
     <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        <button
-          type="button"
-          onClick={() => setShowTable((v) => !v)}
-          className="text-xs font-semibold text-accent-soft-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
-        >
-          {showTable ? t('analytics.dashboard.chart.show_chart') : t('analytics.dashboard.chart.show_table')}
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {intervals.length > 1 && (
+            <div role="group" aria-label={t('analytics.dashboard.interval.label')} className="inline-flex overflow-hidden rounded-lg border border-line">
+              {intervals.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={option === interval}
+                  onClick={() => option !== interval && onIntervalChange(option)}
+                  className={`border-r border-line px-2.5 py-1 text-xs font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                    option === interval ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
+                  }`}
+                >
+                  {t(`analytics.dashboard.interval.${option}`)}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowTable((v) => !v)}
+            className="text-xs font-semibold text-accent-soft-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+          >
+            {showTable ? t('analytics.dashboard.chart.show_chart') : t('analytics.dashboard.chart.show_table')}
+          </button>
+        </div>
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
@@ -203,7 +257,7 @@ export default function VisitorsChart({ title, data }: { title: string; data: Se
             <thead className="sticky top-0 bg-surface">
               <tr>
                 <th className="px-3 py-2 text-left text-xs font-semibold text-muted">
-                  {hourly ? t('analytics.dashboard.chart.hour') : t('analytics.dashboard.chart.date')}
+                  {t(`analytics.dashboard.interval.${interval}`)}
                 </th>
                 {metrics.map((m) => (
                   <th key={m.key} className="whitespace-nowrap px-3 py-2 text-right text-xs font-semibold text-muted">
@@ -327,7 +381,7 @@ export default function VisitorsChart({ title, data }: { title: string; data: Se
             )}
           </div>
 
-          <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" format={hourly ? (d) => d.slice(11, 16) : undefined} />
+          <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" format={formatAxis} />
 
           {lines.length > 0 && <p className="mt-3 text-xs text-subtle">{t('analytics.dashboard.chart.scale_hint')}</p>}
         </>

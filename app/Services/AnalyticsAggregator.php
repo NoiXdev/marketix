@@ -8,6 +8,7 @@ use App\Models\Visit;
 use App\Support\Analytics\AnalyticsQuery;
 use App\Support\Analytics\ChannelClassifier;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -142,27 +143,31 @@ class AnalyticsAggregator
 
     private function bucketExpression(string $column, AnalyticsQuery $query): string
     {
-        if (! $query->hourly()) {
-            return "DATE({$column})";
-        }
+        $sqlite = $this->isSqlite();
 
-        return $this->isSqlite()
-            ? "strftime('%Y-%m-%d %H:00', {$column})"
-            : "DATE_FORMAT({$column}, '%Y-%m-%d %H:00')";
+        return match ($query->interval) {
+            'hour' => $sqlite ? "strftime('%Y-%m-%d %H:00', {$column})" : "DATE_FORMAT({$column}, '%Y-%m-%d %H:00')",
+            'week' => $sqlite
+                ? "date({$column}, '-' || ((CAST(strftime('%w', {$column}) AS INTEGER) + 6) % 7) || ' days')"
+                : "DATE_FORMAT(DATE_SUB({$column}, INTERVAL WEEKDAY({$column}) DAY), '%Y-%m-%d')",
+            'month' => $sqlite ? "strftime('%Y-%m-01', {$column})" : "DATE_FORMAT({$column}, '%Y-%m-01')",
+            default => "DATE({$column})",
+        };
     }
 
     /** @return list<string> */
     private function bucketKeys(AnalyticsQuery $query): array
     {
-        if ($query->hourly()) {
-            $day = $query->from->startOfDay();
-
-            return array_map(fn (int $h) => $day->addHours($h)->format('Y-m-d H:00'), range(0, 23));
-        }
+        [$start, $step, $format, $end] = match ($query->interval) {
+            'hour' => [$query->from->startOfDay(), 'addHour', 'Y-m-d H:00', $query->to->endOfDay()],
+            'week' => [$query->from->startOfWeek(CarbonInterface::MONDAY), 'addWeek', 'Y-m-d', $query->to],
+            'month' => [$query->from->startOfMonth(), 'addMonthNoOverflow', 'Y-m-01', $query->to],
+            default => [$query->from->startOfDay(), 'addDay', 'Y-m-d', $query->to],
+        };
 
         $keys = [];
-        for ($date = $query->from->startOfDay(); $date->lte($query->to); $date = $date->addDay()) {
-            $keys[] = $date->format('Y-m-d');
+        for ($date = $start; $date->lte($end); $date = $date->{$step}()) {
+            $keys[] = $date->format($format);
         }
 
         return $keys;
