@@ -32,5 +32,7 @@ class DatabaseSeeder extends Seeder
 
             $project->users()->attach($user, ['role' => 'admin', 'active' => true]);
         }
+
+        $this->call(AnalyticsDemoSeeder::class);
     }
 }
