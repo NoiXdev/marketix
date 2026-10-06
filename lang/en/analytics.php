@@ -76,6 +76,33 @@ return [
         'no_data' => 'No data',
         'map_title' => 'Visitors by country',
 
+        'tabs' => [
+            'label' => 'Analytics sections',
+            'overview' => [
+                'label' => 'Overview',
+                'description' => 'The most important numbers of your website at a glance.',
+            ],
+            'acquisition' => [
+                'label' => 'Acquisition',
+                'description' => 'Where your visitors come from: channels, referring websites and campaigns.',
+                'more' => 'All sources',
+            ],
+            'behavior' => [
+                'label' => 'Behavior',
+                'description' => 'What visitors do on your website: pages, interactions, events and active times.',
+                'more' => 'All pages',
+            ],
+            'audience' => [
+                'label' => 'Audience',
+                'description' => 'Who your visitors are: countries, languages, devices and browsers.',
+                'more' => 'More about your audience',
+            ],
+            'conversions' => [
+                'label' => 'Conversions',
+                'description' => 'How many visits reach your goals.',
+            ],
+        ],
+
         'chart' => [
             'show_table' => 'Show as table',
             'show_chart' => 'Show as chart',
