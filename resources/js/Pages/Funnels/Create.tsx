@@ -22,7 +22,7 @@ export default function FunnelsCreate({ site, stepTypes, limits }: { site: { id:
 
   return (
     <AppLayout title={t('analytics.funnels.create')}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6">
           <BackLink href={back}>{t('analytics.funnels.back')}</BackLink>
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('analytics.funnels.create')}</h1>

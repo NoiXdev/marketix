@@ -24,9 +24,9 @@ export default function ChannelTable({ title, channels, emptyLabel }: { title: s
         <table className="w-full text-sm">
           <thead>
             <tr className="text-muted text-xs">
-              <th className="px-4 py-2 text-left font-semibold">{t('analytics.dashboard.channel_table.channel')}</th>
-              <th className="px-3 py-2 text-right font-semibold">{t('analytics.dashboard.channel_table.sessions')}</th>
-              <th className="px-3 py-2 text-right font-semibold">{t('analytics.dashboard.channel_table.engagement')}</th>
+              <th className="py-2 pr-2 pl-4 text-left font-semibold sm:px-4">{t('analytics.dashboard.channel_table.channel')}</th>
+              <th className="px-2 py-2 text-right font-semibold sm:px-3">{t('analytics.dashboard.channel_table.sessions')}</th>
+              <th className="py-2 pr-4 pl-2 text-right font-semibold sm:px-3">{t('analytics.dashboard.channel_table.engagement')}</th>
               <th className="hidden px-4 py-2 text-right font-semibold sm:table-cell">{t('analytics.dashboard.channel_table.avg_duration')}</th>
             </tr>
           </thead>
@@ -35,7 +35,7 @@ export default function ChannelTable({ title, channels, emptyLabel }: { title: s
               const count = Number(row.count);
               return (
                 <tr key={row.channel} className="border-line hover:bg-elevated border-t">
-                  <td className="px-4 py-2">
+                  <td className="py-2 pr-2 pl-4 sm:px-4">
                     <button
                       type="button"
                       onClick={() => addFilter('channel', row.channel)}
@@ -48,11 +48,11 @@ export default function ChannelTable({ title, channels, emptyLabel }: { title: s
                       <div className="bg-accent h-1 rounded-full" style={{ width: `${(count / max) * 100}%` }} />
                     </div>
                   </td>
-                  <td className="px-3 py-2 text-right whitespace-nowrap tabular-nums">
+                  <td className="px-2 py-2 text-right whitespace-nowrap tabular-nums sm:px-3">
                     <span className="text-foreground font-semibold">{count.toLocaleString(locale)}</span>
-                    <span className="text-muted ml-1.5 text-xs">{percent(total > 0 ? (count / total) * 100 : 0)}</span>
+                    <span className="text-muted ml-1.5 hidden text-xs sm:inline">{percent(total > 0 ? (count / total) * 100 : 0)}</span>
                   </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="py-2 pr-4 pl-2 text-right whitespace-nowrap sm:px-3">
                     {row.engagement_rate === null ? (
                       <span className="text-muted">—</span>
                     ) : (

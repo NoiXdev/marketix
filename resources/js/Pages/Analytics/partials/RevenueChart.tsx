@@ -1,3 +1,4 @@
+import { scrubHandlers } from '@/lib/chartScrub';
 import { formatMoney } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { formatAxisLabel, formatBucket, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
@@ -66,7 +67,7 @@ export default function RevenueChart({
   }
 
   return (
-    <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
+    <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-foreground text-sm font-semibold">{t('analytics.dashboard.revenue.chart_title')}</h2>
         {intervals.length > 1 && (
@@ -97,13 +98,14 @@ export default function RevenueChart({
           onKeyDown={onKeyDown}
           onFocus={() => setHovered((h) => h ?? data.length - 1)}
           onBlur={() => setHovered(null)}
-          className="border-line flex h-44 border-b focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
+          {...scrubHandlers((slot) => setHovered(Number(slot)))}
+          className="border-line flex h-44 touch-pan-y border-b focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
           style={{ gap: SLOT_GAP }}
         >
           {data.map((d, i) => (
             <div
               key={d.date}
-              onMouseEnter={() => setHovered(i)}
+              data-slot={i}
               className={`relative flex h-full min-w-0 flex-1 items-end justify-center rounded-t-[4px] pt-3 ${hovered === i ? 'bg-elevated' : ''}`}
             >
               <div

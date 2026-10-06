@@ -21,7 +21,7 @@ export default function GoalsCreate({ site, goalTypes }: { site: { id: string };
 
   return (
     <AppLayout title={t('analytics.goals.create')}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })}>
             {t('analytics.goals.back')}

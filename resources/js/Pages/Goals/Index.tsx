@@ -24,7 +24,7 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
 
   return (
     <AppLayout title={t('analytics.goals.title', { name: site.name })}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id })}>
             {t('analytics.goals.back')}
@@ -39,17 +39,23 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
           <TableCard
             columns={[
               { label: t('analytics.goals.columns.name') },
-              { label: t('analytics.goals.columns.type') },
-              { label: t('analytics.goals.columns.match') },
+              { label: t('analytics.goals.columns.type'), className: 'hidden sm:table-cell' },
+              { label: t('analytics.goals.columns.match'), className: 'hidden sm:table-cell' },
               { label: '' },
             ]}
           >
             <tbody className="divide-y divide-line">
               {goals.map((goal) => (
                 <tr key={goal.id} className="group">
-                  <td className="px-4 py-3 font-medium text-foreground">{goal.name}</td>
-                  <td className="px-4 py-3 text-muted">{goal.type}</td>
-                  <td className="px-4 py-3 font-mono text-muted">{goal.match_value}</td>
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    {goal.name}
+                    {/* Phones show type and match below the name instead of in their own columns */}
+                    <span className="mt-0.5 block font-mono text-xs font-normal break-all text-muted sm:hidden">
+                      {goal.type} · {goal.match_value}
+                    </span>
+                  </td>
+                  <td className="hidden px-4 py-3 text-muted sm:table-cell">{goal.type}</td>
+                  <td className="hidden px-4 py-3 font-mono break-all text-muted sm:table-cell">{goal.match_value}</td>
                   <RowActions>
                     <IconButton
                       icon={Pencil}

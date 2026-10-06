@@ -32,7 +32,7 @@ export default function FunnelsEdit({
 
   return (
     <AppLayout title={t('analytics.funnels.edit')}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id, tab: 'conversions' })}>{t('analytics.funnels.back')}</BackLink>

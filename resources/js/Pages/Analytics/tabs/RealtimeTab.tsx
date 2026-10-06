@@ -1,5 +1,6 @@
 import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
+import { scrubHandlers } from '@/lib/chartScrub';
 import { countryName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 import { useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
@@ -70,8 +71,8 @@ export default function RealtimeTab({ realtime }: RealtimeData) {
         {t('analytics.dashboard.realtime.auto_refresh', { seconds: REFRESH_MS / 1000 })}
       </p>
 
-      <div className="mb-6 grid grid-cols-1 gap-3.5 md:grid-cols-3">
-        <section className="border-line bg-surface rounded-[var(--radius)] border p-5 shadow-[var(--shadow-sm)]">
+      <div className="mb-6 grid grid-cols-2 gap-3.5 md:grid-cols-3">
+        <section className="border-line bg-surface col-span-2 rounded-[var(--radius)] border p-5 shadow-[var(--shadow-sm)] md:col-span-1">
           <p className="text-muted text-[12.5px] font-semibold">{t('analytics.dashboard.realtime.active_now')}</p>
           <p className="text-foreground mt-1 text-5xl font-bold tracking-tight">{number(realtime.active_now)}</p>
           <p className="text-subtle mt-1 text-xs">{t('analytics.dashboard.realtime.active_hint')}</p>
@@ -88,16 +89,20 @@ export default function RealtimeTab({ realtime }: RealtimeData) {
         </section>
       </div>
 
-      <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
+      <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)] sm:p-6">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-foreground text-sm font-semibold">{t('analytics.dashboard.realtime.per_minute')}</h2>
           <p className="text-muted text-xs">{readout}</p>
         </div>
-        <div className="border-line flex h-32 items-end gap-[3px] border-b" onMouseLeave={() => setHovered(null)}>
+        <div
+          className="border-line flex h-32 touch-pan-y items-end gap-[2px] border-b sm:gap-[3px]"
+          onMouseLeave={() => setHovered(null)}
+          {...scrubHandlers((slot) => setHovered(Number(slot)))}
+        >
           {realtime.minutes.map((minute, i) => (
             <div
               key={minute.minutes_ago}
-              onMouseEnter={() => setHovered(i)}
+              data-slot={i}
               className={`flex h-full min-w-0 flex-1 items-end justify-center rounded-t-[4px] pt-2 ${hovered === i ? 'bg-elevated' : ''}`}
             >
               <div
