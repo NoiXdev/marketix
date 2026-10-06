@@ -1,15 +1,18 @@
+import { EmptyState, Flash, LinkButton, PageHeader } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
-import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import SiteCard, { SiteStats } from '@/Pages/Sites/partials/SiteCard';
 import { PageProps, Site } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { LineChart, Pencil, Plus, Trash2 } from 'lucide-react';
+import { LineChart, Plus } from 'lucide-react';
 
-export default function SitesIndex({ sites }: { sites: Site[] }) {
+type OverviewSite = Site & { tracking_mode_label: string };
+
+export default function SitesIndex({ sites, stats }: { sites: OverviewSite[]; stats?: Record<string, SiteStats | null> }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const projectId = project!.id;
 
   async function destroy(site: Site) {
     const confirmed = await confirmTyped({
@@ -19,11 +22,12 @@ export default function SitesIndex({ sites }: { sites: Site[] }) {
       confirmText: t('analytics.sites.delete.action'),
     });
     if (!confirmed) return;
-    router.delete(route('app.project.sites.destroy', { project: project!.id, site: site.id }));
+    router.delete(route('app.project.sites.destroy', { project: projectId, site: site.id }));
   }
 
+  const createUrl = route('app.project.sites.create', { project: projectId });
   const createBtn = (
-    <LinkButton href={route('app.project.sites.create', { project: project!.id })}>
+    <LinkButton href={createUrl}>
       <Plus className="h-4 w-4" />
       {t('analytics.sites.create')}
     </LinkButton>
@@ -32,7 +36,7 @@ export default function SitesIndex({ sites }: { sites: Site[] }) {
   return (
     <AppLayout title={t('analytics.sites.title')}>
       <div className="px-8 py-8">
-        <PageHeader title={t('analytics.sites.title')} action={createBtn} />
+        <PageHeader title={t('analytics.sites.title')} subtitle={t('analytics.sites.overview.subtitle')} action={createBtn} />
         <Flash />
 
         {sites.length === 0 ? (
@@ -41,50 +45,35 @@ export default function SitesIndex({ sites }: { sites: Site[] }) {
             title={t('analytics.sites.empty')}
             hint={t('analytics.sites.empty_hint')}
             action={
-              <LinkButton size="sm" href={route('app.project.sites.create', { project: project!.id })}>
+              <LinkButton size="sm" href={createUrl}>
                 <Plus className="h-3.5 w-3.5" />
                 {t('analytics.sites.create')}
               </LinkButton>
             }
           />
         ) : (
-          <TableCard
-            columns={[
-              { label: t('analytics.sites.columns.name') },
-              { label: t('analytics.sites.columns.domain') },
-              { label: t('analytics.sites.columns.mode') },
-              { label: '' },
-            ]}
-          >
-            <tbody className="divide-y divide-line">
-              {sites.map((site) => (
-                <tr
-                  key={site.id}
-                  onClick={rowLink(route('app.project.analytics.show', { project: project!.id, site: site.id }))}
-                  className={`group ${ROW_LINK_CLASS}`}
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={route('app.project.analytics.show', { project: project!.id, site: site.id })}
-                      className="font-medium text-foreground hover:text-accent-soft-foreground"
-                    >
-                      {site.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-muted">{site.domain}</td>
-                  <td className="px-4 py-3 text-muted">{site.tracking_mode}</td>
-                  <RowActions>
-                    <IconButton
-                      icon={Pencil}
-                      label={t('common.actions.edit')}
-                      href={route('app.project.sites.edit', { project: project!.id, site: site.id })}
-                    />
-                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(site)} />
-                  </RowActions>
-                </tr>
-              ))}
-            </tbody>
-          </TableCard>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
+            {sites.map((site) => (
+              <SiteCard
+                key={site.id}
+                site={site}
+                stats={stats === undefined ? undefined : (stats[site.id] ?? null)}
+                analyticsUrl={route('app.project.analytics.show', { project: projectId, site: site.id })}
+                editUrl={route('app.project.sites.edit', { project: projectId, site: site.id })}
+                onDelete={() => destroy(site)}
+              />
+            ))}
+            <Link
+              href={createUrl}
+              className="group border-line-strong text-muted hover:border-accent hover:bg-accent-soft/40 hover:text-accent-soft-foreground flex min-h-48 flex-col items-center justify-center gap-2 rounded-[var(--radius)] border border-dashed p-6 text-center transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
+            >
+              <span className="bg-elevated group-hover:bg-accent-soft grid h-10 w-10 place-items-center rounded-full transition-colors">
+                <Plus className="h-5 w-5" />
+              </span>
+              <span className="text-sm font-semibold">{t('analytics.sites.create')}</span>
+              <span className="text-subtle text-xs">{t('analytics.sites.overview.add_hint')}</span>
+            </Link>
+          </div>
         )}
       </div>
     </AppLayout>

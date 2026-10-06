@@ -5,24 +5,29 @@ namespace App\Http\Controllers;
 use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Http\Requests\SiteRequest;
+use App\Services\SiteOverview;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SiteController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, SiteOverview $overview)
     {
         $project = $request->get('project');
+        $sites = $project->sites()->latest()->get();
 
         return inertia('Sites/Index', [
-            'sites' => $project->sites()->latest()->get()->map(fn ($s) => [
+            'sites' => $sites->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
                 'domain' => $s->domain,
                 'tracking_id' => $s->tracking_id,
                 'tracking_mode' => $s->tracking_mode->value,
+                'tracking_mode_label' => $s->tracking_mode->label(),
                 'consent_mode' => $s->consent_mode->value,
                 'created_at' => $s->created_at->toISOString(),
             ]),
+            'stats' => Inertia::defer(fn () => $overview->forSites($sites)),
         ]);
     }
 
