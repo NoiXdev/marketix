@@ -9,7 +9,7 @@ import { useState } from 'react';
 import Brand from './Brand';
 import VersionLabel from './VersionLabel';
 
-type NavItem = { key: string; icon: typeof LinkIcon; routeName: string; countKey?: string };
+type NavItem = { key: string; icon: typeof LinkIcon; routeName: string; countKey?: string; activeRoutes?: string[] };
 type NavGroup = { labelKey: string; items: NavItem[] };
 
 const groups: NavGroup[] = [
@@ -19,7 +19,7 @@ const groups: NavGroup[] = [
     items: [
       { key: 'links', icon: LinkIcon, routeName: 'app.project.links.index', countKey: 'links' },
       { key: 'domains', icon: Globe, routeName: 'app.project.domains.index' },
-      { key: 'qrcodes', icon: QrCode, routeName: 'app.project.qrcodes.index' },
+      { key: 'qrcodes', icon: QrCode, routeName: 'app.project.qrcodes.index', activeRoutes: ['app.project.qr-templates.*'] },
       { key: 'pixels', icon: Zap, routeName: 'app.project.pixels.index' },
     ],
   },
@@ -27,13 +27,17 @@ const groups: NavGroup[] = [
     labelKey: 'insights',
     items: [
       { key: 'statistics', icon: BarChart3, routeName: 'app.project.statistics' },
-      { key: 'sites', icon: LineChart, routeName: 'app.project.sites.index' },
+      { key: 'sites', icon: LineChart, routeName: 'app.project.sites.index', activeRoutes: ['app.project.analytics.*'] },
       { key: 'reports', icon: FileBarChart, routeName: 'app.project.reports.index' },
     ],
   },
   { labelKey: 'management', items: [{ key: 'activity', icon: History, routeName: 'app.project.activity.index' }] },
   { labelKey: 'docs_help', items: [{ key: 'data_privacy', icon: ShieldCheck, routeName: 'app.project.docs.privacy' }] },
 ];
+
+function isNavItemActive({ routeName, activeRoutes = [] }: NavItem): boolean {
+  return [routeName.replace(/\.index$/, '.*'), ...activeRoutes].some((pattern) => route().current(pattern));
+}
 
 export default function Sidebar() {
   const { project, navCounts, currentProjectRole, auth } = usePage<PageProps>().props;
@@ -106,9 +110,10 @@ export default function Sidebar() {
               </p>
             )}
             <ul className="space-y-0.5">
-              {group.items.map(({ key, icon: Icon, routeName, countKey }) => {
+              {group.items.map((item) => {
+                const { key, icon: Icon, routeName, countKey } = item;
                 const href = route(routeName, { project: project?.id });
-                const isActive = route().current(routeName);
+                const isActive = isNavItemActive(item);
                 const count = countKey && navCounts ? navCounts[countKey] : undefined;
                 return (
                   <li key={key} className="group relative">
