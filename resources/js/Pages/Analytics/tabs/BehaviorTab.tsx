@@ -1,13 +1,13 @@
 import { Favicon } from '@/Components/icons/Favicon';
+import { LinkButton } from '@/Components/ui';
 import { HourBucket } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import ActivityHeatmap from '@/Pages/Analytics/partials/ActivityHeatmap';
+import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import { EventRow, Interactions, Rank } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
-import { LinkButton } from '@/Components/ui';
-import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import { FileDown, FileX, Search } from 'lucide-react';
 
 export type BehaviorData = {
@@ -48,9 +48,7 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, hostnames
             },
             { key: 'exit', label: t('analytics.dashboard.breakdown.exit_pages'), rows: rows(exitPages, 'exit_path', 'exit_path', (r) => titled(r.exit_path, r.title)) },
             // Only worth a tab when the snippet runs on more than one host (subdomains, staging, …)
-            ...(hostnames.length > 1
-              ? [{ key: 'hostnames', label: t('analytics.dashboard.breakdown.hostnames'), rows: rows(hostnames, 'hostname', 'hostname') }]
-              : []),
+            ...(hostnames.length > 1 ? [{ key: 'hostnames', label: t('analytics.dashboard.breakdown.hostnames'), rows: rows(hostnames, 'hostname', 'hostname') }] : []),
           ]}
         />
 

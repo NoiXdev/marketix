@@ -1,15 +1,15 @@
-import { type MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { CountryFlag } from '@/Components/icons/CountryFlag';
 import ScaleLegend from '@/Components/ScaleLegend';
 import { SCALE_EMPTY, scaleFill } from '@/lib/colorScale';
-import { geoNaturalEarth1, geoPath } from 'd3-geo';
-import { feature } from 'topojson-client';
-import type { FeatureCollection, Geometry } from 'geojson';
-import { numericToAlpha2 } from 'i18n-iso-countries';
-import worldData from 'world-atlas/countries-110m.json';
-import { Minus, Plus, RotateCcw } from 'lucide-react';
-import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { countryName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
+import { geoNaturalEarth1, geoPath } from 'd3-geo';
+import type { FeatureCollection, Geometry } from 'geojson';
+import { numericToAlpha2 } from 'i18n-iso-countries';
+import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { type MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { feature } from 'topojson-client';
+import worldData from 'world-atlas/countries-110m.json';
 
 // Minimal local type for topojson-specification's Topology (not directly importable)
 type TopoTopology = { objects: Record<string, unknown> };
@@ -32,10 +32,10 @@ const pathGen = geoPath(projection);
 
 // world-atlas countries-110m: numeric string ids in `id`, name in properties.name.
 const topo = worldData as unknown as TopoTopology;
-const countries = feature(
-  topo as Parameters<typeof feature>[0],
-  topo.objects['countries'] as Parameters<typeof feature>[1],
-) as unknown as FeatureCollection<Geometry, { name: string }>;
+const countries = feature(topo as Parameters<typeof feature>[0], topo.objects['countries'] as Parameters<typeof feature>[1]) as unknown as FeatureCollection<
+  Geometry,
+  { name: string }
+>;
 
 interface Props {
   data: CountryDatum[];
@@ -157,12 +157,8 @@ export default function WorldMap({ data, title, bare }: Props) {
 
   const titleRow = (
     <>
-      <h2 className="text-sm font-semibold text-foreground">{title ?? t('common.map.title')}</h2>
-      {hasData ? (
-        <span className="hidden text-xs text-subtle sm:inline">{t('common.map.zoom_hint')}</span>
-      ) : (
-        <span className="text-xs text-subtle">{t('common.map.no_data')}</span>
-      )}
+      <h2 className="text-foreground text-sm font-semibold">{title ?? t('common.map.title')}</h2>
+      {hasData ? <span className="text-subtle hidden text-xs sm:inline">{t('common.map.zoom_hint')}</span> : <span className="text-subtle text-xs">{t('common.map.no_data')}</span>}
     </>
   );
 
@@ -194,9 +190,7 @@ export default function WorldMap({ data, title, bare }: Props) {
               vectorEffect="non-scaling-stroke"
               fill={datum ? fillFor(datum.count) : NO_DATA}
               onMouseEnter={(e) =>
-                datum &&
-                !isDragging &&
-                setHover({ code: datum.country_code, name: countryName(datum.country_code, locale, datum.country), count: datum.count, ...pointer(e) })
+                datum && !isDragging && setHover({ code: datum.country_code, name: countryName(datum.country_code, locale, datum.country), count: datum.count, ...pointer(e) })
               }
               onMouseMove={(e) => datum && !isDragging && setHover((h) => (h ? { ...h, ...pointer(e) } : h))}
               onMouseLeave={() => setHover(null)}
@@ -208,14 +202,21 @@ export default function WorldMap({ data, title, bare }: Props) {
   );
 
   const controls = (
-    <div className="absolute right-2 top-2 flex flex-col gap-1">
+    <div className="absolute top-2 right-2 flex flex-col gap-1">
       <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_in')} title={t('common.map.zoom_in')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1.4)}>
         <Plus className="h-4 w-4" />
       </button>
       <button type="button" className={zoomBtn} aria-label={t('common.map.zoom_out')} title={t('common.map.zoom_out')} onClick={() => zoomAt(VIEW_W / 2, VIEW_H / 2, 1 / 1.4)}>
         <Minus className="h-4 w-4" />
       </button>
-      <button type="button" className={zoomBtn} aria-label={t('common.map.reset')} title={t('common.map.reset')} disabled={view.k === 1 && view.x === 0 && view.y === 0} onClick={() => setView(IDENTITY)}>
+      <button
+        type="button"
+        className={zoomBtn}
+        aria-label={t('common.map.reset')}
+        title={t('common.map.reset')}
+        disabled={view.k === 1 && view.x === 0 && view.y === 0}
+        onClick={() => setView(IDENTITY)}
+      >
         <RotateCcw className="h-4 w-4" />
       </button>
     </div>
@@ -223,7 +224,7 @@ export default function WorldMap({ data, title, bare }: Props) {
 
   const hoverTip = hover && (
     <div
-      className="pointer-events-none absolute z-10 inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)]"
+      className="bg-foreground text-canvas pointer-events-none absolute z-10 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-[var(--shadow)]"
       style={{ top: hover.y + 12, ...(hover.right !== null ? { right: hover.right + 12 } : { left: hover.x + 12 }) }}
     >
       <CountryFlag code={hover.code} />
@@ -247,7 +248,7 @@ export default function WorldMap({ data, title, bare }: Props) {
   }
 
   return (
-    <div className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+    <div className="border-line bg-surface rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
       <div className="mb-4 flex items-center justify-between">{titleRow}</div>
       <div className="relative overflow-hidden rounded-lg">
         {mapSvg('h-auto w-full')}

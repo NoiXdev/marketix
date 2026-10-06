@@ -1,8 +1,8 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { PageProps, Pixel } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Zap } from 'lucide-react';
@@ -65,32 +65,23 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
             }
           />
         ) : (
-          <TableCard
-            columns={[
-              { label: t('pixels.columns.name') },
-              { label: t('pixels.columns.provider') },
-              { label: t('pixels.columns.tag') },
-              { label: '' },
-            ]}
-          >
-            <tbody className="divide-y divide-line">
+          <TableCard columns={[{ label: t('pixels.columns.name') }, { label: t('pixels.columns.provider') }, { label: t('pixels.columns.tag') }, { label: '' }]}>
+            <tbody className="divide-line divide-y">
               {pixels.map((pixel) => (
-                <tr
-                  key={pixel.id}
-                  onClick={rowLink(route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id }))}
-                  className={`group ${ROW_LINK_CLASS}`}
-                >
-                  <td className="px-4 py-3 font-medium text-foreground">
+                <tr key={pixel.id} onClick={rowLink(route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                  <td className="text-foreground px-4 py-3 font-medium">
                     <Link href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} className="hover:text-accent-soft-foreground">
                       {pixel.name}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${PROVIDER_COLORS[pixel.provider] ?? 'bg-neutral-soft text-neutral-foreground'}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${PROVIDER_COLORS[pixel.provider] ?? 'bg-neutral-soft text-neutral-foreground'}`}
+                    >
                       {providerLabel(pixel.provider)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted">{pixel.tag}</td>
+                  <td className="text-muted px-4 py-3 font-mono text-xs">{pixel.tag}</td>
                   <RowActions>
                     <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} />
                     <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(pixel)} />

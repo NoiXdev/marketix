@@ -30,17 +30,17 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
     listQrTemplates(currentProject.id)
       .then(setTemplates)
       .catch(() => setStatus({ kind: 'error', message: t('qr.template.load_error') }));
-  }, [currentProject]);
+  }, [currentProject, t]);
 
-  const handleSave: FormEventHandler = e => {
+  const handleSave: FormEventHandler = (e) => {
     e.preventDefault();
     if (!currentProject || !name.trim() || saving) return;
 
     setSaving(true);
     setStatus(null);
     createQrTemplate(currentProject.id, name.trim(), style)
-      .then(template => {
-        setTemplates(prev => [template, ...prev]);
+      .then((template) => {
+        setTemplates((prev) => [template, ...prev]);
         setName('');
         setStatus({ kind: 'success', message: t('qr.template.saved') });
       })
@@ -62,7 +62,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
     setStatus(null);
     deleteQrTemplate(currentProject.id, template.id)
       .then(() => {
-        setTemplates(prev => prev.filter(tpl => tpl.id !== template.id));
+        setTemplates((prev) => prev.filter((tpl) => tpl.id !== template.id));
         setStatus({ kind: 'success', message: t('qr.template.deleted') });
       })
       .catch(() => setStatus({ kind: 'error', message: t('qr.template.delete_error') }))
@@ -70,33 +70,29 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
   }
 
   return (
-    <div className="space-y-3 border-t border-line pt-4">
+    <div className="border-line space-y-3 border-t pt-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-foreground">{t('qr.template.title')}</h3>
+        <h3 className="text-foreground text-sm font-semibold">{t('qr.template.title')}</h3>
         {currentProject && (
           <Link
             href={route('app.project.qr-templates.index', { project: currentProject.id })}
-            className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent-soft-foreground"
+            className="text-muted hover:text-accent-soft-foreground inline-flex items-center gap-1 text-xs"
           >
             <Settings2 className="h-3.5 w-3.5" /> {t('qr.template.manage')}
           </Link>
         )}
       </div>
-      <p className="text-xs text-muted">{t('qr.template.apply_hint')}</p>
+      <p className="text-muted text-xs">{t('qr.template.apply_hint')}</p>
 
-      {status && (
-        <p className={`text-xs ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>
-          {status.message}
-        </p>
-      )}
+      {status && <p className={`text-xs ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>{status.message}</p>}
 
       {templates.length === 0 ? (
-        <p className="text-xs text-muted">{t('qr.template.empty')}</p>
+        <p className="text-muted text-xs">{t('qr.template.empty')}</p>
       ) : (
         <ul className="space-y-1.5">
-          {templates.map(template => (
-            <li key={template.id} className="flex items-center justify-between gap-2 rounded-[var(--radius-sm)] border border-line bg-surface px-3 py-2">
-              <span className="truncate text-sm text-foreground">{template.name}</span>
+          {templates.map((template) => (
+            <li key={template.id} className="border-line bg-surface flex items-center justify-between gap-2 rounded-[var(--radius-sm)] border px-3 py-2">
+              <span className="text-foreground truncate text-sm">{template.name}</span>
               <div className="flex items-center gap-1">
                 <IconButton icon={Check} label={t('qr.template.apply')} onClick={() => onApply(template.style)} />
                 <IconButton
@@ -114,13 +110,7 @@ export default function QrTemplatePanel({ style, onApply }: Props) {
       )}
 
       <form onSubmit={handleSave} className="flex items-center gap-2">
-        <Input
-          type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder={t('qr.template.save_prompt')}
-          aria-label={t('qr.template.save_prompt')}
-        />
+        <Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('qr.template.save_prompt')} aria-label={t('qr.template.save_prompt')} />
         <Button type="submit" variant="secondary" size="sm" loading={saving} disabled={!name.trim()}>
           {t('qr.template.save')}
         </Button>

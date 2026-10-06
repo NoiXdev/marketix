@@ -12,12 +12,12 @@ interface Props {
 
 function Section({ icon: Icon, title, children }: { icon: typeof Database; title: string; children: ReactNode }) {
   return (
-    <section className="rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
-        <Icon className="h-4 w-4 text-accent-soft-foreground" />
+    <section className="border-line bg-surface rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
+      <h2 className="text-foreground mb-3 flex items-center gap-2 text-sm font-semibold">
+        <Icon className="text-accent-soft-foreground h-4 w-4" />
         {title}
       </h2>
-      <div className="space-y-3 text-sm leading-relaxed text-muted">{children}</div>
+      <div className="text-muted space-y-3 text-sm leading-relaxed">{children}</div>
     </section>
   );
 }
@@ -27,7 +27,7 @@ function Bullets({ items }: { items: string[] }) {
     <ul className="space-y-2">
       {items.map((text, i) => (
         <li key={i} className="flex gap-2">
-          <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+          <span className="bg-accent mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full" />
           <span>{text}</span>
         </li>
       ))}
@@ -54,8 +54,8 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
         <PageHeader title={t('docs.privacy.title')} subtitle={t('docs.privacy.subtitle', { app: appName })} />
 
         {/* Disclaimer */}
-        <div className="mb-6 flex items-start gap-2 rounded-[var(--radius)] border border-line bg-elevated px-4 py-3 text-xs text-muted">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-subtle" />
+        <div className="border-line bg-elevated text-muted mb-6 flex items-start gap-2 rounded-[var(--radius)] border px-4 py-3 text-xs">
+          <Info className="text-subtle mt-0.5 h-3.5 w-3.5 shrink-0" />
           <span>{t('docs.privacy.disclaimer')}</span>
         </div>
 
@@ -78,24 +78,12 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
 
           <Section icon={Cookie} title={t('docs.privacy.modes.heading')}>
             <Bullets
-              items={[
-                t('docs.privacy.modes.cookieless'),
-                t('docs.privacy.modes.cookie'),
-                t('docs.privacy.modes.dnt'),
-                t('docs.privacy.modes.links_note', { app: appName }),
-              ]}
+              items={[t('docs.privacy.modes.cookieless'), t('docs.privacy.modes.cookie'), t('docs.privacy.modes.dnt'), t('docs.privacy.modes.links_note', { app: appName })]}
             />
           </Section>
 
           <Section icon={ShieldOff} title={t('docs.privacy.nocollect.heading', { app: appName })}>
-            <Bullets
-              items={[
-                t('docs.privacy.nocollect.cookies'),
-                t('docs.privacy.nocollect.raw_ip'),
-                t('docs.privacy.nocollect.pii'),
-                t('docs.privacy.nocollect.cross'),
-              ]}
-            />
+            <Bullets items={[t('docs.privacy.nocollect.cookies'), t('docs.privacy.nocollect.raw_ip'), t('docs.privacy.nocollect.pii'), t('docs.privacy.nocollect.cross')]} />
           </Section>
 
           <Section icon={Scale} title={t('docs.privacy.retention.heading')}>
@@ -111,14 +99,14 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
 
           <Section icon={FileText} title={t('docs.privacy.notice.heading')}>
             <p>{t('docs.privacy.notice.intro', { app: appName })}</p>
-            <div className="relative rounded-[var(--radius-sm)] border border-line bg-elevated p-4 pr-12 text-[13px] leading-relaxed text-foreground">
+            <div className="border-line bg-elevated text-foreground relative rounded-[var(--radius-sm)] border p-4 pr-12 text-[13px] leading-relaxed">
               {snippet}
               <button
                 type="button"
                 onClick={copySnippet}
                 title={copied ? t('docs.privacy.notice.copied') : t('docs.privacy.notice.copy')}
                 aria-label={copied ? t('docs.privacy.notice.copied') : t('docs.privacy.notice.copy')}
-                className={`absolute right-2 top-2 rounded-md p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                className={`absolute top-2 right-2 rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
                   copied ? 'text-success-foreground' : 'text-subtle hover:bg-surface hover:text-foreground'
                 }`}
               >

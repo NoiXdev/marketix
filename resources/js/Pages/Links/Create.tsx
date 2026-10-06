@@ -1,34 +1,28 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { Domain, PageProps, PixelOption } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import LinkForm, { LinkFormData } from './partials/LinkForm';
 
-export default function LinksCreate({
-  domains,
-  pixels,
-}: {
-  domains: Pick<Domain, 'id' | 'name'>[];
-  pixels: PixelOption[];
-}) {
+export default function LinksCreate({ domains, pixels }: { domains: Pick<Domain, 'id' | 'name'>[]; pixels: PixelOption[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
   const { data, setData, post, processing, errors } = useForm<LinkFormData>({
-    domain_id:          domains[0]?.id.toString() ?? '',
-    slug:               '',
-    url:                '',
-    type:               '0',
-    status:             '1',
-    password:           '',
-    expired_at:         '',
-    targeting_geo:      [],
-    targeting_device:   [],
+    domain_id: domains[0]?.id.toString() ?? '',
+    slug: '',
+    url: '',
+    type: '0',
+    status: '1',
+    password: '',
+    expired_at: '',
+    targeting_geo: [],
+    targeting_device: [],
     targeting_language: [],
-    targeting_ab:       [],
-    utm:                {},
-    pixel_ids:          [],
+    targeting_ab: [],
+    utm: {},
+    pixel_ids: [],
   });
 
   return (
@@ -36,7 +30,7 @@ export default function LinksCreate({
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.links.index', { project: project!.id })}>{t('links.back')}</BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('links.create')}</h1>
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('links.create')}</h1>
         </div>
 
         <div className="max-w-2xl">

@@ -6,10 +6,23 @@ import { FlaskConical, Globe, Monitor, Plus, Trash2, Type } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface GeoRule      { country: string; state: string; url: string }
-export interface DeviceRule   { device: string;  url: string }
-export interface LanguageRule { language: string; url: string }
-export interface AbVariant    { url: string; weight: string }
+export interface GeoRule {
+  country: string;
+  state: string;
+  url: string;
+}
+export interface DeviceRule {
+  device: string;
+  url: string;
+}
+export interface LanguageRule {
+  language: string;
+  url: string;
+}
+export interface AbVariant {
+  url: string;
+  weight: string;
+}
 
 const DEVICES = ['Windows', 'macOS', 'Linux', 'Android', 'iOS'];
 
@@ -26,18 +39,18 @@ interface SectionProps {
 
 function Section({ icon, title, description, onAdd, addLabel, children }: SectionProps) {
   return (
-    <div className="rounded-[var(--radius)] border border-line bg-surface">
-      <div className="flex items-center justify-between border-b border-line px-5 py-4">
+    <div className="border-line bg-surface rounded-[var(--radius)] border">
+      <div className="border-line flex items-center justify-between border-b px-5 py-4">
         <div className="flex items-center gap-2.5">
           <span className="text-muted">{icon}</span>
-          <span className="text-sm font-semibold text-foreground">{title}</span>
+          <span className="text-foreground text-sm font-semibold">{title}</span>
         </div>
         <Button type="button" size="sm" onClick={onAdd}>
           <Plus className="h-3.5 w-3.5" />
           {addLabel}
         </Button>
       </div>
-      <p className="px-5 py-3 text-xs text-muted">{description}</p>
+      <p className="text-muted px-5 py-3 text-xs">{description}</p>
       {children}
     </div>
   );
@@ -47,11 +60,7 @@ function Section({ icon, title, description, onAdd, addLabel, children }: Sectio
 
 function RemoveBtn({ onClick }: { onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="shrink-0 rounded p-1.5 text-subtle hover:bg-danger-soft hover:text-danger-foreground"
-    >
+    <button type="button" onClick={onClick} className="text-subtle hover:bg-danger-soft hover:text-danger-foreground shrink-0 rounded p-1.5">
       <Trash2 className="h-4 w-4" />
     </button>
   );
@@ -68,8 +77,7 @@ export function GeoTargeting({ rules, onChange }: GeoProps) {
   const { t } = useTranslation();
   const add = () => onChange([...rules, { country: 'US', state: '', url: '' }]);
 
-  const update = (i: number, patch: Partial<GeoRule>) =>
-    onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const update = (i: number, patch: Partial<GeoRule>) => onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
 
   const remove = (i: number) => onChange(rules.filter((_, idx) => idx !== i));
 
@@ -84,42 +92,31 @@ export function GeoTargeting({ rules, onChange }: GeoProps) {
       {rules.map((rule, i) => {
         const subdivisions = SUBDIVISIONS[rule.country] ?? [];
         return (
-          <div key={i} className="border-t border-line px-5 py-4">
+          <div key={i} className="border-line border-t px-5 py-4">
             <div className="flex gap-2">
               {/* Country */}
-              <Select
-                value={rule.country}
-                onChange={(e) => update(i, { country: e.target.value, state: '' })}
-                className="flex-1"
-              >
+              <Select value={rule.country} onChange={(e) => update(i, { country: e.target.value, state: '' })} className="flex-1">
                 {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>{c.name}</option>
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
                 ))}
               </Select>
 
               {/* State/Region */}
-              <Select
-                value={rule.state}
-                onChange={(e) => update(i, { state: e.target.value })}
-                disabled={subdivisions.length === 0}
-                className="flex-1"
-              >
+              <Select value={rule.state} onChange={(e) => update(i, { state: e.target.value })} disabled={subdivisions.length === 0} className="flex-1">
                 <option value="">{t('links.targeting.geo.all_regions')}</option>
                 {subdivisions.map((s) => (
-                  <option key={s.code} value={s.code}>{s.name}</option>
+                  <option key={s.code} value={s.code}>
+                    {s.name}
+                  </option>
                 ))}
               </Select>
 
               <RemoveBtn onClick={() => remove(i)} />
             </div>
 
-            <Input
-              type="url"
-              value={rule.url}
-              onChange={(e) => update(i, { url: e.target.value })}
-              placeholder="https://example.com/redirect-url"
-              className="mt-2"
-            />
+            <Input type="url" value={rule.url} onChange={(e) => update(i, { url: e.target.value })} placeholder="https://example.com/redirect-url" className="mt-2" />
           </div>
         );
       })}
@@ -138,8 +135,7 @@ export function DeviceTargeting({ rules, onChange }: DeviceProps) {
   const { t } = useTranslation();
   const add = () => onChange([...rules, { device: 'Windows', url: '' }]);
 
-  const update = (i: number, patch: Partial<DeviceRule>) =>
-    onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const update = (i: number, patch: Partial<DeviceRule>) => onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
 
   const remove = (i: number) => onChange(rules.filter((_, idx) => idx !== i));
 
@@ -152,26 +148,18 @@ export function DeviceTargeting({ rules, onChange }: DeviceProps) {
       addLabel={t('common.actions.add')}
     >
       {rules.map((rule, i) => (
-        <div key={i} className="border-t border-line px-5 py-4">
+        <div key={i} className="border-line border-t px-5 py-4">
           <div className="flex gap-2">
-            <Select
-              value={rule.device}
-              onChange={(e) => update(i, { device: e.target.value })}
-              className="flex-1"
-            >
+            <Select value={rule.device} onChange={(e) => update(i, { device: e.target.value })} className="flex-1">
               {DEVICES.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>
+                  {d}
+                </option>
               ))}
             </Select>
             <RemoveBtn onClick={() => remove(i)} />
           </div>
-          <Input
-            type="url"
-            value={rule.url}
-            onChange={(e) => update(i, { url: e.target.value })}
-            placeholder="https://example.com/redirect-url"
-            className="mt-2"
-          />
+          <Input type="url" value={rule.url} onChange={(e) => update(i, { url: e.target.value })} placeholder="https://example.com/redirect-url" className="mt-2" />
         </div>
       ))}
     </Section>
@@ -190,8 +178,7 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
   const { t } = useTranslation();
   const add = () => onChange([...variants, { url: '', weight: '' }]);
 
-  const update = (i: number, patch: Partial<AbVariant>) =>
-    onChange(variants.map((v, idx) => (idx === i ? { ...v, ...patch } : v)));
+  const update = (i: number, patch: Partial<AbVariant>) => onChange(variants.map((v, idx) => (idx === i ? { ...v, ...patch } : v)));
 
   const remove = (i: number) => onChange(variants.filter((_, idx) => idx !== i));
 
@@ -199,11 +186,10 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
   const allVariants = [{ url: defaultUrl, weight: '' }, ...variants];
   const n = allVariants.length;
   const explicitSum = allVariants.reduce((s, v) => s + (v.weight !== '' ? parseFloat(v.weight) || 0 : 0), 0);
-  const autoCount   = allVariants.filter((v) => v.weight === '').length;
-  const autoWeight  = autoCount > 0 ? Math.max(0, 100 - explicitSum) / autoCount : 0;
+  const autoCount = allVariants.filter((v) => v.weight === '').length;
+  const autoWeight = autoCount > 0 ? Math.max(0, 100 - explicitSum) / autoCount : 0;
 
-  const displayWeight = (w: string) =>
-    w !== '' ? `${w}%` : `~${autoWeight.toFixed(1)}%`;
+  const displayWeight = (w: string) => (w !== '' ? `${w}%` : `~${autoWeight.toFixed(1)}%`);
 
   return (
     <Section
@@ -214,30 +200,18 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
       addLabel={t('common.actions.add')}
     >
       {/* Default URL row — non-editable */}
-      <div className="border-t border-line px-5 py-3">
+      <div className="border-line border-t px-5 py-3">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center rounded bg-elevated px-2 py-0.5 text-xs font-semibold text-muted">
-            {t('links.targeting.ab.default')}
-          </span>
-          <span className="flex-1 truncate text-sm text-muted">
-            {defaultUrl || <span className="italic">{t('links.targeting.ab.enter_url')}</span>}
-          </span>
-          <span className="shrink-0 rounded bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-soft-foreground">
-            {displayWeight('')}
-          </span>
+          <span className="bg-elevated text-muted inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold">{t('links.targeting.ab.default')}</span>
+          <span className="text-muted flex-1 truncate text-sm">{defaultUrl || <span className="italic">{t('links.targeting.ab.enter_url')}</span>}</span>
+          <span className="bg-accent-soft text-accent-soft-foreground shrink-0 rounded px-2 py-0.5 text-xs font-semibold">{displayWeight('')}</span>
         </div>
       </div>
 
       {variants.map((variant, i) => (
-        <div key={i} className="border-t border-line px-5 py-4">
+        <div key={i} className="border-line border-t px-5 py-4">
           <div className="flex gap-2">
-            <Input
-              type="url"
-              value={variant.url}
-              onChange={(e) => update(i, { url: e.target.value })}
-              placeholder="https://example.com/variant-b"
-              className="flex-1"
-            />
+            <Input type="url" value={variant.url} onChange={(e) => update(i, { url: e.target.value })} placeholder="https://example.com/variant-b" className="flex-1" />
             {/* Weight input */}
             <div className="relative w-24 shrink-0">
               <Input
@@ -250,23 +224,17 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
                 placeholder="Auto"
                 className="pr-6 text-right"
               />
-              <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-subtle">
-                %
-              </span>
+              <span className="text-subtle pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-xs">%</span>
             </div>
             <RemoveBtn onClick={() => remove(i)} />
           </div>
-          {variant.weight === '' && (
-            <p className="mt-1 text-xs text-subtle">
-              {t('links.targeting.ab.auto_weight', { weight: displayWeight(variant.weight) })}
-            </p>
-          )}
+          {variant.weight === '' && <p className="text-subtle mt-1 text-xs">{t('links.targeting.ab.auto_weight', { weight: displayWeight(variant.weight) })}</p>}
         </div>
       ))}
 
       {n > 1 && (
-        <div className="border-t border-line px-5 py-2.5">
-          <p className="text-xs text-subtle">
+        <div className="border-line border-t px-5 py-2.5">
+          <p className="text-subtle text-xs">
             {autoCount > 0
               ? t('links.targeting.ab.summary_auto', {
                   variants: String(n),
@@ -276,8 +244,7 @@ export function AbTesting({ defaultUrl, variants, onChange }: AbProps) {
               : t('links.targeting.ab.summary', {
                   variants: String(n),
                   total: explicitSum.toFixed(0),
-                })
-            }
+                })}
           </p>
         </div>
       )}
@@ -296,8 +263,7 @@ export function LanguageTargeting({ rules, onChange }: LanguageProps) {
   const { t } = useTranslation();
   const add = () => onChange([...rules, { language: 'en', url: '' }]);
 
-  const update = (i: number, patch: Partial<LanguageRule>) =>
-    onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const update = (i: number, patch: Partial<LanguageRule>) => onChange(rules.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
 
   const remove = (i: number) => onChange(rules.filter((_, idx) => idx !== i));
 
@@ -310,26 +276,18 @@ export function LanguageTargeting({ rules, onChange }: LanguageProps) {
       addLabel={t('common.actions.add')}
     >
       {rules.map((rule, i) => (
-        <div key={i} className="border-t border-line px-5 py-4">
+        <div key={i} className="border-line border-t px-5 py-4">
           <div className="flex gap-2">
-            <Select
-              value={rule.language}
-              onChange={(e) => update(i, { language: e.target.value })}
-              className="flex-1"
-            >
+            <Select value={rule.language} onChange={(e) => update(i, { language: e.target.value })} className="flex-1">
               {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.name}</option>
+                <option key={l.code} value={l.code}>
+                  {l.name}
+                </option>
               ))}
             </Select>
             <RemoveBtn onClick={() => remove(i)} />
           </div>
-          <Input
-            type="url"
-            value={rule.url}
-            onChange={(e) => update(i, { url: e.target.value })}
-            placeholder="https://example.com/redirect-url"
-            className="mt-2"
-          />
+          <Input type="url" value={rule.url} onChange={(e) => update(i, { url: e.target.value })} placeholder="https://example.com/redirect-url" className="mt-2" />
         </div>
       ))}
     </Section>

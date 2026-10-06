@@ -62,12 +62,12 @@ export default function WidgetConfigForm({ widget, onSave, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={t('widgets.configure')}
-        className="w-full max-w-sm rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow)]"
+        className="border-line bg-surface w-full max-w-sm rounded-[var(--radius)] border p-4 shadow-[var(--shadow)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-foreground">{t('widgets.configure')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.actions.close')} className="rounded p-1 text-subtle hover:bg-elevated hover:text-foreground">
+          <h2 className="text-foreground text-sm font-semibold">{t('widgets.configure')}</h2>
+          <button type="button" onClick={onClose} aria-label={t('common.actions.close')} className="text-subtle hover:bg-elevated hover:text-foreground rounded p-1">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -119,7 +119,7 @@ export default function WidgetConfigForm({ widget, onSave, onClose }: Props) {
             </Field>
           )}
 
-          <label className="flex items-center gap-2 text-sm text-muted">
+          <label className="text-muted flex items-center gap-2 text-sm">
             <Checkbox checked={hideFrame} onChange={(e) => setHideFrame(e.target.checked)} />
             {t('widgets.config.hide_frame')}
           </label>

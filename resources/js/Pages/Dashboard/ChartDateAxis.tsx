@@ -6,26 +6,14 @@ import { axisLabelStep, formatAxisDate } from '@/lib/chartAxis';
  * timeline stays readable even when every bar is zero. `gapClass` must match the
  * bar row's gap so labels line up under their bars.
  */
-export default function ChartDateAxis({
-  dates,
-  gapClass = 'gap-[3px]',
-  format = formatAxisDate,
-}: {
-  dates: string[];
-  gapClass?: string;
-  format?: (value: string) => string;
-}) {
+export default function ChartDateAxis({ dates, gapClass = 'gap-[3px]', format = formatAxisDate }: { dates: string[]; gapClass?: string; format?: (value: string) => string }) {
   const step = axisLabelStep(dates.length);
 
   return (
     <div className={`mt-2 flex ${gapClass}`}>
       {dates.map((date, i) => (
         <div key={date} className="flex flex-1 justify-center">
-          {(i % step === 0 || i === dates.length - 1) && (
-            <span className="whitespace-nowrap text-[10px] leading-none text-subtle [writing-mode:vertical-rl]">
-              {format(date)}
-            </span>
-          )}
+          {(i % step === 0 || i === dates.length - 1) && <span className="text-subtle text-[10px] leading-none whitespace-nowrap [writing-mode:vertical-rl]">{format(date)}</span>}
         </div>
       ))}
     </div>

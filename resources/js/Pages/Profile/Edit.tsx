@@ -1,6 +1,6 @@
 import { Button, Card, Field, Flash, FormSection, Input } from '@/Components/ui';
-import { useTranslation } from '@/lib/i18n';
 import ProfileLayout from '@/Layouts/ProfileLayout';
+import { useTranslation } from '@/lib/i18n';
 import ApiTokensSection from '@/Pages/Profile/partials/ApiTokensSection';
 import PasskeysSection from '@/Pages/Profile/partials/PasskeysSection';
 import TwoFactorSection from '@/Pages/Profile/partials/TwoFactorSection';
@@ -42,15 +42,7 @@ interface Props {
   tokens: ApiToken[];
 }
 
-export default function ProfileEdit({
-  user,
-  twoFactorEnabled,
-  twoFactorPending,
-  twoFactorSetup,
-  recoveryCodes,
-  passkeys,
-  tokens,
-}: Props) {
+export default function ProfileEdit({ user, twoFactorEnabled, twoFactorPending, twoFactorSetup, recoveryCodes, passkeys, tokens }: Props) {
   const { t } = useTranslation();
   const { flash } = usePage<PageProps>().props;
   const { data, setData, put, processing, errors, reset } = useForm({
@@ -69,46 +61,31 @@ export default function ProfileEdit({
 
   return (
     <ProfileLayout title={t('profile.title')}>
-      <h1 className="mb-6 text-2xl font-bold text-foreground">{t('profile.title')}</h1>
+      <h1 className="text-foreground mb-6 text-2xl font-bold">{t('profile.title')}</h1>
 
       <Flash />
 
       <Card className="mb-8 space-y-3 p-4">
         <div>
-          <p className="text-xs font-medium text-subtle">{t('profile.name')}</p>
-          <p className="text-sm text-foreground">{user.name}</p>
+          <p className="text-subtle text-xs font-medium">{t('profile.name')}</p>
+          <p className="text-foreground text-sm">{user.name}</p>
         </div>
         <div>
-          <p className="text-xs font-medium text-subtle">{t('profile.email')}</p>
-          <p className="text-sm text-foreground">{user.email}</p>
+          <p className="text-subtle text-xs font-medium">{t('profile.email')}</p>
+          <p className="text-foreground text-sm">{user.email}</p>
         </div>
       </Card>
 
       <form onSubmit={submit}>
         <FormSection title={t('profile.password.heading')}>
           <Field label={t('profile.password.current')} htmlFor="current_password" error={errors.current_password}>
-            <Input
-              id="current_password"
-              type="password"
-              value={data.current_password}
-              onChange={(e) => setData('current_password', e.target.value)}
-            />
+            <Input id="current_password" type="password" value={data.current_password} onChange={(e) => setData('current_password', e.target.value)} />
           </Field>
           <Field label={t('profile.password.new')} htmlFor="password" error={errors.password}>
-            <Input
-              id="password"
-              type="password"
-              value={data.password}
-              onChange={(e) => setData('password', e.target.value)}
-            />
+            <Input id="password" type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
           </Field>
           <Field label={t('profile.password.confirm')} htmlFor="password_confirmation">
-            <Input
-              id="password_confirmation"
-              type="password"
-              value={data.password_confirmation}
-              onChange={(e) => setData('password_confirmation', e.target.value)}
-            />
+            <Input id="password_confirmation" type="password" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} />
           </Field>
           <Button type="submit" loading={processing}>
             {t('profile.password.submit')}
@@ -117,12 +94,7 @@ export default function ProfileEdit({
       </form>
 
       <div className="mt-8 space-y-6">
-        <TwoFactorSection
-          enabled={twoFactorEnabled}
-          pending={twoFactorPending}
-          setup={twoFactorSetup}
-          recoveryCodes={recoveryCodes}
-        />
+        <TwoFactorSection enabled={twoFactorEnabled} pending={twoFactorPending} setup={twoFactorSetup} recoveryCodes={recoveryCodes} />
         <PasskeysSection passkeys={passkeys} />
         <ApiTokensSection tokens={tokens} newToken={flash?.token ?? null} />
       </div>

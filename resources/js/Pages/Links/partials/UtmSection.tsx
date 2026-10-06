@@ -41,7 +41,7 @@ export default function UtmSection({ utm, onChange, target, errors }: UtmSection
     <FormSection
       title={
         <span className="flex items-center gap-2">
-          <Megaphone className="h-4 w-4 text-muted" />
+          <Megaphone className="text-muted h-4 w-4" />
           {t('links.utm.title')}
         </span>
       }
@@ -64,8 +64,8 @@ export default function UtmSection({ utm, onChange, target, errors }: UtmSection
       </div>
 
       {preview && (
-        <p className="mt-3 text-xs text-muted">
-          {t('links.utm.preview')} <code className="font-mono break-all text-foreground">{preview}</code>
+        <p className="text-muted mt-3 text-xs">
+          {t('links.utm.preview')} <code className="text-foreground font-mono break-all">{preview}</code>
         </p>
       )}
     </FormSection>

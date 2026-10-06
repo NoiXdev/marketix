@@ -28,10 +28,7 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
 
   if (state === 'invalid') {
     return (
-      <GuestLayout
-        title={t('auth.invitation.invalid_title')}
-        description={t('auth.invitation.invalid_description')}
-      >
+      <GuestLayout title={t('auth.invitation.invalid_title')} description={t('auth.invitation.invalid_description')}>
         <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.go_to_login')}</LinkButton>
       </GuestLayout>
     );
@@ -39,10 +36,7 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
 
   if (state === 'wrong_user') {
     return (
-      <GuestLayout
-        title={t('auth.invitation.wrong_account_title')}
-        description={t('auth.invitation.wrong_account_description', { email: email ?? '' })}
-      >
+      <GuestLayout title={t('auth.invitation.wrong_account_title')} description={t('auth.invitation.wrong_account_description', { email: email ?? '' })}>
         <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.go_to_login')}</LinkButton>
       </GuestLayout>
     );
@@ -51,10 +45,7 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
   // Existing user, not logged in → prompt login first.
   if (!needsAccount && !authenticated) {
     return (
-      <GuestLayout
-        title={t('auth.invitation.title')}
-        description={t('auth.invitation.login_prompt', { project: projectName ?? '', email: email ?? '' })}
-      >
+      <GuestLayout title={t('auth.invitation.title')} description={t('auth.invitation.login_prompt', { project: projectName ?? '', email: email ?? '' })}>
         <LinkButton href={route('app.auth.show-login')}>{t('auth.invitation.login_cta')}</LinkButton>
       </GuestLayout>
     );
@@ -63,10 +54,7 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
   // Logged-in existing user → one-click confirm.
   if (!needsAccount && authenticated) {
     return (
-      <GuestLayout
-        title={t('auth.invitation.title')}
-        description={t('auth.invitation.confirm_prompt', { project: projectName ?? '', email: email ?? '' })}
-      >
+      <GuestLayout title={t('auth.invitation.title')} description={t('auth.invitation.confirm_prompt', { project: projectName ?? '', email: email ?? '' })}>
         <form onSubmit={submit}>
           <Button type="submit" loading={processing}>
             {t('auth.invitation.accept_cta')}
@@ -78,10 +66,7 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
 
   // New user → set name + password.
   return (
-    <GuestLayout
-      title={t('auth.invitation.title')}
-      description={t('auth.invitation.signup_prompt', { project: projectName ?? '' })}
-    >
+    <GuestLayout title={t('auth.invitation.title')} description={t('auth.invitation.signup_prompt', { project: projectName ?? '' })}>
       <form onSubmit={submit} className="space-y-4">
         <Field label={t('auth.invitation.email_label')} htmlFor="email">
           <Input id="email" value={email} disabled />
@@ -90,24 +75,10 @@ export default function AcceptInvitation({ state, token, email, projectName, nee
           <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
         </Field>
         <Field label={t('auth.invitation.password_label')} htmlFor="password" error={errors.password}>
-          <Input
-            id="password"
-            type="password"
-            value={data.password}
-            onChange={(e) => setData('password', e.target.value)}
-          />
+          <Input id="password" type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
         </Field>
-        <Field
-          label={t('auth.invitation.confirm_password_label')}
-          htmlFor="password_confirmation"
-          error={errors.password_confirmation}
-        >
-          <Input
-            id="password_confirmation"
-            type="password"
-            value={data.password_confirmation}
-            onChange={(e) => setData('password_confirmation', e.target.value)}
-          />
+        <Field label={t('auth.invitation.confirm_password_label')} htmlFor="password_confirmation" error={errors.password_confirmation}>
+          <Input id="password_confirmation" type="password" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} />
         </Field>
         <Button type="submit" loading={processing} className="w-full justify-center">
           {t('auth.invitation.submit')}

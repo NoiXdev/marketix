@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { renderQr } from './render';
+import { describe, expect, it } from 'vitest';
 import { DEFAULT_STYLE } from '../../data/qrTypes';
+import { renderQr } from './render';
 
 describe('renderQr', () => {
   it('returns a well-formed svg with matching viewBox', () => {
@@ -10,8 +10,17 @@ describe('renderQr', () => {
     expect(r.svg).toContain('</svg>');
   });
   it('emits a linearGradient def when fg_gradient is set', () => {
-    const r = renderQr('x', { ...DEFAULT_STYLE, fg_gradient: {
-      type: 'linear', rotation: 45, stops: [{offset:0,color:'#111'},{offset:1,color:'#999'}] } });
+    const r = renderQr('x', {
+      ...DEFAULT_STYLE,
+      fg_gradient: {
+        type: 'linear',
+        rotation: 45,
+        stops: [
+          { offset: 0, color: '#111' },
+          { offset: 1, color: '#999' },
+        ],
+      },
+    });
     expect(r.svg).toContain('<linearGradient');
     expect(r.svg).toContain('url(#');
   });

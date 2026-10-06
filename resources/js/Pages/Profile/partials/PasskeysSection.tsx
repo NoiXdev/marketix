@@ -35,17 +35,17 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
 
   return (
     <Card className="space-y-4 p-4">
-      <h2 className="text-sm font-semibold text-foreground">{t('profile.passkeys.heading')}</h2>
+      <h2 className="text-foreground text-sm font-semibold">{t('profile.passkeys.heading')}</h2>
 
-      {!isSupported && <p className="text-xs text-subtle">{t('profile.passkeys.not_supported')}</p>}
+      {!isSupported && <p className="text-subtle text-xs">{t('profile.passkeys.not_supported')}</p>}
 
       {passkeys.length > 0 && (
-        <ul className="divide-y divide-line">
+        <ul className="divide-line divide-y">
           {passkeys.map((p) => (
             <li key={p.id} className="flex items-center justify-between py-2">
               <div>
-                <p className="text-sm text-foreground">{p.name}</p>
-                <p className="text-xs text-subtle">
+                <p className="text-foreground text-sm">{p.name}</p>
+                <p className="text-subtle text-xs">
                   {p.authenticator ?? t('profile.passkeys.security_key')}
                   {p.last_used_at ? ` · ${t('profile.passkeys.last_used')} ${p.last_used_at}` : ''}
                 </p>
@@ -62,13 +62,7 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
         <form onSubmit={add} className="flex items-end gap-2">
           <div className="flex-1">
             <Field label={t('profile.passkeys.name_label')} htmlFor="passkey_name">
-              <Input
-                id="passkey_name"
-                type="text"
-                placeholder="e.g. MacBook Touch ID"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <Input id="passkey_name" type="text" placeholder="e.g. MacBook Touch ID" value={name} onChange={(e) => setName(e.target.value)} />
             </Field>
           </div>
           <Button type="submit" loading={isLoading} disabled={!name.trim()}>
@@ -77,7 +71,7 @@ export default function PasskeysSection({ passkeys }: { passkeys: Passkey[] }) {
         </form>
       )}
 
-      {error && <p className="text-xs text-danger-foreground">{error}</p>}
+      {error && <p className="text-danger-foreground text-xs">{error}</p>}
     </Card>
   );
 }

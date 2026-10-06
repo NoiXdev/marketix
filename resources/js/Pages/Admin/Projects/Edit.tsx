@@ -66,7 +66,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
             <Field label={t('admin.projects.fields.name')} error={details.errors.name}>
               <Input value={details.data.name} onChange={(e) => details.setData('name', e.target.value)} />
             </Field>
-            <label className="flex items-center gap-2 text-sm text-foreground">
+            <label className="text-foreground flex items-center gap-2 text-sm">
               <Checkbox checked={details.data.locked} onChange={(e) => details.setData('locked', e.target.checked)} />
               {t('admin.projects.fields.locked')}
             </label>
@@ -76,7 +76,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
               </Button>
               <Link
                 href={route('app.admin.projects.index')}
-                className="inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                className="text-muted hover:bg-elevated hover:text-foreground inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               >
                 {t('common.actions.cancel')}
               </Link>
@@ -84,7 +84,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
           </FormSection>
         </form>
 
-        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('admin.projects.members.title')}</h2>
+        <h2 className="text-foreground mb-3 text-lg font-semibold">{t('admin.projects.members.title')}</h2>
 
         {members.length === 0 ? (
           <div className="mb-4">
@@ -92,19 +92,12 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
           </div>
         ) : (
           <div className="mb-4">
-            <TableCard
-              columns={[
-                { label: t('admin.users.columns.name') },
-                { label: t('admin.users.columns.email') },
-                { label: t('admin.common.role') },
-                { label: '' },
-              ]}
-            >
-              <tbody className="divide-y divide-line">
+            <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: t('admin.users.columns.email') }, { label: t('admin.common.role') }, { label: '' }]}>
+              <tbody className="divide-line divide-y">
                 {members.map((member) => (
                   <tr key={member.id}>
-                    <td className="px-4 py-3 font-medium text-foreground">{member.name}</td>
-                    <td className="px-4 py-3 text-muted">{member.email}</td>
+                    <td className="text-foreground px-4 py-3 font-medium">{member.name}</td>
+                    <td className="text-muted px-4 py-3">{member.email}</td>
                     <td className="px-4 py-3">
                       <div className="w-32">
                         <Select value={member.role} onChange={(e) => changeRole(member, e.target.value)}>

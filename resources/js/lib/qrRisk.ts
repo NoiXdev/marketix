@@ -16,7 +16,7 @@ export interface QrEditState {
  */
 export function isRiskyEdit(original: QrEditState, next: QrEditState): boolean {
   if (original.is_dynamic !== next.is_dynamic) return true; // mode switch
-  if (original.type !== next.type) return true;              // payload kind changes
+  if (original.type !== next.type) return true; // payload kind changes
   if (JSON.stringify(original.style) !== JSON.stringify(next.style)) return true; // re-render
 
   if (next.is_dynamic) {

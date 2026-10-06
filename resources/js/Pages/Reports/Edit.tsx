@@ -1,5 +1,5 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -23,17 +23,7 @@ interface ReportRecord {
   active: boolean;
 }
 
-export default function ReportsEdit({
-  report,
-  links,
-  sites,
-  types,
-}: {
-  report: ReportRecord;
-  links: LinkOption[];
-  sites: SiteOption[];
-  types: string[];
-}) {
+export default function ReportsEdit({ report, links, sites, types }: { report: ReportRecord; links: LinkOption[]; sites: SiteOption[]; types: string[] }) {
   const { project, locale } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
@@ -59,10 +49,8 @@ export default function ReportsEdit({
     <AppLayout title={t('reports.form.edit_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.reports.index', { project: project!.id })}>
-            {t('common.actions.cancel')}
-          </BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('reports.form.edit_title')}</h1>
+          <BackLink href={route('app.project.reports.index', { project: project!.id })}>{t('common.actions.cancel')}</BackLink>
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('reports.form.edit_title')}</h1>
         </div>
 
         <div className="max-w-2xl">

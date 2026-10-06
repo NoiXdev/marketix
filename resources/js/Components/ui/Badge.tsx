@@ -10,16 +10,6 @@ const map: Record<Variant, string> = {
   accent: 'bg-accent-soft text-accent-soft-foreground',
 };
 
-export function Badge({
-  variant = 'neutral',
-  className = '',
-  children,
-}: PropsWithChildren<{ variant?: Variant; className?: string }>) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${map[variant]} ${className}`}
-    >
-      {children}
-    </span>
-  );
+export function Badge({ variant = 'neutral', className = '', children }: PropsWithChildren<{ variant?: Variant; className?: string }>) {
+  return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${map[variant]} ${className}`}>{children}</span>;
 }

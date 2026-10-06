@@ -60,15 +60,7 @@ export default function RevenueTab({ revenue }: RevenueData) {
   }
 
   if (revenue.currencies.length === 0 && !previousSummary?.orders) {
-    return (
-      <AnalyticsEmptyState
-        framed
-        icon={ShoppingBag}
-        title={t('analytics.dashboard.revenue.empty_title')}
-        text={t('analytics.dashboard.revenue.empty_text')}
-        code={SNIPPET}
-      />
-    );
+    return <AnalyticsEmptyState framed icon={ShoppingBag} title={t('analytics.dashboard.revenue.empty_title')} text={t('analytics.dashboard.revenue.empty_text')} code={SNIPPET} />;
   }
 
   return (

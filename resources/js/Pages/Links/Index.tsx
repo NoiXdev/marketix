@@ -1,8 +1,8 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, StatusPill, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, Check, Copy, ExternalLink, LinkIcon, Pencil, Plus, Power, Trash2 } from 'lucide-react';
@@ -35,7 +35,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={copy}
       title={copied ? t('links.copy.copied') : t('links.copy.idle')}
-      className={`rounded-md p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+      className={`rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
         copied ? 'text-success-foreground' : 'text-subtle hover:bg-elevated hover:text-foreground'
       }`}
     >
@@ -92,22 +92,15 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
               { label: '' },
             ]}
           >
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-line divide-y">
               {urls.map((url) => {
                 const shortUrl = url.domain ? `https://${url.domain.name}/${url.slug}` : url.slug;
 
                 return (
-                  <tr
-                    key={url.id}
-                    onClick={rowLink(route('app.project.links.show', { project: project!.id, url: url.id }))}
-                    className={`group ${ROW_LINK_CLASS}`}
-                  >
+                  <tr key={url.id} onClick={rowLink(route('app.project.links.show', { project: project!.id, url: url.id }))} className={`group ${ROW_LINK_CLASS}`}>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 font-medium text-foreground">
-                        <Link
-                          href={route('app.project.links.show', { project: project!.id, url: url.id })}
-                          className="flex items-center gap-1 hover:text-accent-soft-foreground"
-                        >
+                      <div className="text-foreground flex items-center gap-1 font-medium">
+                        <Link href={route('app.project.links.show', { project: project!.id, url: url.id })} className="hover:text-accent-soft-foreground flex items-center gap-1">
                           {url.domain ? (
                             <>
                               <span className="text-subtle">{url.domain.name}/</span>
@@ -119,19 +112,10 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
                         </Link>
                         <CopyButton text={shortUrl} />
                       </div>
-                      {url.expired_at && (
-                        <p className="mt-0.5 text-xs text-warning-foreground">
-                          {t('links.expires', { date: new Date(url.expired_at).toLocaleDateString() })}
-                        </p>
-                      )}
+                      {url.expired_at && <p className="text-warning-foreground mt-0.5 text-xs">{t('links.expires', { date: new Date(url.expired_at).toLocaleDateString() })}</p>}
                     </td>
                     <td className="max-w-xs px-4 py-3">
-                      <a
-                        href={url.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 truncate text-muted hover:text-accent-soft-foreground"
-                      >
+                      <a href={url.url} target="_blank" rel="noopener noreferrer" className="text-muted hover:text-accent-soft-foreground inline-flex items-center gap-1 truncate">
                         <span className="truncate">{url.url}</span>
                         <ExternalLink className="h-3 w-3 shrink-0" />
                       </a>
@@ -143,14 +127,10 @@ export default function LinksIndex({ urls }: { urls: UrlRow[] }) {
                         <StatusPill status="neutral">{t('links.status.inactive')}</StatusPill>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-muted">{url.clicks.toLocaleString()}</td>
+                    <td className="text-muted px-4 py-3 text-right tabular-nums">{url.clicks.toLocaleString()}</td>
                     <RowActions>
                       <IconButton icon={BarChart3} label={t('links.actions.view_stats')} href={route('app.project.links.show', { project: project!.id, url: url.id })} />
-                      <IconButton
-                        icon={Power}
-                        label={url.status === 1 ? t('links.actions.deactivate') : t('links.actions.activate')}
-                        onClick={() => toggle(url)}
-                      />
+                      <IconButton icon={Power} label={url.status === 1 ? t('links.actions.deactivate') : t('links.actions.activate')} onClick={() => toggle(url)} />
                       <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.links.edit', { project: project!.id, url: url.id })} />
                       <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(url)} />
                     </RowActions>

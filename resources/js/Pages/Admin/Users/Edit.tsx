@@ -25,15 +25,7 @@ interface AvailableProject {
   name: string;
 }
 
-export default function AdminUsersEdit({
-  user,
-  memberships,
-  availableProjects,
-}: {
-  user: EditUser;
-  memberships: Membership[];
-  availableProjects: AvailableProject[];
-}) {
+export default function AdminUsersEdit({ user, memberships, availableProjects }: { user: EditUser; memberships: Membership[]; availableProjects: AvailableProject[] }) {
   const { t } = useTranslation();
   const account = useForm({
     name: user.name,
@@ -95,15 +87,12 @@ export default function AdminUsersEdit({
             <Field label={t('admin.users.fields.new_password_hint')} error={account.errors.password}>
               <Input type="password" value={account.data.password} onChange={(e) => account.setData('password', e.target.value)} />
             </Field>
-            <label className="flex items-center gap-2 text-sm text-foreground">
+            <label className="text-foreground flex items-center gap-2 text-sm">
               <Checkbox checked={account.data.super_admin} onChange={(e) => account.setData('super_admin', e.target.checked)} />
               {t('admin.users.fields.super_admin')}
             </label>
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <Checkbox
-                checked={account.data.force_password_change}
-                onChange={(e) => account.setData('force_password_change', e.target.checked)}
-              />
+            <label className="text-foreground flex items-center gap-2 text-sm">
+              <Checkbox checked={account.data.force_password_change} onChange={(e) => account.setData('force_password_change', e.target.checked)} />
               {t('admin.users.fields.force_password_change')}
             </label>
             <div className="flex gap-2">
@@ -112,7 +101,7 @@ export default function AdminUsersEdit({
               </Button>
               <Link
                 href={route('app.admin.users.index')}
-                className="inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                className="text-muted hover:bg-elevated hover:text-foreground inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               >
                 {t('common.actions.cancel')}
               </Link>
@@ -123,7 +112,7 @@ export default function AdminUsersEdit({
         {/* Security actions */}
         <div className="mb-8 max-w-2xl">
           <FormSection title={t('admin.users.sections.security')}>
-            <p className="text-sm text-muted">{t('admin.users.security.reset_description')}</p>
+            <p className="text-muted text-sm">{t('admin.users.security.reset_description')}</p>
             <Button variant="secondary" onClick={sendPasswordReset}>
               {t('admin.users.security.send_reset')}
             </Button>
@@ -137,10 +126,10 @@ export default function AdminUsersEdit({
               <EmptyState icon={Users} title={t('admin.users.memberships.empty')} />
             ) : (
               <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: t('admin.common.role') }, { label: '' }]}>
-                <tbody className="divide-y divide-line">
+                <tbody className="divide-line divide-y">
                   {memberships.map((m) => (
                     <tr key={m.id}>
-                      <td className="px-4 py-3 font-medium text-foreground">{m.name}</td>
+                      <td className="text-foreground px-4 py-3 font-medium">{m.name}</td>
                       <td className="px-4 py-3">
                         <div className="w-32">
                           <Select value={m.role} onChange={(e) => changeRole(m, e.target.value)}>

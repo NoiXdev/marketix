@@ -81,49 +81,49 @@ export default function DashboardSwitcher({ dashboards, active }: Props) {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="true"
-        className="flex items-center gap-2 rounded-[var(--radius)] border border-line bg-surface px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+        className="border-line bg-surface text-foreground hover:border-line-strong flex items-center gap-2 rounded-[var(--radius)] border px-3 py-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
       >
-        <LayoutGrid className="h-4 w-4 shrink-0 text-subtle" />
+        <LayoutGrid className="text-subtle h-4 w-4 shrink-0" />
         <span className="max-w-[12rem] truncate">{active.name}</span>
-        <ChevronDown className="h-4 w-4 shrink-0 text-subtle" />
+        <ChevronDown className="text-subtle h-4 w-4 shrink-0" />
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-30 mt-2 w-64 rounded-xl border border-line bg-surface p-1.5 shadow-[var(--shadow)]">
-          <p className="px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wider text-subtle">{t('dashboards.switcher.label')}</p>
+        <div className="border-line bg-surface absolute top-full left-0 z-30 mt-2 w-64 rounded-xl border p-1.5 shadow-[var(--shadow)]">
+          <p className="text-subtle px-2.5 py-1 text-[10.5px] font-bold tracking-wider uppercase">{t('dashboards.switcher.label')}</p>
           <div className="max-h-64 overflow-y-auto">
             {dashboards.map((d) => (
-              <div key={d.id} className="group flex items-center gap-1 rounded-lg hover:bg-elevated">
+              <div key={d.id} className="group hover:bg-elevated flex items-center gap-1 rounded-lg">
                 <button
                   onClick={() => switchTo(d)}
-                  className="flex min-w-0 flex-1 items-center gap-2.5 px-2.5 py-2 text-left text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                  className="text-foreground flex min-w-0 flex-1 items-center gap-2.5 px-2.5 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
                 >
                   <span className="min-w-0 flex-1 truncate">{d.name}</span>
-                  {d.id === active.id && <Check className="h-4 w-4 shrink-0 text-accent-soft-foreground" />}
+                  {d.id === active.id && <Check className="text-accent-soft-foreground h-4 w-4 shrink-0" />}
                 </button>
                 <button
                   onClick={() => destroy(d)}
                   aria-label={t('dashboards.switcher.delete')}
-                  className="shrink-0 rounded p-1.5 text-subtle opacity-0 transition-opacity hover:bg-danger-soft hover:text-danger-foreground focus-visible:opacity-100 focus-visible:outline-none group-hover:opacity-100"
+                  className="text-subtle hover:bg-danger-soft hover:text-danger-foreground shrink-0 rounded p-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             ))}
           </div>
-          <div className="mt-1 border-t border-line pt-1">
+          <div className="border-line mt-1 border-t pt-1">
             <button
               onClick={renameActive}
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              className="text-foreground hover:bg-elevated flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
             >
-              <Pencil className="h-4 w-4 shrink-0 text-subtle" />
+              <Pencil className="text-subtle h-4 w-4 shrink-0" />
               {t('dashboards.switcher.rename')}
             </button>
             <button
               onClick={createDashboard}
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              className="text-foreground hover:bg-elevated flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
             >
-              <Plus className="h-4 w-4 shrink-0 text-subtle" />
+              <Plus className="text-subtle h-4 w-4 shrink-0" />
               {t('dashboards.switcher.new')}
             </button>
           </div>

@@ -49,12 +49,7 @@ function getLogoUrl(style: QrStyle): string | undefined {
 
 /** A gradient `<def>` with a deterministic id. Linear gradients rotate about the centre. */
 function gradientDef(id: string, g: QrGradient): string {
-  const stops = g.stops
-    .map(
-      (s) =>
-        `<stop offset="${n(clamp01(s.offset))}" stop-color="${escapeXml(s.color)}"/>`,
-    )
-    .join('');
+  const stops = g.stops.map((s) => `<stop offset="${n(clamp01(s.offset))}" stop-color="${escapeXml(s.color)}"/>`).join('');
   if (g.type === 'radial') {
     return `<radialGradient id="${id}">${stops}</radialGradient>`;
   }
@@ -73,21 +68,17 @@ export function renderQr(data: string, style: QrStyle): RenderResult {
   const framed = style.frame_style === 'simple' || style.frame_style === 'rounded';
   const padX = framed ? FRAME_PAD : 0;
   const padTop = framed ? FRAME_PAD : 0;
-  const padBottom =
-    style.frame_style === 'badge-bottom' ? BADGE_HEIGHT : framed ? FRAME_PAD : 0;
+  const padBottom = style.frame_style === 'badge-bottom' ? BADGE_HEIGHT : framed ? FRAME_PAD : 0;
   const width = inner + padX * 2;
   const height = inner + padTop + padBottom;
 
   // ── paints ──────────────────────────────────────────────────────────────
   const fgPaint = style.fg_gradient ? 'url(#qrg-fg)' : style.foreground;
   const bgPaint = style.bg_gradient ? 'url(#qrg-bg)' : style.background;
-  const eyePaint = style.eye_gradient
-    ? 'url(#qrg-eye)'
-    : style.eye_color || fgPaint;
+  const eyePaint = style.eye_gradient ? 'url(#qrg-eye)' : style.eye_color || fgPaint;
 
   // Colour used to "clear" the area behind the logo (never a gradient url).
-  const clearColor =
-    style.background === 'transparent' ? '#ffffff' : style.background;
+  const clearColor = style.background === 'transparent' ? '#ffffff' : style.background;
 
   // ── defs ────────────────────────────────────────────────────────────────
   const defs: string[] = [];
@@ -100,16 +91,12 @@ export function renderQr(data: string, style: QrStyle): RenderResult {
   // ── frame background (whole canvas) ───────────────────────────────────────
   if (style.frame_style !== 'none') {
     const rx = style.frame_style === 'rounded' ? FRAME_RADIUS : 0;
-    layers.push(
-      `<rect x="0" y="0" width="${n(width)}" height="${n(height)}" rx="${n(rx)}" fill="${escapeXml(style.frame_background)}"/>`,
-    );
+    layers.push(`<rect x="0" y="0" width="${n(width)}" height="${n(height)}" rx="${n(rx)}" fill="${escapeXml(style.frame_background)}"/>`);
   }
 
   // ── QR background (module area) ───────────────────────────────────────────
   if (style.background !== 'transparent') {
-    layers.push(
-      `<rect class="qr-bg" x="${n(padX)}" y="${n(padTop)}" width="${n(inner)}" height="${n(inner)}" fill="${escapeXml(bgPaint)}"/>`,
-    );
+    layers.push(`<rect class="qr-bg" x="${n(padX)}" y="${n(padTop)}" width="${n(inner)}" height="${n(inner)}" fill="${escapeXml(bgPaint)}"/>`);
   }
 
   // ── modules + eyes (translated into the framed content box) ───────────────
@@ -119,10 +106,7 @@ export function renderQr(data: string, style: QrStyle): RenderResult {
 
   const content: string[] = [];
   if (modules) content.push(`<path d="${modules}" fill="${escapeXml(fgPaint)}"/>`);
-  if (frames)
-    content.push(
-      `<path d="${frames}" fill="${escapeXml(eyePaint)}" fill-rule="evenodd"/>`,
-    );
+  if (frames) content.push(`<path d="${frames}" fill="${escapeXml(eyePaint)}" fill-rule="evenodd"/>`);
   if (balls) content.push(`<path d="${balls}" fill="${escapeXml(eyePaint)}"/>`);
 
   // ── logo ──────────────────────────────────────────────────────────────────
@@ -134,9 +118,7 @@ export function renderQr(data: string, style: QrStyle): RenderResult {
     const cy = inner / 2;
     if (style.logo_clear_modules) {
       const clearSide = side + margin * 2;
-      content.push(
-        `<rect x="${n(cx - clearSide / 2)}" y="${n(cy - clearSide / 2)}" width="${n(clearSide)}" height="${n(clearSide)}" fill="${escapeXml(clearColor)}"/>`,
-      );
+      content.push(`<rect x="${n(cx - clearSide / 2)}" y="${n(cy - clearSide / 2)}" width="${n(clearSide)}" height="${n(clearSide)}" fill="${escapeXml(clearColor)}"/>`);
     }
     content.push(
       `<image href="${escapeXml(logoUrl)}" x="${n(cx - side / 2)}" y="${n(cy - side / 2)}" width="${n(side)}" height="${n(side)}" preserveAspectRatio="xMidYMid meet"/>`,
@@ -154,20 +136,14 @@ export function renderQr(data: string, style: QrStyle): RenderResult {
     );
   } else if (style.frame_style === 'badge-bottom') {
     const barY = inner;
-    layers.push(
-      `<rect x="0" y="${n(barY)}" width="${n(width)}" height="${n(BADGE_HEIGHT)}" fill="${escapeXml(style.frame_color)}"/>`,
-    );
+    layers.push(`<rect x="0" y="${n(barY)}" width="${n(width)}" height="${n(BADGE_HEIGHT)}" fill="${escapeXml(style.frame_color)}"/>`);
     layers.push(
       `<text x="${n(width / 2)}" y="${n(barY + BADGE_HEIGHT / 2)}" text-anchor="middle" dominant-baseline="central" font-family="system-ui, sans-serif" font-size="${n(BADGE_HEIGHT * 0.44)}" font-weight="600" fill="${escapeXml(style.frame_text_color)}">${escapeXml(style.frame_text)}</text>`,
     );
   }
 
   const defsBlock = defs.length ? `<defs>${defs.join('')}</defs>` : '';
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${n(width)}" height="${n(height)}" viewBox="0 0 ${n(width)} ${n(height)}">` +
-    defsBlock +
-    layers.join('') +
-    `</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${n(width)}" height="${n(height)}" viewBox="0 0 ${n(width)} ${n(height)}">` + defsBlock + layers.join('') + `</svg>`;
 
   return { svg, width, height };
 }

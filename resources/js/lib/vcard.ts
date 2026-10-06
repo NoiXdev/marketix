@@ -8,11 +8,7 @@ export interface ParsedVCard {
 const FOLD = /\r\n[ \t]|\n[ \t]|\r[ \t]/g;
 
 function unescape(value: string): string {
-  return value
-    .replace(/\\n/gi, '\n')
-    .replace(/\\,/g, ',')
-    .replace(/\\;/g, ';')
-    .replace(/\\\\/g, '\\');
+  return value.replace(/\\n/gi, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
 }
 
 // Property name = text before the first ':' , minus any ';' parameters, uppercased.
@@ -30,7 +26,11 @@ function propValue(line: string): string {
 
 // ADR is ';'-separated structured parts; join the non-empty ones readably.
 function joinAddress(value: string): string {
-  return value.split(';').map(s => s.trim()).filter(Boolean).join(', ');
+  return value
+    .split(';')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(', ');
 }
 
 // N is family;given;additional;prefix;suffix → "Given Family".
@@ -71,13 +71,45 @@ export function parseVCards(text: string): ParsedVCard[] {
 
     const value = propValue(line);
     switch (name) {
-      case 'FN':    if (!cur.fields.name)    { cur.fields.name = unescape(value); continue; } break;
-      case 'ORG':   if (!cur.fields.org)     { cur.fields.org = unescape(value); continue; } break;
-      case 'TEL':   if (!cur.fields.phone)   { cur.fields.phone = unescape(value); continue; } break;
-      case 'EMAIL': if (!cur.fields.email)   { cur.fields.email = unescape(value); continue; } break;
-      case 'URL':   if (!cur.fields.url)     { cur.fields.url = unescape(value); continue; } break;
-      case 'ADR':   if (!cur.fields.address) { cur.fields.address = joinAddress(value); continue; } break;
-      case 'N':     if (!nValue) nValue = value; break; // captured for fallback, also preserved below
+      case 'FN':
+        if (!cur.fields.name) {
+          cur.fields.name = unescape(value);
+          continue;
+        }
+        break;
+      case 'ORG':
+        if (!cur.fields.org) {
+          cur.fields.org = unescape(value);
+          continue;
+        }
+        break;
+      case 'TEL':
+        if (!cur.fields.phone) {
+          cur.fields.phone = unescape(value);
+          continue;
+        }
+        break;
+      case 'EMAIL':
+        if (!cur.fields.email) {
+          cur.fields.email = unescape(value);
+          continue;
+        }
+        break;
+      case 'URL':
+        if (!cur.fields.url) {
+          cur.fields.url = unescape(value);
+          continue;
+        }
+        break;
+      case 'ADR':
+        if (!cur.fields.address) {
+          cur.fields.address = joinAddress(value);
+          continue;
+        }
+        break;
+      case 'N':
+        if (!nValue) nValue = value;
+        break; // captured for fallback, also preserved below
     }
     cur.extra.push(line);
   }
@@ -85,10 +117,7 @@ export function parseVCards(text: string): ParsedVCard[] {
   return cards;
 }
 
-export function mergeVCardIntoContent(
-  content: Record<string, string>,
-  parsed: ParsedVCard,
-): Record<string, string> {
+export function mergeVCardIntoContent(content: Record<string, string>, parsed: ParsedVCard): Record<string, string> {
   const next: Record<string, string> = { ...content };
   for (const [key, value] of Object.entries(parsed.fields)) {
     if (value) next[key] = value;
@@ -98,6 +127,9 @@ export function mergeVCardIntoContent(
 }
 
 export function extraSummary(extra: string | undefined): { count: number; names: string[] } {
-  const lines = (extra ?? '').split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = (extra ?? '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   return { count: lines.length, names: lines.map(propName) };
 }

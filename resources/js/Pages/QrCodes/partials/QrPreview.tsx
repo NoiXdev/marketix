@@ -40,7 +40,7 @@ export default function QrPreview({ data, style, name = 'qr-code' }: Props) {
   return (
     <div className="flex flex-col items-center gap-4">
       <div
-        className="w-[280px] max-w-full overflow-hidden rounded-[12px] border border-line [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+        className="border-line w-[280px] max-w-full overflow-hidden rounded-[12px] border [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
         style={{ background: style.background }}
         dangerouslySetInnerHTML={{ __html: svg }}
       />

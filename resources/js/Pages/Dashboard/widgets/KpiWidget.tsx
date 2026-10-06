@@ -1,7 +1,7 @@
 import { formatCompactNumber } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
-import { useWidgetData } from '@/lib/widgets/useWidgetData';
 import type { WidgetConfig } from '@/lib/widgets/schema';
+import { useWidgetData } from '@/lib/widgets/useWidgetData';
 import WidgetFrame from './WidgetFrame';
 
 type Kpi = { value: number; deltaPct: number | null };
@@ -20,13 +20,15 @@ export default function KpiWidget({ config, editing, onConfigure, onRemove }: { 
         // here so a KPI fits a short cell and isn't a redundant card-in-a-card.
         // When frameless there's no frame title, so show the label too.
         <div className="flex h-full flex-col justify-center">
-          {frameless && <p className="text-[12.5px] font-semibold text-muted">{title}</p>}
-          <p className="text-[28px] font-bold leading-none tracking-tight text-foreground tabular-nums" title={data.value.toLocaleString()}>
+          {frameless && <p className="text-muted text-[12.5px] font-semibold">{title}</p>}
+          <p className="text-foreground text-[28px] leading-none font-bold tracking-tight tabular-nums" title={data.value.toLocaleString()}>
             {formatCompactNumber(data.value)}
           </p>
-          <p className={`mt-1 inline-flex items-center gap-1 text-xs font-bold ${data.deltaPct === null ? 'text-muted' : up ? 'text-success-foreground' : 'text-danger-foreground'}`}>
+          <p
+            className={`mt-1 inline-flex items-center gap-1 text-xs font-bold ${data.deltaPct === null ? 'text-muted' : up ? 'text-success-foreground' : 'text-danger-foreground'}`}
+          >
             {data.deltaPct === null ? '—' : `${up ? '▲' : '▼'} ${Math.abs(data.deltaPct)} %`}
-            <span className="font-medium text-muted">{t('common.dashboard.vs_previous')}</span>
+            <span className="text-muted font-medium">{t('common.dashboard.vs_previous')}</span>
           </p>
         </div>
       )}

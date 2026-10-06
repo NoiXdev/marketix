@@ -83,21 +83,14 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
           </FormSection>
         </form>
 
-        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('team.members.heading')}</h2>
+        <h2 className="text-foreground mb-3 text-lg font-semibold">{t('team.members.heading')}</h2>
         <div className="mb-8">
-          <TableCard
-            columns={[
-              { label: t('team.members.columns.name') },
-              { label: t('team.members.columns.email') },
-              { label: t('team.members.columns.role') },
-              { label: '' },
-            ]}
-          >
-            <tbody className="divide-y divide-line">
+          <TableCard columns={[{ label: t('team.members.columns.name') }, { label: t('team.members.columns.email') }, { label: t('team.members.columns.role') }, { label: '' }]}>
+            <tbody className="divide-line divide-y">
               {members.map((member) => (
                 <tr key={member.id}>
-                  <td className="px-4 py-3 font-medium text-foreground">{member.name}</td>
-                  <td className="px-4 py-3 text-muted">{member.email}</td>
+                  <td className="text-foreground px-4 py-3 font-medium">{member.name}</td>
+                  <td className="text-muted px-4 py-3">{member.email}</td>
                   <td className="px-4 py-3">
                     <div className="w-32">
                       <Select value={member.role} onChange={(e) => changeRole(member, e.target.value)} disabled={member.id === auth.user.id}>
@@ -117,23 +110,23 @@ export default function TeamIndex({ members, invitations }: { members: ProjectMe
 
         {invitations.length > 0 && (
           <>
-            <h2 className="mb-3 text-lg font-semibold text-foreground">{t('team.invitations.heading')}</h2>
+            <h2 className="text-foreground mb-3 text-lg font-semibold">{t('team.invitations.heading')}</h2>
             <TableCard columns={[{ label: t('team.members.columns.email') }, { label: t('team.members.columns.role') }, { label: '' }, { label: '' }]}>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-line divide-y">
                 {invitations.map((inv) => (
                   <tr key={inv.id}>
-                    <td className="px-4 py-3 text-foreground">
+                    <td className="text-foreground px-4 py-3">
                       <span className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-subtle" />
+                        <Mail className="text-subtle h-4 w-4" />
                         {inv.email}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-muted">{t(`common.roles.${inv.role}`)}</td>
+                    <td className="text-muted px-4 py-3">{t(`common.roles.${inv.role}`)}</td>
                     <td className="px-4 py-3">
                       {inv.expired ? (
                         <Badge variant="warning">{t('team.invitations.expired_badge')}</Badge>
                       ) : (
-                        <span className="text-xs text-subtle">{t('team.invitations.expires_at', { date: new Date(inv.expires_at).toLocaleDateString() })}</span>
+                        <span className="text-subtle text-xs">{t('team.invitations.expires_at', { date: new Date(inv.expires_at).toLocaleDateString() })}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">

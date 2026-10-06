@@ -22,13 +22,13 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
   const overflow = scroll ? 'overflow-auto' : 'overflow-hidden';
 
   const body = loading ? (
-    <div className="flex h-full items-center justify-center text-subtle">
+    <div className="text-subtle flex h-full items-center justify-center">
       <Loader2 className="h-5 w-5 animate-spin" />
     </div>
   ) : error ? (
-    <div className="flex h-full flex-col items-center justify-center gap-2 text-xs text-subtle">
+    <div className="text-subtle flex h-full flex-col items-center justify-center gap-2 text-xs">
       <span>{t('widgets.load_error')}</span>
-      <button type="button" onClick={onReload} className="widget-no-drag inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 hover:bg-elevated">
+      <button type="button" onClick={onReload} className="widget-no-drag border-line hover:bg-elevated inline-flex items-center gap-1 rounded-md border px-2 py-1">
         <RefreshCw className="h-3 w-3" /> {t('widgets.retry')}
       </button>
     </div>
@@ -38,10 +38,10 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
 
   const controls = (
     <div className="widget-no-drag flex items-center gap-1">
-      <button type="button" onClick={onConfigure} aria-label={t('widgets.configure')} className="rounded p-1 text-subtle hover:bg-elevated hover:text-foreground">
+      <button type="button" onClick={onConfigure} aria-label={t('widgets.configure')} className="text-subtle hover:bg-elevated hover:text-foreground rounded p-1">
         <Settings2 className="h-3.5 w-3.5" />
       </button>
-      <button type="button" onClick={onRemove} aria-label={t('widgets.remove')} className="rounded p-1 text-subtle hover:bg-danger-soft hover:text-danger-foreground">
+      <button type="button" onClick={onRemove} aria-label={t('widgets.remove')} className="text-subtle hover:bg-danger-soft hover:text-danger-foreground rounded p-1">
         <X className="h-3.5 w-3.5" />
       </button>
     </div>
@@ -51,21 +51,17 @@ export default function WidgetFrame({ title, loading, error, onReload, editing, 
   // controls so the widget stays configurable/removable and draggable.
   if (frameless) {
     return (
-      <div className={`relative flex h-full flex-col ${overflow} ${editing ? 'rounded-[var(--radius)] border border-dashed border-line' : ''}`}>
-        {editing && (
-          <div className="absolute right-1 top-1 z-10 rounded-md border border-line bg-surface/90 p-0.5 shadow-[var(--shadow-sm)] backdrop-blur-sm">
-            {controls}
-          </div>
-        )}
+      <div className={`relative flex h-full flex-col ${overflow} ${editing ? 'border-line rounded-[var(--radius)] border border-dashed' : ''}`}>
+        {editing && <div className="border-line bg-surface/90 absolute top-1 right-1 z-10 rounded-md border p-0.5 shadow-[var(--shadow-sm)] backdrop-blur-sm">{controls}</div>}
         <div className="min-h-0 flex-1">{body}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-      <div className="flex items-center justify-between border-b border-line px-3 py-2">
-        <h3 className="truncate text-xs font-semibold text-foreground">{title}</h3>
+    <div className="border-line bg-surface flex h-full flex-col overflow-hidden rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+      <div className="border-line flex items-center justify-between border-b px-3 py-2">
+        <h3 className="text-foreground truncate text-xs font-semibold">{title}</h3>
         {editing && controls}
       </div>
       <div className={`min-h-0 flex-1 p-3 ${overflow}`}>{body}</div>

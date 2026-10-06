@@ -20,12 +20,12 @@ export default function VersionLabel({ className = '' }: { className?: string })
         rel="noopener noreferrer"
         title={label}
         aria-label={label}
-        className="inline-flex items-center gap-1.5 rounded hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+        className="hover:text-accent inline-flex items-center gap-1.5 rounded focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
       >
         v{version}
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+          <span className="bg-accent absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+          <span className="bg-accent relative inline-flex h-2 w-2 rounded-full" />
         </span>
       </a>
     </p>

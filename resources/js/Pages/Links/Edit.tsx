@@ -1,11 +1,11 @@
 import ActivityHistory from '@/Components/ActivityHistory';
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, Domain, PageProps, PixelOption } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import LinkForm, { LinkFormData } from './partials/LinkForm';
-import { AbVariant, GeoRule, DeviceRule, LanguageRule } from './partials/TargetingSection';
+import { AbVariant, DeviceRule, GeoRule, LanguageRule } from './partials/TargetingSection';
 import { UtmParams } from './partials/UtmSection';
 
 interface UrlData {
@@ -27,34 +27,24 @@ interface UrlData {
   pixel_ids: string[];
 }
 
-export default function LinksEdit({
-  url,
-  domains,
-  pixels,
-  history,
-}: {
-  url: UrlData;
-  domains: Pick<Domain, 'id' | 'name'>[];
-  pixels: PixelOption[];
-  history?: ActivityEntry[];
-}) {
+export default function LinksEdit({ url, domains, pixels, history }: { url: UrlData; domains: Pick<Domain, 'id' | 'name'>[]; pixels: PixelOption[]; history?: ActivityEntry[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
   const { data, setData, put, processing, errors } = useForm<LinkFormData>({
-    domain_id:          url.domain_id.toString(),
-    slug:               url.slug,
-    url:                url.url,
-    type:               url.type.toString(),
-    status:             url.status.toString(),
-    password:           url.password ?? '',
-    expired_at:         url.expired_at ?? '',
-    targeting_geo:      url.targeting_geo ?? [],
-    targeting_device:   url.targeting_device ?? [],
+    domain_id: url.domain_id.toString(),
+    slug: url.slug,
+    url: url.url,
+    type: url.type.toString(),
+    status: url.status.toString(),
+    password: url.password ?? '',
+    expired_at: url.expired_at ?? '',
+    targeting_geo: url.targeting_geo ?? [],
+    targeting_device: url.targeting_device ?? [],
     targeting_language: url.targeting_language ?? [],
-    targeting_ab:       url.targeting_ab ?? [],
-    utm:                url.utm ?? {},
-    pixel_ids:          url.pixel_ids ?? [],
+    targeting_ab: url.targeting_ab ?? [],
+    utm: url.utm ?? {},
+    pixel_ids: url.pixel_ids ?? [],
   });
 
   return (
@@ -62,7 +52,7 @@ export default function LinksEdit({
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.links.index', { project: project!.id })}>{t('links.back')}</BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">
             {t('common.actions.edit')} <span className="text-accent-soft-foreground">{url.slug}</span>
           </h1>
         </div>

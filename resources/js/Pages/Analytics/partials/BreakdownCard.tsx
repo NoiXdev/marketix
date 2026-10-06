@@ -45,11 +45,7 @@ export default function BreakdownCard({
         )}
       </div>
       <div role="tabpanel" className="flex-1">
-        {active && active.rows.length === 0 && active.empty ? (
-          active.empty
-        ) : (
-          <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
-        )}
+        {active && active.rows.length === 0 && active.empty ? active.empty : <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />}
       </div>
       {hint && <p className="border-line text-subtle border-t px-4 py-3 text-xs">{hint}</p>}
       {more && (

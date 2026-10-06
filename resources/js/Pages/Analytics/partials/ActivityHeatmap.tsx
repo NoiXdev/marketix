@@ -21,17 +21,19 @@ export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) 
   const max = Math.max(0, ...grid.flat());
 
   let peak = { day: 0, hour: 0, value: 0 };
-  grid.forEach((row, day) => row.forEach((value, hour) => {
-    if (value > peak.value) peak = { day, hour, value };
-  }));
+  grid.forEach((row, day) =>
+    row.forEach((value, hour) => {
+      if (value > peak.value) peak = { day, hour, value };
+    }),
+  );
 
   const focus = hovered ? { ...hovered, value: grid[hovered.day]?.[hovered.hour] ?? 0 } : null;
 
   return (
-    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow-sm)] sm:p-6">
+    <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-sm font-semibold text-foreground">{t('analytics.dashboard.heatmap.title')}</h2>
-        <p className="text-xs text-muted">
+        <h2 className="text-foreground text-sm font-semibold">{t('analytics.dashboard.heatmap.title')}</h2>
+        <p className="text-muted text-xs">
           {focus
             ? t('analytics.dashboard.heatmap.cell', { day: weekdays[focus.day], hours: hourRange(focus.hour), count: focus.value.toLocaleString(locale) })
             : peak.value > 0
@@ -51,20 +53,20 @@ export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) 
       >
         <span />
         {HOURS.map((h) => (
-          <span key={h} className="text-center text-[10px] leading-4 text-subtle">
+          <span key={h} className="text-subtle text-center text-[10px] leading-4">
             {h % 3 === 0 && <span className={h % 6 === 0 ? '' : 'hidden sm:inline'}>{String(h).padStart(2, '0')}</span>}
           </span>
         ))}
         {grid.map((row, day) => (
           <div key={day} className="contents">
-            <span className="self-center pr-1 text-[11px] font-semibold text-muted">{weekdays[day]}</span>
+            <span className="text-muted self-center pr-1 text-[11px] font-semibold">{weekdays[day]}</span>
             {row.map((value, hour) => (
               <span
                 key={hour}
                 role="img"
                 aria-label={t('analytics.dashboard.heatmap.cell', { day: weekdays[day], hours: hourRange(hour), count: value })}
                 data-slot={`${day}:${hour}`}
-                className={`h-4 rounded-[2px] sm:h-5 sm:rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-inset ring-[color:var(--foreground)]' : ''}`}
+                className={`h-4 rounded-[2px] sm:h-5 sm:rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-[color:var(--foreground)] ring-inset' : ''}`}
                 style={{ background: scaleFill(value, max) }}
               />
             ))}
@@ -74,7 +76,7 @@ export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) 
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         {max > 0 ? <ScaleLegend /> : <span />}
-        <span className="text-xs text-subtle">{t('analytics.dashboard.heatmap.timezone', { zone: timezone })}</span>
+        <span className="text-subtle text-xs">{t('analytics.dashboard.heatmap.timezone', { zone: timezone })}</span>
       </div>
     </section>
   );

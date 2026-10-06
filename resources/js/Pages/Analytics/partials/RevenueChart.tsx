@@ -103,11 +103,7 @@ export default function RevenueChart({
           style={{ gap: SLOT_GAP }}
         >
           {data.map((d, i) => (
-            <div
-              key={d.date}
-              data-slot={i}
-              className={`relative flex h-full min-w-0 flex-1 items-end justify-center rounded-t-[4px] pt-3 ${hovered === i ? 'bg-elevated' : ''}`}
-            >
+            <div key={d.date} data-slot={i} className={`relative flex h-full min-w-0 flex-1 items-end justify-center rounded-t-[4px] pt-3 ${hovered === i ? 'bg-elevated' : ''}`}>
               <div
                 className={`${barWidth >= 6 ? 'rounded-t-[4px]' : 'rounded-t-[2px]'} bg-accent transition-[height] duration-300`}
                 style={{ width: barWidth, height: d.revenue > 0 && max > 0 ? `max(2px, ${(d.revenue / max) * 100}%)` : '0px' }}

@@ -14,19 +14,22 @@ export interface ScanReport {
   contrastRatio: number;
 }
 
-const ECC_RESERVE: Record<QrEcc, number> = { L: 0.07, M: 0.15, Q: 0.25, H: 0.30 };
+const ECC_RESERVE: Record<QrEcc, number> = { L: 0.07, M: 0.15, Q: 0.25, H: 0.3 };
 
 function hexToRgb(hex: string): [number, number, number] {
   let h = hex.replace('#', '');
   if (h.length === 3) {
-    h = h.split('').map(c => c + c).join('');
+    h = h
+      .split('')
+      .map((c) => c + c)
+      .join('');
   }
   const num = parseInt(h, 16);
   return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
 }
 
 function relativeLuminance(hex: string): number {
-  const [r, g, b] = hexToRgb(hex).map(v => {
+  const [r, g, b] = hexToRgb(hex).map((v) => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
   });
@@ -70,10 +73,7 @@ export function scannability(style: QrStyle): ScanReport {
     issues.push({ code: 'quiet_zone', level: 'warn', message: 'Quiet zone is smaller than recommended (4 modules).' });
   }
 
-  const level: ScanLevel = issues.reduce<ScanLevel>(
-    (worst, issue) => (levelRank(issue.level) > levelRank(worst) ? issue.level : worst),
-    'good',
-  );
+  const level: ScanLevel = issues.reduce<ScanLevel>((worst, issue) => (levelRank(issue.level) > levelRank(worst) ? issue.level : worst), 'good');
 
   return { level, issues, contrastRatio: ratio };
 }

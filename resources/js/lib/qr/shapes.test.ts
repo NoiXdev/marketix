@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { modulesPath, eyeBallsPath } from './shapes';
+import { describe, expect, it } from 'vitest';
 import type { QrMatrix } from './matrix';
+import { eyeBallsPath, modulesPath } from './shapes';
 
 // 3×3 fake matrix, no finders, only the centre module dark.
 function single(): QrMatrix {
@@ -14,7 +14,7 @@ function pair(): QrMatrix {
 describe('modulesPath', () => {
   it('square mode emits no arc/curve commands', () => {
     const d = modulesPath(single(), 'square', 1, 10, 0);
-    expect(d).not.toMatch(/[AaQqCc]/);       // no rounding
+    expect(d).not.toMatch(/[AaQqCc]/); // no rounding
     expect(d.length).toBeGreaterThan(0);
   });
   it('rounded isolated module rounds all four corners (4 arcs)', () => {

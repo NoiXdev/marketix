@@ -47,28 +47,18 @@ export default function QrDownloadMenu({ name, type, isDynamic, content, dynamic
 
   return (
     <Menu>
-      <MenuButton
-        type="button"
-        title={t('qr.export.download')}
-        aria-label={t('qr.export.download')}
-        disabled={busy}
-        onClick={(e) => e.stopPropagation()}
-        className={btn}
-      >
+      <MenuButton type="button" title={t('qr.export.download')} aria-label={t('qr.export.download')} disabled={busy} onClick={(e) => e.stopPropagation()} className={btn}>
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
       </MenuButton>
-      <MenuItems
-        anchor="bottom end"
-        className="z-30 w-36 rounded-md border border-line bg-surface py-1 shadow-lg focus:outline-none [--anchor-gap:4px]"
-      >
+      <MenuItems anchor="bottom end" className="border-line bg-surface z-30 w-36 rounded-md border py-1 shadow-lg [--anchor-gap:4px] focus:outline-none">
         {FORMATS.map(({ format, labelKey }) => (
           <MenuItem key={format}>
             <button
               type="button"
               onClick={() => handle(format)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-muted data-[focus]:bg-elevated data-[focus]:text-foreground"
+              className="text-muted data-[focus]:bg-elevated data-[focus]:text-foreground flex w-full items-center gap-2 px-3 py-2 text-sm"
             >
-              <Download className="h-3.5 w-3.5 text-subtle" />
+              <Download className="text-subtle h-3.5 w-3.5" />
               {t(labelKey)}
             </button>
           </MenuItem>

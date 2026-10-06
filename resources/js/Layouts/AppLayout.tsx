@@ -18,7 +18,7 @@ export default function AppLayout({ children, title }: PropsWithChildren<AppLayo
   }
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-canvas text-foreground">
+    <div className="bg-canvas text-foreground flex h-dvh overflow-hidden">
       {title && <Head title={title} />}
       <Sidebar mobileOpen={mobileNav.open} onMobileClose={mobileNav.close} />
       <div className="flex min-w-0 flex-1 flex-col">

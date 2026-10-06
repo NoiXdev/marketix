@@ -20,15 +20,7 @@ function Brand({ icon, className }: { icon: SimpleIcon; className: string }) {
  * "Other" bucket fall back to neutral lucide glyphs. All render monochrome in
  * the current text color so they sit quietly next to the label.
  */
-export function PlatformIcon({
-  kind,
-  name,
-  className = 'h-4 w-4 text-subtle',
-}: {
-  kind: 'browser' | 'os' | 'device';
-  name?: string | null;
-  className?: string;
-}) {
+export function PlatformIcon({ kind, name, className = 'h-4 w-4 text-subtle' }: { kind: 'browser' | 'os' | 'device'; name?: string | null; className?: string }) {
   const key = (name ?? '').trim().toLowerCase();
 
   if (kind === 'browser') {

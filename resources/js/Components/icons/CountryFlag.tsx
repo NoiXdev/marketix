@@ -10,14 +10,8 @@ export function CountryFlag({ code, className = '' }: { code?: string | null; cl
   const cc = code?.trim().toLowerCase();
 
   if (!cc || cc.length !== 2) {
-    return <Globe className="h-4 w-4 text-subtle" aria-hidden />;
+    return <Globe className="text-subtle h-4 w-4" aria-hidden />;
   }
 
-  return (
-    <span
-      className={`fi fi-${cc} rounded-[2px] bg-elevated ${className}`}
-      style={{ fontSize: '1rem', lineHeight: 1 }}
-      aria-hidden
-    />
-  );
+  return <span className={`fi fi-${cc} bg-elevated rounded-[2px] ${className}`} style={{ fontSize: '1rem', lineHeight: 1 }} aria-hidden />;
 }

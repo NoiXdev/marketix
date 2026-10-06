@@ -26,8 +26,7 @@ function svgToImage(svg: string): Promise<HTMLImageElement> {
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('Failed to load SVG image'));
     // Encode as a UTF-8-safe data URL (handles unicode in frame text).
-    img.src =
-      'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   });
 }
 
@@ -35,12 +34,7 @@ function svgToImage(svg: string): Promise<HTMLImageElement> {
  * Rasterise an SVG to a PNG Blob on a canvas sized `width*scale × height*scale`.
  * Rejects if the environment provides no 2d canvas context (e.g. jsdom).
  */
-export async function toPngBlob(
-  svg: string,
-  width: number,
-  height: number,
-  scale: number,
-): Promise<Blob> {
+export async function toPngBlob(svg: string, width: number, height: number, scale: number): Promise<Blob> {
   const img = await svgToImage(svg);
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(width * scale);
@@ -61,20 +55,13 @@ export async function toPngBlob(
  * sized to the SVG's pixel dimensions (treated as PDF points); orientation
  * follows the aspect ratio.
  */
-export async function toPdfBlob(
-  svg: string,
-  width: number,
-  height: number,
-): Promise<Blob> {
+export async function toPdfBlob(svg: string, width: number, height: number): Promise<Blob> {
   const doc = new jsPDF({
     unit: 'pt',
     format: [width, height],
     orientation: width >= height ? 'landscape' : 'portrait',
   });
-  const el = new DOMParser().parseFromString(
-    svg,
-    'image/svg+xml',
-  ).documentElement as unknown as SVGElement;
+  const el = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement as unknown as SVGElement;
   await doc.svg(el, { x: 0, y: 0, width, height });
   return doc.output('blob');
 }

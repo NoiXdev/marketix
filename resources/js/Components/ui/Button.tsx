@@ -1,5 +1,5 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'destructive';
 export type ButtonSize = 'sm' | 'md';
@@ -16,8 +16,7 @@ const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-accent-foreground hover:bg-accent-hover',
   secondary: 'bg-surface text-foreground border border-line-strong hover:bg-elevated',
   ghost: 'text-muted hover:bg-elevated hover:text-foreground',
-  danger:
-    'text-danger-foreground border border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] hover:bg-danger-soft',
+  danger: 'text-danger-foreground border border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] hover:bg-danger-soft',
   destructive: 'bg-[color:var(--danger-dot)] text-white hover:bg-[color:color-mix(in_srgb,var(--danger-dot)_85%,black)]',
 };
 
@@ -36,14 +35,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   ref,
 ) {
   return (
-    <button
-      ref={ref}
-      type={type}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
-      className={buttonClasses(variant, size, className)}
-      {...props}
-    >
+    <button ref={ref} type={type} disabled={disabled || loading} aria-busy={loading || undefined} className={buttonClasses(variant, size, className)} {...props}>
       {loading && <Loader2 className="h-4 w-4 animate-spin" />}
       {children}
     </button>

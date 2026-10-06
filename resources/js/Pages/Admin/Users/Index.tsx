@@ -2,7 +2,7 @@ import { Flash, IconButton, Input, LinkButton, PageHeader, Pagination, RowAction
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Shield, Trash2 } from 'lucide-react';
 
@@ -53,25 +53,18 @@ export default function AdminUsersIndex({ users, search }: { users: Paginated<Ad
           </div>
         </form>
 
-        <TableCard
-          columns={[
-            { label: t('admin.users.columns.name') },
-            { label: t('admin.users.columns.email') },
-            { label: t('admin.users.columns.projects') },
-            { label: '' },
-          ]}
-        >
-          <tbody className="divide-y divide-line">
+        <TableCard columns={[{ label: t('admin.users.columns.name') }, { label: t('admin.users.columns.email') }, { label: t('admin.users.columns.projects') }, { label: '' }]}>
+          <tbody className="divide-line divide-y">
             {users.data.map((user) => (
               <tr key={user.id} onClick={rowLink(route('app.admin.users.edit', { user: user.id }))} className={`group ${ROW_LINK_CLASS}`}>
-                <td className="px-4 py-3 font-medium text-foreground">
-                  <Link href={route('app.admin.users.edit', { user: user.id })} className="flex items-center gap-2 hover:text-accent-soft-foreground">
+                <td className="text-foreground px-4 py-3 font-medium">
+                  <Link href={route('app.admin.users.edit', { user: user.id })} className="hover:text-accent-soft-foreground flex items-center gap-2">
                     {user.name}
-                    {user.super_admin && <Shield className="h-3.5 w-3.5 text-accent" />}
+                    {user.super_admin && <Shield className="text-accent h-3.5 w-3.5" />}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-muted">{user.email}</td>
-                <td className="px-4 py-3 text-muted">{user.projects_count}</td>
+                <td className="text-muted px-4 py-3">{user.email}</td>
+                <td className="text-muted px-4 py-3">{user.projects_count}</td>
                 <RowActions>
                   <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.admin.users.edit', { user: user.id })} />
                   <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(user)} />

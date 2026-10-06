@@ -1,5 +1,5 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, StatusPill, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
@@ -30,19 +30,11 @@ export default function ReportsIndex({ reports }: { reports: ReportRow[] }) {
   }
 
   function toggle(report: ReportRow) {
-    router.post(
-      route('app.project.reports.toggle', { project: project!.id, report: report.id }),
-      {},
-      { preserveScroll: true },
-    );
+    router.post(route('app.project.reports.toggle', { project: project!.id, report: report.id }), {}, { preserveScroll: true });
   }
 
   function sendNow(report: ReportRow) {
-    router.post(
-      route('app.project.reports.send-now', { project: project!.id, report: report.id }),
-      {},
-      { preserveScroll: true },
-    );
+    router.post(route('app.project.reports.send-now', { project: project!.id, report: report.id }), {}, { preserveScroll: true });
   }
 
   const createBtn = (
@@ -80,41 +72,28 @@ export default function ReportsIndex({ reports }: { reports: ReportRow[] }) {
               { label: '' },
             ]}
           >
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-line divide-y">
               {reports.map((report) => (
                 <tr key={report.id} className="group">
-                  <td className="px-4 py-3 font-medium text-foreground">{report.name}</td>
-                  <td className="px-4 py-3 text-muted">{t(`reports.types.${report.type}`)}</td>
-                  <td className="px-4 py-3 text-muted">{t(`reports.frequencies.${report.frequency}`)}</td>
-                  <td className="px-4 py-3 text-muted">
-                    {report.next_run_at ? new Date(report.next_run_at).toLocaleString() : '—'}
-                  </td>
+                  <td className="text-foreground px-4 py-3 font-medium">{report.name}</td>
+                  <td className="text-muted px-4 py-3">{t(`reports.types.${report.type}`)}</td>
+                  <td className="text-muted px-4 py-3">{t(`reports.frequencies.${report.frequency}`)}</td>
+                  <td className="text-muted px-4 py-3">{report.next_run_at ? new Date(report.next_run_at).toLocaleString() : '—'}</td>
                   <td className="px-4 py-3">
                     <button
                       type="button"
                       onClick={() => toggle(report)}
                       aria-label={t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
                       title={t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
-                      className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                      className="rounded-full focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
                     >
-                      <StatusPill status={report.active ? 'success' : 'neutral'}>
-                        {t(report.active ? 'reports.index.active' : 'reports.index.inactive')}
-                      </StatusPill>
+                      <StatusPill status={report.active ? 'success' : 'neutral'}>{t(report.active ? 'reports.index.active' : 'reports.index.inactive')}</StatusPill>
                     </button>
                   </td>
                   <RowActions>
                     <IconButton icon={Send} label={t('reports.index.actions.send_now')} onClick={() => sendNow(report)} />
-                    <IconButton
-                      icon={Pencil}
-                      label={t('reports.index.actions.edit')}
-                      href={route('app.project.reports.edit', { project: project!.id, report: report.id })}
-                    />
-                    <IconButton
-                      icon={Trash2}
-                      label={t('reports.index.actions.delete')}
-                      variant="danger"
-                      onClick={() => destroy(report)}
-                    />
+                    <IconButton icon={Pencil} label={t('reports.index.actions.edit')} href={route('app.project.reports.edit', { project: project!.id, report: report.id })} />
+                    <IconButton icon={Trash2} label={t('reports.index.actions.delete')} variant="danger" onClick={() => destroy(report)} />
                   </RowActions>
                 </tr>
               ))}

@@ -71,17 +71,15 @@ export default function AdminBrandingEdit(props: Props) {
 
           {imageFields.map(({ field, remove, label, hint }) => (
             <Field key={field} label={label} hint={hint} error={errors[field]}>
-              {currentUrl[field] && (
-                <img src={currentUrl[field]!} alt={label} className="mb-2 h-10 w-auto rounded border border-line bg-elevated p-1" />
-              )}
+              {currentUrl[field] && <img src={currentUrl[field]!} alt={label} className="border-line bg-elevated mb-2 h-10 w-auto rounded border p-1" />}
               <input
                 type="file"
                 accept={field === 'favicon' ? '.ico,.png,.jpg,.jpeg' : 'image/*'}
                 onChange={(e) => setData(field, e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-muted file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-soft-foreground"
+                className="text-muted file:bg-accent-soft file:text-accent-soft-foreground block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium"
               />
               {currentUrl[field] && (
-                <label className="mt-1 flex items-center gap-2 text-xs text-muted">
+                <label className="text-muted mt-1 flex items-center gap-2 text-xs">
                   <Checkbox checked={Boolean(data[remove])} onChange={(e) => setData(remove, e.target.checked)} />
                   {t('admin.branding.remove_current')}
                 </label>

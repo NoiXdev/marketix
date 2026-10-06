@@ -1,6 +1,16 @@
 export type QrType =
-  | 'text' | 'sms' | 'wifi' | 'vcard' | 'event'                              // static-capable
-  | 'link' | 'email' | 'phone' | 'application' | 'file' | 'whatsapp' | 'crypto'; // dynamic-only
+  | 'text'
+  | 'sms'
+  | 'wifi'
+  | 'vcard'
+  | 'event' // static-capable
+  | 'link'
+  | 'email'
+  | 'phone'
+  | 'application'
+  | 'file'
+  | 'whatsapp'
+  | 'crypto'; // dynamic-only
 
 export interface QrTypeConfig {
   value: QrType;
@@ -12,23 +22,23 @@ export interface QrTypeConfig {
 
 export const QR_TYPES: QrTypeConfig[] = [
   // ── Static ─────────────────────────────────────────────────────────────
-  { value: 'text',   label: 'Text',        category: 'static', icon: '✏️', defaultContent: { text: '' } },
-  { value: 'sms',    label: 'SMS & Message', category: 'both',  icon: '💬', defaultContent: { phone: '', message: '' } },
-  { value: 'wifi',   label: 'WiFi',         category: 'static', icon: '📶', defaultContent: { ssid: '', password: '', encryption: 'WPA', hidden: 'false' } },
-  { value: 'vcard',  label: 'vCard',        category: 'both',   icon: '👤', defaultContent: { name: '', phone: '', email: '', org: '', url: '', address: '' } },
-  { value: 'event',  label: 'Event',        category: 'static', icon: '📅', defaultContent: { title: '', start: '', end: '', location: '', description: '' } },
+  { value: 'text', label: 'Text', category: 'static', icon: '✏️', defaultContent: { text: '' } },
+  { value: 'sms', label: 'SMS & Message', category: 'both', icon: '💬', defaultContent: { phone: '', message: '' } },
+  { value: 'wifi', label: 'WiFi', category: 'static', icon: '📶', defaultContent: { ssid: '', password: '', encryption: 'WPA', hidden: 'false' } },
+  { value: 'vcard', label: 'vCard', category: 'both', icon: '👤', defaultContent: { name: '', phone: '', email: '', org: '', url: '', address: '' } },
+  { value: 'event', label: 'Event', category: 'static', icon: '📅', defaultContent: { title: '', start: '', end: '', location: '', description: '' } },
   // ── Dynamic (also usable as static / no-tracking) ────────────────────────
-  { value: 'link',        label: 'Link',           category: 'both', icon: '🔗', defaultContent: { url: '' } },
-  { value: 'email',       label: 'Email',          category: 'both', icon: '📧', defaultContent: { email: '', subject: '', body: '' } },
-  { value: 'phone',       label: 'Phone',          category: 'both', icon: '📞', defaultContent: { phone: '' } },
-  { value: 'application', label: 'Application',    category: 'both', icon: '📱', defaultContent: { url_ios: '', url_android: '', url_fallback: '' } },
-  { value: 'file',        label: 'File',           category: 'both', icon: '📄', defaultContent: { file_url: '' } },
-  { value: 'whatsapp',    label: 'WhatsApp',       category: 'both', icon: '🟢', defaultContent: { phone: '', message: '' } },
-  { value: 'crypto',      label: 'Cryptocurrency', category: 'both', icon: '₿',  defaultContent: { currency: 'BTC', address: '', amount: '', label: '' } },
+  { value: 'link', label: 'Link', category: 'both', icon: '🔗', defaultContent: { url: '' } },
+  { value: 'email', label: 'Email', category: 'both', icon: '📧', defaultContent: { email: '', subject: '', body: '' } },
+  { value: 'phone', label: 'Phone', category: 'both', icon: '📞', defaultContent: { phone: '' } },
+  { value: 'application', label: 'Application', category: 'both', icon: '📱', defaultContent: { url_ios: '', url_android: '', url_fallback: '' } },
+  { value: 'file', label: 'File', category: 'both', icon: '📄', defaultContent: { file_url: '' } },
+  { value: 'whatsapp', label: 'WhatsApp', category: 'both', icon: '🟢', defaultContent: { phone: '', message: '' } },
+  { value: 'crypto', label: 'Cryptocurrency', category: 'both', icon: '₿', defaultContent: { currency: 'BTC', address: '', amount: '', label: '' } },
 ];
 
-export const STATIC_TYPES  = QR_TYPES.filter(t => t.category === 'static' || t.category === 'both');
-export const DYNAMIC_TYPES = QR_TYPES.filter(t => t.category === 'dynamic' || t.category === 'both');
+export const STATIC_TYPES = QR_TYPES.filter((t) => t.category === 'static' || t.category === 'both');
+export const DYNAMIC_TYPES = QR_TYPES.filter((t) => t.category === 'dynamic' || t.category === 'both');
 
 // A QR is tracked only when it is dynamic (static-only types can never be tracked).
 // The three dual-mode types ('sms', 'vcard', 'whatsapp') are tracked iff dynamic.
@@ -39,93 +49,111 @@ export function qrTypeTrackable(config: QrTypeConfig, isDynamic: boolean): boole
 // ── Content → QR string ───────────────────────────────────────────────────
 
 function buildVCard(c: Record<string, string>): string {
-  const extra = (c.extra || '').split('\n').map(s => s.trim()).filter(Boolean);
+  const extra = (c.extra || '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
   return [
-    'BEGIN:VCARD', 'VERSION:3.0',
-    c.name       ? `FN:${c.name}`          : '',
-    c.org        ? `ORG:${c.org}`          : '',
-    c.phone      ? `TEL:${c.phone}`        : '',
-    c.email      ? `EMAIL:${c.email}`      : '',
-    c.url        ? `URL:${c.url}`          : '',
-    c.address    ? `ADR:;;${c.address};;;` : '',
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    c.name ? `FN:${c.name}` : '',
+    c.org ? `ORG:${c.org}` : '',
+    c.phone ? `TEL:${c.phone}` : '',
+    c.email ? `EMAIL:${c.email}` : '',
+    c.url ? `URL:${c.url}` : '',
+    c.address ? `ADR:;;${c.address};;;` : '',
     ...extra,
     'END:VCARD',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 function buildEvent(c: Record<string, string>): string {
   const toIcal = (dt: string) => dt.replace(/[-:T]/g, '').slice(0, 15) + 'Z';
   return [
-    'BEGIN:VCALENDAR', 'VERSION:2.0',
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
     'BEGIN:VEVENT',
-    c.title       ? `SUMMARY:${c.title}`         : '',
-    c.start       ? `DTSTART:${toIcal(c.start)}`  : '',
-    c.end         ? `DTEND:${toIcal(c.end)}`      : '',
-    c.location    ? `LOCATION:${c.location}`      : '',
+    c.title ? `SUMMARY:${c.title}` : '',
+    c.start ? `DTSTART:${toIcal(c.start)}` : '',
+    c.end ? `DTEND:${toIcal(c.end)}` : '',
+    c.location ? `LOCATION:${c.location}` : '',
     c.description ? `DESCRIPTION:${c.description}` : '',
-    'END:VEVENT', 'END:VCALENDAR',
-  ].filter(Boolean).join('\n');
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
-export function buildQrContent(
-  type: QrType,
-  isDynamic: boolean,
-  content: Record<string, string>,
-  dynamicUrl?: string,
-): string {
+export function buildQrContent(type: QrType, isDynamic: boolean, content: Record<string, string>, dynamicUrl?: string): string {
   // Dynamic types encode a redirect URL (when the QR has been saved and has a code)
   if (isDynamic && dynamicUrl) return dynamicUrl;
 
   switch (type) {
-    case 'text':        return content.text || '';
-    case 'sms':         return `SMSTO:${content.phone || ''}:${content.message || ''}`;
-    case 'wifi':        return `WIFI:T:${content.encryption || 'WPA'};S:${content.ssid || ''};P:${content.password || ''};H:${content.hidden === 'true'};`;
-    case 'vcard':       return buildVCard(content);
-    case 'event':       return buildEvent(content);
-    case 'link':        return content.url || '';
-    case 'email':       return `mailto:${content.email || ''}?subject=${encodeURIComponent(content.subject || '')}&body=${encodeURIComponent(content.body || '')}`;
-    case 'phone':       return `tel:${content.phone || ''}`;
-    case 'whatsapp':    return `https://wa.me/${(content.phone || '').replace(/[^0-9]/g, '')}${content.message ? `?text=${encodeURIComponent(content.message)}` : ''}`;
-    case 'crypto':      return `${(content.currency || 'bitcoin').toLowerCase()}:${content.address || ''}${content.amount ? `?amount=${content.amount}` : ''}`;
-    case 'application': return content.url_fallback || content.url_android || content.url_ios || '';
-    case 'file':        return content.file_url || '';
-    default:            return '';
+    case 'text':
+      return content.text || '';
+    case 'sms':
+      return `SMSTO:${content.phone || ''}:${content.message || ''}`;
+    case 'wifi':
+      return `WIFI:T:${content.encryption || 'WPA'};S:${content.ssid || ''};P:${content.password || ''};H:${content.hidden === 'true'};`;
+    case 'vcard':
+      return buildVCard(content);
+    case 'event':
+      return buildEvent(content);
+    case 'link':
+      return content.url || '';
+    case 'email':
+      return `mailto:${content.email || ''}?subject=${encodeURIComponent(content.subject || '')}&body=${encodeURIComponent(content.body || '')}`;
+    case 'phone':
+      return `tel:${content.phone || ''}`;
+    case 'whatsapp':
+      return `https://wa.me/${(content.phone || '').replace(/[^0-9]/g, '')}${content.message ? `?text=${encodeURIComponent(content.message)}` : ''}`;
+    case 'crypto':
+      return `${(content.currency || 'bitcoin').toLowerCase()}:${content.address || ''}${content.amount ? `?amount=${content.amount}` : ''}`;
+    case 'application':
+      return content.url_fallback || content.url_android || content.url_ios || '';
+    case 'file':
+      return content.file_url || '';
+    default:
+      return '';
   }
 }
 
-export type LogoType           = 'none' | 'predefined' | 'custom';
+export type LogoType = 'none' | 'predefined' | 'custom';
 
 export type QrEcc = 'L' | 'M' | 'Q' | 'H';
 export interface QrGradient {
   type: 'linear' | 'radial';
-  rotation: number;                               // degrees (linear)
-  stops: { offset: number; color: string }[];     // ≥2, offsets 0..1
+  rotation: number; // degrees (linear)
+  stops: { offset: number; color: string }[]; // ≥2, offsets 0..1
 }
-export type ModuleMode   = 'square' | 'dots' | 'rounded' | 'classy';
-export type EyeFrameMode  = 'square' | 'rounded' | 'dots';
-export type EyeBallMode   = 'square' | 'rounded' | 'dot';
-export type FrameStyle    = 'none' | 'simple' | 'rounded' | 'badge-bottom';
+export type ModuleMode = 'square' | 'dots' | 'rounded' | 'classy';
+export type EyeFrameMode = 'square' | 'rounded' | 'dots';
+export type EyeBallMode = 'square' | 'rounded' | 'dot';
+export type FrameStyle = 'none' | 'simple' | 'rounded' | 'badge-bottom';
 
 export interface QrStyle {
-  foreground:           string;
-  background:           string;
-  logo_type:            LogoType;
-  logo_name:            string;
-  logo_data:            string;
-  logo_size:            number;
+  foreground: string;
+  background: string;
+  logo_type: LogoType;
+  logo_name: string;
+  logo_data: string;
+  logo_size: number;
   module_mode: ModuleMode;
-  module_rounding: number;        // 0..1
+  module_rounding: number; // 0..1
   eye_frame_mode: EyeFrameMode;
-  eye_frame_rounding: number;     // 0..1
+  eye_frame_rounding: number; // 0..1
   eye_ball_mode: EyeBallMode;
-  eye_ball_rounding: number;      // 0..1
-  eye_color?: string;             // default = foreground
+  eye_ball_rounding: number; // 0..1
+  eye_color?: string; // default = foreground
   eye_gradient?: QrGradient;
   fg_gradient?: QrGradient;
   bg_gradient?: QrGradient;
   error_correction: QrEcc;
-  quiet_zone: number;             // modules
-  logo_margin: number;            // modules
+  quiet_zone: number; // modules
+  logo_margin: number; // modules
   logo_clear_modules: boolean;
   frame_style: FrameStyle;
   frame_text: string;
@@ -135,12 +163,12 @@ export interface QrStyle {
 }
 
 export const DEFAULT_STYLE: QrStyle = {
-  foreground:           '#000000',
-  background:           '#ffffff',
-  logo_type:            'none',
-  logo_name:            '',
-  logo_data:            '',
-  logo_size:            30,
+  foreground: '#000000',
+  background: '#ffffff',
+  logo_type: 'none',
+  logo_name: '',
+  logo_data: '',
+  logo_size: 30,
   module_mode: 'square',
   module_rounding: 0,
   eye_frame_mode: 'square',

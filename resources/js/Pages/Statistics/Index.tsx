@@ -5,14 +5,25 @@ import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { BarChart3, MousePointerClick } from 'lucide-react';
 
-interface DayClicks { date: string; clicks: number }
-interface TopLink { id: string; slug: string; domain_name: string; clicks: number }
-interface BreakdownRow { [key: string]: string | number; count: number }
+interface DayClicks {
+  date: string;
+  clicks: number;
+}
+interface TopLink {
+  id: string;
+  slug: string;
+  domain_name: string;
+  clicks: number;
+}
+interface BreakdownRow {
+  [key: string]: string | number;
+  count: number;
+}
 
 interface Props {
   days: number;
@@ -34,19 +45,21 @@ function ClicksBars({ data, clicksLabel }: { data: DayClicks[]; clicksLabel: str
   return (
     <div>
       <div className="flex h-32 items-end gap-px">
-      {data.map((d) => (
-        <div key={d.date} className="group relative flex h-full flex-1 flex-col items-center justify-end">
-          <div
-            className="w-full rounded-t bg-accent transition-all"
-            style={{ height: `${Math.max((d.clicks / max) * 100, d.clicks > 0 ? 4 : 1)}%` }}
-            title={`${d.date}: ${d.clicks} ${clicksLabel}`}
-          />
-          <div className="pointer-events-none absolute bottom-full z-10 mb-1 hidden whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-canvas shadow-[var(--shadow)] group-hover:block">
-            <p className="font-semibold">{d.clicks.toLocaleString()} {clicksLabel}</p>
-            <p className="text-subtle">{d.date}</p>
+        {data.map((d) => (
+          <div key={d.date} className="group relative flex h-full flex-1 flex-col items-center justify-end">
+            <div
+              className="bg-accent w-full rounded-t transition-all"
+              style={{ height: `${Math.max((d.clicks / max) * 100, d.clicks > 0 ? 4 : 1)}%` }}
+              title={`${d.date}: ${d.clicks} ${clicksLabel}`}
+            />
+            <div className="bg-foreground text-canvas pointer-events-none absolute bottom-full z-10 mb-1 hidden rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-[var(--shadow)] group-hover:block">
+              <p className="font-semibold">
+                {d.clicks.toLocaleString()} {clicksLabel}
+              </p>
+              <p className="text-subtle">{d.date}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       </div>
       <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" />
     </div>
@@ -55,23 +68,16 @@ function ClicksBars({ data, clicksLabel }: { data: DayClicks[]; clicksLabel: str
 
 function Breakdown({ title, rows, labelKey, emptyLabel }: { title: string; rows: BreakdownRow[]; labelKey: string; emptyLabel: string }) {
   return (
-    <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+      <div className="border-line border-b px-4 py-3">
+        <h2 className="text-foreground text-sm font-semibold">{title}</h2>
       </div>
-      <RankedList
-        emptyLabel={emptyLabel}
-        rows={rows.map((r, i) => ({ key: `${String(r[labelKey] ?? '')}-${i}`, label: String(r[labelKey] || '—'), value: r.count }))}
-      />
+      <RankedList emptyLabel={emptyLabel} rows={rows.map((r, i) => ({ key: `${String(r[labelKey] ?? '')}-${i}`, label: String(r[labelKey] || '—'), value: r.count }))} />
     </section>
   );
 }
 
-export default function StatisticsIndex({
-  days, totalClicks, uniqueClicks, clicksByDay,
-  topLinks, topCountries, topBrowsers, topOs, topReferrers,
-  clicksByCountry,
-}: Props) {
+export default function StatisticsIndex({ days, totalClicks, uniqueClicks, clicksByDay, topLinks, topCountries, topBrowsers, topOs, topReferrers, clicksByCountry }: Props) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
@@ -85,16 +91,16 @@ export default function StatisticsIndex({
         {/* Header */}
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">{t('statistics.title')}</h1>
-            <p className="mt-1 text-sm text-muted">{t('statistics.subtitle')}</p>
+            <h1 className="text-foreground text-2xl font-bold tracking-tight">{t('statistics.title')}</h1>
+            <p className="text-muted mt-1 text-sm">{t('statistics.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="inline-flex overflow-hidden rounded-lg border border-line">
+            <div className="border-line inline-flex overflow-hidden rounded-lg border">
               {RANGES.map((d) => (
                 <button
                   key={d}
                   onClick={() => setDays(d)}
-                  className={`border-r border-line px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                  className={`border-line border-r px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
                     days === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
                   }`}
                 >
@@ -114,44 +120,38 @@ export default function StatisticsIndex({
         </div>
 
         {/* Clicks over time */}
-        <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
-          <h2 className="mb-4 text-sm font-semibold text-foreground">
-            {t('statistics.clicks_over_time')} <span className="font-normal text-muted">{t('statistics.last_days', { days: String(days) })}</span>
+        <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
+          <h2 className="text-foreground mb-4 text-sm font-semibold">
+            {t('statistics.clicks_over_time')} <span className="text-muted font-normal">{t('statistics.last_days', { days: String(days) })}</span>
           </h2>
           <ClicksBars data={clicksByDay} clicksLabel={t('statistics.clicks')} />
         </section>
 
         {/* Top links */}
-        <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-          <div className="border-b border-line px-4 py-3">
-            <h2 className="text-sm font-semibold text-foreground">{t('statistics.top_links')}</h2>
+        <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+          <div className="border-line border-b px-4 py-3">
+            <h2 className="text-foreground text-sm font-semibold">{t('statistics.top_links')}</h2>
           </div>
           {topLinks.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-subtle">{t('statistics.no_data')}</p>
+            <p className="text-subtle px-4 py-6 text-center text-sm">{t('statistics.no_data')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('statistics.columns.link')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-muted">{t('statistics.columns.clicks')}</th>
+                <tr className="border-line border-b">
+                  <th className="text-muted px-4 py-2.5 text-left text-xs font-semibold tracking-wider uppercase">{t('statistics.columns.link')}</th>
+                  <th className="text-muted px-4 py-2.5 text-right text-xs font-semibold tracking-wider uppercase">{t('statistics.columns.clicks')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-line divide-y">
                 {topLinks.map((link) => (
-                  <tr
-                    key={link.id}
-                    onClick={rowLink(route('app.project.links.show', { project: project!.id, url: link.id }))}
-                    className={`group ${ROW_LINK_CLASS}`}
-                  >
-                    <td className="px-4 py-2.5 font-medium text-foreground">
-                      <Link
-                        href={route('app.project.links.show', { project: project!.id, url: link.id })}
-                        className="hover:text-accent-soft-foreground"
-                      >
-                        <span className="text-subtle">{link.domain_name}/</span>{link.slug}
+                  <tr key={link.id} onClick={rowLink(route('app.project.links.show', { project: project!.id, url: link.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                    <td className="text-foreground px-4 py-2.5 font-medium">
+                      <Link href={route('app.project.links.show', { project: project!.id, url: link.id })} className="hover:text-accent-soft-foreground">
+                        <span className="text-subtle">{link.domain_name}/</span>
+                        {link.slug}
                       </Link>
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-muted">{link.clicks.toLocaleString()}</td>
+                    <td className="text-muted px-4 py-2.5 text-right tabular-nums">{link.clicks.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
