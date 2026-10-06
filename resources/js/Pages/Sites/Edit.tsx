@@ -1,48 +1,24 @@
+import CodeSnippet from '@/Components/CodeSnippet';
 import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, Checkbox, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import EnhancedMeasurementSection from '@/Pages/Sites/partials/EnhancedMeasurementSection';
 import { PageProps, Site } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { Check, Copy } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 
 type Option = { value: string; label: string };
-
-function CopyButton({ text }: { text: string }) {
-  const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-
-  function copy() {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
-
-  return (
-    <button
-      onClick={copy}
-      title={copied ? t('analytics.sites.copied') : t('analytics.sites.copy')}
-      className={`rounded-md p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
-        copied ? 'text-success-foreground' : 'text-subtle hover:bg-elevated hover:text-foreground'
-      }`}
-    >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </button>
-  );
-}
 
 export default function SitesEdit({
   site,
   trackingModes,
   consentModes,
-  snippetUrl,
+  snippet,
 }: {
   site: Site;
   trackingModes: Option[];
   consentModes: Option[];
-  snippetUrl: string;
+  snippet: string;
 }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
@@ -64,8 +40,6 @@ export default function SitesEdit({
     retention_days: data.retention_days === '' ? null : data.retention_days,
   }));
 
-  const snippet = `<script defer data-site="${site.tracking_id}" src="${snippetUrl}"></script>`;
-
   function submit(e: FormEvent) {
     e.preventDefault();
     put(route('app.project.sites.update', { project: project!.id, site: site.id }));
@@ -84,10 +58,7 @@ export default function SitesEdit({
         <div className="max-w-2xl">
           <div className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-4">
             <p className="mb-2 text-sm font-medium text-foreground">{t('analytics.sites.snippet_title')}</p>
-            <div className="flex items-start gap-2">
-              <code className="block flex-1 overflow-x-auto rounded-[var(--radius-sm)] bg-foreground p-3 text-xs text-canvas">{snippet}</code>
-              <CopyButton text={snippet} />
-            </div>
+            <CodeSnippet code={snippet} language="html" wrap className="w-full" />
             <p className="mt-2 text-xs text-muted">{t('analytics.sites.snippet_hint', { domain: site.domain })}</p>
           </div>
 

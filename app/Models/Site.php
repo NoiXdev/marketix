@@ -112,4 +112,16 @@ class Site extends Model
     {
         return array_values(array_filter(array_map('trim', explode(',', (string) $this->site_search_params))));
     }
+
+    public function trackingSnippet(): string
+    {
+        $src = rtrim((string) config('app.url'), '/').'/mx.js';
+
+        return '<script defer data-site="'.e($this->tracking_id).'" src="'.e($src).'"></script>';
+    }
+
+    public function hasTrackedVisits(): bool
+    {
+        return $this->visits()->where('is_bot', false)->exists();
+    }
 }

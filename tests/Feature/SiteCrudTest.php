@@ -69,6 +69,20 @@ class SiteCrudTest extends TestCase
             );
     }
 
+    public function test_edit_page_shows_the_tracking_snippet(): void
+    {
+        [$user, $project] = $this->userWithProject();
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->get(route('app.project.sites.edit', ['project' => $project->id, 'site' => $site->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Sites/Edit')
+                ->where('snippet', '<script defer data-site="'.$site->tracking_id.'" src="'.rtrim(config('app.url'), '/').'/mx.js"></script>')
+            );
+    }
+
     public function test_create_form_does_not_offer_own_banner_consent_mode(): void
     {
         [$user, $project] = $this->userWithProject();

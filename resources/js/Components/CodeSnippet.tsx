@@ -1,4 +1,4 @@
-import { highlightJs, TokenKind } from '@/lib/highlight';
+import { highlightHtml, highlightJs, Token, TokenKind } from '@/lib/highlight';
 import { useTranslation } from '@/lib/i18n';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
@@ -13,7 +13,14 @@ const COLORS: Record<TokenKind, string> = {
   plain: '',
 };
 
-export default function CodeSnippet({ code, className = '' }: { code: string; className?: string }) {
+const HIGHLIGHTERS: Record<CodeLanguage, (code: string) => Token[]> = {
+  js: highlightJs,
+  html: highlightHtml,
+};
+
+export type CodeLanguage = 'js' | 'html';
+
+export default function CodeSnippet({ code, language = 'js', wrap = false, className = '' }: { code: string; language?: CodeLanguage; wrap?: boolean; className?: string }) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
@@ -26,9 +33,11 @@ export default function CodeSnippet({ code, className = '' }: { code: string; cl
 
   return (
     <div className={`relative inline-flex max-w-full items-center rounded-[var(--radius-sm)] bg-[color:var(--code-bg)] text-left ${className}`}>
-      <pre className="overflow-x-auto py-2.5 pr-11 pl-3.5 font-mono text-xs leading-relaxed text-[color:var(--code-fg)]">
+      <pre
+        className={`min-w-0 flex-1 py-2.5 pr-11 pl-3.5 font-mono text-xs leading-relaxed text-[color:var(--code-fg)] ${wrap ? '[overflow-wrap:anywhere] whitespace-pre-wrap' : 'overflow-x-auto'}`}
+      >
         <code>
-          {highlightJs(code).map((token, i) => (
+          {HIGHLIGHTERS[language](code).map((token, i) => (
             <span key={i} className={COLORS[token.kind]}>
               {token.text}
             </span>

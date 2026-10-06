@@ -31,8 +31,9 @@ class AnalyticsController extends Controller
         $project = $request->get('project');
         $model = $project->sites()->findOrFail($site);
 
+        $hasData = $model->hasTrackedVisits();
         $tab = $request->input('tab');
-        $tab = in_array($tab, self::TABS, true) ? $tab : 'overview';
+        $tab = $hasData && in_array($tab, self::TABS, true) ? $tab : 'overview';
 
         $filters = $request->input('filters');
         $period = PeriodResolver::resolve(
@@ -46,6 +47,8 @@ class AnalyticsController extends Controller
                 'name' => $model->name,
                 'domain' => $model->domain,
                 'search_enabled' => $model->searchParams() !== [],
+                'has_data' => $hasData,
+                'snippet' => $model->trackingSnippet(),
             ],
             'tab' => $tab,
             'period' => $period->toArray(),

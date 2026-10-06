@@ -121,6 +121,8 @@ class AnalyticsDashboardTest extends TestCase
 
     public function test_audience_tab(): void
     {
+        Visit::factory()->forSite($this->site)->create();
+
         $this->dashboard('?tab=audience')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
@@ -151,6 +153,24 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('goals.0.byCampaign')
                 ->missing('summary')
             );
+    }
+
+    public function test_site_without_visits_exposes_the_setup_snippet_and_only_the_overview(): void
+    {
+        $this->dashboard('?tab=acquisition')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('site.has_data', false)
+                ->where('site.snippet', $this->site->trackingSnippet())
+                ->where('tab', 'overview')
+                ->has('summary')
+                ->missing('utmSources')
+            );
+
+        Visit::factory()->forSite($this->site)->create();
+
+        $this->dashboard()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('site.has_data', true));
     }
 
     public function test_unknown_tab_falls_back_to_overview(): void

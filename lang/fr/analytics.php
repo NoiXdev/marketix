@@ -154,8 +154,14 @@ return [
             ],
         ],
 
+        'setup' => [
+            'title' => 'Aucune donnée reçue pour l’instant',
+            'text' => 'Ajoutez cet extrait dans le <head> de chaque page de :domain. Dès la première visite, vos rapports apparaissent ici.',
+            'waiting' => 'En attente de la première visite – cette page se met à jour automatiquement.',
+        ],
+
         'realtime' => [
-            'window' => '30 dernières minutes',
+            'window' =>'30 dernières minutes',
             'auto_refresh' => 'En direct – actualisation automatique toutes les :seconds secondes.',
             'active_now' => 'Actifs en ce moment',
             'active_hint' => 'Visiteurs actifs au cours des 5 dernières minutes',
