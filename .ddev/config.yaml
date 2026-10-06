@@ -18,6 +18,13 @@ web_environment:
   - LARAVEL_PDF_CHROME_PATH=/usr/bin/chromium
   - LARAVEL_PDF_NO_SANDBOX=true
 corepack_enable: false
+# Process queued jobs (analytics page views, click statistics, reports) while
+# the project runs. queue:listen boots fresh per job, so code changes apply
+# without a restart.
+web_extra_daemons:
+  - name: queue
+    command: php artisan queue:listen --tries=1 --timeout=0
+    directory: /var/www/html
 
 # Key features of DDEV's config.yaml:
 
