@@ -219,7 +219,7 @@ return [
         ],
 
         'realtime' => [
-            'window' =>'Letzte 30 Minuten',
+            'window' => 'Letzte 30 Minuten',
             'auto_refresh' => 'Live – aktualisiert sich alle :seconds Sekunden automatisch.',
             'active_now' => 'Gerade aktiv',
             'active_hint' => 'Besucher mit Aktivität in den letzten 5 Minuten',
@@ -351,19 +351,12 @@ return [
         ],
 
         'visitor_types' => [
-
             'title' => 'Neue vs. wiederkehrende Besucher',
-
             'new' => 'Neue Besucher',
-
             'returning' => 'Wiederkehrende Besucher',
-
             'note' => ':sessions Sitzungen · :rate % Engagement',
-
             'cookieless_hint' => 'Ohne Cookies wird ein Besucher nur am selben Tag wiedererkannt. Wer an einem anderen Tag zurückkommt, zählt als neu.',
-
         ],
-
 
         'interactions' => [
             'title' => 'Interaktionen',

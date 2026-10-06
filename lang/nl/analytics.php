@@ -219,7 +219,7 @@ return [
         ],
 
         'realtime' => [
-            'window' =>'Laatste 30 minuten',
+            'window' => 'Laatste 30 minuten',
             'auto_refresh' => 'Live – ververst automatisch elke :seconds seconden.',
             'active_now' => 'Nu actief',
             'active_hint' => 'Bezoekers actief in de laatste 5 minuten',
@@ -267,7 +267,7 @@ return [
             'change' => 'Verandering',
             'current' => 'Huidig',
             'previous' => 'Vergelijking',
-            'select_metric' =>'Selecteer minstens één metriek.',
+            'select_metric' => 'Selecteer minstens één metriek.',
             'scale_hint' => 'Paginaweergaven en unieke bezoekers delen één schaal; elke lijn is geschaald naar zijn piek in deze periode. Exacte waarden in de tooltip of de tabel.',
         ],
 
@@ -351,19 +351,12 @@ return [
         ],
 
         'visitor_types' => [
-
             'title' => 'Nieuwe vs. terugkerende bezoekers',
-
             'new' => 'Nieuwe bezoekers',
-
             'returning' => 'Terugkerende bezoekers',
-
             'note' => ':sessions sessies · :rate % betrokkenheid',
-
             'cookieless_hint' => 'Zonder cookies wordt een bezoeker alleen op dezelfde dag herkend. Wie op een andere dag terugkomt, telt als nieuw.',
-
         ],
-
 
         'interactions' => [
             'title' => 'Interacties',
