@@ -154,8 +154,14 @@ return [
             ],
         ],
 
+        'setup' => [
+            'title' => 'Noch keine Daten empfangen',
+            'text' => 'Fügen Sie dieses Snippet in den <head> jeder Seite von :domain ein. Sobald der erste Besuch eingeht, erscheinen hier Ihre Auswertungen.',
+            'waiting' => 'Warte auf den ersten Besuch – diese Seite aktualisiert sich automatisch.',
+        ],
+
         'realtime' => [
-            'window' => 'Letzte 30 Minuten',
+            'window' =>'Letzte 30 Minuten',
             'auto_refresh' => 'Live – aktualisiert sich alle :seconds Sekunden automatisch.',
             'active_now' => 'Gerade aktiv',
             'active_hint' => 'Besucher mit Aktivität in den letzten 5 Minuten',

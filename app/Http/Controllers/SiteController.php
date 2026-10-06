@@ -70,7 +70,7 @@ class SiteController extends Controller
             ],
             'trackingModes' => TrackingMode::options(),
             'consentModes' => ConsentMode::selectableOptions(),
-            'snippetUrl' => rtrim(config('app.url'), '/').'/mx.js',
+            'snippet' => $model->trackingSnippet(),
         ]);
     }
 

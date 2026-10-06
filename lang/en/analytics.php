@@ -154,8 +154,14 @@ return [
             ],
         ],
 
+        'setup' => [
+            'title' => 'No data received yet',
+            'text' => 'Add this snippet to the <head> of every page on :domain. As soon as the first visit comes in, your reports appear here.',
+            'waiting' => 'Waiting for the first visit – this page updates automatically.',
+        ],
+
         'realtime' => [
-            'window' => 'Last 30 minutes',
+            'window' =>'Last 30 minutes',
             'auto_refresh' => 'Live – refreshes automatically every :seconds seconds.',
             'active_now' => 'Active right now',
             'active_hint' => 'Visitors active in the last 5 minutes',

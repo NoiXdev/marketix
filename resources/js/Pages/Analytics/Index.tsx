@@ -9,6 +9,7 @@ import DateRangePicker from '@/Pages/Analytics/partials/DateRangePicker';
 import FilterBar, { ActiveFilter } from '@/Pages/Analytics/partials/FilterBar';
 import LiveVisitors from '@/Pages/Analytics/partials/LiveVisitors';
 import { COMPARISONS, Comparison, Period } from '@/Pages/Analytics/partials/period';
+import TrackingSetup from '@/Pages/Analytics/partials/TrackingSetup';
 import AcquisitionTab, { AcquisitionData } from '@/Pages/Analytics/tabs/AcquisitionTab';
 import AudienceTab, { AudienceData } from '@/Pages/Analytics/tabs/AudienceTab';
 import BehaviorTab, { BehaviorData } from '@/Pages/Analytics/tabs/BehaviorTab';
@@ -61,11 +62,11 @@ function Header({ liveVisitors }: { liveVisitors: number }) {
         <BackLink href={route('app.project.sites.index', { project: projectId })}>{t('analytics.dashboard.back')}</BackLink>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="text-foreground text-2xl font-bold tracking-tight">{site.name}</h1>
-          <LiveVisitors count={liveVisitors} />
+          {site.has_data && <LiveVisitors count={liveVisitors} />}
         </div>
         <p className="text-muted mt-1 text-sm">{site.domain}</p>
       </div>
-      {tab === 'realtime' ? (
+      {!site.has_data ? null : tab === 'realtime' ? (
         <span className="border-line bg-surface text-muted inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold shadow-[var(--shadow-sm)]">
           <Clock className="text-subtle h-4 w-4" />
           {t('analytics.dashboard.realtime.window')}
@@ -145,11 +146,26 @@ export default function AnalyticsIndex({ site, tab, period, filters, liveVisitor
       <AnalyticsProvider projectId={project!.id} site={site} tab={tab} period={period} filters={filters}>
         <div className="px-8 py-8">
           <Header liveVisitors={liveVisitors} />
-          <AnalyticsTabs />
-          {tab !== 'realtime' && <ActiveFilters />}
-          <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
-            <ActiveTab tab={tab} data={data} />
-          </div>
+          {site.has_data ? (
+            <>
+              <AnalyticsTabs />
+              {tab !== 'realtime' && <ActiveFilters />}
+              <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
+                <ActiveTab tab={tab} data={data} />
+              </div>
+            </>
+          ) : (
+            <>
+              <TrackingSetup />
+              <div
+                inert
+                aria-hidden
+                className="pointer-events-none max-h-[560px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_35%,transparent)] opacity-50 grayscale select-none"
+              >
+                <ActiveTab tab={tab} data={data} />
+              </div>
+            </>
+          )}
         </div>
       </AnalyticsProvider>
     </AppLayout>

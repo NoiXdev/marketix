@@ -154,8 +154,14 @@ return [
             ],
         ],
 
+        'setup' => [
+            'title' => 'Nog geen gegevens ontvangen',
+            'text' => 'Voeg dit fragment toe aan de <head> van elke pagina van :domain. Zodra het eerste bezoek binnenkomt, verschijnen hier uw rapporten.',
+            'waiting' => 'Wachten op het eerste bezoek – deze pagina wordt automatisch bijgewerkt.',
+        ],
+
         'realtime' => [
-            'window' => 'Laatste 30 minuten',
+            'window' =>'Laatste 30 minuten',
             'auto_refresh' => 'Live – ververst automatisch elke :seconds seconden.',
             'active_now' => 'Nu actief',
             'active_hint' => 'Bezoekers actief in de laatste 5 minuten',
