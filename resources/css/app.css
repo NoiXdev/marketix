@@ -5,6 +5,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme:light;
   --canvas:#f4f6f8; --surface:#ffffff; --elevated:#eef1f5; --line:#e2e6ec; --line-strong:#d3d9e2;
   --foreground:#1b1f27; --muted:#626c7d; --subtle:#8a94a4;
   --accent:#0d9488; --accent-hover:#0f766e; --accent-foreground:#ffffff;
@@ -20,9 +21,11 @@
   --chart-views:#0d9488; --chart-visitors:#2a78d6; --chart-bounce:#d55181; --chart-duration:#4a3aa7; --chart-campaign:#c98500; --chart-engagement:#1a7a43;
   --code-bg:#1b1f27; --code-fg:#e5e7eb; --code-function:#7dd3fc; --code-string:#86efac; --code-number:#fdba74;
   --code-key:#c4b5fd; --code-keyword:#f9a8d4; --code-punctuation:#94a3b8;
+  --scrollbar-thumb:#c3cad4; --scrollbar-thumb-hover:#a3acba;
 }
 
 .dark {
+  color-scheme:dark;
   --canvas:#14161b; --surface:#1b1e25; --elevated:#22262f; --line:#2b303a; --line-strong:#363c48;
   --foreground:#e7eaf0; --muted:#9aa3b2; --subtle:#6c7688;
   --accent:#3fc9b8; --accent-hover:#57d3c3; --accent-foreground:#04140f;
@@ -36,6 +39,7 @@
   --map-1:#0a6b60; --map-2:#0d9488; --map-3:#43c2ac; --map-4:#8fddcf; --map-5:#d5f0ea;
   --chart-views:#20a090; --chart-visitors:#3987e5; --chart-bounce:#d55181; --chart-duration:#9085e9; --chart-campaign:#c98500; --chart-engagement:#1a7a43;
   --code-bg:#0d0f13;
+  --scrollbar-thumb:#3a404c; --scrollbar-thumb-hover:#4c5362;
 }
 
 @theme inline {
@@ -48,4 +52,20 @@
   --color-warning-soft:var(--warning-soft); --color-warning-foreground:var(--warning-foreground);
   --color-danger-soft:var(--danger-soft);   --color-danger-foreground:var(--danger-foreground);
   --color-neutral-soft:var(--neutral-soft); --color-neutral-foreground:var(--neutral-foreground);
+}
+
+/* Scrollbars follow the active theme. `scrollbar-width` is not inherited, hence `*`. */
+@layer base {
+  * {
+    scrollbar-width:thin;
+    scrollbar-color:var(--scrollbar-thumb) transparent;
+  }
+}
+
+/* Fallback for engines without the standard properties (Safari) */
+@supports not (scrollbar-color:auto) {
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background:transparent; }
+  ::-webkit-scrollbar-thumb { background-color:var(--scrollbar-thumb); background-clip:content-box; border:2px solid transparent; border-radius:9999px; }
+  ::-webkit-scrollbar-thumb:hover { background-color:var(--scrollbar-thumb-hover); }
 }
