@@ -117,6 +117,33 @@ class AnalyticsAggregatorTest extends TestCase
         $this->assertSame(1, $this->agg->totalPageViews($site->id, AnalyticsQuery::lastDays(30, ['hostname' => 'staging.example.com'])));
     }
 
+    public function test_visitor_types_split_new_and_returning_visits(): void
+    {
+        $site = Site::factory()->create();
+        Visit::factory()->forSite($site)->create(['visitor_hash' => 'a', 'is_returning' => false, 'pageview_count' => 1]);
+        Visit::factory()->forSite($site)->create(['visitor_hash' => 'a', 'is_returning' => true, 'pageview_count' => 3]);
+        Visit::factory()->forSite($site)->create(['visitor_hash' => 'b', 'is_returning' => true, 'pageview_count' => 1]);
+        Visit::factory()->forSite($site)->create(['visitor_hash' => 'c', 'is_returning' => false, 'pageview_count' => 1]);
+
+        $this->assertSame([
+            ['type' => 'new', 'visitors' => 2, 'sessions' => 2, 'engagement_rate' => 0.0],
+            ['type' => 'returning', 'visitors' => 2, 'sessions' => 2, 'engagement_rate' => 50.0],
+        ], $this->agg->visitorTypes($site->id, 30));
+    }
+
+    public function test_visitor_type_filter_narrows_reports_and_ignores_unknown_values(): void
+    {
+        $site = Site::factory()->create();
+        $first = Visit::factory()->forSite($site)->create(['is_returning' => false]);
+        $later = Visit::factory()->forSite($site)->create(['is_returning' => true]);
+        PageView::factory()->forVisit($first)->create();
+        PageView::factory()->forVisit($later)->count(2)->create();
+
+        $this->assertSame(2, $this->agg->totalPageViews($site->id, AnalyticsQuery::lastDays(30, ['visitor_type' => 'returning'])));
+        $this->assertSame(1, $this->agg->totalSessions($site->id, AnalyticsQuery::lastDays(30, ['visitor_type' => 'new'])));
+        $this->assertSame(2, $this->agg->totalSessions($site->id, AnalyticsQuery::lastDays(30, ['visitor_type' => 'bogus'])));
+    }
+
     public function test_locations_reject_unknown_column(): void
     {
         $this->expectException(\InvalidArgumentException::class);

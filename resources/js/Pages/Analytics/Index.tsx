@@ -109,6 +109,8 @@ function ActiveFilters() {
         );
       case 'language':
         return languageName(value, locale);
+      case 'visitor_type':
+        return t(`analytics.dashboard.visitor_types.${value}`);
       default:
         return value;
     }

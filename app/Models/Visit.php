@@ -36,6 +36,7 @@ class Visit extends Model
         'utm_term',
         'utm_content',
         'is_bot',
+        'is_returning',
     ];
 
     public function site(): BelongsTo
@@ -55,6 +56,7 @@ class Visit extends Model
             'last_activity_at' => 'datetime',
             'pageview_count' => 'integer',
             'is_bot' => 'boolean',
+            'is_returning' => 'boolean',
         ];
     }
 }

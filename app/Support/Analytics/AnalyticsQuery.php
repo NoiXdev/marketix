@@ -23,7 +23,10 @@ final class AnalyticsQuery
         'utm_source',
         'utm_medium',
         'utm_campaign',
+        'visitor_type',
     ];
+
+    public const VISITOR_TYPES = ['new', 'returning'];
 
     public const INTERVALS = ['hour', 'day', 'week', 'month'];
 

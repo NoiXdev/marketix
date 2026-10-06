@@ -350,6 +350,21 @@ return [
             'engagement_time' => 'Gem. :time actief',
         ],
 
+        'visitor_types' => [
+
+            'title' => 'Nieuwe vs. terugkerende bezoekers',
+
+            'new' => 'Nieuwe bezoekers',
+
+            'returning' => 'Terugkerende bezoekers',
+
+            'note' => ':sessions sessies · :rate % betrokkenheid',
+
+            'cookieless_hint' => 'Zonder cookies wordt een bezoeker alleen op dezelfde dag herkend. Wie op een andere dag terugkomt, telt als nieuw.',
+
+        ],
+
+
         'interactions' => [
             'title' => 'Interacties',
             'outbound' => 'Uitgaande links',
@@ -396,6 +411,7 @@ return [
                 'utm_source' => 'Bron',
                 'utm_medium' => 'Medium',
                 'utm_campaign' => 'Campagne',
+                'visitor_type' => 'Type bezoeker',
             ],
         ],
 

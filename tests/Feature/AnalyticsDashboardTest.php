@@ -136,6 +136,8 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('devices')
                 ->has('browsers')
                 ->has('operatingSystems')
+                ->has('visitorTypes', 2)
+                ->where('site.tracking_mode', $this->site->tracking_mode->value)
                 ->missing('summary')
             );
     }

@@ -5,7 +5,19 @@ import { ReactNode, useState } from 'react';
 
 export type BreakdownTab = { key: string; label: string; rows: RankRow[]; emptyLabel?: string; empty?: ReactNode };
 
-export default function BreakdownCard({ title, tabs, emptyLabel, more }: { title: string; tabs: BreakdownTab[]; emptyLabel: string; more?: { href: string; label: string } }) {
+export default function BreakdownCard({
+  title,
+  tabs,
+  emptyLabel,
+  more,
+  hint,
+}: {
+  title: string;
+  tabs: BreakdownTab[];
+  emptyLabel: string;
+  more?: { href: string; label: string };
+  hint?: string;
+}) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
   const active = tabs.find((tab) => tab.key === activeKey) ?? tabs[0];
 
@@ -39,6 +51,7 @@ export default function BreakdownCard({ title, tabs, emptyLabel, more }: { title
           <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
         )}
       </div>
+      {hint && <p className="border-line text-subtle border-t px-4 py-3 text-xs">{hint}</p>}
       {more && (
         <Link
           href={more.href}
