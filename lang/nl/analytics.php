@@ -126,10 +126,34 @@ return [
                 'label' => 'Conversies',
                 'description' => 'Hoeveel bezoeken uw doelen bereiken – en waar bezoekers onderweg afhaken.',
             ],
+            'realtime' => [
+                'label' => 'Realtime',
+                'description' => 'Wat er nu op uw website gebeurt – in de laatste 30 minuten.',
+            ],
             'revenue' => [
                 'label' => 'Omzet',
                 'description' => 'Hoeveel omzet uw website oplevert – en welke kanalen, campagnes en pagina’s daaraan bijdragen.',
             ],
+        ],
+
+        'realtime' => [
+            'window' => 'Laatste 30 minuten',
+            'auto_refresh' => 'Live – ververst automatisch elke :seconds seconden.',
+            'active_now' => 'Nu actief',
+            'active_hint' => 'Bezoekers actief in de laatste 5 minuten',
+            'visitors' => 'Bezoekers',
+            'last_30' => 'in de laatste 30 minuten',
+            'per_minute' => 'Paginaweergaven per minuut',
+            'hover_hint' => 'Beweeg over een balk voor details.',
+            'minute_detail' => ':when: :views paginaweergaven · :visitors bezoekers',
+            'minutes_ago' => ':count min geleden',
+            'now' => 'Nu',
+            'active_pages' => 'Actieve pagina’s',
+            'feed' => 'Recente activiteit',
+            'event' => 'Event „:name”',
+            'nobody' => 'Nu niemand',
+            'empty_title' => 'Nu geen bezoekers',
+            'empty_text' => 'Zodra iemand uw website bezoekt, verschijnt dat hier binnen enkele seconden.',
         ],
 
         'revenue' => [

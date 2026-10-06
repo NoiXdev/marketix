@@ -14,13 +14,15 @@ import AudienceTab, { AudienceData } from '@/Pages/Analytics/tabs/AudienceTab';
 import BehaviorTab, { BehaviorData } from '@/Pages/Analytics/tabs/BehaviorTab';
 import ConversionsTab, { ConversionsData } from '@/Pages/Analytics/tabs/ConversionsTab';
 import OverviewTab, { OverviewData } from '@/Pages/Analytics/tabs/OverviewTab';
+import RealtimeTab, { RealtimeData } from '@/Pages/Analytics/tabs/RealtimeTab';
 import RevenueTab, { RevenueData } from '@/Pages/Analytics/tabs/RevenueTab';
 import { FilterKey, Filters, SiteInfo, TabKey } from '@/Pages/Analytics/types';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
+import { Clock } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
-type TabData = OverviewData & AcquisitionData & BehaviorData & AudienceData & ConversionsData & RevenueData;
+type TabData = OverviewData & RealtimeData & AcquisitionData & BehaviorData & AudienceData & ConversionsData & RevenueData;
 
 type AnalyticsPageProps = {
   site: SiteInfo;
@@ -32,6 +34,8 @@ type AnalyticsPageProps = {
 
 function ActiveTab({ tab, data }: { tab: TabKey; data: Partial<TabData> }) {
   switch (tab) {
+    case 'realtime':
+      return <RealtimeTab {...(data as RealtimeData)} />;
     case 'acquisition':
       return <AcquisitionTab {...(data as AcquisitionData)} />;
     case 'behavior':
@@ -49,7 +53,7 @@ function ActiveTab({ tab, data }: { tab: TabKey; data: Partial<TabData> }) {
 
 function Header({ liveVisitors }: { liveVisitors: number }) {
   const { t } = useTranslation();
-  const { projectId, site, period, go } = useAnalytics();
+  const { projectId, site, tab, period, go } = useAnalytics();
 
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -61,21 +65,28 @@ function Header({ liveVisitors }: { liveVisitors: number }) {
         </div>
         <p className="text-muted mt-1 text-sm">{site.domain}</p>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <DateRangePicker period={period} onSelect={(range, custom) => go({ range, ...custom })} />
-        <select
-          aria-label={t('analytics.dashboard.compare.label')}
-          value={period.compare}
-          onChange={(e) => go({ compare: e.target.value as Comparison })}
-          className="border-line bg-surface text-foreground hover:bg-elevated rounded-lg border py-1.5 pr-8 pl-3 text-sm font-semibold shadow-[var(--shadow-sm)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
-        >
-          {COMPARISONS.map((option) => (
-            <option key={option} value={option}>
-              {t(`analytics.dashboard.compare.${option}`)}
-            </option>
-          ))}
-        </select>
-      </div>
+      {tab === 'realtime' ? (
+        <span className="border-line bg-surface text-muted inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold shadow-[var(--shadow-sm)]">
+          <Clock className="text-subtle h-4 w-4" />
+          {t('analytics.dashboard.realtime.window')}
+        </span>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <DateRangePicker period={period} onSelect={(range, custom) => go({ range, ...custom })} />
+          <select
+            aria-label={t('analytics.dashboard.compare.label')}
+            value={period.compare}
+            onChange={(e) => go({ compare: e.target.value as Comparison })}
+            className="border-line bg-surface text-foreground hover:bg-elevated rounded-lg border py-1.5 pr-8 pl-3 text-sm font-semibold shadow-[var(--shadow-sm)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
+          >
+            {COMPARISONS.map((option) => (
+              <option key={option} value={option}>
+                {t(`analytics.dashboard.compare.${option}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }
@@ -135,7 +146,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, liveVisitor
         <div className="px-8 py-8">
           <Header liveVisitors={liveVisitors} />
           <AnalyticsTabs />
-          <ActiveFilters />
+          {tab !== 'realtime' && <ActiveFilters />}
           <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
             <ActiveTab tab={tab} data={data} />
           </div>

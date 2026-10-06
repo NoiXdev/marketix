@@ -126,10 +126,34 @@ return [
                 'label' => 'Conversions',
                 'description' => 'Combien de visites atteignent vos objectifs – et où les visiteurs abandonnent en chemin.',
             ],
+            'realtime' => [
+                'label' => 'Temps réel',
+                'description' => 'Ce qui se passe sur votre site en ce moment – au cours des 30 dernières minutes.',
+            ],
             'revenue' => [
                 'label' => 'Chiffre d’affaires',
                 'description' => 'Le chiffre d’affaires généré par votre site – et les canaux, campagnes et pages qui y contribuent.',
             ],
+        ],
+
+        'realtime' => [
+            'window' => '30 dernières minutes',
+            'auto_refresh' => 'En direct – actualisation automatique toutes les :seconds secondes.',
+            'active_now' => 'Actifs en ce moment',
+            'active_hint' => 'Visiteurs actifs au cours des 5 dernières minutes',
+            'visitors' => 'Visiteurs',
+            'last_30' => 'au cours des 30 dernières minutes',
+            'per_minute' => 'Pages vues par minute',
+            'hover_hint' => 'Survolez une barre pour plus de détails.',
+            'minute_detail' => ':when : :views pages vues · :visitors visiteurs',
+            'minutes_ago' => 'il y a :count min',
+            'now' => 'Maintenant',
+            'active_pages' => 'Pages actives',
+            'feed' => 'Activité récente',
+            'event' => 'Événement « :name »',
+            'nobody' => 'Personne en ce moment',
+            'empty_title' => 'Aucun visiteur en ce moment',
+            'empty_text' => 'Dès que quelqu’un visite votre site, cela apparaît ici en quelques secondes.',
         ],
 
         'revenue' => [

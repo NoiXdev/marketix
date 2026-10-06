@@ -8,6 +8,7 @@ use App\Models\Site;
 use App\Services\AnalyticsAggregator;
 use App\Services\FunnelAggregator;
 use App\Services\GoalAggregator;
+use App\Services\RealtimeAggregator;
 use App\Services\RevenueAggregator;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
@@ -15,13 +16,14 @@ use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
-    public const TABS = ['overview', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
+    public const TABS = ['overview', 'realtime', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
 
     public function __construct(
         private AnalyticsAggregator $agg,
         private GoalAggregator $goals,
         private FunnelAggregator $funnels,
         private RevenueAggregator $revenueReports,
+        private RealtimeAggregator $realtimeReports,
     ) {}
 
     public function show(Request $request, string $site)
@@ -62,6 +64,7 @@ class AnalyticsController extends Controller
             'audience' => $this->audience($site->id, $period),
             'conversions' => $this->conversions($site, $period),
             'revenue' => $this->revenue($site->id, $period),
+            'realtime' => ['realtime' => fn () => $this->realtimeReports->snapshot($site->id)],
             default => $this->overview($site->id, $period),
         };
     }

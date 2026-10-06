@@ -2,10 +2,11 @@ import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import { TabKey, TABS } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
-import { Banknote, Globe2, LayoutDashboard, LucideIcon, Megaphone, MousePointerClick, Target } from 'lucide-react';
+import { Banknote, Globe2, LayoutDashboard, LucideIcon, Megaphone, MousePointerClick, Radio, Target } from 'lucide-react';
 
 const ICONS: Record<TabKey, LucideIcon> = {
   overview: LayoutDashboard,
+  realtime: Radio,
   acquisition: Megaphone,
   behavior: MousePointerClick,
   audience: Globe2,

@@ -126,10 +126,34 @@ return [
                 'label' => 'Conversions',
                 'description' => 'How many visits reach your goals – and where visitors drop off on the way.',
             ],
+            'realtime' => [
+                'label' => 'Realtime',
+                'description' => 'What is happening on your website right now – in the last 30 minutes.',
+            ],
             'revenue' => [
                 'label' => 'Revenue',
                 'description' => 'How much revenue your website generates – and which channels, campaigns and pages contribute.',
             ],
+        ],
+
+        'realtime' => [
+            'window' => 'Last 30 minutes',
+            'auto_refresh' => 'Live – refreshes automatically every :seconds seconds.',
+            'active_now' => 'Active right now',
+            'active_hint' => 'Visitors active in the last 5 minutes',
+            'visitors' => 'Visitors',
+            'last_30' => 'in the last 30 minutes',
+            'per_minute' => 'Page views per minute',
+            'hover_hint' => 'Hover over a bar for details.',
+            'minute_detail' => ':when: :views page views · :visitors visitors',
+            'minutes_ago' => ':count min ago',
+            'now' => 'Now',
+            'active_pages' => 'Active pages',
+            'feed' => 'Latest activity',
+            'event' => 'Event “:name”',
+            'nobody' => 'Nobody right now',
+            'empty_title' => 'No visitors right now',
+            'empty_text' => 'As soon as someone visits your website, it shows up here within a few seconds.',
         ],
 
         'revenue' => [
