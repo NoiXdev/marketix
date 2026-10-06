@@ -232,8 +232,11 @@ return [
             'search_title' => 'Search & error pages',
             'searches' => 'Search terms',
             'not_found' => '404 pages',
-            'search_disabled' => 'Search terms are not tracked for this site. You can enable them in the site settings under “Enhanced measurement”.',
-            'not_found_hint' => "No 404 pages tracked yet. Call marketix('404') on your error page.",
+            'search_disabled_title' => 'Search terms are not enabled',
+            'search_disabled_text' => 'Add the URL parameters of your site search (e.g. q) in the site settings under “Enhanced measurement”. You will then see here what your visitors search for.',
+            'open_settings' => 'Open site settings',
+            'not_found_empty_title' => 'No 404 pages tracked yet',
+            'not_found_empty_text' => 'Add this call to your error page. You will then see here which non-existent pages are requested.',
         ],
 
         'channels' => [

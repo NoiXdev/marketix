@@ -1,6 +1,7 @@
 import { LinkButton } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
+import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import FunnelCard from '@/Pages/Analytics/partials/FunnelCard';
 import { FunnelReport, GoalCard } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
@@ -28,13 +29,14 @@ export default function ConversionsTab({ goals, funnels }: ConversionsData) {
         )}
       </div>
       {funnels.length === 0 ? (
-        <div className="border-line bg-surface mb-8 flex flex-col items-center rounded-[var(--radius)] border border-dashed px-6 py-8 text-center">
-          <span className="bg-accent-soft text-accent-soft-foreground mb-3 grid h-10 w-10 place-items-center rounded-full">
-            <Filter className="h-5 w-5" />
-          </span>
-          <p className="text-foreground text-sm font-semibold">{t('analytics.dashboard.funnels.empty_title')}</p>
-          <p className="text-muted mt-1 mb-4 max-w-md text-sm">{t('analytics.dashboard.funnels.empty_text')}</p>
-          <LinkButton href={createFunnel}>{t('analytics.dashboard.funnels.create')}</LinkButton>
+        <div className="mb-8">
+          <AnalyticsEmptyState
+            framed
+            icon={Filter}
+            title={t('analytics.dashboard.funnels.empty_title')}
+            text={t('analytics.dashboard.funnels.empty_text')}
+            action={<LinkButton href={createFunnel}>{t('analytics.dashboard.funnels.create')}</LinkButton>}
+          />
         </div>
       ) : (
         <div className="mb-8 grid grid-cols-1 gap-3.5 xl:grid-cols-2">

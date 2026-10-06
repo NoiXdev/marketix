@@ -6,6 +6,8 @@ import ActivityHeatmap from '@/Pages/Analytics/partials/ActivityHeatmap';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import { EventRow, Interactions, Rank } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
+import { LinkButton } from '@/Components/ui';
+import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import { FileDown, FileX, Search } from 'lucide-react';
 
 export type BehaviorData = {
@@ -98,13 +100,31 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, interacti
               key: 'searches',
               label: t('analytics.dashboard.interactions.searches'),
               rows: valueRows(interactions.searches, () => ({ prefix: <Search className="text-subtle mx-auto h-4 w-4" /> })),
-              emptyLabel: site.search_enabled ? noData : t('analytics.dashboard.interactions.search_disabled'),
+              empty: site.search_enabled ? undefined : (
+                <AnalyticsEmptyState
+                  icon={Search}
+                  title={t('analytics.dashboard.interactions.search_disabled_title')}
+                  text={t('analytics.dashboard.interactions.search_disabled_text')}
+                  action={
+                    <LinkButton variant="secondary" size="sm" href={route('app.project.sites.edit', { project: projectId, site: site.id })}>
+                      {t('analytics.dashboard.interactions.open_settings')}
+                    </LinkButton>
+                  }
+                />
+              ),
             },
             {
               key: 'not_found',
               label: t('analytics.dashboard.interactions.not_found'),
               rows: valueRows(interactions.notFound, () => ({ prefix: <FileX className="text-subtle mx-auto h-4 w-4" /> })),
-              emptyLabel: t('analytics.dashboard.interactions.not_found_hint'),
+              empty: (
+                <AnalyticsEmptyState
+                  icon={FileX}
+                  title={t('analytics.dashboard.interactions.not_found_empty_title')}
+                  text={t('analytics.dashboard.interactions.not_found_empty_text')}
+                  code="marketix('404');"
+                />
+              ),
             },
           ]}
         />

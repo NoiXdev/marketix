@@ -1,3 +1,4 @@
+import CodeSnippet from '@/Components/CodeSnippet';
 import { Checkbox, Field, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 
@@ -44,10 +45,10 @@ export default function EnhancedMeasurementSection({
         />
       </Field>
 
-      <p className="text-xs text-muted">
-        {t('analytics.sites.measurement.not_found_hint')}{' '}
-        <code className="rounded bg-elevated px-1 py-0.5 font-mono text-foreground">marketix(&apos;404&apos;)</code>
-      </p>
+      <div>
+        <p className="mb-2 text-xs text-muted">{t('analytics.sites.measurement.not_found_hint')}</p>
+        <CodeSnippet code="marketix('404');" />
+      </div>
     </FormSection>
   );
 }

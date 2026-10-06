@@ -232,8 +232,11 @@ return [
             'search_title' => 'Suche & Fehlerseiten',
             'searches' => 'Suchbegriffe',
             'not_found' => '404-Seiten',
-            'search_disabled' => 'Suchbegriffe werden für diese Website nicht erfasst. Sie können das in den Website-Einstellungen unter „Erweiterte Messung“ aktivieren.',
-            'not_found_hint' => "Keine 404-Seiten erfasst. Rufen Sie auf Ihrer Fehlerseite marketix('404') auf.",
+            'search_disabled_title' => 'Suchbegriffe sind nicht aktiviert',
+            'search_disabled_text' => 'Hinterlegen Sie in den Website-Einstellungen unter „Erweiterte Messung“ die URL-Parameter Ihrer Website-Suche, z. B. q. Danach sehen Sie hier, wonach Ihre Besucher suchen.',
+            'open_settings' => 'Website-Einstellungen öffnen',
+            'not_found_empty_title' => 'Noch keine 404-Seiten erfasst',
+            'not_found_empty_text' => 'Fügen Sie diesen Aufruf auf Ihrer Fehlerseite ein. Danach sehen Sie hier, welche nicht existierenden Seiten aufgerufen werden.',
         ],
 
         'channels' => [

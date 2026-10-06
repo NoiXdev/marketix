@@ -232,8 +232,11 @@ return [
             'search_title' => 'Recherche & pages d’erreur',
             'searches' => 'Termes de recherche',
             'not_found' => 'Pages 404',
-            'search_disabled' => 'Les termes de recherche ne sont pas mesurés pour ce site. Vous pouvez les activer dans les paramètres du site sous « Mesure avancée ».',
-            'not_found_hint' => "Aucune page 404 mesurée. Appelez marketix('404') sur votre page d’erreur.",
+            'search_disabled_title' => 'Les termes de recherche ne sont pas activés',
+            'search_disabled_text' => 'Indiquez les paramètres d’URL de votre recherche (p. ex. q) dans les paramètres du site sous « Mesure avancée ». Vous verrez ensuite ici ce que vos visiteurs recherchent.',
+            'open_settings' => 'Ouvrir les paramètres du site',
+            'not_found_empty_title' => 'Aucune page 404 mesurée',
+            'not_found_empty_text' => 'Ajoutez cet appel à votre page d’erreur. Vous verrez ensuite ici quelles pages inexistantes sont demandées.',
         ],
 
         'channels' => [
