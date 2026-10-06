@@ -57,6 +57,19 @@ class AnalyticsDemoSeeder extends Seeder
         'AU' => ['Australia', ['Sydney'], 1],
     ];
 
+    private const HOSTS = ['www.demo-shop.ch' => 96, 'demo-shop.ch' => 3, 'staging.demo-shop.ch' => 1];
+
+    private const TITLES = [
+        '/' => 'Demo Shop – Kaffeemaschinen & Zubehör', '/produkte' => 'Alle Produkte – Demo Shop',
+        '/produkte/kaffeemaschine-pro' => 'Kaffeemaschine Pro – Demo Shop', '/produkte/milchschaeumer' => 'Milchschäumer – Demo Shop',
+        '/produkte/bohnen-espresso' => 'Espresso-Bohnen – Demo Shop', '/preise' => 'Preise – Demo Shop', '/blog' => 'Blog – Demo Shop',
+        '/blog/perfekter-espresso' => 'So gelingt der perfekte Espresso – Demo Shop', '/blog/latte-art-guide' => 'Latte Art für Einsteiger – Demo Shop',
+        '/blog/entkalken' => 'Kaffeemaschine richtig entkalken – Demo Shop', '/ueber-uns' => 'Über uns – Demo Shop',
+        '/kontakt' => 'Kontakt – Demo Shop', '/warenkorb' => 'Warenkorb – Demo Shop', '/newsletter' => 'Newsletter – Demo Shop',
+        '/faq' => 'Häufige Fragen – Demo Shop', '/jobs' => 'Jobs – Demo Shop', '/aktion/herbst-sale' => 'Herbst-Sale: bis 30 % Rabatt – Demo Shop',
+        '/sommer-sale-2025' => 'Seite nicht gefunden – Demo Shop', '/shop/espresso-maschine' => 'Seite nicht gefunden – Demo Shop',
+    ];
+
     private const REGIONS = [
         'Zürich' => 'Zurich', 'Bern' => 'Bern', 'Basel' => 'Basel-City', 'Luzern' => 'Lucerne', 'St. Gallen' => 'Saint Gallen',
         'Genève' => 'Geneva', 'Lausanne' => 'Vaud', 'Berlin' => 'Land Berlin', 'München' => 'Bavaria', 'Hamburg' => 'Hamburg',
@@ -387,6 +400,7 @@ class AnalyticsDemoSeeder extends Seeder
         ];
 
         $city = $this->pick($cities);
+        $host = $this->weighted(self::HOSTS);
         foreach ($paths as $i => $path) {
             $refererDomain = $i === 0 ? $source['referer_domain'] : 'www.'.self::DOMAIN;
             $this->pageViews[] = [
@@ -395,7 +409,9 @@ class AnalyticsDemoSeeder extends Seeder
                 'site_id' => $this->site->id,
                 'project_id' => $this->site->project_id,
                 'visitor_hash' => $visitor,
+                'hostname' => $host,
                 'path' => $path,
+                'title' => self::TITLES[$path] ?? null,
                 'referer' => $refererDomain ? 'https://'.$refererDomain.($i === 0 ? '/' : $paths[$i - 1]) : null,
                 'referer_domain' => $refererDomain,
                 'utm_source' => $i === 0 ? ($source['utm_source'] ?? null) : null,
@@ -438,7 +454,8 @@ class AnalyticsDemoSeeder extends Seeder
 
         $this->pageViews[] = [
             'id' => (string) Str::ulid(), 'visit_id' => $visitId, 'site_id' => $this->site->id,
-            'project_id' => $this->site->project_id, 'visitor_hash' => $visitor, 'path' => $path, 'referer' => null,
+            'project_id' => $this->site->project_id, 'visitor_hash' => $visitor, 'hostname' => 'www.'.self::DOMAIN, 'path' => $path,
+            'title' => self::TITLES[$path] ?? null, 'referer' => null,
             'referer_domain' => null, 'utm_source' => null, 'utm_medium' => null, 'utm_campaign' => null,
             'utm_term' => null, 'utm_content' => null, 'country' => 'United States', 'country_code' => 'US', 'region' => 'Virginia',
             'city' => 'Ashburn', 'browser' => 'Other', 'os' => 'Linux', 'device' => 'Desktop', 'language' => 'en',

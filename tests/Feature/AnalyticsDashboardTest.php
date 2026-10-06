@@ -108,6 +108,7 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('topPaths')
                 ->has('entryPages')
                 ->has('exitPages')
+                ->has('hostnames')
                 ->has('topEvents', 1)
                 ->where('topEvents.0.name', 'signup')
                 ->has('interactions.outbound')

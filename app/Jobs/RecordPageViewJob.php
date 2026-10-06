@@ -37,6 +37,8 @@ class RecordPageViewJob implements ShouldQueue
         private ?string $language,
         private array $geo,
         private array $utm = [],
+        private ?string $hostname = null,
+        private ?string $title = null,
     ) {}
 
     public function handle(): void
@@ -78,7 +80,9 @@ class RecordPageViewJob implements ShouldQueue
             'site_id' => $this->siteId,
             'project_id' => $this->projectId,
             'visitor_hash' => $this->visitorHash,
+            'hostname' => $this->hostname,
             'path' => $this->path,
+            'title' => $this->title,
             'referer' => $this->referer,
             'referer_domain' => $refererDomain,
             'country' => $this->geo['country'] ?? null,

@@ -27,6 +27,10 @@ class AnalyticsSnippetServedTest extends TestCase
         $this->assertStringContainsString('utm_', $contents);
         $this->assertStringContainsString('payload.utm', $contents);
 
+        // Page title and hostname travel with each page view.
+        $this->assertStringContainsString('document.title', $contents);
+        $this->assertStringContainsString('location.hostname', $contents);
+
         // Custom event API
         $this->assertStringContainsString('window.marketix', $contents);
         $this->assertStringContainsString('marketix.q', $contents);

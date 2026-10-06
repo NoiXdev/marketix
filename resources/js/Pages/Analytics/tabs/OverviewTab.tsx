@@ -16,7 +16,7 @@ export type OverviewData = {
   previousSummary: Summary | null;
   timeseries: SeriesPoint[];
   previousTimeseries: SeriesPoint[] | null;
-  topPaths: (Rank & { avg_engaged: number | null; avg_scroll: number | null })[];
+  topPaths: (Rank & { title: string | null; avg_engaged: number | null; avg_scroll: number | null })[];
   channels: (Rank & { channel: string; visitors: number })[];
   countries: Rank[];
   devices: Rank[];
@@ -25,7 +25,7 @@ export type OverviewData = {
 export default function OverviewTab({ summary, previousSummary, timeseries, previousTimeseries, topPaths, channels, countries, devices }: OverviewData) {
   const { t, locale } = useTranslation();
   const { period, go, href, addFilter } = useAnalytics();
-  const { rows, channelLabel, engagementSub } = useRowBuilders();
+  const { rows, titled, channelLabel, engagementSub } = useRowBuilders();
 
   const noData = t('analytics.dashboard.no_data');
   const percent = (value: number) => `${value.toLocaleString(locale)} %`;
@@ -97,7 +97,7 @@ export default function OverviewTab({ summary, previousSummary, timeseries, prev
           title={t('analytics.dashboard.breakdown.top_pages')}
           emptyLabel={noData}
           more={more('behavior')}
-          tabs={[{ key: 'top', label: '', rows: rows(topPaths, 'path', 'path', (r) => ({ note: engagementSub(r.avg_engaged, r.avg_scroll) })) }]}
+          tabs={[{ key: 'top', label: '', rows: rows(topPaths, 'path', 'path', (r) => ({ ...titled(r.path, r.title), note: engagementSub(r.avg_engaged, r.avg_scroll) })) }]}
         />
         <BreakdownCard
           title={t('analytics.dashboard.breakdown.channels')}

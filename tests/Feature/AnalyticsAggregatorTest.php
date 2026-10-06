@@ -91,6 +91,32 @@ class AnalyticsAggregatorTest extends TestCase
         $this->assertSame([['Zürich', 'CH', 3], ['Bern', 'US', 2], ['Bern', 'CH', 1]], $cities->map(fn ($r) => [$r->city, $r->country_code, (int) $r->count])->all());
     }
 
+    public function test_page_lists_carry_the_most_recent_title_of_each_path(): void
+    {
+        $site = Site::factory()->create();
+        $visit = Visit::factory()->forSite($site)->create(['entry_path' => '/pricing', 'exit_path' => '/pricing']);
+        PageView::factory()->forVisit($visit)->create(['path' => '/pricing', 'title' => 'Zebra (old name)', 'created_at' => now()->subDays(2)]);
+        PageView::factory()->forVisit($visit)->create(['path' => '/pricing', 'title' => 'Pricing', 'created_at' => now()->subHour()]);
+        PageView::factory()->forVisit($visit)->create(['path' => '/untitled', 'title' => null]);
+
+        $titles = $this->agg->topPaths($site->id, 30)->pluck('title', 'path')->all();
+        $this->assertSame(['/pricing' => 'Pricing', '/untitled' => null], $titles);
+        $this->assertSame('Pricing', $this->agg->entryPages($site->id, 30)->first()->title);
+        $this->assertSame('Pricing', $this->agg->exitPages($site->id, 30)->first()->title);
+    }
+
+    public function test_hostnames_rank_and_filter_page_views(): void
+    {
+        $site = Site::factory()->create();
+        $visit = Visit::factory()->forSite($site)->create();
+        PageView::factory()->forVisit($visit)->count(3)->create(['hostname' => 'www.example.com']);
+        PageView::factory()->forVisit($visit)->create(['hostname' => 'staging.example.com']);
+        PageView::factory()->forVisit($visit)->create(['hostname' => null]);
+
+        $this->assertSame(['www.example.com' => 3, 'staging.example.com' => 1], $this->agg->hostnames($site->id, 30)->mapWithKeys(fn ($r) => [$r->hostname => (int) $r->count])->all());
+        $this->assertSame(1, $this->agg->totalPageViews($site->id, AnalyticsQuery::lastDays(30, ['hostname' => 'staging.example.com'])));
+    }
+
     public function test_locations_reject_unknown_column(): void
     {
         $this->expectException(\InvalidArgumentException::class);

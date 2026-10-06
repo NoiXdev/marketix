@@ -134,6 +134,39 @@ class AnalyticsIngestionTest extends TestCase
         $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'utm_source' => 'google', 'utm_medium' => 'cpc', 'utm_campaign' => 'summer']);
     }
 
+    public function test_page_view_stores_normalized_hostname_and_title(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $body = json_encode([
+            'site' => $site->tracking_id,
+            'hostname' => 'Shop.Example.COM',
+            'path' => '/pricing',
+            'title' => "  Pricing \n\t – Example  ",
+        ]);
+
+        $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $body)
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'hostname' => 'shop.example.com', 'title' => 'Pricing – Example']);
+    }
+
+    public function test_invalid_hostname_and_blank_title_are_stored_as_null_and_long_titles_truncated(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $headers = ['CONTENT_TYPE' => 'text/plain'];
+
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, json_encode([
+            'site' => $site->tracking_id, 'hostname' => 'evil.com/<script>', 'path' => '/a', 'title' => '   ',
+        ]))->assertStatus(202);
+        $this->call('POST', route('app.analytics.event'), [], [], [], $headers, json_encode([
+            'site' => $site->tracking_id, 'path' => '/b', 'title' => str_repeat('ä', 400),
+        ]))->assertStatus(202);
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'path' => '/a', 'hostname' => null, 'title' => null]);
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'path' => '/b', 'title' => str_repeat('ä', 255)]);
+    }
+
     public function test_first_touch_utm_is_not_overwritten_within_session(): void
     {
         $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);

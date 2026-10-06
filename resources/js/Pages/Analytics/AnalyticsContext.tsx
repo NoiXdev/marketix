@@ -118,6 +118,11 @@ export function useRowBuilders() {
     return items.map((r, i) => ({ key: `${r.value}-${i}`, label: r.value, value: Number(r.count), ...extra(r) }));
   }
 
+  // Pages with a recorded title show it as the label and the path below it
+  function titled(path: unknown, title: unknown): Partial<RankRow> {
+    return title ? { label: String(title), sub: String(path) } : {};
+  }
+
   function channelLabel(channel: string): string {
     return t(`analytics.dashboard.channels.${channel}`);
   }
@@ -129,5 +134,5 @@ export function useRowBuilders() {
       : t('analytics.dashboard.breakdown.engagement', { time: formatDuration(seconds), scroll });
   }
 
-  return { rows, valueRows, channelLabel, engagementSub };
+  return { rows, valueRows, titled, channelLabel, engagementSub };
 }

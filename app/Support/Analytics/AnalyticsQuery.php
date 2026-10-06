@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 final class AnalyticsQuery
 {
     public const FILTERS = [
+        'hostname',
         'path',
         'entry_path',
         'exit_path',

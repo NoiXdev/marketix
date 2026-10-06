@@ -11,18 +11,19 @@ import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState'
 import { FileDown, FileX, Search } from 'lucide-react';
 
 export type BehaviorData = {
-  topPaths: (Rank & { avg_engaged: number | null; avg_scroll: number | null })[];
-  entryPages: (Rank & { bounce_rate: number })[];
-  exitPages: Rank[];
+  topPaths: (Rank & { title: string | null; avg_engaged: number | null; avg_scroll: number | null })[];
+  entryPages: (Rank & { title: string | null; bounce_rate: number })[];
+  exitPages: (Rank & { title: string | null })[];
+  hostnames: (Rank & { hostname: string })[];
   interactions: Interactions;
   topEvents: EventRow[];
   hourlyActivity: HourBucket[];
 };
 
-export default function BehaviorTab({ topPaths, entryPages, exitPages, interactions, topEvents, hourlyActivity }: BehaviorData) {
+export default function BehaviorTab({ topPaths, entryPages, exitPages, hostnames, interactions, topEvents, hourlyActivity }: BehaviorData) {
   const { t } = useTranslation();
   const { projectId, site, period } = useAnalytics();
-  const { rows, valueRows, engagementSub } = useRowBuilders();
+  const { rows, valueRows, titled, engagementSub } = useRowBuilders();
   const noData = t('analytics.dashboard.no_data');
 
   return (
@@ -35,14 +36,21 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, interacti
             {
               key: 'top',
               label: t('analytics.dashboard.breakdown.top_pages'),
-              rows: rows(topPaths, 'path', 'path', (r) => ({ note: engagementSub(r.avg_engaged, r.avg_scroll) })),
+              rows: rows(topPaths, 'path', 'path', (r) => ({ ...titled(r.path, r.title), note: engagementSub(r.avg_engaged, r.avg_scroll) })),
             },
             {
               key: 'entry',
               label: t('analytics.dashboard.breakdown.entry_pages'),
-              rows: rows(entryPages, 'entry_path', 'entry_path', (r) => ({ note: t('analytics.dashboard.breakdown.bounce_sub', { rate: r.bounce_rate }) })),
+              rows: rows(entryPages, 'entry_path', 'entry_path', (r) => ({
+                ...titled(r.entry_path, r.title),
+                note: t('analytics.dashboard.breakdown.bounce_sub', { rate: r.bounce_rate }),
+              })),
             },
-            { key: 'exit', label: t('analytics.dashboard.breakdown.exit_pages'), rows: rows(exitPages, 'exit_path', 'exit_path') },
+            { key: 'exit', label: t('analytics.dashboard.breakdown.exit_pages'), rows: rows(exitPages, 'exit_path', 'exit_path', (r) => titled(r.exit_path, r.title)) },
+            // Only worth a tab when the snippet runs on more than one host (subdomains, staging, …)
+            ...(hostnames.length > 1
+              ? [{ key: 'hostnames', label: t('analytics.dashboard.breakdown.hostnames'), rows: rows(hostnames, 'hostname', 'hostname') }]
+              : []),
           ]}
         />
 
