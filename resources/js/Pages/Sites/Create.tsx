@@ -1,17 +1,17 @@
+import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
-import { BackLink, Button, Checkbox, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
-import EnhancedMeasurementSection from '@/Pages/Sites/partials/EnhancedMeasurementSection';
+import SiteForm, { Option, SiteFormData } from '@/Pages/Sites/partials/SiteForm';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { ShieldCheck } from 'lucide-react';
 
-type Option = { value: string; label: string };
+const STEPS = ['create', 'install', 'watch'] as const;
 
 export default function SitesCreate({ trackingModes, consentModes }: { trackingModes: Option[]; consentModes: Option[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
-  const { data, setData, post, processing, errors, transform } = useForm({
+  const form = useForm<SiteFormData>({
     name: '',
     domain: '',
     tracking_mode: 'cookieless',
@@ -21,107 +21,59 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
     track_outbound_links: true,
     track_file_downloads: true,
     site_search_params: '',
-    retention_days: '' as string | number,
+    retention_days: '',
   });
 
-  transform((data) => ({
-    ...data,
-    retention_days: data.retention_days === '' ? null : data.retention_days,
-  }));
+  form.transform((data) => ({ ...data, retention_days: data.retention_days === '' ? null : data.retention_days }));
 
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    post(route('app.project.sites.store', { project: project!.id }));
-  }
-
-  const errorMessages = Object.values(errors).filter(Boolean) as string[];
+  const indexUrl = route('app.project.sites.index', { project: project!.id });
 
   return (
     <AppLayout title={t('analytics.sites.create')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.sites.index', { project: project!.id })}>{t('analytics.sites.back')}</BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('analytics.sites.create')}</h1>
+          <BackLink href={indexUrl}>{t('analytics.sites.back')}</BackLink>
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('analytics.sites.create')}</h1>
+          <p className="text-muted mt-1 text-sm">{t('analytics.sites.form.create_subtitle')}</p>
         </div>
 
-        <div className="max-w-2xl">
-          <form onSubmit={submit} className="space-y-5">
-            <ErrorSummary title={t('links.form.save_error_title')} errors={errorMessages} />
+        <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0">
+            <SiteForm
+              form={form}
+              trackingModes={trackingModes}
+              consentModes={consentModes}
+              submitLabel={t('analytics.sites.create')}
+              cancelHref={indexUrl}
+              onSubmit={() => form.post(route('app.project.sites.store', { project: project!.id }))}
+            />
+          </div>
 
-            <FormSection>
-              <Field label={t('analytics.sites.form.name')} htmlFor="name" error={errors.name}>
-                <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
-              </Field>
+          <aside className="space-y-4 lg:sticky lg:top-6">
+            <section className="border-line bg-surface rounded-[var(--radius)] border p-5 shadow-[var(--shadow-sm)]">
+              <h2 className="text-foreground text-sm font-semibold">{t('analytics.sites.form.steps.title')}</h2>
+              <ol className="mt-4 space-y-4">
+                {STEPS.map((step, i) => (
+                  <li key={step} className="flex gap-3">
+                    <span
+                      className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold ${i === 0 ? 'bg-accent text-accent-foreground' : 'bg-elevated text-muted'}`}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-foreground text-sm font-semibold">{t(`analytics.sites.form.steps.${step}_title`)}</p>
+                      <p className="text-muted mt-0.5 text-xs leading-relaxed">{t(`analytics.sites.form.steps.${step}_text`)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
 
-              <Field label={t('analytics.sites.form.domain')} htmlFor="domain" error={errors.domain}>
-                <Input
-                  id="domain"
-                  value={data.domain}
-                  onChange={(e) => setData('domain', e.target.value)}
-                  placeholder={t('analytics.sites.form.domain_placeholder')}
-                />
-              </Field>
-
-              <Field label={t('analytics.sites.form.tracking_mode')} htmlFor="tracking_mode">
-                <Select id="tracking_mode" value={data.tracking_mode} onChange={(e) => setData('tracking_mode', e.target.value)}>
-                  {trackingModes.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field label={t('analytics.sites.form.consent_mode')} htmlFor="consent_mode">
-                <Select id="consent_mode" value={data.consent_mode} onChange={(e) => setData('consent_mode', e.target.value)}>
-                  {consentModes.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field
-                label={t('analytics.sites.form.consent_signal')}
-                htmlFor="consent_signal"
-                hint={t('analytics.sites.form.consent_signal_hint')}
-              >
-                <Input
-                  id="consent_signal"
-                  value={data.consent_signal}
-                  onChange={(e) => setData('consent_signal', e.target.value)}
-                  placeholder={t('analytics.sites.form.consent_signal_placeholder')}
-                />
-              </Field>
-
-              <Field
-                label={t('analytics.sites.form.retention_days')}
-                htmlFor="retention_days"
-                hint={t('analytics.sites.form.retention_days_hint')}
-                error={errors.retention_days}
-              >
-                <Input
-                  id="retention_days"
-                  type="number"
-                  min={1}
-                  value={data.retention_days}
-                  onChange={(e) => setData('retention_days', e.target.value)}
-                />
-              </Field>
-
-              <label className="flex items-center gap-2 text-sm text-foreground">
-                <Checkbox checked={data.respect_dnt} onChange={(e) => setData('respect_dnt', e.target.checked)} />
-                {t('analytics.sites.form.respect_dnt')}
-              </label>
-            </FormSection>
-
-            <EnhancedMeasurementSection values={data} onChange={(patch) => setData({ ...data, ...patch })} error={errors.site_search_params} />
-
-            <Button type="submit" loading={processing}>
-              {t('analytics.sites.create')}
-            </Button>
-          </form>
+            <section className="border-line bg-accent-soft/40 flex gap-3 rounded-[var(--radius)] border p-4">
+              <ShieldCheck className="text-accent-soft-foreground mt-0.5 h-5 w-5 shrink-0" />
+              <p className="text-muted text-xs leading-relaxed">{t('analytics.sites.form.privacy_note')}</p>
+            </section>
+          </aside>
         </div>
       </div>
     </AppLayout>
