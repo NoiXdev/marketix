@@ -76,7 +76,9 @@ class AnalyticsIngestionController extends Controller
 
         $data = $request->validate([
             'site' => ['required', 'string'],
+            'hostname' => ['nullable', 'string', 'max:255'],
             'path' => ['required', 'string', 'max:2048'],
+            'title' => ['nullable', 'string', 'max:1000'],
             'referrer' => ['nullable', 'string', 'max:2048'],
             'visitor_id' => ['nullable', 'string', 'max:255'],
             'utm' => ['nullable', 'array'],
@@ -167,8 +169,25 @@ class AnalyticsIngestionController extends Controller
             substr($request->header('Accept-Language', ''), 0, 2) ?: null,
             $this->geoIp->lookup($ip),
             $utm,
+            $this->hostname($data['hostname'] ?? null),
+            $this->title($data['title'] ?? null),
         );
 
         return response('', 202);
+    }
+
+    private function hostname(?string $hostname): ?string
+    {
+        $hostname = strtolower(trim((string) $hostname));
+
+        // location.hostname is ASCII (IDNs arrive as punycode); anything else is not a hostname
+        return preg_match('/^[a-z0-9.-]+$/', $hostname) ? $hostname : null;
+    }
+
+    private function title(?string $title): ?string
+    {
+        $title = trim((string) preg_replace('/\s+/u', ' ', (string) $title));
+
+        return $title === '' ? null : mb_substr($title, 0, 255);
     }
 }

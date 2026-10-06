@@ -337,6 +337,7 @@ return [
             'pages' => 'Seiten',
             'entry_pages' => 'Einstiegsseiten',
             'exit_pages' => 'Ausstiegsseiten',
+            'hostnames' => 'Hostnamen',
             'bounce_sub' => ':rate % Absprungrate',
             'sources' => 'Quellen',
             'channels' => 'Kanäle',
@@ -379,6 +380,7 @@ return [
             'remove' => 'Filter „:name“ entfernen',
             'clear' => 'Alle Filter entfernen',
             'keys' => [
+                'hostname' => 'Hostname',
                 'path' => 'Seite',
                 'entry_path' => 'Einstiegsseite',
                 'exit_path' => 'Ausstiegsseite',

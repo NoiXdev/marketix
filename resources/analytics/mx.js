@@ -88,7 +88,9 @@
   function send(visitorId, referrer) {
     var payload = {
       site: site,
+      hostname: location.hostname,
       path: location.pathname,
+      title: document.title ? document.title.slice(0, 300) : null,
       referrer: referrer || null,
     };
     var utm = readUtm();
@@ -265,9 +267,18 @@
     trackSiteSearch();
   }
 
+  // Client-side routers usually set document.title only after the URL has
+  // changed, so a navigation is recorded a moment later. Navigations in quick
+  // succession (redirects) collapse into one page view for the final URL.
+  var navigationTimer = null;
+
   function onNavigate() {
-    if (location.pathname === currentPath) return;
-    trackPageview(currentPath === null ? document.referrer : location.origin + currentPath);
+    if (location.pathname === currentPath || navigationTimer !== null) return;
+    var referrer = currentPath === null ? document.referrer : location.origin + currentPath;
+    navigationTimer = setTimeout(function () {
+      navigationTimer = null;
+      if (location.pathname !== currentPath) trackPageview(referrer);
+    }, 100);
   }
 
   function patchHistory(method) {

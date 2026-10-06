@@ -23,7 +23,7 @@ class AnalyticsAggregator
 
     public const ENGAGED_MIN_PAGE_VIEWS = 2;
 
-    private const PAGE_VIEW_FILTERS = ['path', 'language', 'country_code', 'region', 'city', 'browser', 'os', 'device'];
+    private const PAGE_VIEW_FILTERS = ['hostname', 'path', 'language', 'country_code', 'region', 'city', 'browser', 'os', 'device'];
 
     private const VISIT_FILTERS = ['entry_path', 'exit_path', 'referer_domain', 'country_code', 'browser', 'os', 'device', 'utm_source', 'utm_medium', 'utm_campaign'];
 
@@ -363,7 +363,39 @@ class AnalyticsAggregator
             ->each(function ($row) {
                 $row->avg_engaged = $row->avg_engaged === null ? null : (int) round((float) $row->avg_engaged);
                 $row->avg_scroll = $row->avg_scroll === null ? null : (int) round((float) $row->avg_scroll);
-            });
+            })
+            ->pipe(fn (Collection $rows) => $this->withTitles($rows, 'path', $siteId, $range));
+    }
+
+    /**
+     * Adds the most recent page title seen in the range for each row's path, so
+     * renamed pages show their current title.
+     *
+     * @param  Collection<int, \stdClass>  $rows
+     * @return Collection<int, \stdClass>
+     */
+    private function withTitles(Collection $rows, string $column, string $siteId, AnalyticsQuery|int $range): Collection
+    {
+        $paths = $rows->pluck($column)->filter()->unique()->values()->all();
+
+        $titles = $paths === [] ? collect() : $this->base($siteId, $range)
+            ->whereIn('path', $paths)
+            ->whereNotNull('title')->where('title', '!=', '')
+            ->select('path', 'title', DB::raw('MAX(created_at) as last_seen'))
+            ->groupBy('path', 'title')->get()
+            ->sortBy('last_seen')
+            ->pluck('title', 'path'); // newer titles overwrite older ones
+
+        return $rows->each(fn ($row) => $row->title = $titles->get($row->{$column}));
+    }
+
+    /** @return Collection<int, \stdClass> */
+    public function hostnames(string $siteId, AnalyticsQuery|int $range, int $limit = 10): Collection
+    {
+        return $this->base($siteId, $range)
+            ->whereNotNull('hostname')->where('hostname', '!=', '')
+            ->select('hostname', DB::raw('COUNT(*) as count'), DB::raw('COUNT(DISTINCT visitor_hash) as visitors'))
+            ->groupBy('hostname')->orderByDesc('count')->limit($limit)->get();
     }
 
     /** @return Collection<int, \stdClass> */
@@ -379,7 +411,8 @@ class AnalyticsAggregator
             ->each(function ($row) {
                 $row->bounce_rate = $row->count > 0 ? round((int) $row->bounced / (int) $row->count * 100, 1) : 0.0;
                 unset($row->bounced);
-            });
+            })
+            ->pipe(fn (Collection $rows) => $this->withTitles($rows, 'entry_path', $siteId, $range));
     }
 
     /** @return Collection<int, \stdClass> */
@@ -387,7 +420,8 @@ class AnalyticsAggregator
     {
         return $this->visitBase($siteId, $range)
             ->select('exit_path', DB::raw('COUNT(*) as count'))
-            ->groupBy('exit_path')->orderByDesc('count')->limit($limit)->get();
+            ->groupBy('exit_path')->orderByDesc('count')->limit($limit)->get()
+            ->pipe(fn (Collection $rows) => $this->withTitles($rows, 'exit_path', $siteId, $range));
     }
 
     /** @return Collection<int, \stdClass> */

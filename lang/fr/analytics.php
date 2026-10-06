@@ -337,6 +337,7 @@ return [
             'pages' => 'Pages',
             'entry_pages' => "Pages d'entrée",
             'exit_pages' => 'Pages de sortie',
+            'hostnames' => 'Noms d\'hôte',
             'bounce_sub' => ':rate % de rebond',
             'sources' => 'Sources',
             'channels' => 'Canaux',
@@ -379,6 +380,7 @@ return [
             'remove' => 'Retirer le filtre « :name »',
             'clear' => 'Effacer tous les filtres',
             'keys' => [
+                'hostname' => 'Nom d\'hôte',
                 'path' => 'Page',
                 'entry_path' => "Page d'entrée",
                 'exit_path' => 'Page de sortie',

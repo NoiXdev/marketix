@@ -116,6 +116,7 @@ class AnalyticsController extends Controller
             'topPaths' => fn () => $this->agg->topPaths($id, $query),
             'entryPages' => fn () => $this->agg->entryPages($id, $query),
             'exitPages' => fn () => $this->agg->exitPages($id, $query),
+            'hostnames' => fn () => $this->agg->hostnames($id, $query),
             'topEvents' => fn () => $this->goals->topEvents($id, $query),
             'interactions' => fn () => [
                 'outbound' => $this->goals->eventBreakdown($id, $query, 'outbound_click', 'url'),

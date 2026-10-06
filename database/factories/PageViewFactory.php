@@ -16,7 +16,9 @@ class PageViewFactory extends Factory
     {
         return [
             'visitor_hash' => hash('sha256', $this->faker->uuid()),
+            'hostname' => null,
             'path' => '/'.$this->faker->slug(),
+            'title' => null,
             'referer' => null,
             'referer_domain' => null,
             'utm_source' => null,

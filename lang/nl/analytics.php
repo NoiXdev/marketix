@@ -337,6 +337,7 @@ return [
             'pages' => "Pagina's",
             'entry_pages' => "Instappagina's",
             'exit_pages' => "Uitstappagina's",
+            'hostnames' => 'Hostnamen',
             'bounce_sub' => ':rate % bounce',
             'sources' => 'Bronnen',
             'channels' => 'Kanalen',
@@ -379,6 +380,7 @@ return [
             'remove' => 'Filter “:name” verwijderen',
             'clear' => 'Alle filters wissen',
             'keys' => [
+                'hostname' => 'Hostnaam',
                 'path' => 'Pagina',
                 'entry_path' => 'Instappagina',
                 'exit_path' => 'Uitstappagina',
