@@ -1,5 +1,5 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -9,15 +9,7 @@ import ReportForm, { ReportFormData } from './partials/ReportForm';
 type LinkOption = { id: string; slug: string };
 type SiteOption = { id: string; name: string };
 
-export default function ReportsCreate({
-  links,
-  sites,
-  types,
-}: {
-  links: LinkOption[];
-  sites: SiteOption[];
-  types: string[];
-}) {
+export default function ReportsCreate({ links, sites, types }: { links: LinkOption[]; sites: SiteOption[]; types: string[] }) {
   const { project, auth, locale } = usePage<PageProps>().props;
   const { t } = useTranslation();
 
@@ -43,10 +35,8 @@ export default function ReportsCreate({
     <AppLayout title={t('reports.form.create_title')}>
       <div className="px-8 py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.reports.index', { project: project!.id })}>
-            {t('common.actions.cancel')}
-          </BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('reports.form.create_title')}</h1>
+          <BackLink href={route('app.project.reports.index', { project: project!.id })}>{t('common.actions.cancel')}</BackLink>
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('reports.form.create_title')}</h1>
         </div>
 
         <div className="max-w-2xl">

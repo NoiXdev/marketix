@@ -1,11 +1,11 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
+import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 import { Domain, PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import StatusPills from '@/Pages/Domains/Partials/StatusPills';
 import { Globe, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -67,32 +67,34 @@ export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain
               { label: '' },
             ]}
           >
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-line divide-y">
               {domains.map((domain) => (
-                <tr
-                  key={domain.id}
-                  onClick={rowLink(route('app.project.domains.edit', { project: project!.id, domain: domain.id }))}
-                  className={`group ${ROW_LINK_CLASS}`}
-                >
-                  <td className="px-4 py-3 font-medium text-foreground">
+                <tr key={domain.id} onClick={rowLink(route('app.project.domains.edit', { project: project!.id, domain: domain.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                  <td className="text-foreground px-4 py-3 font-medium">
                     <Link href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} className="hover:text-accent-soft-foreground">
                       {domain.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-muted">
+                  <td className="text-muted px-4 py-3">
                     {domain.redirect_root ? <span className="block max-w-xs truncate">{domain.redirect_root}</span> : <span className="text-subtle">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-muted">
+                  <td className="text-muted px-4 py-3">
                     {domain.redirect_not_found ? <span className="block max-w-xs truncate">{domain.redirect_not_found}</span> : <span className="text-subtle">—</span>}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
                       <StatusPills domain={domain} />
-                      <span className="text-xs text-subtle">{relativeTime(domain.last_checked_at, locale, t('domains.never_checked'))}</span>
+                      <span className="text-subtle text-xs">{relativeTime(domain.last_checked_at, locale, t('domains.never_checked'))}</span>
                     </div>
                   </td>
                   <RowActions>
-                    <IconButton icon={RefreshCw} label={t('domains.actions.check')} onClick={() => check(domain)} disabled={checking === domain.id} spinning={checking === domain.id} />
+                    <IconButton
+                      icon={RefreshCw}
+                      label={t('domains.actions.check')}
+                      onClick={() => check(domain)}
+                      disabled={checking === domain.id}
+                      spinning={checking === domain.id}
+                    />
                     <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} />
                     <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(domain)} />
                   </RowActions>

@@ -29,13 +29,13 @@ export default function QrScannability({ style }: Props) {
   }
 
   return (
-    <div className="rounded-[var(--radius)] border border-line bg-elevated p-4">
+    <div className="border-line bg-elevated rounded-[var(--radius)] border p-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-foreground">{t('qr.scan.title')}</h3>
+        <h3 className="text-foreground text-sm font-semibold">{t('qr.scan.title')}</h3>
         <Badge variant={VARIANT[report.level]}>{t(`qr.scan.${report.level}`)}</Badge>
       </div>
       {report.issues.length > 0 && (
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted">
+        <ul className="text-muted mt-2 list-disc space-y-1 pl-5 text-xs">
           {report.issues.map((issue) => (
             <li key={issue.code}>{issueMessage(issue)}</li>
           ))}

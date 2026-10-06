@@ -9,8 +9,7 @@ const INTERACTIVE_SELECTOR = 'a, button, select, input, label, [role="button"]';
  * Tailwind classes giving a row the clickable affordance.
  * Merge with the row's existing classes (e.g. `group ${ROW_LINK_CLASS}`).
  */
-export const ROW_LINK_CLASS =
-  'cursor-pointer transition-colors hover:bg-elevated';
+export const ROW_LINK_CLASS = 'cursor-pointer transition-colors hover:bg-elevated';
 
 /**
  * Returns a `<tr>` onClick handler that navigates to `href`.

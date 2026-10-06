@@ -22,7 +22,7 @@ export default function AdminUsersCreate() {
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.admin.users.index')}>{t('common.actions.cancel')}</BackLink>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">{t('admin.users.create.title')}</h1>
+          <h1 className="text-foreground mt-2 text-2xl font-bold tracking-tight">{t('admin.users.create.title')}</h1>
         </div>
 
         <form onSubmit={submit} className="max-w-md">
@@ -36,7 +36,7 @@ export default function AdminUsersCreate() {
             <Field label={t('admin.users.fields.password')} error={errors.password}>
               <Input type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
             </Field>
-            <label className="flex items-center gap-2 text-sm text-foreground">
+            <label className="text-foreground flex items-center gap-2 text-sm">
               <Checkbox checked={data.super_admin} onChange={(e) => setData('super_admin', e.target.checked)} />
               {t('admin.users.fields.super_admin')}
             </label>
@@ -46,7 +46,7 @@ export default function AdminUsersCreate() {
               </Button>
               <Link
                 href={route('app.admin.users.index')}
-                className="inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-muted transition-colors hover:bg-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                className="text-muted hover:bg-elevated hover:text-foreground inline-flex items-center rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               >
                 {t('common.actions.cancel')}
               </Link>

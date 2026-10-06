@@ -2,7 +2,7 @@ import { Flash, IconButton, Input, LinkButton, PageHeader, Pagination, RowAction
 import AdminLayout from '@/Layouts/AdminLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { Link, router } from '@inertiajs/react';
 import { ExternalLink, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 
@@ -22,8 +22,7 @@ export default function AdminProjectsIndex({ projects, search }: { projects: Pag
   const { t } = useTranslation();
 
   async function destroy(project: AdminProjectRow) {
-    if (!(await confirmDelete({ title: t('admin.projects.delete_confirm.title'), text: t('admin.projects.delete_confirm.text', { name: project.name }) })))
-      return;
+    if (!(await confirmDelete({ title: t('admin.projects.delete_confirm.title'), text: t('admin.projects.delete_confirm.text', { name: project.name }) }))) return;
     router.delete(route('app.admin.projects.destroy', { project: project.id }));
   }
 
@@ -54,16 +53,16 @@ export default function AdminProjectsIndex({ projects, search }: { projects: Pag
         </form>
 
         <TableCard columns={[{ label: t('admin.projects.columns.name') }, { label: t('admin.projects.columns.members') }, { label: '' }]}>
-          <tbody className="divide-y divide-line">
+          <tbody className="divide-line divide-y">
             {projects.data.map((project) => (
               <tr key={project.id} onClick={rowLink(route('app.admin.projects.edit', { project: project.id }))} className={`group ${ROW_LINK_CLASS}`}>
-                <td className="px-4 py-3 font-medium text-foreground">
-                  <Link href={route('app.admin.projects.edit', { project: project.id })} className="flex items-center gap-2 hover:text-accent-soft-foreground">
+                <td className="text-foreground px-4 py-3 font-medium">
+                  <Link href={route('app.admin.projects.edit', { project: project.id })} className="hover:text-accent-soft-foreground flex items-center gap-2">
                     {project.name}
-                    {project.locked && <Lock className="h-3.5 w-3.5 text-warning-foreground" />}
+                    {project.locked && <Lock className="text-warning-foreground h-3.5 w-3.5" />}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-muted">{project.users_count}</td>
+                <td className="text-muted px-4 py-3">{project.users_count}</td>
                 <RowActions>
                   <IconButton icon={ExternalLink} label={t('admin.projects.actions.open')} href={route('app.project.dashboard', { project: project.id })} />
                   <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.admin.projects.edit', { project: project.id })} />

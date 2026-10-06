@@ -12,9 +12,9 @@ export default function ProfileLayout({ children, title }: PropsWithChildren<Pro
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-canvas text-foreground">
+    <div className="bg-canvas text-foreground min-h-screen">
       {title && <Head title={title} />}
-      <header className="flex h-14 items-center border-b border-line bg-surface px-4">
+      <header className="border-line bg-surface flex h-14 items-center border-b px-4">
         <Brand />
       </header>
       <main className="mx-auto w-full max-w-xl px-4 py-10">

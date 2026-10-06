@@ -20,17 +20,17 @@ export function Field({ label, hint, error, htmlFor, children }: PropsWithChildr
   return (
     <div className="space-y-1.5">
       {label && (
-        <label htmlFor={htmlFor} className="block text-sm font-semibold text-foreground">
+        <label htmlFor={htmlFor} className="text-foreground block text-sm font-semibold">
           {label}
         </label>
       )}
       {control}
       {error ? (
-        <p id={describedById} className="text-xs text-danger-foreground">
+        <p id={describedById} className="text-danger-foreground text-xs">
           {error}
         </p>
       ) : hint ? (
-        <p id={describedById} className="text-xs text-muted">
+        <p id={describedById} className="text-muted text-xs">
           {hint}
         </p>
       ) : null}

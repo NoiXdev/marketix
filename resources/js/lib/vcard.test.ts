@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseVCards, mergeVCardIntoContent, extraSummary } from './vcard';
+import { extraSummary, mergeVCardIntoContent, parseVCards } from './vcard';
 
 const card = (body: string) => `BEGIN:VCARD\nVERSION:3.0\n${body}\nEND:VCARD`;
 
@@ -10,12 +10,13 @@ describe('parseVCards', () => {
   });
 
   it('maps the six known properties', () => {
-    const [c] = parseVCards(card(
-      'FN:Jane Doe\nORG:Acme\nTEL:+49 30 1\nEMAIL:jane@example.com\nURL:https://example.com\nADR:;;Main St;Berlin;;12345;Germany',
-    ));
+    const [c] = parseVCards(card('FN:Jane Doe\nORG:Acme\nTEL:+49 30 1\nEMAIL:jane@example.com\nURL:https://example.com\nADR:;;Main St;Berlin;;12345;Germany'));
     expect(c.fields).toEqual({
-      name: 'Jane Doe', org: 'Acme', phone: '+49 30 1',
-      email: 'jane@example.com', url: 'https://example.com',
+      name: 'Jane Doe',
+      org: 'Acme',
+      phone: '+49 30 1',
+      email: 'jane@example.com',
+      url: 'https://example.com',
       address: 'Main St, Berlin, 12345, Germany',
     });
     expect(c.extra).toEqual([]);
@@ -47,7 +48,7 @@ describe('parseVCards', () => {
 
   it('parses multiple contacts', () => {
     const cards = parseVCards(`${card('FN:Alice')}\n${card('FN:Bob')}`);
-    expect(cards.map(c => c.displayName)).toEqual(['Alice', 'Bob']);
+    expect(cards.map((c) => c.displayName)).toEqual(['Alice', 'Bob']);
   });
 
   it('falls back to email then a generated label for displayName', () => {
@@ -79,17 +80,21 @@ describe('mergeVCardIntoContent', () => {
   });
 
   it('clears extras when the card has none', () => {
-    const out = mergeVCardIntoContent({ extra: 'OLD:x' }, {
-      displayName: 'X', fields: { name: 'X' }, extra: [],
-    });
+    const out = mergeVCardIntoContent(
+      { extra: 'OLD:x' },
+      {
+        displayName: 'X',
+        fields: { name: 'X' },
+        extra: [],
+      },
+    );
     expect(out.extra).toBe('');
   });
 });
 
 describe('extraSummary', () => {
   it('counts lines and lists property names', () => {
-    expect(extraSummary('TITLE:CTO\nBDAY:1990\nTEL;TYPE=HOME:222'))
-      .toEqual({ count: 3, names: ['TITLE', 'BDAY', 'TEL'] });
+    expect(extraSummary('TITLE:CTO\nBDAY:1990\nTEL;TYPE=HOME:222')).toEqual({ count: 3, names: ['TITLE', 'BDAY', 'TEL'] });
   });
 
   it('handles empty/undefined', () => {

@@ -235,19 +235,19 @@ export default function VisitorsChart({
   const previousHeading = previousPoint ? (sameHeadings ? t('analytics.dashboard.chart.previous') : formatBucket(previousPoint.date)) : '';
 
   return (
-    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow-sm)] sm:p-6">
+    <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+        <h2 className="text-foreground text-sm font-semibold">{title}</h2>
         <div className="flex flex-wrap items-center gap-3">
           {intervals.length > 1 && (
-            <div role="group" aria-label={t('analytics.dashboard.interval.label')} className="inline-flex overflow-hidden rounded-lg border border-line">
+            <div role="group" aria-label={t('analytics.dashboard.interval.label')} className="border-line inline-flex overflow-hidden rounded-lg border">
               {intervals.map((option) => (
                 <button
                   key={option}
                   type="button"
                   aria-pressed={option === interval}
                   onClick={() => option !== interval && onIntervalChange(option)}
-                  className={`border-r border-line px-2.5 py-1 text-xs font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                  className={`border-line border-r px-2.5 py-1 text-xs font-semibold last:border-r-0 focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
                     option === interval ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function VisitorsChart({
           <button
             type="button"
             onClick={() => setShowTable((v) => !v)}
-            className="text-xs font-semibold text-accent-soft-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+            className="text-accent-soft-foreground text-xs font-semibold hover:underline focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
           >
             {showTable ? t('analytics.dashboard.chart.show_chart') : t('analytics.dashboard.chart.show_table')}
           </button>
@@ -272,46 +272,40 @@ export default function VisitorsChart({
           return (
             <label
               key={m.key}
-              className={`inline-flex cursor-pointer select-none items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors select-none sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
                 on ? 'border-line-strong bg-elevated text-foreground' : 'border-line text-muted hover:bg-elevated'
               }`}
             >
               <Checkbox checked={on} onChange={() => toggle(m.key)} />
-              <span
-                aria-hidden
-                className={m.kind === 'bar' ? 'h-3 w-2.5 rounded-t-[2px]' : 'h-0.5 w-4 rounded-full'}
-                style={{ background: m.color }}
-              />
+              <span aria-hidden className={m.kind === 'bar' ? 'h-3 w-2.5 rounded-t-[2px]' : 'h-0.5 w-4 rounded-full'} style={{ background: m.color }} />
               {m.label}
             </label>
           );
         })}
         {hasComparison && (
           <label
-            className={`inline-flex cursor-pointer select-none items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
+            className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors select-none sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
               showComparison ? 'border-line-strong bg-elevated text-foreground' : 'border-line text-muted hover:bg-elevated'
             }`}
           >
             <Checkbox checked={showComparison} onChange={() => setShowComparison((on) => !on)} />
-            <svg aria-hidden width="16" height="2" className="shrink-0 text-muted">
+            <svg aria-hidden width="16" height="2" className="text-muted shrink-0">
               <line x1="0" y1="1" x2="16" y2="1" stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" />
             </svg>
             {t('analytics.dashboard.chart.comparison')}
-            {comparisonRange && <span className="font-medium text-muted">{comparisonRange}</span>}
+            {comparisonRange && <span className="text-muted font-medium">{comparisonRange}</span>}
           </label>
         )}
       </div>
 
       {showTable ? (
-        <div className="max-h-96 overflow-auto rounded-lg border border-line">
+        <div className="border-line max-h-96 overflow-auto rounded-lg border">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-surface">
+            <thead className="bg-surface sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-semibold text-muted">
-                  {t(`analytics.dashboard.interval.${interval}`)}
-                </th>
+                <th className="text-muted px-3 py-2 text-left text-xs font-semibold">{t(`analytics.dashboard.interval.${interval}`)}</th>
                 {metrics.map((m) => (
-                  <th key={m.key} className="whitespace-nowrap px-3 py-2 text-right text-xs font-semibold text-muted">
+                  <th key={m.key} className="text-muted px-3 py-2 text-right text-xs font-semibold whitespace-nowrap">
                     {m.label}
                   </th>
                 ))}
@@ -319,12 +313,12 @@ export default function VisitorsChart({
             </thead>
             <tbody>
               {[...data].reverse().map((p) => (
-                <tr key={p.date} className="border-t border-line">
-                  <td className="whitespace-nowrap px-3 py-1.5 text-muted">{formatBucket(p.date)}</td>
+                <tr key={p.date} className="border-line border-t">
+                  <td className="text-muted px-3 py-1.5 whitespace-nowrap">{formatBucket(p.date)}</td>
                   {metrics.map((m) => {
                     const value = p[m.key];
                     return (
-                      <td key={m.key} className="px-3 py-1.5 text-right font-semibold tabular-nums text-foreground">
+                      <td key={m.key} className="text-foreground px-3 py-1.5 text-right font-semibold tabular-nums">
                         {value === null ? '—' : m.format(value)}
                       </td>
                     );
@@ -346,15 +340,11 @@ export default function VisitorsChart({
               onFocus={() => setHovered((h) => h ?? data.length - 1)}
               onBlur={() => setHovered(null)}
               {...scrubHandlers((slot) => setHovered(Number(slot)))}
-              className="relative flex h-48 touch-pan-y border-b border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              className="border-line relative flex h-48 touch-pan-y border-b focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               style={{ gap: SLOT_GAP }}
             >
               {data.map((p, i) => (
-                <div
-                  key={p.date}
-                  data-slot={i}
-                  className={`relative h-full min-w-0 flex-1 rounded-t-[4px] ${hovered === i ? 'bg-elevated' : ''}`}
-                >
+                <div key={p.date} data-slot={i} className={`relative h-full min-w-0 flex-1 rounded-t-[4px] ${hovered === i ? 'bg-elevated' : ''}`}>
                   {bars.length > 0 && (
                     <div className="absolute inset-x-0 bottom-0 flex items-end justify-center" style={{ top: PLOT_TOP, gap: MARK_GAP }}>
                       {bars.map((m) => (
@@ -382,9 +372,7 @@ export default function VisitorsChart({
                     return (
                       <g key={`previous-${metric.key}`}>
                         <Trace segments={segments} color={metric.color} dashed />
-                        {hoverPoint && (
-                          <circle cx={hoverPoint.x} cy={hoverPoint.y} r={3.5} fill="var(--surface)" stroke={metric.color} strokeWidth={1.5} />
-                        )}
+                        {hoverPoint && <circle cx={hoverPoint.x} cy={hoverPoint.y} r={3.5} fill="var(--surface)" stroke={metric.color} strokeWidth={1.5} />}
                       </g>
                     );
                   })}
@@ -393,9 +381,7 @@ export default function VisitorsChart({
                     return (
                       <g key={metric.key}>
                         <Trace segments={segments} color={metric.color} />
-                        {hoverPoint && (
-                          <circle cx={hoverPoint.x} cy={hoverPoint.y} r={4} fill={metric.color} stroke="var(--surface)" strokeWidth={2} />
-                        )}
+                        {hoverPoint && <circle cx={hoverPoint.x} cy={hoverPoint.y} r={4} fill={metric.color} stroke="var(--surface)" strokeWidth={2} />}
                       </g>
                     );
                   })}
@@ -404,15 +390,13 @@ export default function VisitorsChart({
             </div>
 
             {active.length === 0 && (
-              <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-subtle">
-                {t('analytics.dashboard.chart.select_metric')}
-              </p>
+              <p className="text-subtle pointer-events-none absolute inset-0 grid place-items-center text-sm">{t('analytics.dashboard.chart.select_metric')}</p>
             )}
 
             {point && active.length > 0 && (
               <div
                 ref={tipRef}
-                className="pointer-events-none absolute top-2 z-20 min-w-44 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-[var(--shadow)]"
+                className="border-line bg-surface pointer-events-none absolute top-2 z-20 max-w-full min-w-44 rounded-lg border px-3 py-2 text-xs shadow-[var(--shadow)]"
                 style={{ left: tipLeft }}
               >
                 {previousPoint ? (
@@ -434,15 +418,15 @@ export default function VisitorsChart({
                         return (
                           <tr key={m.key}>
                             <td className="py-0.5">
-                              <span className="inline-flex items-center gap-2 text-muted">
+                              <span className="text-muted inline-flex items-center gap-2">
                                 <span aria-hidden className="h-0.5 w-3 shrink-0 rounded-full" style={{ background: m.color }} />
                                 {m.label}
                               </span>
                             </td>
-                            <td className="whitespace-nowrap pl-3 text-right font-bold tabular-nums text-foreground sm:pl-4">{value === null ? '—' : m.format(value)}</td>
-                            <td className="whitespace-nowrap pl-3 text-right tabular-nums text-muted sm:pl-4">{before === null ? '—' : m.format(before)}</td>
+                            <td className="text-foreground pl-3 text-right font-bold whitespace-nowrap tabular-nums sm:pl-4">{value === null ? '—' : m.format(value)}</td>
+                            <td className="text-muted pl-3 text-right whitespace-nowrap tabular-nums sm:pl-4">{before === null ? '—' : m.format(before)}</td>
                             <td
-                              className={`whitespace-nowrap pl-3 text-right font-bold tabular-nums sm:pl-4 ${change === null || change === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
+                              className={`pl-3 text-right font-bold whitespace-nowrap tabular-nums sm:pl-4 ${change === null || change === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
                             >
                               {change === null ? '—' : change === 0 ? '± 0 %' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toLocaleString(locale)} %`}
                             </td>
@@ -453,13 +437,13 @@ export default function VisitorsChart({
                   </table>
                 ) : (
                   <>
-                    <p className="mb-1.5 whitespace-nowrap font-semibold text-muted">{formatBucket(point.date)}</p>
+                    <p className="text-muted mb-1.5 font-semibold whitespace-nowrap">{formatBucket(point.date)}</p>
                     {active.map((m) => {
                       const value = point[m.key];
                       return (
-                        <div key={m.key} className="flex items-center gap-2 whitespace-nowrap py-0.5">
+                        <div key={m.key} className="flex items-center gap-2 py-0.5 whitespace-nowrap">
                           <span aria-hidden className="h-0.5 w-3 shrink-0 rounded-full" style={{ background: m.color }} />
-                          <span className="font-bold tabular-nums text-foreground">{value === null ? '—' : m.format(value)}</span>
+                          <span className="text-foreground font-bold tabular-nums">{value === null ? '—' : m.format(value)}</span>
                           <span className="text-muted">{m.label}</span>
                         </div>
                       );
@@ -473,7 +457,7 @@ export default function VisitorsChart({
           <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" format={formatAxis} />
 
           {(lines.length > 0 || comparison) && (
-            <p className="mt-3 text-xs text-subtle">
+            <p className="text-subtle mt-3 text-xs">
               {[comparison && active.length > 0 ? t('analytics.dashboard.chart.comparison_hint') : null, lines.length > 0 ? t('analytics.dashboard.chart.scale_hint') : null]
                 .filter(Boolean)
                 .join(' ')}

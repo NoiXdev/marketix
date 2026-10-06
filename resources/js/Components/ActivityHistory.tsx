@@ -17,8 +17,7 @@ function Diff({ changes }: { changes: ActivityEntry['changes'] }) {
     <ul className="mt-1 space-y-0.5 text-xs">
       {keys.map((k) => (
         <li key={k} className="text-muted">
-          <span className="font-medium">{k}</span>:{' '}
-          {k in old && <span className="text-danger-foreground line-through">{JSON.stringify(old[k])}</span>}{' '}
+          <span className="font-medium">{k}</span>: {k in old && <span className="text-danger-foreground line-through">{JSON.stringify(old[k])}</span>}{' '}
           <span className="text-success-foreground">{JSON.stringify(attrs[k])}</span>
         </li>
       ))}
@@ -39,24 +38,24 @@ export default function ActivityHistory({ history }: { history?: ActivityEntry[]
   }
 
   return (
-    <div className="rounded-xl border border-line bg-surface">
-      <button type="button" onClick={toggle} className="flex w-full items-center gap-2 px-5 py-3 text-left text-sm font-semibold text-foreground">
+    <div className="border-line bg-surface rounded-xl border">
+      <button type="button" onClick={toggle} className="text-foreground flex w-full items-center gap-2 px-5 py-3 text-left text-sm font-semibold">
         {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         {t('activity.history.title')}
       </button>
       {open && (
-        <div className="border-t border-line px-5 py-3">
+        <div className="border-line border-t px-5 py-3">
           {!history ? (
-            <p className="text-sm text-subtle">{t('activity.history.loading')}</p>
+            <p className="text-subtle text-sm">{t('activity.history.loading')}</p>
           ) : history.length === 0 ? (
-            <p className="text-sm text-subtle">{t('activity.history.empty')}</p>
+            <p className="text-subtle text-sm">{t('activity.history.empty')}</p>
           ) : (
-            <ul className="divide-y divide-line">
+            <ul className="divide-line divide-y">
               {history.map((a) => (
                 <li key={a.id} className="py-2">
-                  <p className="text-sm text-muted">
-                    <span className="font-medium text-foreground">{a.causer?.name ?? 'System'}</span> {a.description}{' '}
-                    <span className="text-xs text-subtle">{new Date(a.created_at).toLocaleString()}</span>
+                  <p className="text-muted text-sm">
+                    <span className="text-foreground font-medium">{a.causer?.name ?? 'System'}</span> {a.description}{' '}
+                    <span className="text-subtle text-xs">{new Date(a.created_at).toLocaleString()}</span>
                   </p>
                   <Diff changes={a.changes} />
                 </li>

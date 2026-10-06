@@ -70,15 +70,7 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function RecipientsInput({
-  value,
-  onChange,
-  error,
-}: {
-  value: string[];
-  onChange: (next: string[]) => void;
-  error?: string;
-}) {
+function RecipientsInput({ value, onChange, error }: { value: string[]; onChange: (next: string[]) => void; error?: string }) {
   const [draft, setDraft] = useState('');
 
   function commit() {
@@ -104,7 +96,7 @@ function RecipientsInput({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 rounded-[var(--radius-sm)] border border-line-strong bg-surface p-2">
+      <div className="border-line-strong bg-surface flex flex-wrap gap-2 rounded-[var(--radius-sm)] border p-2">
         {value.map((email) => (
           <span
             key={email}
@@ -116,7 +108,7 @@ function RecipientsInput({
             <button
               type="button"
               onClick={() => remove(email)}
-              className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              className="rounded-full focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               aria-label={`Remove ${email}`}
             >
               <X className="h-3 w-3" />
@@ -128,27 +120,15 @@ function RecipientsInput({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKeyDown}
           onBlur={commit}
-          className="min-w-[10ch] flex-1 border-0 bg-transparent p-1 text-sm text-foreground outline-none placeholder:text-subtle"
+          className="text-foreground placeholder:text-subtle min-w-[10ch] flex-1 border-0 bg-transparent p-1 text-sm outline-none"
         />
       </div>
-      {error && <p className="mt-1.5 text-xs text-danger-foreground">{error}</p>}
+      {error && <p className="text-danger-foreground mt-1.5 text-xs">{error}</p>}
     </div>
   );
 }
 
-export default function ReportForm({
-  data,
-  setData,
-  errors,
-  processing,
-  submitLabel,
-  cancelHref,
-  links,
-  sites,
-  types,
-  locale,
-  onSubmit,
-}: ReportFormProps) {
+export default function ReportForm({ data, setData, errors, processing, submitLabel, cancelHref, links, sites, types, locale, onSubmit }: ReportFormProps) {
   const { t } = useTranslation();
 
   const errorMessages = Object.values(errors).filter(Boolean) as string[];
@@ -172,12 +152,7 @@ export default function ReportForm({
 
       <FormSection>
         <Field label={t('reports.form.name')} htmlFor="name" error={errors.name}>
-          <Input
-            id="name"
-            value={data.name}
-            onChange={(e) => setData('name', e.target.value)}
-            placeholder={t('reports.form.name_placeholder')}
-          />
+          <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('reports.form.name_placeholder')} />
         </Field>
 
         <Field label={t('reports.form.type')} htmlFor="type">
@@ -230,11 +205,7 @@ export default function ReportForm({
 
         {data.frequency === 'weekly' && (
           <Field label={t('reports.form.weekday')} htmlFor="weekday" error={errors.weekday}>
-            <Select
-              id="weekday"
-              value={data.weekday ?? 1}
-              onChange={(e) => setData('weekday', Number(e.target.value))}
-            >
+            <Select id="weekday" value={data.weekday ?? 1} onChange={(e) => setData('weekday', Number(e.target.value))}>
               {Array.from({ length: 7 }, (_, i) => i).map((day) => (
                 <option key={day} value={day}>
                   {weekdayLabel(day, locale)}
@@ -246,11 +217,7 @@ export default function ReportForm({
 
         {data.frequency === 'monthly' && (
           <Field label={t('reports.form.day_of_month')} htmlFor="day_of_month" error={errors.day_of_month}>
-            <Select
-              id="day_of_month"
-              value={data.day_of_month ?? 1}
-              onChange={(e) => setData('day_of_month', Number(e.target.value))}
-            >
+            <Select id="day_of_month" value={data.day_of_month ?? 1} onChange={(e) => setData('day_of_month', Number(e.target.value))}>
               {DAYS_OF_MONTH.map((day) => (
                 <option key={day} value={day}>
                   {day}
@@ -272,37 +239,25 @@ export default function ReportForm({
       </FormSection>
 
       <FormSection title={t('reports.form.formats')}>
-        <label className="flex items-center gap-2 text-sm text-foreground">
-          <Checkbox
-            checked={data.formats.csv}
-            onChange={(e) => setData('formats', { ...data.formats, csv: e.target.checked })}
-          />
+        <label className="text-foreground flex items-center gap-2 text-sm">
+          <Checkbox checked={data.formats.csv} onChange={(e) => setData('formats', { ...data.formats, csv: e.target.checked })} />
           {t('reports.form.format_csv')}
         </label>
-        <label className="flex items-center gap-2 text-sm text-foreground">
-          <Checkbox
-            checked={data.formats.pdf}
-            onChange={(e) => setData('formats', { ...data.formats, pdf: e.target.checked })}
-          />
+        <label className="text-foreground flex items-center gap-2 text-sm">
+          <Checkbox checked={data.formats.pdf} onChange={(e) => setData('formats', { ...data.formats, pdf: e.target.checked })} />
           {t('reports.form.format_pdf')}
         </label>
         {(errors['formats.csv'] || errors['formats.pdf'] || errors.formats) && (
-          <p className="text-xs text-danger-foreground">
-            {errors['formats.csv'] || errors['formats.pdf'] || errors.formats}
-          </p>
+          <p className="text-danger-foreground text-xs">{errors['formats.csv'] || errors['formats.pdf'] || errors.formats}</p>
         )}
       </FormSection>
 
       <FormSection>
         <Field label={t('reports.form.recipients')} hint={data.recipients.length === 0 ? t('reports.form.recipients_hint') : undefined}>
-          <RecipientsInput
-            value={data.recipients}
-            onChange={(next) => setData('recipients', next)}
-            error={errors.recipients}
-          />
+          <RecipientsInput value={data.recipients} onChange={(next) => setData('recipients', next)} error={errors.recipients} />
         </Field>
 
-        <label className="flex items-center gap-2 text-sm text-foreground">
+        <label className="text-foreground flex items-center gap-2 text-sm">
           <Checkbox checked={data.active} onChange={(e) => setData('active', e.target.checked)} />
           {t('reports.form.active')}
         </label>
@@ -312,7 +267,7 @@ export default function ReportForm({
         <Button type="submit" loading={processing}>
           {submitLabel}
         </Button>
-        <Link href={cancelHref} className="text-sm text-muted transition-colors hover:text-foreground">
+        <Link href={cancelHref} className="text-muted hover:text-foreground text-sm transition-colors">
           {t('common.actions.cancel')}
         </Link>
       </div>

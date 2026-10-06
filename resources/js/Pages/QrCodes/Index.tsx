@@ -1,10 +1,10 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { Badge, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import QrDownloadMenu from '@/Pages/QrCodes/partials/QrDownloadMenu';
 import { QrStyle, QrType } from '@/data/qrTypes';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
+import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import { PageProps } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Palette, Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
@@ -69,34 +69,21 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
               { label: '' },
             ]}
           >
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-line divide-y">
               {qrCodes.map((qr) => (
-                <tr
-                  key={qr.id}
-                  onClick={rowLink(route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id }))}
-                  className={`group ${ROW_LINK_CLASS}`}
-                >
-                  <td className="px-4 py-3 font-medium text-foreground">
+                <tr key={qr.id} onClick={rowLink(route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                  <td className="text-foreground px-4 py-3 font-medium">
                     <Link href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} className="hover:text-accent-soft-foreground">
                       {qr.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 capitalize text-muted">{qr.type.replace('_', ' ')}</td>
+                  <td className="text-muted px-4 py-3 capitalize">{qr.type.replace('_', ' ')}</td>
                   <td className="px-4 py-3">
-                    <Badge variant={qr.is_dynamic ? 'accent' : 'neutral'}>
-                      {qr.is_dynamic ? t('qrcodes.kind.dynamic') : t('qrcodes.kind.static')}
-                    </Badge>
+                    <Badge variant={qr.is_dynamic ? 'accent' : 'neutral'}>{qr.is_dynamic ? t('qrcodes.kind.dynamic') : t('qrcodes.kind.static')}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-muted">{qr.is_dynamic ? qr.scans.toLocaleString() : '—'}</td>
+                  <td className="text-muted px-4 py-3 text-right tabular-nums">{qr.is_dynamic ? qr.scans.toLocaleString() : '—'}</td>
                   <RowActions>
-                    <QrDownloadMenu
-                      name={qr.name}
-                      type={qr.type}
-                      isDynamic={qr.is_dynamic}
-                      content={qr.content}
-                      dynamicUrl={qr.dynamic_url}
-                      style={qr.style}
-                    />
+                    <QrDownloadMenu name={qr.name} type={qr.type} isDynamic={qr.is_dynamic} content={qr.content} dynamicUrl={qr.dynamic_url} style={qr.style} />
                     <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} />
                     <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(qr)} />
                   </RowActions>

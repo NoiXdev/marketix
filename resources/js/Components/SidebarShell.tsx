@@ -48,26 +48,22 @@ export default function SidebarShell({ brand, mobileOpen, onMobileClose, childre
   }
 
   const footer = (centered: boolean) => (
-    <div className="border-t border-line px-3 py-2">
-      <VersionLabel className={`text-[11px] text-subtle ${centered ? 'text-center' : ''}`} />
+    <div className="border-line border-t px-3 py-2">
+      <VersionLabel className={`text-subtle text-[11px] ${centered ? 'text-center' : ''}`} />
     </div>
   );
 
   return (
     <>
       <aside
-        className={`hidden shrink-0 flex-col border-r border-line bg-elevated transition-[width] duration-200 motion-reduce:transition-none lg:flex ${
+        className={`border-line bg-elevated hidden shrink-0 flex-col border-r transition-[width] duration-200 motion-reduce:transition-none lg:flex ${
           collapsed ? 'w-[72px]' : 'w-64'
         }`}
       >
         {/* Header */}
-        <div className="flex h-14 items-center border-b border-line px-3">
+        <div className="border-line flex h-14 items-center border-b px-3">
           {!collapsed && <div className="flex-1 overflow-hidden">{brand}</div>}
-          <button
-            onClick={toggle}
-            aria-label={t('common.nav.toggle_sidebar')}
-            className={`h-7 w-7 ${iconButton} ${collapsed ? 'mx-auto' : 'ml-auto'}`}
-          >
+          <button onClick={toggle} aria-label={t('common.nav.toggle_sidebar')} className={`h-7 w-7 ${iconButton} ${collapsed ? 'mx-auto' : 'ml-auto'}`}>
             <ChevronLeft className={`h-[15px] w-[15px] transition-transform duration-200 motion-reduce:transition-none ${collapsed ? 'rotate-180' : ''}`} />
           </button>
         </div>
@@ -86,9 +82,9 @@ export default function SidebarShell({ brand, mobileOpen, onMobileClose, childre
         <DialogPanel
           transition
           onClick={closeOnLinkClick}
-          className="fixed inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-line bg-elevated shadow-[var(--shadow)] transition duration-200 ease-out data-[closed]:-translate-x-full motion-reduce:transition-none"
+          className="border-line bg-elevated fixed inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r shadow-[var(--shadow)] transition duration-200 ease-out data-[closed]:-translate-x-full motion-reduce:transition-none"
         >
-          <div className="flex h-14 items-center gap-3 border-b border-line px-3">
+          <div className="border-line flex h-14 items-center gap-3 border-b px-3">
             <div className="flex-1 overflow-hidden">{brand}</div>
             <button onClick={onMobileClose} aria-label={t('common.nav.close_menu')} className={`h-9 w-9 ${iconButton}`}>
               <X className="h-[18px] w-[18px]" />

@@ -7,7 +7,7 @@ export default function LiveVisitors({ count }: { count: number }) {
 
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-foreground"
+      className="border-line bg-surface text-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold"
       title={t('analytics.dashboard.live.hint')}
     >
       <span className="relative flex h-2 w-2">

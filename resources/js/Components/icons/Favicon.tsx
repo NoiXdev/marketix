@@ -11,16 +11,8 @@ export function Favicon({ domain, className = 'h-4 w-4 rounded-[2px]' }: { domai
   const host = domain?.trim();
 
   if (!host || failed) {
-    return <Globe className="h-4 w-4 text-subtle" aria-hidden />;
+    return <Globe className="text-subtle h-4 w-4" aria-hidden />;
   }
 
-  return (
-    <img
-      src={route('app.favicon.show', { domain: host })}
-      alt=""
-      className={className}
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
-  );
+  return <img src={route('app.favicon.show', { domain: host })} alt="" className={className} loading="lazy" onError={() => setFailed(true)} />;
 }

@@ -56,15 +56,11 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
             </Select>
           </Field>
 
-          {driverChanged && (
-            <div className="max-w-md rounded-md bg-warning-soft px-4 py-3 text-sm text-warning-foreground">
-              {t('admin.storage.driver_changed_warning')}
-            </div>
-          )}
+          {driverChanged && <div className="bg-warning-soft text-warning-foreground max-w-md rounded-md px-4 py-3 text-sm">{t('admin.storage.driver_changed_warning')}</div>}
 
           {data.driver === 's3' && (
-            <fieldset className="space-y-4 rounded-md border border-line p-4">
-              <legend className="px-1 text-sm font-semibold text-foreground">{t('admin.storage.options.s3')}</legend>
+            <fieldset className="border-line space-y-4 rounded-md border p-4">
+              <legend className="text-foreground px-1 text-sm font-semibold">{t('admin.storage.options.s3')}</legend>
               <Field label={t('admin.storage.fields.s3_key')} htmlFor="s3_key" error={errors.s3_key}>
                 <Input id="s3_key" value={data.s3_key} onChange={(e) => setData('s3_key', e.target.value)} />
               </Field>
@@ -92,25 +88,11 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
               <Field label={t('admin.storage.fields.s3_bucket')} htmlFor="s3_bucket" error={errors.s3_bucket}>
                 <Input id="s3_bucket" value={data.s3_bucket} onChange={(e) => setData('s3_bucket', e.target.value)} />
               </Field>
-              <Field
-                label={t('admin.storage.fields.s3_endpoint')}
-                htmlFor="s3_endpoint"
-                hint={t('admin.storage.fields.s3_endpoint_hint')}
-                error={errors.s3_endpoint}
-              >
-                <Input
-                  id="s3_endpoint"
-                  value={data.s3_endpoint}
-                  onChange={(e) => setData('s3_endpoint', e.target.value)}
-                  placeholder="https://..."
-                />
+              <Field label={t('admin.storage.fields.s3_endpoint')} htmlFor="s3_endpoint" hint={t('admin.storage.fields.s3_endpoint_hint')} error={errors.s3_endpoint}>
+                <Input id="s3_endpoint" value={data.s3_endpoint} onChange={(e) => setData('s3_endpoint', e.target.value)} placeholder="https://..." />
               </Field>
-              <label className="flex items-center gap-2 text-sm text-foreground">
-                <Checkbox
-                  id="s3_use_path_style"
-                  checked={data.s3_use_path_style}
-                  onChange={(e) => setData('s3_use_path_style', e.target.checked)}
-                />
+              <label className="text-foreground flex items-center gap-2 text-sm">
+                <Checkbox id="s3_use_path_style" checked={data.s3_use_path_style} onChange={(e) => setData('s3_use_path_style', e.target.checked)} />
                 {t('admin.storage.fields.s3_use_path_style')}
               </label>
             </fieldset>

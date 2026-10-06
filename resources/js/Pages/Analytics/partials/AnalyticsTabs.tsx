@@ -34,7 +34,7 @@ export default function AnalyticsTabs() {
       <nav
         ref={navRef}
         aria-label={t('analytics.dashboard.tabs.label')}
-        className="-mx-4 overflow-x-auto overflow-y-hidden px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 [scrollbar-width:none] overflow-x-auto overflow-y-hidden px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
       >
         <ul className="flex w-max min-w-full gap-1 shadow-[inset_0_-1px_0_var(--line)]">
           {TABS.map((tab) => {

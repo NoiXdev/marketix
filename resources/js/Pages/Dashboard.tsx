@@ -1,16 +1,16 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { Button } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
+import { WIDGET_DEFS, newWidget, type Widget as W, type WidgetConfig } from '@/lib/widgets/schema';
+import AddWidgetPicker from '@/Pages/Dashboard/AddWidgetPicker';
+import DashboardSwitcher from '@/Pages/Dashboard/DashboardSwitcher';
+import WidgetConfigForm from '@/Pages/Dashboard/WidgetConfigForm';
+import Widget from '@/Pages/Dashboard/widgets/Widget';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Responsive, WidthProvider, type Layout } from 'react-grid-layout/legacy';
 import { Check, Pencil, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { WIDGET_DEFS, newWidget, type Widget as W, type WidgetConfig } from '@/lib/widgets/schema';
-import Widget from '@/Pages/Dashboard/widgets/Widget';
-import DashboardSwitcher from '@/Pages/Dashboard/DashboardSwitcher';
-import AddWidgetPicker from '@/Pages/Dashboard/AddWidgetPicker';
-import WidgetConfigForm from '@/Pages/Dashboard/WidgetConfigForm';
+import { useState } from 'react';
+import { Responsive, WidthProvider, type Layout } from 'react-grid-layout/legacy';
 
 const Grid = WidthProvider(Responsive);
 
@@ -29,7 +29,13 @@ interface Props {
   active: { id: string; name: string; widgets: W[] };
 }
 
-export default function Dashboard({ dashboards, active }: Props) {
+// Keyed by dashboard so switching dashboards starts with fresh local state
+// (widgets, edit mode, open dialogs).
+export default function Dashboard(props: Props) {
+  return <DashboardBoard key={props.active.id} {...props} />;
+}
+
+function DashboardBoard({ dashboards, active }: Props) {
   const project = usePage<PageProps>().props.project!;
   const { t } = useTranslation();
 
@@ -42,21 +48,11 @@ export default function Dashboard({ dashboards, active }: Props) {
   // persisting that collapsed layout would clobber the saved desktop layout.
   const [breakpoint, setBreakpoint] = useState('lg');
 
-  // Reset local edit state whenever the active dashboard changes (switcher navigation).
-  useEffect(() => {
-    setWidgets(active.widgets);
-    setEditing(false);
-    setPicking(false);
-    setConfiguring(null);
-  }, [active.id]);
-
-  // If the viewport shrinks below `lg` while editing, drop out of edit mode —
-  // editing is desktop-only.
-  useEffect(() => {
-    if (breakpoint !== 'lg' && editing) {
-      setEditing(false);
-    }
-  }, [breakpoint, editing]);
+  function onBreakpointChange(next: string) {
+    setBreakpoint(next);
+    // If the viewport shrinks below `lg` while editing, drop out of edit mode.
+    if (next !== 'lg') setEditing(false);
+  }
 
   function save(next: W[]) {
     setWidgets(next);
@@ -114,15 +110,14 @@ export default function Dashboard({ dashboards, active }: Props) {
   // values carry over and widgets drift off-screen, so stack them full-width
   // in desktop reading order (top to bottom, then left to right).
   const typeById = new Map(widgets.map((w) => [w.id, w.type]));
-  let stackedY = 0;
   const mobileLayout: Layout = [...layout]
     .sort((a, b) => a.y - b.y || a.x - b.x)
-    .map((item) => {
+    .reduce<Layout>((stack, item) => {
+      const previous = stack[stack.length - 1];
+      const y = previous ? previous.y + previous.h : 0;
       const h = Math.max(item.h, MOBILE_MIN_H[typeById.get(item.i)!] ?? 0);
-      const stacked = { i: item.i, x: 0, y: stackedY, w: 1, h, static: true };
-      stackedY += h;
-      return stacked;
-    });
+      return [...stack, { i: item.i, x: 0, y, w: 1, h, static: true }];
+    }, []);
 
   return (
     <AppLayout title={project.name}>
@@ -156,7 +151,7 @@ export default function Dashboard({ dashboards, active }: Props) {
           isResizable={editing}
           draggableCancel=".widget-no-drag"
           margin={[14, 14]}
-          onBreakpointChange={(bp) => setBreakpoint(bp)}
+          onBreakpointChange={onBreakpointChange}
           onDragStop={(l) => onLayoutChange(l)}
           onResizeStop={(l) => onLayoutChange(l)}
         >
@@ -169,9 +164,7 @@ export default function Dashboard({ dashboards, active }: Props) {
       </div>
 
       {picking && <AddWidgetPicker onPick={addWidget} onClose={() => setPicking(false)} />}
-      {configuring && (
-        <WidgetConfigForm widget={configuring} onSave={(config) => configureWidget(configuring.id, config)} onClose={() => setConfiguring(null)} />
-      )}
+      {configuring && <WidgetConfigForm widget={configuring} onSave={(config) => configureWidget(configuring.id, config)} onClose={() => setConfiguring(null)} />}
     </AppLayout>
   );
 }

@@ -72,8 +72,8 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           </Field>
 
           {data.default_mailer === 'postal' && (
-            <fieldset className="space-y-4 rounded-md border border-line p-4">
-              <legend className="px-1 text-sm font-semibold text-foreground">{t('admin.mailer.options.postal')}</legend>
+            <fieldset className="border-line space-y-4 rounded-md border p-4">
+              <legend className="text-foreground px-1 text-sm font-semibold">{t('admin.mailer.options.postal')}</legend>
               <Field label={t('admin.mailer.fields.postal_url')} htmlFor="postal_url" error={errors.postal_url}>
                 <Input id="postal_url" value={data.postal_url} onChange={(e) => setData('postal_url', e.target.value)} />
               </Field>
@@ -99,18 +99,13 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           )}
 
           {data.default_mailer === 'smtp' && (
-            <fieldset className="space-y-4 rounded-md border border-line p-4">
-              <legend className="px-1 text-sm font-semibold text-foreground">{t('admin.mailer.options.smtp')}</legend>
+            <fieldset className="border-line space-y-4 rounded-md border p-4">
+              <legend className="text-foreground px-1 text-sm font-semibold">{t('admin.mailer.options.smtp')}</legend>
               <Field label={t('admin.mailer.fields.smtp_host')} htmlFor="smtp_host" error={errors.smtp_host}>
                 <Input id="smtp_host" value={data.smtp_host} onChange={(e) => setData('smtp_host', e.target.value)} />
               </Field>
               <Field label={t('admin.mailer.fields.smtp_port')} htmlFor="smtp_port" error={errors.smtp_port}>
-                <Input
-                  id="smtp_port"
-                  type="number"
-                  value={data.smtp_port}
-                  onChange={(e) => setData('smtp_port', Number(e.target.value))}
-                />
+                <Input id="smtp_port" type="number" value={data.smtp_port} onChange={(e) => setData('smtp_port', Number(e.target.value))} />
               </Field>
               <Field label={t('admin.mailer.fields.smtp_username')} htmlFor="smtp_username" error={errors.smtp_username}>
                 <Input id="smtp_username" value={data.smtp_username} onChange={(e) => setData('smtp_username', e.target.value)} />
@@ -147,12 +142,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
         <form onSubmit={sendTest} className="mt-8 max-w-md">
           <FormSection title={t('admin.mailer.test.title')}>
             <Field label={t('admin.mailer.test.recipient_label')} htmlFor="test_email" error={testForm.errors.test_email}>
-              <Input
-                id="test_email"
-                type="email"
-                value={testForm.data.test_email}
-                onChange={(e) => testForm.setData('test_email', e.target.value)}
-              />
+              <Input id="test_email" type="email" value={testForm.data.test_email} onChange={(e) => testForm.setData('test_email', e.target.value)} />
             </Field>
             <Button type="submit" variant="secondary" loading={testForm.processing}>
               {t('admin.mailer.test.send_button')}

@@ -16,8 +16,7 @@
   }
 
   var VID_COOKIE = 'mx_vid';
-  var DOWNLOAD_EXTENSIONS =
-    /\.(pdf|xlsx?|docx?|pptx?|csv|txt|rtf|odt|ods|odp|zip|rar|7z|gz|tar|dmg|exe|msi|pkg|apk|mp3|wav|mp4|mov|avi|mkv|epub|key|numbers|pages)$/i;
+  var DOWNLOAD_EXTENSIONS = /\.(pdf|xlsx?|docx?|pptx?|csv|txt|rtf|odt|ods|odp|zip|rar|7z|gz|tar|dmg|exe|msi|pkg|apk|mp3|wav|mp4|mov|avi|mkv|epub|key|numbers|pages)$/i;
 
   function getCookie(name) {
     var m = document.cookie.match('(?:^|;)\\s*' + name + '=([^;]*)');
@@ -28,8 +27,7 @@
     var d = new Date();
     d.setTime(d.getTime() + days * 864e5);
     var secure = location.protocol === 'https:' ? ';Secure' : '';
-    document.cookie =
-      name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax' + secure;
+    document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax' + secure;
   }
 
   function randomId() {

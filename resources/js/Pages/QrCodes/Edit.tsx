@@ -10,7 +10,10 @@ import { useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import QrEditor, { QrFormData } from './partials/QrEditor';
 
-interface Domain { id: string; name: string }
+interface Domain {
+  id: string;
+  name: string;
+}
 
 interface QrData {
   id: string;
@@ -38,22 +41,22 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
   const { t } = useTranslation();
 
   const { data, setData, put, processing, errors } = useForm<QrFormData>({
-    name:       qrCode.name,
-    type:       qrCode.type,
+    name: qrCode.name,
+    type: qrCode.type,
     is_dynamic: qrCode.is_dynamic,
-    domain_id:  qrCode.domain_id ?? (domains[0]?.id ?? ''),
-    slug:       qrCode.slug ?? '',
-    content:            qrCode.content,
-    style:              { ...DEFAULT_STYLE, ...qrCode.style },
-    status:             qrCode.status != null ? String(qrCode.status) : '1',
-    password:           '',
-    expired_at:         qrCode.expired_at ?? '',
-    targeting_geo:      (qrCode.targeting_geo ?? []) as QrFormData['targeting_geo'],
-    targeting_device:   (qrCode.targeting_device ?? []) as QrFormData['targeting_device'],
+    domain_id: qrCode.domain_id ?? domains[0]?.id ?? '',
+    slug: qrCode.slug ?? '',
+    content: qrCode.content,
+    style: { ...DEFAULT_STYLE, ...qrCode.style },
+    status: qrCode.status != null ? String(qrCode.status) : '1',
+    password: '',
+    expired_at: qrCode.expired_at ?? '',
+    targeting_geo: (qrCode.targeting_geo ?? []) as QrFormData['targeting_geo'],
+    targeting_device: (qrCode.targeting_device ?? []) as QrFormData['targeting_device'],
     targeting_language: (qrCode.targeting_language ?? []) as QrFormData['targeting_language'],
-    targeting_ab:       (qrCode.targeting_ab ?? []) as QrFormData['targeting_ab'],
-    utm:                qrCode.utm ?? {},
-    pixel_ids:          qrCode.pixel_ids ?? [],
+    targeting_ab: (qrCode.targeting_ab ?? []) as QrFormData['targeting_ab'],
+    utm: qrCode.utm ?? {},
+    pixel_ids: qrCode.pixel_ids ?? [],
   });
 
   const original: QrEditState = {
@@ -93,7 +96,7 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
       <div className="px-8 py-8">
         <div className="mb-6">
           <BackLink href={route('app.project.qrcodes.index', { project: project!.id })}>{t('qr.editor.back')}</BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">
             {t('qr.editor.edit_title')} <span className="text-accent-soft-foreground">{qrCode.name}</span>
           </h1>
         </div>

@@ -1,4 +1,7 @@
-export interface Language { code: string; name: string }
+export interface Language {
+  code: string;
+  name: string;
+}
 
 export const LANGUAGES: Language[] = [
   { code: 'af', name: 'Afrikaans' },

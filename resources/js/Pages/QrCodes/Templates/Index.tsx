@@ -34,7 +34,7 @@ export default function QrTemplatesIndex() {
     listQrTemplates(project.id)
       .then(setTemplates)
       .catch(() => setStatus({ kind: 'error', message: t('qr.template.load_error') }));
-  }, [project]);
+  }, [project, t]);
 
   const preview = useMemo(() => renderQr(SAMPLE_DATA, style), [style]);
 
@@ -52,22 +52,18 @@ export default function QrTemplatesIndex() {
     setStatus(null);
   }
 
-  const handleSubmit: FormEventHandler = e => {
+  const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     if (!project || !name.trim() || saving) return;
 
     setSaving(true);
     setStatus(null);
 
-    const request = selectedId
-      ? updateQrTemplate(project.id, selectedId, { name: name.trim(), style })
-      : createQrTemplate(project.id, name.trim(), style);
+    const request = selectedId ? updateQrTemplate(project.id, selectedId, { name: name.trim(), style }) : createQrTemplate(project.id, name.trim(), style);
 
     request
-      .then(template => {
-        setTemplates(prev =>
-          selectedId ? prev.map(tpl => (tpl.id === template.id ? template : tpl)) : [template, ...prev],
-        );
+      .then((template) => {
+        setTemplates((prev) => (selectedId ? prev.map((tpl) => (tpl.id === template.id ? template : tpl)) : [template, ...prev]));
         setSelectedId(template.id);
         setStatus({ kind: 'success', message: t(selectedId ? 'qr.template.updated' : 'qr.template.saved') });
       })
@@ -89,7 +85,7 @@ export default function QrTemplatesIndex() {
     setStatus(null);
     deleteQrTemplate(project.id, template.id)
       .then(() => {
-        setTemplates(prev => prev.filter(tpl => tpl.id !== template.id));
+        setTemplates((prev) => prev.filter((tpl) => tpl.id !== template.id));
         if (selectedId === template.id) startNew();
         setStatus({ kind: 'success', message: t('qr.template.deleted') });
       })
@@ -100,9 +96,7 @@ export default function QrTemplatesIndex() {
   return (
     <AppLayout title={t('qr.template.page_title')}>
       <div className="px-8 py-8">
-        <BackLink href={route('app.project.qrcodes.index', { project: project!.id })}>
-          {t('qr.template.back')}
-        </BackLink>
+        <BackLink href={route('app.project.qrcodes.index', { project: project!.id })}>{t('qr.template.back')}</BackLink>
         <div className="mt-3">
           <PageHeader
             title={t('qr.template.page_title')}
@@ -115,30 +109,22 @@ export default function QrTemplatesIndex() {
           />
         </div>
 
-        {status && (
-          <p className={`mb-4 text-sm ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>
-            {status.message}
-          </p>
-        )}
+        {status && <p className={`mb-4 text-sm ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>{status.message}</p>}
 
         <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
           <Card className="h-fit p-3">
             {templates.length === 0 ? (
-              <p className="px-2 py-3 text-sm text-muted">{t('qr.template.empty')}</p>
+              <p className="text-muted px-2 py-3 text-sm">{t('qr.template.empty')}</p>
             ) : (
               <ul className="space-y-1">
-                {templates.map(template => (
+                {templates.map((template) => (
                   <li key={template.id}>
                     <div
                       className={`flex items-center justify-between gap-2 rounded-[var(--radius-sm)] border px-3 py-2 ${
-                        selectedId === template.id ? 'border-accent bg-accent-soft' : 'border-transparent hover:bg-elevated'
+                        selectedId === template.id ? 'border-accent bg-accent-soft' : 'hover:bg-elevated border-transparent'
                       }`}
                     >
-                      <button
-                        type="button"
-                        onClick={() => select(template)}
-                        className="min-w-0 flex-1 truncate text-left text-sm text-foreground"
-                      >
+                      <button type="button" onClick={() => select(template)} className="text-foreground min-w-0 flex-1 truncate text-left text-sm">
                         {template.name}
                       </button>
                       <IconButton
@@ -160,16 +146,10 @@ export default function QrTemplatesIndex() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-6 md:grid-cols-[1fr_auto]">
                 <Field label={t('qr.template.name_label')} htmlFor="preset-name">
-                  <Input
-                    id="preset-name"
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder={t('qr.template.save_prompt')}
-                  />
+                  <Input id="preset-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('qr.template.save_prompt')} />
                 </Field>
                 <div
-                  className="w-[160px] shrink-0 overflow-hidden rounded-[12px] border border-line [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+                  className="border-line w-[160px] shrink-0 overflow-hidden rounded-[12px] border [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
                   style={{ background: style.background }}
                   dangerouslySetInnerHTML={{ __html: preview.svg }}
                 />
@@ -177,11 +157,11 @@ export default function QrTemplatesIndex() {
 
               <QrStyleForm style={style} onChange={setStyle} />
 
-              <div className="flex items-center gap-3 border-t border-line pt-4">
+              <div className="border-line flex items-center gap-3 border-t pt-4">
                 <Button type="submit" loading={saving} disabled={!name.trim()}>
                   {selectedId ? t('qr.template.update') : t('qr.template.save')}
                 </Button>
-                <p className="text-xs text-muted">{t('qr.template.update_hint')}</p>
+                <p className="text-muted text-xs">{t('qr.template.update_hint')}</p>
               </div>
             </form>
           </Card>

@@ -3,11 +3,11 @@ import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { Favicon } from '@/Components/icons/Favicon';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
+import { Button, LinkButton, StatusPill } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import ClicksChart from '@/Pages/Dashboard/ClicksChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import RankedList from '@/Pages/Dashboard/RankedList';
-import { Button, LinkButton, StatusPill } from '@/Components/ui';
 import { confirmTyped } from '@/lib/confirm';
 import { countryName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
@@ -16,8 +16,15 @@ import { router, usePage } from '@inertiajs/react';
 import { BarChart3, Calendar, Check, Copy, ExternalLink, MousePointerClick, Pencil, QrCode as QrCodeIcon, RotateCcw } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
-interface DayClicks { date: string; clicks: number; unique: number }
-interface BreakdownRow { count: number; [key: string]: string | number }
+interface DayClicks {
+  date: string;
+  clicks: number;
+  unique: number;
+}
+interface BreakdownRow {
+  count: number;
+  [key: string]: string | number;
+}
 interface RecentClick {
   id: string;
   country: string | null;
@@ -72,7 +79,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={copy}
       title={copied ? t('links.copy.copied') : t('links.copy.idle')}
-      className={`rounded-md p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+      className={`rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
         copied ? 'text-success-foreground' : 'text-subtle hover:bg-elevated hover:text-foreground'
       }`}
     >
@@ -95,9 +102,9 @@ function Breakdown({
   prefix?: (row: BreakdownRow) => ReactNode;
 }) {
   return (
-    <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-      <div className="border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+      <div className="border-line border-b px-4 py-3">
+        <h2 className="text-foreground text-sm font-semibold">{title}</h2>
       </div>
       <RankedList
         emptyLabel={emptyLabel}
@@ -113,8 +120,17 @@ function Breakdown({
 }
 
 export default function LinksShow({
-  link, days, rangeClicks, rangeUnique, clicksByDay,
-  topCountries, topCities, topBrowsers, topOs, topReferrers, recentClicks,
+  link,
+  days,
+  rangeClicks,
+  rangeUnique,
+  clicksByDay,
+  topCountries,
+  topCities,
+  topBrowsers,
+  topOs,
+  topReferrers,
+  recentClicks,
   clicksByCountry,
 }: Props) {
   const { project } = usePage<PageProps>().props;
@@ -123,11 +139,7 @@ export default function LinksShow({
   const shortUrl = link.domain ? `https://${link.domain.name}/${link.slug}` : link.slug;
 
   function setDays(d: number) {
-    router.get(
-      route('app.project.links.show', { project: project!.id, url: link.id }),
-      { days: d },
-      { preserveState: true, preserveScroll: true },
-    );
+    router.get(route('app.project.links.show', { project: project!.id, url: link.id }), { days: d }, { preserveState: true, preserveScroll: true });
   }
 
   async function resetStats() {
@@ -145,33 +157,41 @@ export default function LinksShow({
     <AppLayout title={t('links.show.page_title', { slug: link.slug })}>
       <div className="px-8 py-8">
         {/* Header / detail card */}
-        <div className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+        <div className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-1 text-xl font-bold text-foreground">
+              <div className="text-foreground flex items-center gap-1 text-xl font-bold">
                 {link.domain && <span className="text-subtle">{link.domain.name}/</span>}
                 <span className="truncate">{link.slug}</span>
                 <CopyButton text={shortUrl} />
                 {link.status === 1 ? (
-                  <span className="ml-2"><StatusPill status="success">{t('links.status.active')}</StatusPill></span>
+                  <span className="ml-2">
+                    <StatusPill status="success">{t('links.status.active')}</StatusPill>
+                  </span>
                 ) : (
-                  <span className="ml-2"><StatusPill status="neutral">{t('links.status.inactive')}</StatusPill></span>
+                  <span className="ml-2">
+                    <StatusPill status="neutral">{t('links.status.inactive')}</StatusPill>
+                  </span>
                 )}
               </div>
               <a
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex max-w-full items-center gap-1 truncate text-sm text-muted hover:text-accent-soft-foreground"
+                className="text-muted hover:text-accent-soft-foreground mt-2 inline-flex max-w-full items-center gap-1 truncate text-sm"
               >
                 <span className="truncate">{link.url}</span>
                 <ExternalLink className="h-3 w-3 shrink-0" />
               </a>
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-subtle">
+              <div className="text-subtle mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                 <span>{link.type_label}</span>
                 <span>{t('links.show.created', { date: new Date(link.created_at).toLocaleDateString() })}</span>
                 {link.expired_at && <span className="text-warning-foreground">{t('links.expires', { date: new Date(link.expired_at).toLocaleDateString() })}</span>}
-                {link.has_qr_code && <span className="inline-flex items-center gap-1"><QrCodeIcon className="h-3.5 w-3.5" /> {t('links.show.qr_code')}</span>}
+                {link.has_qr_code && (
+                  <span className="inline-flex items-center gap-1">
+                    <QrCodeIcon className="h-3.5 w-3.5" /> {t('links.show.qr_code')}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -196,12 +216,12 @@ export default function LinksShow({
 
         {/* Range selector */}
         <div className="mb-6 flex justify-end">
-          <div className="inline-flex overflow-hidden rounded-lg border border-line">
+          <div className="border-line inline-flex overflow-hidden rounded-lg border">
             {RANGES.map((d) => (
               <button
                 key={d}
                 onClick={() => setDays(d)}
-                className={`border-r border-line px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                className={`border-line border-r px-3 py-1.5 text-sm font-semibold last:border-r-0 focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
                   days === d ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
                 }`}
               >
@@ -221,13 +241,15 @@ export default function LinksShow({
         </div>
 
         {/* Clicks over time */}
-        <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-          <div className="border-b border-line px-4 py-3.5">
-            <h2 className="text-sm font-semibold text-foreground">
-              {t('links.show.clicks_over_time')} <span className="font-normal text-muted">{t('links.show.last_days', { days: String(days) })}</span>
+        <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+          <div className="border-line border-b px-4 py-3.5">
+            <h2 className="text-foreground text-sm font-semibold">
+              {t('links.show.clicks_over_time')} <span className="text-muted font-normal">{t('links.show.last_days', { days: String(days) })}</span>
             </h2>
           </div>
-          <div className="p-4"><ClicksChart data={clicksByDay} /></div>
+          <div className="p-4">
+            <ClicksChart data={clicksByDay} />
+          </div>
         </section>
 
         {/* Clicks by country map */}
@@ -269,31 +291,31 @@ export default function LinksShow({
         </div>
 
         {/* Recent clicks */}
-        <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-          <div className="border-b border-line px-4 py-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              {t('links.show.recent_clicks')} <span className="font-normal text-muted">{t('links.show.last_days', { days: String(days) })}</span>
+        <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+          <div className="border-line border-b px-4 py-3">
+            <h2 className="text-foreground text-sm font-semibold">
+              {t('links.show.recent_clicks')} <span className="text-muted font-normal">{t('links.show.last_days', { days: String(days) })}</span>
             </h2>
           </div>
           {recentClicks.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-subtle">{t('links.show.no_clicks')}</p>
+            <p className="text-subtle px-4 py-6 text-center text-sm">{t('links.show.no_clicks')}</p>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('links.show.columns.when')}</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('links.show.columns.location')}</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('links.show.columns.device')}</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-muted">{t('links.show.columns.referrer')}</th>
+                <tr className="border-line border-b">
+                  <th className="text-muted px-4 py-2.5 text-left text-xs font-semibold tracking-wider uppercase">{t('links.show.columns.when')}</th>
+                  <th className="text-muted px-4 py-2.5 text-left text-xs font-semibold tracking-wider uppercase">{t('links.show.columns.location')}</th>
+                  <th className="text-muted px-4 py-2.5 text-left text-xs font-semibold tracking-wider uppercase">{t('links.show.columns.device')}</th>
+                  <th className="text-muted px-4 py-2.5 text-left text-xs font-semibold tracking-wider uppercase">{t('links.show.columns.referrer')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-line divide-y">
                 {recentClicks.map((c) => (
                   <tr key={c.id}>
-                    <td className="px-4 py-2.5 text-muted">{new Date(c.created_at).toLocaleString()}</td>
-                    <td className="px-4 py-2.5 text-muted">{[c.city, c.country].filter(Boolean).join(', ') || '—'}</td>
-                    <td className="px-4 py-2.5 text-muted">{[c.browser, c.os].filter(Boolean).join(' · ') || '—'}</td>
-                    <td className="px-4 py-2.5 text-muted">{c.domain || '—'}</td>
+                    <td className="text-muted px-4 py-2.5">{new Date(c.created_at).toLocaleString()}</td>
+                    <td className="text-muted px-4 py-2.5">{[c.city, c.country].filter(Boolean).join(', ') || '—'}</td>
+                    <td className="text-muted px-4 py-2.5">{[c.browser, c.os].filter(Boolean).join(' · ') || '—'}</td>
+                    <td className="text-muted px-4 py-2.5">{c.domain || '—'}</td>
                   </tr>
                 ))}
               </tbody>

@@ -29,9 +29,7 @@ export default function ReportDownloadButton({ projectId, urlId }: Props) {
 
   const build = (params: Record<string, string | number>) => {
     const base = { project: projectId, ...(urlId ? { url: urlId } : {}), ...params };
-    return urlId
-      ? route('app.project.links.reports.download', base)
-      : route('app.project.reports.download', base);
+    return urlId ? route('app.project.links.reports.download', base) : route('app.project.reports.download', base);
   };
 
   const go = (params: Record<string, string | number>) => {
@@ -41,49 +39,29 @@ export default function ReportDownloadButton({ projectId, urlId }: Props) {
 
   return (
     <div className="relative" ref={ref}>
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="true"
-        aria-expanded={open}
-      >
+      <Button type="button" variant="secondary" onClick={() => setOpen((v) => !v)} aria-haspopup="true" aria-expanded={open}>
         <Download className="h-4 w-4" /> {t('common.report.download_pdf')}
       </Button>
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-64 rounded-[var(--radius)] border border-line bg-surface p-3 shadow-[var(--shadow)]">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">
-            {t('common.report.preset')}
-          </div>
+        <div className="border-line bg-surface absolute right-0 z-20 mt-2 w-64 rounded-[var(--radius)] border p-3 shadow-[var(--shadow)]">
+          <div className="text-subtle mb-2 text-xs font-semibold tracking-wide uppercase">{t('common.report.preset')}</div>
           <div className="flex gap-2">
             {[7, 30, 90].map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => go({ range: d })}
-                className="flex-1 rounded-[var(--radius-sm)] bg-elevated px-2 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent-soft hover:text-accent-soft-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+                className="bg-elevated text-foreground hover:bg-accent-soft hover:text-accent-soft-foreground flex-1 rounded-[var(--radius-sm)] px-2 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
               >
                 {d}
                 {t('common.report.day_suffix')}
               </button>
             ))}
           </div>
-          <div className="my-2 text-xs font-semibold uppercase tracking-wide text-subtle">
-            {t('common.report.custom')}
-          </div>
+          <div className="text-subtle my-2 text-xs font-semibold tracking-wide uppercase">{t('common.report.custom')}</div>
           <div className="flex flex-col gap-2">
-            <Input
-              type="date"
-              aria-label={t('common.report.from')}
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-            <Input
-              type="date"
-              aria-label={t('common.report.to')}
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
+            <Input type="date" aria-label={t('common.report.from')} value={from} onChange={(e) => setFrom(e.target.value)} />
+            <Input type="date" aria-label={t('common.report.to')} value={to} onChange={(e) => setTo(e.target.value)} />
             <Button type="button" disabled={!from || !to} onClick={() => go({ from, to })}>
               {t('common.report.download_range')}
             </Button>

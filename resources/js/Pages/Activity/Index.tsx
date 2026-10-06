@@ -1,6 +1,6 @@
 import ActivityFeed from '@/Components/ActivityFeed';
-import AppLayout from '@/Layouts/AppLayout';
 import { PageHeader, Pagination, Select } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
@@ -10,15 +10,7 @@ interface Paginated<T> {
   links: { url: string | null; label: string; active: boolean }[];
 }
 
-export default function ActivityIndex({
-  activities,
-  logName,
-  logNames,
-}: {
-  activities: Paginated<ActivityEntry>;
-  logName: string | null;
-  logNames: string[];
-}) {
+export default function ActivityIndex({ activities, logName, logNames }: { activities: Paginated<ActivityEntry>; logName: string | null; logNames: string[] }) {
   const project = usePage<PageProps>().props.project;
   const { t } = useTranslation();
 
@@ -34,7 +26,9 @@ export default function ActivityIndex({
       <Select value={logName ?? ''} onChange={(e) => onFilter(e.target.value)}>
         <option value="">{t('activity.all')}</option>
         {logNames.map((n) => (
-          <option key={n} value={n}>{n}</option>
+          <option key={n} value={n}>
+            {n}
+          </option>
         ))}
       </Select>
     </div>
@@ -44,7 +38,7 @@ export default function ActivityIndex({
     <AppLayout title={t('activity.title')}>
       <div className="px-8 py-8">
         <PageHeader title={t('activity.title')} action={filter} />
-        <div className="rounded-[var(--radius)] border border-line bg-surface px-5 shadow-[var(--shadow-sm)]">
+        <div className="border-line bg-surface rounded-[var(--radius)] border px-5 shadow-[var(--shadow-sm)]">
           <ActivityFeed activities={activities.data} />
         </div>
         <div className="mt-4">

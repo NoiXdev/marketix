@@ -64,11 +64,7 @@ export default function AdminActivityIndex({
             </Select>
           </div>
           <div className="w-48">
-            <Input
-              defaultValue={filters.causer ?? ''}
-              onBlur={(e) => apply({ causer: e.target.value || null })}
-              placeholder={t('admin.activity.filters.causer_placeholder')}
-            />
+            <Input defaultValue={filters.causer ?? ''} onBlur={(e) => apply({ causer: e.target.value || null })} placeholder={t('admin.activity.filters.causer_placeholder')} />
           </div>
           <div className="w-40">
             <Input type="date" defaultValue={filters.from ?? ''} onChange={(e) => apply({ from: e.target.value || null })} />
@@ -78,7 +74,7 @@ export default function AdminActivityIndex({
           </div>
         </div>
 
-        <div className="rounded-[var(--radius)] border border-line bg-surface px-5">
+        <div className="border-line bg-surface rounded-[var(--radius)] border px-5">
           <ActivityFeed activities={activities.data} showProject />
         </div>
 

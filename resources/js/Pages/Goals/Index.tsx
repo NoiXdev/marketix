@@ -1,5 +1,5 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { Goal, PageProps } from '@/types';
@@ -26,9 +26,7 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
     <AppLayout title={t('analytics.goals.title', { name: site.name })}>
       <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id })}>
-            {t('analytics.goals.back')}
-          </BackLink>
+          <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id })}>{t('analytics.goals.back')}</BackLink>
         </div>
         <PageHeader title={t('analytics.goals.title', { name: site.name })} action={createBtn} />
         <Flash />
@@ -44,18 +42,18 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
               { label: '' },
             ]}
           >
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-line divide-y">
               {goals.map((goal) => (
                 <tr key={goal.id} className="group">
-                  <td className="px-4 py-3 font-medium text-foreground">
+                  <td className="text-foreground px-4 py-3 font-medium">
                     {goal.name}
                     {/* Phones show type and match below the name instead of in their own columns */}
-                    <span className="mt-0.5 block font-mono text-xs font-normal break-all text-muted sm:hidden">
+                    <span className="text-muted mt-0.5 block font-mono text-xs font-normal break-all sm:hidden">
                       {goal.type} · {goal.match_value}
                     </span>
                   </td>
-                  <td className="hidden px-4 py-3 text-muted sm:table-cell">{goal.type}</td>
-                  <td className="hidden px-4 py-3 font-mono break-all text-muted sm:table-cell">{goal.match_value}</td>
+                  <td className="text-muted hidden px-4 py-3 sm:table-cell">{goal.type}</td>
+                  <td className="text-muted hidden px-4 py-3 font-mono break-all sm:table-cell">{goal.match_value}</td>
                   <RowActions>
                     <IconButton
                       icon={Pencil}

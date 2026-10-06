@@ -8,7 +8,7 @@ export default function AdminLayout({ children, title }: PropsWithChildren<{ tit
   const mobileNav = useMobileNav();
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-canvas text-foreground">
+    <div className="bg-canvas text-foreground flex h-dvh overflow-hidden">
       {title && <Head title={title} />}
       <AdminSidebar mobileOpen={mobileNav.open} onMobileClose={mobileNav.close} />
       <div className="flex min-w-0 flex-1 flex-col">

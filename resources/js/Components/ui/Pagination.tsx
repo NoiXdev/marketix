@@ -11,16 +11,12 @@ export function Pagination({ links }: { links: PageLink[] }) {
     <nav className="flex flex-wrap items-center gap-1 px-4 py-3">
       {links.map((link, i) =>
         link.url === null ? (
-          <span
-            key={i}
-            className="pointer-events-none rounded-md px-3 py-1.5 text-sm text-subtle opacity-50"
-            dangerouslySetInnerHTML={{ __html: link.label }}
-          />
+          <span key={i} className="text-subtle pointer-events-none rounded-md px-3 py-1.5 text-sm opacity-50" dangerouslySetInnerHTML={{ __html: link.label }} />
         ) : (
           <Link
             key={i}
             href={link.url}
-            className={`rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+            className={`rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
               link.active ? 'bg-accent text-accent-foreground' : 'text-muted hover:bg-elevated hover:text-foreground'
             }`}
             dangerouslySetInnerHTML={{ __html: link.label }}

@@ -28,12 +28,12 @@ export default function AddWidgetPicker({ onPick, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={t('dashboards.add_widget')}
-        className="w-full max-w-sm rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow)]"
+        className="border-line bg-surface w-full max-w-sm rounded-[var(--radius)] border p-4 shadow-[var(--shadow)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-foreground">{t('dashboards.add_widget')}</h2>
-          <button type="button" onClick={onClose} aria-label={t('common.actions.close')} className="rounded p-1 text-subtle hover:bg-elevated hover:text-foreground">
+          <h2 className="text-foreground text-sm font-semibold">{t('dashboards.add_widget')}</h2>
+          <button type="button" onClick={onClose} aria-label={t('common.actions.close')} className="text-subtle hover:bg-elevated hover:text-foreground rounded p-1">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -43,7 +43,7 @@ export default function AddWidgetPicker({ onPick, onClose }: Props) {
               key={type}
               type="button"
               onClick={() => onPick(type)}
-              className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              className="text-foreground hover:bg-elevated flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
             >
               {t(WIDGET_DEFS[type].labelKey)}
             </button>

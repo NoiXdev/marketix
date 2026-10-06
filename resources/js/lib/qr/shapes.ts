@@ -17,16 +17,7 @@ function rectPath(x: number, y: number, w: number, h: number): string {
  * Rounded rectangle walked clockwise (SVG y-down), inserting a quarter `A`
  * arc at each corner flagged to round and a sharp `L` at each square corner.
  */
-function roundedRectPath(
-  x: number,
-  y: number,
-  size: number,
-  rad: number,
-  tl: boolean,
-  tr: boolean,
-  br: boolean,
-  bl: boolean,
-): string {
+function roundedRectPath(x: number, y: number, size: number, rad: number, tl: boolean, tr: boolean, br: boolean, bl: boolean): string {
   const rTL = tl ? rad : 0;
   const rTR = tr ? rad : 0;
   const rBR = br ? rad : 0;
@@ -36,43 +27,23 @@ function roundedRectPath(
   parts.push(`M ${n(x + rTL)} ${n(y)}`);
   // top edge → top-right corner
   parts.push(`L ${n(x + size - rTR)} ${n(y)}`);
-  parts.push(
-    rTR > 0
-      ? `A ${n(rTR)} ${n(rTR)} 0 0 1 ${n(x + size)} ${n(y + rTR)}`
-      : `L ${n(x + size)} ${n(y)}`,
-  );
+  parts.push(rTR > 0 ? `A ${n(rTR)} ${n(rTR)} 0 0 1 ${n(x + size)} ${n(y + rTR)}` : `L ${n(x + size)} ${n(y)}`);
   // right edge → bottom-right corner
   parts.push(`L ${n(x + size)} ${n(y + size - rBR)}`);
-  parts.push(
-    rBR > 0
-      ? `A ${n(rBR)} ${n(rBR)} 0 0 1 ${n(x + size - rBR)} ${n(y + size)}`
-      : `L ${n(x + size)} ${n(y + size)}`,
-  );
+  parts.push(rBR > 0 ? `A ${n(rBR)} ${n(rBR)} 0 0 1 ${n(x + size - rBR)} ${n(y + size)}` : `L ${n(x + size)} ${n(y + size)}`);
   // bottom edge → bottom-left corner
   parts.push(`L ${n(x + rBL)} ${n(y + size)}`);
-  parts.push(
-    rBL > 0
-      ? `A ${n(rBL)} ${n(rBL)} 0 0 1 ${n(x)} ${n(y + size - rBL)}`
-      : `L ${n(x)} ${n(y + size)}`,
-  );
+  parts.push(rBL > 0 ? `A ${n(rBL)} ${n(rBL)} 0 0 1 ${n(x)} ${n(y + size - rBL)}` : `L ${n(x)} ${n(y + size)}`);
   // left edge → top-left corner
   parts.push(`L ${n(x)} ${n(y + rTL)}`);
-  parts.push(
-    rTL > 0
-      ? `A ${n(rTL)} ${n(rTL)} 0 0 1 ${n(x + rTL)} ${n(y)}`
-      : `L ${n(x)} ${n(y)}`,
-  );
+  parts.push(rTL > 0 ? `A ${n(rTL)} ${n(rTL)} 0 0 1 ${n(x + rTL)} ${n(y)}` : `L ${n(x)} ${n(y)}`);
   parts.push('Z');
   return parts.join(' ');
 }
 
 /** Full circle drawn with two `A` arc commands (semicircles). */
 function circlePath(cx: number, cy: number, rad: number): string {
-  return (
-    `M ${n(cx - rad)} ${n(cy)} ` +
-    `A ${n(rad)} ${n(rad)} 0 1 0 ${n(cx + rad)} ${n(cy)} ` +
-    `A ${n(rad)} ${n(rad)} 0 1 0 ${n(cx - rad)} ${n(cy)} Z`
-  );
+  return `M ${n(cx - rad)} ${n(cy)} ` + `A ${n(rad)} ${n(rad)} 0 1 0 ${n(cx + rad)} ${n(cy)} ` + `A ${n(rad)} ${n(rad)} 0 1 0 ${n(cx - rad)} ${n(cy)} Z`;
 }
 
 // The three finder origins (row, col). Bottom-right is intentionally excluded.
@@ -96,13 +67,7 @@ function finderOrigins(size: number): [number, number][] {
  *   additionally forces the top-right and bottom-left corners square so only
  *   the top-left / bottom-right diagonal pair may round.
  */
-export function modulesPath(
-  matrix: QrMatrix,
-  mode: ModuleMode,
-  rounding: number,
-  cell: number,
-  offset: number,
-): string {
+export function modulesPath(matrix: QrMatrix, mode: ModuleMode, rounding: number, cell: number, offset: number): string {
   const { size, isDark, isFinder } = matrix;
   const rad = clamp01(rounding) * (cell / 2);
   const dotRad = 0.5 * cell * Math.max(clamp01(rounding), 0.6);
@@ -150,13 +115,7 @@ export function modulesPath(
  * minus the inner 5×5 hole) per finder, rendered as two subpaths for even-odd
  * fill. `dots` → circular ring, `rounded` → rounded-square ring, `square` → sharp.
  */
-export function eyeFramesPath(
-  matrix: QrMatrix,
-  mode: EyeFrameMode,
-  rounding: number,
-  cell: number,
-  offset: number,
-): string {
+export function eyeFramesPath(matrix: QrMatrix, mode: EyeFrameMode, rounding: number, cell: number, offset: number): string {
   const { size } = matrix;
   const parts: string[] = [];
 
@@ -197,13 +156,7 @@ export function eyeFramesPath(
  * SVG path `d` for the three finder balls: the inner 3×3 block at each finder
  * origin + (2,2). `square` sharp, `rounded` rounded by `rounding`, `dot` circle.
  */
-export function eyeBallsPath(
-  matrix: QrMatrix,
-  mode: EyeBallMode,
-  rounding: number,
-  cell: number,
-  offset: number,
-): string {
+export function eyeBallsPath(matrix: QrMatrix, mode: EyeBallMode, rounding: number, cell: number, offset: number): string {
   const { size } = matrix;
   const parts: string[] = [];
 

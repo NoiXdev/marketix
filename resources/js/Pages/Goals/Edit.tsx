@@ -1,5 +1,5 @@
-import AppLayout from '@/Layouts/AppLayout';
 import { BackLink, Button, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
+import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import { Goal, PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -23,10 +23,8 @@ export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: strin
     <AppLayout title={t('analytics.goals.edit')}>
       <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6">
-          <BackLink href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })}>
-            {t('analytics.goals.back')}
-          </BackLink>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground">{t('analytics.goals.edit')}</h1>
+          <BackLink href={route('app.project.analytics.goals.index', { project: project!.id, site: site.id })}>{t('analytics.goals.back')}</BackLink>
+          <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('analytics.goals.edit')}</h1>
         </div>
 
         <div className="max-w-2xl">

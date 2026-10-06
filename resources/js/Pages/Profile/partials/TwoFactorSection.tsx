@@ -98,7 +98,7 @@ export default function TwoFactorSection({ enabled, pending, setup, recoveryCode
                 />
               </Field>
             </div>
-            <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
               <Button type="submit" size={'sm'} variant="danger" disabled={passwordForm.processing}>
                 {t('profile.two_factor.disable')}
               </Button>

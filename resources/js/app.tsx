@@ -1,36 +1,29 @@
-import '../css/app.css';
 import 'flag-icons/css/flag-icons.min.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import '../css/app.css';
 import './bootstrap';
 
 import { setConfirmTranslations } from '@/lib/confirm';
 import { createInertiaApp, router } from '@inertiajs/react';
-import type { ComponentType } from 'react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const appName =
-    document.querySelector('meta[name="app-name"]')?.getAttribute('content') ||
-    import.meta.env.VITE_APP_NAME ||
-    'Laravel';
+const appName = document.querySelector('meta[name="app-name"]')?.getAttribute('content') || import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.tsx`,
-            import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx'),
-        ).then((module) => module.default),
-    setup({ el, App, props }) {
-        setConfirmTranslations(props.initialPage.props.translations);
-        router.on('navigate', (event) => setConfirmTranslations(event.detail.page.props.translations));
+  title: (title) => `${title} - ${appName}`,
+  resolve: (name) => resolvePageComponent(`./Pages/${name}.tsx`, import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx')).then((module) => module.default),
+  setup({ el, App, props }) {
+    setConfirmTranslations(props.initialPage.props.translations);
+    router.on('navigate', (event) => setConfirmTranslations(event.detail.page.props.translations));
 
-        const root = createRoot(el);
+    const root = createRoot(el);
 
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
-    },
+    root.render(<App {...props} />);
+  },
+  progress: {
+    color: '#4B5563',
+  },
 });
