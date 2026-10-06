@@ -90,6 +90,10 @@ class AnalyticsAggregator
             if ($key === 'channel') {
                 [$sql, $bindings] = $this->channelExpression($siteId);
                 $builder->whereRaw("({$sql}) = ?", [...$bindings, $value]);
+            } elseif ($key === 'visitor_type') {
+                if (in_array($value, AnalyticsQuery::VISITOR_TYPES, true)) {
+                    $builder->where('is_returning', $value === 'returning');
+                }
             } elseif (in_array($key, self::VISIT_FILTERS, true)) {
                 $builder->where($key, $value);
             } else {
@@ -585,6 +589,37 @@ class AnalyticsAggregator
             'from_campaigns' => $fromCampaigns,
             'percent' => $total > 0 ? round($fromCampaigns / $total * 100, 1) : 0.0,
         ];
+    }
+
+    /**
+     * New vs. returning visitors, by the type of each visit in the range. A
+     * visitor with both a first and a later visit in the range counts in both.
+     *
+     * @return list<array{type: string, visitors: int, sessions: int, engagement_rate: ?float}>
+     */
+    public function visitorTypes(string $siteId, AnalyticsQuery|int $range): array
+    {
+        $rows = $this->visitBase($siteId, $range)
+            ->select(
+                'is_returning',
+                DB::raw('COUNT(*) as sessions'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as visitors'),
+            )
+            ->selectRaw(...$this->engagedSumExpression($siteId))
+            ->groupBy('is_returning')->get()
+            ->keyBy(fn ($row) => $row->is_returning ? 'returning' : 'new');
+
+        return array_map(function (string $type) use ($rows) {
+            $row = $rows->get($type);
+            $sessions = (int) ($row->sessions ?? 0);
+
+            return [
+                'type' => $type,
+                'visitors' => (int) ($row->visitors ?? 0),
+                'sessions' => $sessions,
+                'engagement_rate' => $this->rate((int) ($row->engaged ?? 0), $sessions),
+            ];
+        }, AnalyticsQuery::VISITOR_TYPES);
     }
 
     public function totalSessions(string $siteId, AnalyticsQuery|int $range): int

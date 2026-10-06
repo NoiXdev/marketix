@@ -350,6 +350,21 @@ return [
             'engagement_time' => 'Avg. :time active',
         ],
 
+        'visitor_types' => [
+
+            'title' => 'New vs. returning visitors',
+
+            'new' => 'New visitors',
+
+            'returning' => 'Returning visitors',
+
+            'note' => ':sessions sessions · :rate % engagement',
+
+            'cookieless_hint' => 'Without cookies, visitors are only recognised again on the same day. Anyone coming back on another day counts as new.',
+
+        ],
+
+
         'interactions' => [
             'title' => 'Interactions',
             'outbound' => 'Outbound links',
@@ -396,6 +411,7 @@ return [
                 'utm_source' => 'Source',
                 'utm_medium' => 'Medium',
                 'utm_campaign' => 'Campaign',
+                'visitor_type' => 'Visitor type',
             ],
         ],
 

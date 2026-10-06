@@ -5,7 +5,7 @@ import { countryName, languageName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
-import { Rank } from '@/Pages/Analytics/types';
+import { Rank, VisitorTypeRow } from '@/Pages/Analytics/types';
 
 export type AudienceData = {
   clicksByCountry: CountryDatum[];
@@ -16,11 +16,12 @@ export type AudienceData = {
   devices: Rank[];
   browsers: Rank[];
   operatingSystems: Rank[];
+  visitorTypes: VisitorTypeRow[];
 };
 
-export default function AudienceTab({ clicksByCountry, countries, regions, cities, languages, devices, browsers, operatingSystems }: AudienceData) {
+export default function AudienceTab({ clicksByCountry, countries, regions, cities, languages, devices, browsers, operatingSystems, visitorTypes }: AudienceData) {
   const { t, locale } = useTranslation();
-  const { addFilter } = useAnalytics();
+  const { site, addFilter } = useAnalytics();
   const { rows } = useRowBuilders();
   const noData = t('analytics.dashboard.no_data');
   const withFlag = (r: Rank) => ({ prefix: <CountryFlag code={String(r.country_code ?? '')} /> });
@@ -84,6 +85,31 @@ export default function AudienceTab({ clicksByCountry, countries, regions, citie
               key: 'os',
               label: t('analytics.dashboard.breakdown.os'),
               rows: rows(operatingSystems, 'os', 'os', (r) => ({ prefix: <PlatformIcon kind="os" name={String(r.os ?? '')} /> })),
+            },
+          ]}
+        />
+        <BreakdownCard
+          title={t('analytics.dashboard.visitor_types.title')}
+          emptyLabel={noData}
+          // Without a cookie the visitor hash changes daily, so only same-day returns are recognised
+          hint={site.tracking_mode === 'cookieless' ? t('analytics.dashboard.visitor_types.cookieless_hint') : undefined}
+          tabs={[
+            {
+              key: 'types',
+              label: '',
+              rows: visitorTypes
+                .filter((r) => r.visitors > 0)
+                .map((r) => ({
+                  key: r.type,
+                  label: t(`analytics.dashboard.visitor_types.${r.type}`),
+                  value: r.visitors,
+                  note: t('analytics.dashboard.visitor_types.note', {
+                    sessions: r.sessions.toLocaleString(locale),
+                    rate: (r.engagement_rate ?? 0).toLocaleString(locale),
+                  }),
+                  onClick: () => addFilter('visitor_type', r.type),
+                  title: t('analytics.dashboard.filters.apply'),
+                })),
             },
           ]}
         />

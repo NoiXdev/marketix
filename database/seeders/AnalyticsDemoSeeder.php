@@ -9,6 +9,7 @@ use App\Models\Funnel;
 use App\Models\Goal;
 use App\Models\Project;
 use App\Models\Site;
+use App\Support\Analytics\ReturningVisits;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -146,6 +147,7 @@ class AnalyticsDemoSeeder extends Seeder
 
         $this->seedLiveVisits();
         $this->flush(true);
+        ReturningVisits::backfill($this->site->id);
 
         $this->command?->info(sprintf(
             'Seeded analytics demo site "%s" (%s) in project "%s".',

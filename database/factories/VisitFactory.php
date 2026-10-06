@@ -31,6 +31,7 @@ class VisitFactory extends Factory
             'utm_term' => null,
             'utm_content' => null,
             'is_bot' => false,
+            'is_returning' => false,
         ];
     }
 

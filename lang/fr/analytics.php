@@ -350,6 +350,21 @@ return [
             'engagement_time' => 'Moy. :time actif',
         ],
 
+        'visitor_types' => [
+
+            'title' => 'Nouveaux visiteurs et visiteurs récurrents',
+
+            'new' => 'Nouveaux visiteurs',
+
+            'returning' => 'Visiteurs récurrents',
+
+            'note' => ':sessions sessions · :rate % d’engagement',
+
+            'cookieless_hint' => 'Sans cookies, un visiteur n’est reconnu que le même jour. Toute personne qui revient un autre jour est comptée comme nouvelle.',
+
+        ],
+
+
         'interactions' => [
             'title' => 'Interactions',
             'outbound' => 'Liens sortants',
@@ -396,6 +411,7 @@ return [
                 'utm_source' => 'Source',
                 'utm_medium' => 'Support',
                 'utm_campaign' => 'Campagne',
+                'visitor_type' => 'Type de visiteur',
             ],
         ],
 

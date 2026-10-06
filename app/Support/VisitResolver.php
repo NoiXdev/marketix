@@ -10,7 +10,8 @@ class VisitResolver
 
     /**
      * Return the visitor's open session within the window, or create a new Visit.
-     * First-touch fields are applied ONLY when a new Visit is created.
+     * First-touch fields are applied ONLY when a new Visit is created. A new
+     * Visit is returning when the visitor had any earlier one on the site.
      *
      * @param  array<string, ?string>  $firstTouch
      */
@@ -19,14 +20,13 @@ class VisitResolver
         $now = now();
         $windowStart = $now->copy()->subMinutes(self::SESSION_WINDOW_MINUTES);
 
-        $visit = Visit::where('site_id', $siteId)
+        $latest = Visit::where('site_id', $siteId)
             ->where('visitor_hash', $visitorHash)
-            ->where('last_activity_at', '>=', $windowStart)
             ->latest('last_activity_at')
             ->first();
 
-        if ($visit !== null) {
-            return $visit;
+        if ($latest !== null && $latest->last_activity_at->gte($windowStart)) {
+            return $latest;
         }
 
         return Visit::create([
@@ -44,6 +44,7 @@ class VisitResolver
             'device' => $firstTouch['device'] ?? null,
             'referer_domain' => $firstTouch['referer_domain'] ?? null,
             'is_bot' => $isBot,
+            'is_returning' => $latest !== null,
             'utm_source' => $firstTouch['utm_source'] ?? null,
             'utm_medium' => $firstTouch['utm_medium'] ?? null,
             'utm_campaign' => $firstTouch['utm_campaign'] ?? null,

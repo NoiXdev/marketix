@@ -1,5 +1,5 @@
 export type FilterKey =
-  'hostname' | 'path' | 'entry_path' | 'exit_path' | 'referer_domain' | 'channel' | 'country_code' | 'region' | 'city' | 'browser' | 'os' | 'device' | 'language' | 'utm_source' | 'utm_medium' | 'utm_campaign';
+  'hostname' | 'path' | 'entry_path' | 'exit_path' | 'referer_domain' | 'channel' | 'country_code' | 'region' | 'city' | 'browser' | 'os' | 'device' | 'language' | 'utm_source' | 'utm_medium' | 'utm_campaign' | 'visitor_type';
 
 export type Filters = Partial<Record<FilterKey, string>>;
 
@@ -7,7 +7,7 @@ export type TabKey = 'overview' | 'realtime' | 'acquisition' | 'behavior' | 'aud
 
 export const TABS: TabKey[] = ['overview', 'realtime', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
 
-export type SiteInfo = { id: string; name: string; domain: string; search_enabled: boolean; has_data: boolean; snippet: string };
+export type SiteInfo = { id: string; name: string; domain: string; search_enabled: boolean; tracking_mode: 'cookie' | 'cookieless'; has_data: boolean; snippet: string };
 
 export type Summary = {
   page_views: number;
@@ -28,6 +28,8 @@ export type ChannelRow = { channel: string; count: number; visitors: number; eng
 export type EventRow = { name: string; count: number; visitors: number };
 
 export type ValueRow = { value: string; count: number; visitors: number };
+
+export type VisitorTypeRow = { type: 'new' | 'returning'; visitors: number; sessions: number; engagement_rate: number | null };
 
 export type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
 

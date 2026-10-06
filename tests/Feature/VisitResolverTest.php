@@ -62,4 +62,24 @@ class VisitResolverTest extends TestCase
 
         $this->assertNotSame($a->id, $b->id);
     }
+
+    public function test_a_later_visit_of_the_same_visitor_is_returning(): void
+    {
+        $site = Site::factory()->create();
+        $other = Site::factory()->create();
+        $resolver = new VisitResolver;
+
+        Carbon::setTestNow(now());
+        $first = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/lp', $this->firstTouch());
+        $sameSession = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/other', $this->firstTouch());
+        Carbon::setTestNow(now()->addDay());
+        $later = $resolver->resolve($site->id, $site->project_id, 'v1', false, '/lp', $this->firstTouch());
+        $otherSite = $resolver->resolve($other->id, $other->project_id, 'v1', false, '/lp', $this->firstTouch());
+        Carbon::setTestNow();
+
+        $this->assertFalse($first->is_returning);
+        $this->assertSame($first->id, $sameSession->id);
+        $this->assertTrue($later->is_returning);
+        $this->assertFalse($otherSite->is_returning); // history is per site
+    }
 }
