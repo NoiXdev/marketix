@@ -9,6 +9,7 @@ use App\Mcp\Concerns\ResolvesProject;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\Url;
+use App\Support\UtmTagger;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Facades\Validator;
@@ -39,6 +40,7 @@ class CreateLinkTool extends Tool
             'type' => ['nullable', 'integer', Rule::in(array_column(RedirectType::cases(), 'value'))],
             'expires_at' => ['nullable', 'date'],
             'password' => ['nullable', 'string', 'max:255'],
+            ...collect(UtmTagger::KEYS)->mapWithKeys(fn (string $key) => ["utm_{$key}" => ['nullable', 'string', 'max:255']])->all(),
         ]);
 
         $project = $this->resolveProject($request);
@@ -73,6 +75,7 @@ class CreateLinkTool extends Tool
             'status' => UrlStatus::ACTIVATED->value,
             'password' => $request->get('password'),
             'expired_at' => $request->get('expires_at'),
+            'utm' => collect(UtmTagger::KEYS)->mapWithKeys(fn (string $key) => [$key => $request->get("utm_{$key}")])->all(),
         ];
 
         $url = $this->createLink->handle($project, $request->user(), $data);
@@ -138,6 +141,16 @@ class CreateLinkTool extends Tool
                 ->description('Optional ISO-8601 date/time after which the link stops working.'),
             'password' => $schema->string()
                 ->description('Optional password required to follow the link.'),
+            'utm_source' => $schema->string()
+                ->description('Optional utm_source appended to the destination on redirect, e.g. "newsletter" or "qr".'),
+            'utm_medium' => $schema->string()
+                ->description('Optional utm_medium, e.g. "email", "social" or "print".'),
+            'utm_campaign' => $schema->string()
+                ->description('Optional utm_campaign, e.g. "autumn-sale".'),
+            'utm_term' => $schema->string()
+                ->description('Optional utm_term (usually a paid search keyword).'),
+            'utm_content' => $schema->string()
+                ->description('Optional utm_content to tell apart variants of the same campaign.'),
         ];
     }
 }

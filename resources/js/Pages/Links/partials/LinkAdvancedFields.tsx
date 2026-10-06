@@ -12,6 +12,7 @@ import {
   LanguageRule,
   LanguageTargeting,
 } from './TargetingSection';
+import UtmSection, { UtmParams } from './UtmSection';
 
 export interface LinkAdvancedData {
   status: string;
@@ -21,6 +22,7 @@ export interface LinkAdvancedData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
+  utm: UtmParams;
   pixel_ids: string[];
 }
 
@@ -103,6 +105,9 @@ export default function LinkAdvancedFields({
           </div>
         </div>
       </FormSection>
+
+      {/* ── Campaign tracking (UTM) ── */}
+      <UtmSection utm={data.utm} onChange={(utm) => setField('utm', utm)} target={defaultUrl} errors={errors} />
 
       {/* ── Geo Targeting ── */}
       <GeoTargeting

@@ -68,6 +68,45 @@ return [
         'description' => 'Sélectionnez les pixels à déclencher avant la redirection. La redirection sera retardée de 2 secondes pour permettre le chargement des pixels.',
     ],
 
+    'utm' => [
+
+        'title' => 'Suivi de campagne (UTM)',
+
+        'description' => 'Ces paramètres sont ajoutés à la destination à chaque redirection, y compris pour les destinations de ciblage et de test A/B. Les paramètres déjà présents dans l’URL de destination restent inchangés.',
+
+        'fields' => [
+
+            'source' => 'Source (utm_source)',
+
+            'medium' => 'Support (utm_medium)',
+
+            'campaign' => 'Campagne (utm_campaign)',
+
+            'term' => 'Mot-clé (utm_term)',
+
+            'content' => 'Contenu (utm_content)',
+
+        ],
+
+        'placeholders' => [
+
+            'source' => 'p. ex. newsletter ou qr',
+
+            'medium' => 'p. ex. email, social ou print',
+
+            'campaign' => 'p. ex. soldes-automne',
+
+            'term' => 'facultatif',
+
+            'content' => 'facultatif',
+
+        ],
+
+        'preview' => 'Redirige vers :',
+
+    ],
+
+
     'targeting' => [
         'geo' => [
             'title' => 'Ciblage géographique',

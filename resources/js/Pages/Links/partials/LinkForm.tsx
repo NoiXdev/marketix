@@ -1,5 +1,6 @@
 import LinkAdvancedFields, { LinkAdvancedData } from './LinkAdvancedFields';
 import { AbVariant, DeviceRule, GeoRule, LanguageRule } from './TargetingSection';
+import { UtmParams } from './UtmSection';
 import { Button, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from '@/lib/i18n';
@@ -17,6 +18,7 @@ export interface LinkFormData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
+  utm: UtmParams;
   pixel_ids: string[];
 }
 

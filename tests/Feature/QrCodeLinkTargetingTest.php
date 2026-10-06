@@ -98,6 +98,23 @@ class QrCodeLinkTargetingTest extends TestCase
         $this->assertNotNull($url->expired_at);
     }
 
+    public function test_creating_dynamic_qr_stores_utm_on_the_backing_link(): void
+    {
+        [$user, $project, $domain] = $this->tenant();
+
+        $this->actingAs($user)->postJson(
+            route('app.project.qrcodes.store', ['project' => $project->id]),
+            $this->payload([
+                'domain_id' => $domain->id,
+                'slug' => 'flyer',
+                'utm' => ['source' => 'qr', 'medium' => 'print', 'campaign' => 'autumn'],
+            ]),
+            ['X-Inertia' => 'true'],
+        )->assertSessionHasNoErrors();
+
+        $this->assertSame(['source' => 'qr', 'medium' => 'print', 'campaign' => 'autumn'], Url::where('slug', 'flyer')->firstOrFail()->utm);
+    }
+
     public function test_updating_dynamic_qr_edits_link_targeting(): void
     {
         [$user, $project, $domain] = $this->tenant();

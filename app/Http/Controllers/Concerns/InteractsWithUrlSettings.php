@@ -24,6 +24,7 @@ trait InteractsWithUrlSettings
             'targeting_device' => $data['targeting_device'] ?? null,
             'targeting_language' => $data['targeting_language'] ?? null,
             'targeting_ab' => $data['targeting_ab'] ?? null,
+            'utm' => $data['utm'] ?? null,
         ]);
     }
 

@@ -68,6 +68,45 @@ return [
         'description' => 'Select pixels to fire before redirecting. The redirect will be delayed by 2 seconds to allow pixels to load.',
     ],
 
+    'utm' => [
+
+        'title' => 'Campaign tracking (UTM)',
+
+        'description' => 'These parameters are appended to the destination on every redirect, including targeting and A/B destinations. Parameters already in the destination URL are left unchanged.',
+
+        'fields' => [
+
+            'source' => 'Source (utm_source)',
+
+            'medium' => 'Medium (utm_medium)',
+
+            'campaign' => 'Campaign (utm_campaign)',
+
+            'term' => 'Keyword (utm_term)',
+
+            'content' => 'Content (utm_content)',
+
+        ],
+
+        'placeholders' => [
+
+            'source' => 'e.g. newsletter or qr',
+
+            'medium' => 'e.g. email, social or print',
+
+            'campaign' => 'e.g. autumn-sale',
+
+            'term' => 'optional',
+
+            'content' => 'optional',
+
+        ],
+
+        'preview' => 'Redirects to:',
+
+    ],
+
+
     'targeting' => [
         'geo' => [
             'title' => 'Geo Targeting',

@@ -6,6 +6,7 @@ import { ActivityEntry, Domain, PageProps, PixelOption } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import LinkForm, { LinkFormData } from './partials/LinkForm';
 import { AbVariant, GeoRule, DeviceRule, LanguageRule } from './partials/TargetingSection';
+import { UtmParams } from './partials/UtmSection';
 
 interface UrlData {
   id: string;
@@ -22,6 +23,7 @@ interface UrlData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
+  utm: UtmParams | null;
   pixel_ids: string[];
 }
 
@@ -51,6 +53,7 @@ export default function LinksEdit({
     targeting_device:   url.targeting_device ?? [],
     targeting_language: url.targeting_language ?? [],
     targeting_ab:       url.targeting_ab ?? [],
+    utm:                url.utm ?? {},
     pixel_ids:          url.pixel_ids ?? [],
   });
 
