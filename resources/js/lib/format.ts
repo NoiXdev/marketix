@@ -18,6 +18,17 @@ export function formatDuration(seconds: number): string {
   return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
 }
 
+export function formatMoney(value: number, currency: string, locale: string): string {
+  if (/^[A-Z]{3}$/.test(currency)) {
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 2 }).format(value);
+    } catch {
+      return `${value.toLocaleString(locale, { maximumFractionDigits: 2 })} ${currency}`;
+    }
+  }
+  return value.toLocaleString(locale, { maximumFractionDigits: 2 });
+}
+
 export function percentChange(current: number, previous: number): number | null {
   if (previous === 0) return null;
   return Math.round(((current - previous) / previous) * 1000) / 10;

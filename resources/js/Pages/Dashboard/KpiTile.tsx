@@ -9,11 +9,11 @@ export default function KpiTile({
 }: {
   label: string; value: number | string; deltaPct?: number | null; deltaLabel?: string; subtitle?: ReactNode; icon: LucideIcon; compact?: boolean; lowerIsBetter?: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const showDelta = deltaPct !== undefined;
   const up = (deltaPct ?? 0) >= 0;
   const good = lowerIsBetter ? !up : up;
-  const display = typeof value === 'number' ? (compact ? formatCompactNumber(value) : value.toLocaleString()) : value;
+  const display = typeof value === 'number' ? (compact ? formatCompactNumber(value) : value.toLocaleString(locale)) : value;
 
   return (
     <Card className="p-4">
@@ -28,7 +28,7 @@ export default function KpiTile({
       </p>
       {showDelta && (
         <p className={`mt-0.5 inline-flex items-center gap-1 text-xs font-bold ${deltaPct === null || deltaPct === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}>
-          {deltaPct === null ? '—' : deltaPct === 0 ? '± 0 %' : `${up ? '▲' : '▼'} ${Math.abs(deltaPct)} %`}
+          {deltaPct === null ? '—' : deltaPct === 0 ? '± 0 %' : `${up ? '▲' : '▼'} ${Math.abs(deltaPct).toLocaleString(locale)} %`}
           <span className="font-medium text-muted">{deltaLabel ?? t('common.dashboard.vs_previous')}</span>
         </p>
       )}

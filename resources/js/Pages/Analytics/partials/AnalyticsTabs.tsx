@@ -2,7 +2,7 @@ import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import { TabKey, TABS } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
-import { Globe2, LayoutDashboard, LucideIcon, Megaphone, MousePointerClick, Target } from 'lucide-react';
+import { Banknote, Globe2, LayoutDashboard, LucideIcon, Megaphone, MousePointerClick, Target } from 'lucide-react';
 
 const ICONS: Record<TabKey, LucideIcon> = {
   overview: LayoutDashboard,
@@ -10,6 +10,7 @@ const ICONS: Record<TabKey, LucideIcon> = {
   behavior: MousePointerClick,
   audience: Globe2,
   conversions: Target,
+  revenue: Banknote,
 };
 
 export default function AnalyticsTabs() {

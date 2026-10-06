@@ -1,5 +1,5 @@
 import { Checkbox } from '@/Components/ui';
-import { Interval, parseDate } from '@/Pages/Analytics/partials/period';
+import { formatAxisLabel, formatBucket as formatBucketLabel, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { formatDuration } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
@@ -80,7 +80,7 @@ export default function VisitorsChart({
   const plotRef = useRef<HTMLDivElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
 
-  const multiDay = data.length > 0 && data[0].date.slice(0, 10) !== data[data.length - 1].date.slice(0, 10);
+  const multiDay = spansSeveralDays(data.map((d) => d.date));
   const count = (n: number) => n.toLocaleString(locale);
   const percent = (n: number) => `${n.toLocaleString(locale)} %`;
 
@@ -154,36 +154,8 @@ export default function VisitorsChart({
     setSelection((current) => (current.includes(key) ? current.filter((k) => k !== key) : METRIC_KEYS.filter((k) => k === key || current.includes(k))));
   }
 
-  function formatBucket(key: string) {
-    const date = parseDate(key);
-    switch (interval) {
-      case 'hour': {
-        const hour = Number(key.slice(11, 13));
-        const hours = `${String(hour).padStart(2, '0')}:00 – ${String((hour + 1) % 24).padStart(2, '0')}:00`;
-        return multiDay ? `${date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}, ${hours}` : hours;
-      }
-      case 'week':
-        return t('analytics.dashboard.chart.week_of', {
-          date: date.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }),
-        });
-      case 'month':
-        return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
-      default:
-        return date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    }
-  }
-
-  function formatAxis(key: string) {
-    const date = parseDate(key);
-    switch (interval) {
-      case 'hour':
-        return multiDay ? `${date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })} ${key.slice(11, 16)}` : key.slice(11, 16);
-      case 'month':
-        return date.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
-      default:
-        return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
-    }
-  }
+  const formatBucket = (key: string) => formatBucketLabel(key, interval, multiDay, locale, (date) => t('analytics.dashboard.chart.week_of', { date }));
+  const formatAxis = (key: string) => formatAxisLabel(key, interval, multiDay, locale);
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {

@@ -124,8 +124,32 @@ return [
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'Wie viele Besuche Ihre Ziele erreichen.',
+                'description' => 'Wie viele Besuche Ihre Ziele erreichen – und wo Besucher auf dem Weg dorthin abspringen.',
             ],
+            'revenue' => [
+                'label' => 'Umsatz',
+                'description' => 'Wie viel Umsatz Ihre Website erzielt – und welche Kanäle, Kampagnen und Seiten dazu beitragen.',
+            ],
+        ],
+
+        'revenue' => [
+            'chart_title' => 'Umsatz im Zeitverlauf',
+            'orders_count' => ':count Bestellungen',
+            'kpi' => [
+                'revenue' => 'Umsatz',
+                'orders' => 'Bestellungen',
+                'average_order_value' => 'Ø Bestellwert',
+                'purchase_rate' => 'Kaufrate',
+                'revenue_per_visitor' => 'Umsatz pro Besucher',
+            ],
+            'by_channel' => 'Umsatz nach Kanal',
+            'by_campaign' => 'Umsatz nach Kampagne',
+            'by_landing_page' => 'Umsatz nach Einstiegsseite',
+            'by_country' => 'Umsatz nach Land',
+            'other_currencies' => 'Alle Beträge in :currency. Weitere Währungen im Zeitraum: :others.',
+            'hint' => 'Umsatz stammt aus Events namens „purchase“ mit dem Wert „value“. Er wird der Sitzung zugeordnet, in der gekauft wurde; Kanal und Kampagne sind der erste Kontakt dieser Sitzung. Kaufrate = Sitzungen mit Kauf ÷ alle Sitzungen.',
+            'empty_title' => 'Noch keine Umsätze erfasst',
+            'empty_text' => 'Senden Sie nach einem erfolgreichen Kauf ein Event „purchase“ mit dem Bestellwert. Danach sehen Sie hier Umsatz, Bestellungen und woher Ihre Käufer kommen.',
         ],
 
         'chart' => [

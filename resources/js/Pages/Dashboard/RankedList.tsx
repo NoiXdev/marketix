@@ -1,6 +1,16 @@
 import { ReactNode } from 'react';
 
-export interface RankRow { key: string; label: string; sub?: string; prefix?: ReactNode; value: number; onClick?: () => void; title?: string }
+export interface RankRow {
+  key: string;
+  label: string;
+  sub?: string;
+  note?: string;
+  prefix?: ReactNode;
+  value: number;
+  display?: string;
+  onClick?: () => void;
+  title?: string;
+}
 
 export default function RankedList({ rows, emptyLabel }: { rows: RankRow[]; emptyLabel: string }) {
   const max = Math.max(...rows.map((r) => r.value), 1);
@@ -14,9 +24,10 @@ export default function RankedList({ rows, emptyLabel }: { rows: RankRow[]; empt
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13.5px] font-semibold text-foreground">{r.label}</p>
               {r.sub && <p className="truncate font-mono text-[11.5px] text-muted">{r.sub}</p>}
+              {r.note && <p className="truncate text-xs text-muted">{r.note}</p>}
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold tabular-nums text-foreground">{r.value.toLocaleString()}</p>
+              <p className="text-sm font-bold tabular-nums text-foreground">{r.display ?? r.value.toLocaleString()}</p>
               <span className="mt-1 block h-1 w-16 overflow-hidden rounded-full bg-elevated">
                 <span className="block h-full rounded-full bg-accent" style={{ width: `${(r.value / max) * 100}%` }} />
               </span>

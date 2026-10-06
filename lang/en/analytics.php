@@ -124,8 +124,32 @@ return [
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'How many visits reach your goals.',
+                'description' => 'How many visits reach your goals – and where visitors drop off on the way.',
             ],
+            'revenue' => [
+                'label' => 'Revenue',
+                'description' => 'How much revenue your website generates – and which channels, campaigns and pages contribute.',
+            ],
+        ],
+
+        'revenue' => [
+            'chart_title' => 'Revenue over time',
+            'orders_count' => ':count orders',
+            'kpi' => [
+                'revenue' => 'Revenue',
+                'orders' => 'Orders',
+                'average_order_value' => 'Avg. order value',
+                'purchase_rate' => 'Purchase rate',
+                'revenue_per_visitor' => 'Revenue per visitor',
+            ],
+            'by_channel' => 'Revenue by channel',
+            'by_campaign' => 'Revenue by campaign',
+            'by_landing_page' => 'Revenue by landing page',
+            'by_country' => 'Revenue by country',
+            'other_currencies' => 'All amounts in :currency. Other currencies in this period: :others.',
+            'hint' => 'Revenue comes from events named “purchase” with a “value”. It is attributed to the session in which the purchase happened; channel and campaign are that session’s first touch. Purchase rate = sessions with a purchase ÷ all sessions.',
+            'empty_title' => 'No revenue tracked yet',
+            'empty_text' => 'Send a “purchase” event with the order value after a successful checkout. You will then see revenue, orders and where your buyers come from.',
         ],
 
         'chart' => [

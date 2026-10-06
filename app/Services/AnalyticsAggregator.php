@@ -119,7 +119,7 @@ class AnalyticsAggregator
     }
 
     /** @return array{0: string, 1: list<string>} */
-    private function channelExpression(string $siteId): array
+    public function channelExpression(string $siteId): array
     {
         return ChannelClassifier::expression($this->siteDomain($siteId));
     }
@@ -141,7 +141,7 @@ class AnalyticsAggregator
         return '('.implode(' OR ', array_map(fn ($c) => "{$c} IS NOT NULL", self::CAMPAIGN_COLUMNS)).')';
     }
 
-    private function bucketExpression(string $column, AnalyticsQuery $query): string
+    public function bucketExpression(string $column, AnalyticsQuery $query): string
     {
         $sqlite = $this->isSqlite();
 
@@ -156,7 +156,7 @@ class AnalyticsAggregator
     }
 
     /** @return list<string> */
-    private function bucketKeys(AnalyticsQuery $query): array
+    public function bucketKeys(AnalyticsQuery $query): array
     {
         [$start, $step, $format, $end] = match ($query->interval) {
             'hour' => [$query->from->startOfDay(), 'addHour', 'Y-m-d H:00', $query->to->endOfDay()],

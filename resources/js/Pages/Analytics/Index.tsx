@@ -14,12 +14,13 @@ import AudienceTab, { AudienceData } from '@/Pages/Analytics/tabs/AudienceTab';
 import BehaviorTab, { BehaviorData } from '@/Pages/Analytics/tabs/BehaviorTab';
 import ConversionsTab, { ConversionsData } from '@/Pages/Analytics/tabs/ConversionsTab';
 import OverviewTab, { OverviewData } from '@/Pages/Analytics/tabs/OverviewTab';
+import RevenueTab, { RevenueData } from '@/Pages/Analytics/tabs/RevenueTab';
 import { FilterKey, Filters, SiteInfo, TabKey } from '@/Pages/Analytics/types';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { ReactNode, useEffect, useState } from 'react';
 
-type TabData = OverviewData & AcquisitionData & BehaviorData & AudienceData & ConversionsData;
+type TabData = OverviewData & AcquisitionData & BehaviorData & AudienceData & ConversionsData & RevenueData;
 
 type AnalyticsPageProps = {
   site: SiteInfo;
@@ -39,6 +40,8 @@ function ActiveTab({ tab, data }: { tab: TabKey; data: Partial<TabData> }) {
       return <AudienceTab {...(data as AudienceData)} />;
     case 'conversions':
       return <ConversionsTab {...(data as ConversionsData)} />;
+    case 'revenue':
+      return <RevenueTab {...(data as RevenueData)} />;
     default:
       return <OverviewTab {...(data as OverviewData)} />;
   }

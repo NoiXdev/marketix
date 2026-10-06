@@ -124,8 +124,32 @@ return [
             ],
             'conversions' => [
                 'label' => 'Conversies',
-                'description' => 'Hoeveel bezoeken uw doelen bereiken.',
+                'description' => 'Hoeveel bezoeken uw doelen bereiken – en waar bezoekers onderweg afhaken.',
             ],
+            'revenue' => [
+                'label' => 'Omzet',
+                'description' => 'Hoeveel omzet uw website oplevert – en welke kanalen, campagnes en pagina’s daaraan bijdragen.',
+            ],
+        ],
+
+        'revenue' => [
+            'chart_title' => 'Omzet in de tijd',
+            'orders_count' => ':count bestellingen',
+            'kpi' => [
+                'revenue' => 'Omzet',
+                'orders' => 'Bestellingen',
+                'average_order_value' => 'Gem. bestelwaarde',
+                'purchase_rate' => 'Aankooppercentage',
+                'revenue_per_visitor' => 'Omzet per bezoeker',
+            ],
+            'by_channel' => 'Omzet per kanaal',
+            'by_campaign' => 'Omzet per campagne',
+            'by_landing_page' => 'Omzet per instappagina',
+            'by_country' => 'Omzet per land',
+            'other_currencies' => 'Alle bedragen in :currency. Andere valuta in deze periode: :others.',
+            'hint' => 'Omzet komt uit events „purchase” met een „value”. Hij wordt toegewezen aan de sessie waarin gekocht werd; kanaal en campagne zijn het eerste contact van die sessie. Aankooppercentage = sessies met aankoop ÷ alle sessies.',
+            'empty_title' => 'Nog geen omzet gemeten',
+            'empty_text' => 'Stuur na een geslaagde aankoop een event „purchase” met de bestelwaarde. Daarna ziet u hier omzet, bestellingen en waar uw kopers vandaan komen.',
         ],
 
         'chart' => [
