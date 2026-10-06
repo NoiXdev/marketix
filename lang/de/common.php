@@ -46,6 +46,10 @@ return [
         'search' => 'Suchen',
         'add' => 'Hinzufügen',
     ],
+    'dialog' => [
+        'title' => 'Sind Sie sicher?',
+        'type_to_confirm' => 'Geben Sie „:value“ ein, um zu bestätigen.',
+    ],
     'dashboard' => [
         'overview' => 'Überblick',
         'vs_previous' => 'vs. Vorperiode',

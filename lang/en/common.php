@@ -46,6 +46,10 @@ return [
         'search' => 'Search',
         'add' => 'Add',
     ],
+    'dialog' => [
+        'title' => 'Are you sure?',
+        'type_to_confirm' => 'Please type “:value” to confirm.',
+    ],
     'dashboard' => [
         'overview' => 'Overview',
         'vs_previous' => 'vs. previous',
