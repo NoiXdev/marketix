@@ -58,11 +58,19 @@ export interface Site {
   created_at?: string;
 }
 
+export interface GoalCondition {
+  property: string;
+  value: string;
+}
+
 export interface Goal {
   id: string;
   name: string;
   type: string;
   match_value: string;
+  conditions: GoalCondition[];
+  value: number | null;
+  currency: string | null;
 }
 
 export type ProjectRole = 'admin' | 'member';

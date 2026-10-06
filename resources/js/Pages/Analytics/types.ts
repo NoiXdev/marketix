@@ -1,3 +1,5 @@
+import type { GoalCondition } from '@/types';
+
 export type FilterKey =
   | 'hostname'
   | 'path'
@@ -73,8 +75,12 @@ export type GoalCard = {
   name: string;
   type: string;
   match_value: string;
+  conditions: GoalCondition[];
+  unit_value: number | null;
   conversions: number;
   visitors: number;
   rate: number;
+  value: number | null;
+  currency: string | null;
   byCampaign: { value: string; conversions: number }[];
 };

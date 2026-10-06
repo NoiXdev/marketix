@@ -1,6 +1,8 @@
 import { BackLink, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
+import { formatMoney } from '@/lib/format';
+import { goalMatchLabel } from '@/lib/goals';
 import { useTranslation } from '@/lib/i18n';
 import { Goal, PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
@@ -8,7 +10,7 @@ import { Pencil, Plus, Target, Trash2 } from 'lucide-react';
 
 export default function GoalsIndex({ site, goals }: { site: { id: string; name: string }; goals: Goal[] }) {
   const { project } = usePage<PageProps>().props;
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   async function destroy(goal: Goal) {
     if (!(await confirmDelete({ title: goal.name }))) return;
@@ -39,6 +41,7 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
               { label: t('analytics.goals.columns.name') },
               { label: t('analytics.goals.columns.type'), className: 'hidden sm:table-cell' },
               { label: t('analytics.goals.columns.match'), className: 'hidden sm:table-cell' },
+              { label: t('analytics.goals.columns.value'), align: 'right', className: 'hidden md:table-cell' },
               { label: '' },
             ]}
           >
@@ -49,11 +52,14 @@ export default function GoalsIndex({ site, goals }: { site: { id: string; name: 
                     {goal.name}
                     {/* Phones show type and match below the name instead of in their own columns */}
                     <span className="text-muted mt-0.5 block font-mono text-xs font-normal break-all sm:hidden">
-                      {goal.type} · {goal.match_value}
+                      {goal.type} · {goalMatchLabel(goal)}
                     </span>
                   </td>
                   <td className="text-muted hidden px-4 py-3 sm:table-cell">{goal.type}</td>
-                  <td className="text-muted hidden px-4 py-3 font-mono break-all sm:table-cell">{goal.match_value}</td>
+                  <td className="text-muted hidden px-4 py-3 font-mono break-all sm:table-cell">{goalMatchLabel(goal)}</td>
+                  <td className="text-muted hidden px-4 py-3 text-right whitespace-nowrap tabular-nums md:table-cell">
+                    {goal.value === null ? '—' : formatMoney(goal.value, goal.currency ?? '', locale)}
+                  </td>
                   <RowActions>
                     <IconButton
                       icon={Pencil}

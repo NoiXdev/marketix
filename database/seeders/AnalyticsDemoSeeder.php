@@ -184,11 +184,14 @@ class AnalyticsDemoSeeder extends Seeder
 
     private function createGoals(): void
     {
+        // [name, type, match, property conditions, value per conversion in CHF]
         $goals = [
-            ['Kauf abgeschlossen', GoalType::Event, 'purchase'],
-            ['Newsletter-Anmeldung', GoalType::Event, 'newsletter_subscribe'],
-            ['Kontaktseite besucht', GoalType::Pageview, '/kontakt'],
-            ['Blog gelesen', GoalType::Pageview, '/blog/*'],
+            ['Kauf abgeschlossen', GoalType::Event, 'purchase', null, null],
+            ['Newsletter-Anmeldung', GoalType::Event, 'newsletter_subscribe', null, 5],
+            ['Beratungsanfrage', GoalType::Event, 'contact_form', [['property' => 'topic', 'value' => 'Beratung']], 25],
+            ['Kaffeemaschine Pro im Warenkorb', GoalType::Event, 'add_to_cart', [['property' => 'product', 'value' => 'Kaffeemaschine Pro']], null],
+            ['Kontaktseite besucht', GoalType::Pageview, '/kontakt', null, null],
+            ['Blog gelesen', GoalType::Pageview, '/blog/*', null, null],
         ];
 
         $funnels = [
@@ -213,13 +216,16 @@ class AnalyticsDemoSeeder extends Seeder
             ]);
         }
 
-        foreach ($goals as [$name, $type, $match]) {
+        foreach ($goals as [$name, $type, $match, $conditions, $value]) {
             Goal::create([
                 'project_id' => $this->site->project_id,
                 'site_id' => $this->site->id,
                 'name' => $name,
                 'type' => $type,
                 'match_value' => $match,
+                'conditions' => $conditions,
+                'value' => $value,
+                'currency' => $value === null ? null : 'CHF',
             ]);
         }
     }

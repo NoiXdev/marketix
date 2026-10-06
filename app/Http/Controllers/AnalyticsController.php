@@ -184,6 +184,8 @@ class AnalyticsController extends Controller
                 'name' => $g->name,
                 'type' => $g->type->value,
                 'match_value' => $g->match_value,
+                'conditions' => $g->conditions ?? [],
+                'unit_value' => $g->value,
             ], $this->goals->conversions($g, $query), [
                 'byCampaign' => $this->goals->conversionsByCampaign($g, $query),
             ])),

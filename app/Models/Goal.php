@@ -26,13 +26,16 @@ class Goal extends Model
         'name',
         'type',
         'match_value',
+        'conditions',
+        'value',
+        'currency',
     ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->useLogName('goal')
-            ->logOnly(['name', 'type', 'match_value'])
+            ->logOnly(['name', 'type', 'match_value', 'conditions', 'value', 'currency'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
@@ -56,6 +59,8 @@ class Goal extends Model
     {
         return [
             'type' => GoalType::class,
+            'conditions' => 'array',
+            'value' => 'float',
         ];
     }
 }

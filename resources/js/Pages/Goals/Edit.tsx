@@ -1,6 +1,7 @@
-import { BackLink, Button, ErrorSummary, Field, FormSection, Input, Select } from '@/Components/ui';
+import { BackLink, Button, ErrorSummary } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
+import GoalFields, { GoalFormData } from '@/Pages/Goals/partials/GoalFields';
 import { Goal, PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
@@ -10,7 +11,14 @@ type Option = { value: string; label: string };
 export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: string }; goal: Goal; goalTypes: Option[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
-  const { data, setData, put, processing, errors } = useForm({ name: goal.name, type: goal.type, match_value: goal.match_value });
+  const { data, setData, put, processing, errors } = useForm<GoalFormData>({
+    name: goal.name,
+    type: goal.type,
+    match_value: goal.match_value,
+    conditions: goal.conditions,
+    value: goal.value === null ? '' : String(goal.value),
+    currency: goal.currency ?? '',
+  });
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -31,30 +39,7 @@ export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: strin
           <form onSubmit={submit} className="space-y-5">
             <ErrorSummary title={t('links.form.save_error_title')} errors={errorMessages} />
 
-            <FormSection>
-              <Field label={t('analytics.goals.form.name')} htmlFor="name" error={errors.name}>
-                <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
-              </Field>
-
-              <Field label={t('analytics.goals.form.type')} htmlFor="type">
-                <Select id="type" value={data.type} onChange={(e) => setData('type', e.target.value)}>
-                  {goalTypes.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field
-                label={t('analytics.goals.form.match_value')}
-                htmlFor="match_value"
-                hint={data.type === 'event' ? t('analytics.goals.form.match_value_hint_event') : t('analytics.goals.form.match_value_hint_page')}
-                error={errors.match_value}
-              >
-                <Input id="match_value" value={data.match_value} onChange={(e) => setData('match_value', e.target.value)} />
-              </Field>
-            </FormSection>
+            <GoalFields data={data} setData={setData} errors={errors} goalTypes={goalTypes} />
 
             <Button type="submit" loading={processing}>
               {t('common.actions.save')}

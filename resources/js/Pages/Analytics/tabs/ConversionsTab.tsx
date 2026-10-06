@@ -1,4 +1,6 @@
 import { LinkButton } from '@/Components/ui';
+import { formatMoney } from '@/lib/format';
+import { goalMatchLabel } from '@/lib/goals';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
@@ -68,8 +70,16 @@ export default function ConversionsTab({ goals, funnels }: ConversionsData) {
                 <span className="text-foreground text-2xl font-bold tabular-nums">{g.rate.toLocaleString(locale)} %</span>
               </div>
               <p className="text-muted mb-3 text-xs">
-                {t('analytics.dashboard.goals.stats', { conversions: g.conversions, visitors: g.visitors })} <span className="font-mono">{g.match_value}</span>
+                {t('analytics.dashboard.goals.stats', { conversions: g.conversions, visitors: g.visitors })} <span className="font-mono break-all">{goalMatchLabel(g)}</span>
               </p>
+              {g.value !== null && (
+                <p className="text-muted mb-3 text-xs">
+                  {t('analytics.dashboard.goals.value', {
+                    value: formatMoney(g.value, g.currency ?? '', locale),
+                    unit: formatMoney(g.unit_value ?? 0, g.currency ?? '', locale),
+                  })}
+                </p>
+              )}
               {g.byCampaign.length > 0 && (
                 <ul className="border-line space-y-1 border-t pt-2">
                   {g.byCampaign.map((c, i) => (
