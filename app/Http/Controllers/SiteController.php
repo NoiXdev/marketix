@@ -6,6 +6,7 @@ use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Http\Requests\SiteRequest;
 use App\Services\SiteOverview;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -42,9 +43,9 @@ class SiteController extends Controller
     public function store(SiteRequest $request)
     {
         $project = $request->get('project');
-        $project->sites()->create($request->validated());
+        $site = $project->sites()->create($request->validated());
 
-        return redirect()->route('app.project.sites.index', ['project' => $project->id])
+        return redirect()->route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id])
             ->with('success', __('app.site_created'));
     }
 
@@ -71,6 +72,9 @@ class SiteController extends Controller
             'trackingModes' => TrackingMode::options(),
             'consentModes' => ConsentMode::selectableOptions(),
             'snippet' => $model->trackingSnippet(),
+            'lastSeenAt' => fn () => ($seen = $model->visits()->where('is_bot', false)->max('last_activity_at'))
+                ? CarbonImmutable::parse($seen)->toIso8601String()
+                : null,
         ]);
     }
 

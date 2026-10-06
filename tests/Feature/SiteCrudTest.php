@@ -127,9 +127,24 @@ class SiteCrudTest extends TestCase
                 'consent_mode' => 'immediate',
                 'respect_dnt' => false,
             ])
-            ->assertRedirect(route('app.project.sites.index', ['project' => $project->id]));
+            ->assertRedirect(route('app.project.analytics.show', ['project' => $project->id, 'site' => Site::where('name', 'Shop')->value('id')]));
 
         $this->assertDatabaseHas('sites', ['project_id' => $project->id, 'name' => 'Shop']);
+    }
+
+    public function test_waiting_for_consent_requires_a_signal_name(): void
+    {
+        [$user, $project] = $this->userWithProject();
+
+        $this->actingAs($user)
+            ->post(route('app.project.sites.store', ['project' => $project->id]), [
+                'name' => 'Shop',
+                'domain' => 'shop.example.com',
+                'tracking_mode' => 'cookie',
+                'consent_mode' => 'third_party_signal',
+                'consent_signal' => '',
+            ])
+            ->assertSessionHasErrors('consent_signal');
     }
 
     public function test_update_changes_mode(): void

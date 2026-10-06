@@ -21,12 +21,30 @@ class SiteRequest extends FormRequest
             'domain' => ['required', 'string', 'max:255'],
             'tracking_mode' => ['required', Rule::in(array_column(TrackingMode::cases(), 'value'))],
             'consent_mode' => ['required', Rule::in(ConsentMode::selectableValues())],
-            'consent_signal' => ['nullable', 'string', 'max:255'],
+            'consent_signal' => ['nullable', 'required_if:consent_mode,'.ConsentMode::ThirdPartySignal->value, 'string', 'max:255'],
             'respect_dnt' => ['boolean'],
             'track_outbound_links' => ['boolean'],
             'track_file_downloads' => ['boolean'],
             'site_search_params' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_\-\[\]]+(,[A-Za-z0-9_\-\[\]]+)*$/'],
             'retention_days' => ['nullable', 'integer', 'min:1', 'max:3650'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'name' => __('analytics.sites.form.name'),
+            'domain' => __('analytics.sites.form.domain'),
+            'consent_signal' => __('analytics.sites.form.consent_signal'),
+            'retention_days' => __('analytics.sites.form.retention_days'),
+            'site_search_params' => __('analytics.sites.measurement.search_params'),
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'consent_signal.required_if' => __('analytics.sites.form.consent_signal_required'),
         ];
     }
 

@@ -1,6 +1,7 @@
 import CodeSnippet from '@/Components/CodeSnippet';
-import { Checkbox, Field, FormSection, Input } from '@/Components/ui';
+import { Field, FormSection, Input } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
+import ToggleRow from '@/Pages/Sites/partials/ToggleRow';
 
 export type EnhancedMeasurement = {
   track_outbound_links: boolean;
@@ -21,22 +22,22 @@ export default function EnhancedMeasurementSection({
 
   return (
     <FormSection title={t('analytics.sites.measurement.title')} description={t('analytics.sites.measurement.description')}>
-      <label className="flex items-center gap-2 text-sm text-foreground">
-        <Checkbox checked={values.track_outbound_links} onChange={(e) => onChange({ track_outbound_links: e.target.checked })} />
-        {t('analytics.sites.measurement.outbound_links')}
-      </label>
+      <div className="space-y-1">
+        <ToggleRow
+          checked={values.track_outbound_links}
+          onChange={(checked) => onChange({ track_outbound_links: checked })}
+          title={t('analytics.sites.measurement.outbound_links')}
+          text={t('analytics.sites.measurement.outbound_links_hint')}
+        />
+        <ToggleRow
+          checked={values.track_file_downloads}
+          onChange={(checked) => onChange({ track_file_downloads: checked })}
+          title={t('analytics.sites.measurement.file_downloads')}
+          text={t('analytics.sites.measurement.file_downloads_hint')}
+        />
+      </div>
 
-      <label className="flex items-center gap-2 text-sm text-foreground">
-        <Checkbox checked={values.track_file_downloads} onChange={(e) => onChange({ track_file_downloads: e.target.checked })} />
-        {t('analytics.sites.measurement.file_downloads')}
-      </label>
-
-      <Field
-        label={t('analytics.sites.measurement.search_params')}
-        htmlFor="site_search_params"
-        hint={t('analytics.sites.measurement.search_params_hint')}
-        error={error}
-      >
+      <Field label={t('analytics.sites.measurement.search_params')} htmlFor="site_search_params" hint={t('analytics.sites.measurement.search_params_hint')} error={error}>
         <Input
           id="site_search_params"
           value={values.site_search_params}
@@ -45,8 +46,9 @@ export default function EnhancedMeasurementSection({
         />
       </Field>
 
-      <div>
-        <p className="mb-2 text-xs text-muted">{t('analytics.sites.measurement.not_found_hint')}</p>
+      <div className="border-line border-t pt-4">
+        <p className="text-foreground text-sm font-semibold">{t('analytics.sites.measurement.not_found_title')}</p>
+        <p className="text-muted mt-0.5 mb-2 text-xs">{t('analytics.sites.measurement.not_found_hint')}</p>
         <CodeSnippet code="marketix('404');" />
       </div>
     </FormSection>

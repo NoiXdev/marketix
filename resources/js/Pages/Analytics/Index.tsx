@@ -1,5 +1,5 @@
 import { CountryFlag } from '@/Components/icons/CountryFlag';
-import { BackLink } from '@/Components/ui';
+import { BackLink, Flash } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { countryName, languageName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
@@ -146,6 +146,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, liveVisitor
       <AnalyticsProvider projectId={project!.id} site={site} tab={tab} period={period} filters={filters}>
         <div className="px-8 py-8">
           <Header liveVisitors={liveVisitors} />
+          <Flash />
           {site.has_data ? (
             <>
               <AnalyticsTabs />
