@@ -6,8 +6,10 @@ use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
 use App\Models\Concerns\SetsActivityProject;
 use App\Observers\UrlObserver;
+use App\Support\UtmTagger;
 use Database\Factories\UrlFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,6 +45,7 @@ class Url extends Model
         'targeting_device',
         'targeting_language',
         'targeting_ab',
+        'utm',
     ];
 
     public function project(): BelongsTo
@@ -78,7 +81,7 @@ class Url extends Model
             ->useLogName('url')
             ->logOnly([
                 'slug', 'url', 'type', 'password', 'expired_at', 'status', 'archived',
-                'targeting_geo', 'targeting_device', 'targeting_language', 'targeting_ab',
+                'targeting_geo', 'targeting_device', 'targeting_language', 'targeting_ab', 'utm',
             ])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
@@ -87,6 +90,18 @@ class Url extends Model
     public function getDescriptionForEvent(string $eventName): string
     {
         return $eventName;
+    }
+
+    /**
+     * UTM parameters appended to the redirect target, stored without blanks
+     * (null when none are set) so every caller gets the same normal form.
+     */
+    protected function utm(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value === null ? null : json_decode($value, true),
+            set: fn (?array $value) => ($utm = UtmTagger::normalize($value)) === null ? null : json_encode($utm),
+        );
     }
 
     protected function casts(): array

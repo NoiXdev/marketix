@@ -11,6 +11,7 @@ interface AttachUrl {
   id: string; domain_id: string; slug: string; domain_name: string | null; target: string;
   status: number; has_password: boolean; expired_at: string | null;
   targeting_geo: unknown[]; targeting_device: unknown[]; targeting_language: unknown[]; targeting_ab: unknown[];
+  utm: QrFormData['utm'] | null;
   pixel_ids: string[];
 }
 
@@ -42,6 +43,7 @@ export default function QrCodesCreate({
     targeting_device:   (attachUrl?.targeting_device ?? []) as QrFormData['targeting_device'],
     targeting_language: (attachUrl?.targeting_language ?? []) as QrFormData['targeting_language'],
     targeting_ab:       (attachUrl?.targeting_ab ?? []) as QrFormData['targeting_ab'],
+    utm:                attachUrl?.utm ?? {},
     pixel_ids:          attachUrl?.pixel_ids ?? [],
   });
 

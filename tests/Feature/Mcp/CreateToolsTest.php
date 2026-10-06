@@ -37,6 +37,24 @@ class CreateToolsTest extends TestCase
 
     // ── create_link ─────────────────────────────────────────────────────────
 
+    public function test_create_link_accepts_utm_parameters(): void
+    {
+        $mine = $this->makeProject('Mine');
+
+        MarketixServer::actingAs($mine['user'])
+            ->tool(CreateLinkTool::class, [
+                'project' => $mine['project']->id,
+                'domain' => $mine['domain']->id,
+                'url' => 'https://example.com',
+                'slug' => 'tagged',
+                'utm_source' => 'newsletter',
+                'utm_campaign' => 'autumn',
+            ])
+            ->assertOk();
+
+        $this->assertSame(['source' => 'newsletter', 'campaign' => 'autumn'], Url::where('slug', 'tagged')->firstOrFail()->utm);
+    }
+
     public function test_create_link_persists_a_link_owned_by_the_caller(): void
     {
         $mine = $this->makeProject('Mine');

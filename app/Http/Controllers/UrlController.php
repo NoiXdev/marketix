@@ -132,6 +132,7 @@ class UrlController extends Controller
                 'targeting_device' => $model->targeting_device ?? [],
                 'targeting_language' => $model->targeting_language ?? [],
                 'targeting_ab' => $model->targeting_ab ?? [],
+                'utm' => $model->utm,
                 'pixel_ids' => $model->pixels->pluck('id')->toArray(),
             ],
             'domains' => $project->domains()->get(['id', 'name']),

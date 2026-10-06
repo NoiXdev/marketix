@@ -9,6 +9,7 @@ use App\Models\QrCode;
 use App\Models\Url;
 use App\Services\GeoIpService;
 use App\Support\UserAgent;
+use App\Support\UtmTagger;
 use App\Support\VisitorHash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -81,8 +82,9 @@ class RedirectController extends Controller
     }
 
     /**
-     * Resolve the final target (targeting > A/B > default), record the click,
-     * and return either the pixel-firing view or a plain redirect.
+     * Resolve the final target (targeting > A/B > default), tag it with the
+     * link's UTM parameters, record the click, and return either the
+     * pixel-firing view or a plain redirect.
      */
     private function resolveAndRespond(Request $request, Url $url): mixed
     {
@@ -98,6 +100,9 @@ class RedirectController extends Controller
         $targetUrl = $this->resolveTargeting($request, $url, $geo)  // geo/device/lang wins
                   ?? $this->resolveAbTest($url)                       // A/B if no targeting matched
                   ?? $url->url;                                        // default
+
+        // The link's campaign tags apply to whichever target was chosen
+        $targetUrl = UtmTagger::apply($targetUrl, $url->utm);
 
         if ($url->pixels->isNotEmpty()) {
             return view('redirect.pixels', [

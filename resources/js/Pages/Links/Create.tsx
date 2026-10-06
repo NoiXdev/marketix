@@ -27,6 +27,7 @@ export default function LinksCreate({
     targeting_device:   [],
     targeting_language: [],
     targeting_ab:       [],
+    utm:                {},
     pixel_ids:          [],
   });
 

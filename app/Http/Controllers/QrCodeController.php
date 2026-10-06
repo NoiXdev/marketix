@@ -99,6 +99,7 @@ class QrCodeController extends Controller
                 'targeting_device' => $link->targeting_device ?? [],
                 'targeting_language' => $link->targeting_language ?? [],
                 'targeting_ab' => $link->targeting_ab ?? [],
+                'utm' => $link->utm,
                 'pixel_ids' => $link->pixels()->pluck('pixels.id')->toArray(),
             ];
         }
@@ -148,6 +149,7 @@ class QrCodeController extends Controller
                 'targeting_device' => $model->url?->targeting_device ?? [],
                 'targeting_language' => $model->url?->targeting_language ?? [],
                 'targeting_ab' => $model->url?->targeting_ab ?? [],
+                'utm' => $model->url?->utm,
                 'pixel_ids' => $model->url ? $model->url->pixels->pluck('id')->toArray() : [],
             ],
             'domains' => $project->domains()->get(['id', 'name']),

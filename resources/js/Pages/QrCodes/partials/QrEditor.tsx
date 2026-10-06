@@ -1,5 +1,6 @@
 import { DYNAMIC_TYPES, STATIC_TYPES, QrStyle, QrType, buildQrContent, qrTypeTrackable } from '@/data/qrTypes';
 import LinkAdvancedFields, { LinkAdvancedData } from '@/Pages/Links/partials/LinkAdvancedFields';
+import { UtmParams } from '@/Pages/Links/partials/UtmSection';
 import { AbVariant, DeviceRule, GeoRule, LanguageRule } from '@/Pages/Links/partials/TargetingSection';
 import { Badge, Button, Field, FormSection, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
@@ -28,6 +29,7 @@ export interface QrFormData {
   targeting_device: DeviceRule[];
   targeting_language: LanguageRule[];
   targeting_ab: AbVariant[];
+  utm: UtmParams;
   pixel_ids: string[];
 }
 

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
+use App\Support\UtmTagger;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -38,7 +39,22 @@ class UrlRequest extends FormRequest
             'status' => ['required', 'integer', Rule::in(array_column(UrlStatus::cases(), 'value'))],
             'password' => ['nullable', 'string', 'max:255'],
             'expired_at' => ['nullable', 'date'],
-        ], self::targetingRules());
+        ], self::targetingRules(), self::utmRules());
+    }
+
+    /**
+     * UTM validation rules, shared with QrCodeRequest.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    public static function utmRules(): array
+    {
+        $rules = ['utm' => ['nullable', 'array:'.implode(',', UtmTagger::KEYS)]];
+        foreach (UtmTagger::KEYS as $key) {
+            $rules['utm.'.$key] = ['nullable', 'string', 'max:255'];
+        }
+
+        return $rules;
     }
 
     /**

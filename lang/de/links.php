@@ -68,6 +68,45 @@ return [
         'description' => 'Wählen Sie Pixel aus, die vor der Weiterleitung ausgelöst werden. Die Weiterleitung verzögert sich um 2 Sekunden, damit die Pixel laden können.',
     ],
 
+    'utm' => [
+
+        'title' => 'Kampagnen-Tracking (UTM)',
+
+        'description' => 'Diese Parameter werden bei jeder Weiterleitung an das Ziel angehängt, auch bei Targeting- und A/B-Zielen. Parameter, die schon in der Ziel-URL stehen, bleiben unverändert.',
+
+        'fields' => [
+
+            'source' => 'Quelle (utm_source)',
+
+            'medium' => 'Medium (utm_medium)',
+
+            'campaign' => 'Kampagne (utm_campaign)',
+
+            'term' => 'Keyword (utm_term)',
+
+            'content' => 'Inhalt (utm_content)',
+
+        ],
+
+        'placeholders' => [
+
+            'source' => 'z. B. newsletter oder qr',
+
+            'medium' => 'z. B. email, social oder print',
+
+            'campaign' => 'z. B. herbst-sale',
+
+            'term' => 'optional',
+
+            'content' => 'optional',
+
+        ],
+
+        'preview' => 'Weiterleitung auf:',
+
+    ],
+
+
     'targeting' => [
         'geo' => [
             'title' => 'Geo-Targeting',

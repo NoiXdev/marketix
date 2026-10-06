@@ -29,6 +29,7 @@ interface QrData {
   targeting_device: unknown[];
   targeting_language: unknown[];
   targeting_ab: unknown[];
+  utm: QrFormData['utm'] | null;
   pixel_ids: string[];
 }
 
@@ -51,6 +52,7 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
     targeting_device:   (qrCode.targeting_device ?? []) as QrFormData['targeting_device'],
     targeting_language: (qrCode.targeting_language ?? []) as QrFormData['targeting_language'],
     targeting_ab:       (qrCode.targeting_ab ?? []) as QrFormData['targeting_ab'],
+    utm:                qrCode.utm ?? {},
     pixel_ids:          qrCode.pixel_ids ?? [],
   });
 
