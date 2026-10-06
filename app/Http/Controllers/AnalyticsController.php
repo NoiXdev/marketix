@@ -3,26 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Goal;
+use App\Models\Site;
 use App\Services\AnalyticsAggregator;
 use App\Services\GoalAggregator;
 use App\Support\Analytics\PeriodResolver;
+use App\Support\Analytics\ResolvedPeriod;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
-    public function show(Request $request, string $site, AnalyticsAggregator $agg, GoalAggregator $goalAgg)
+    public const TABS = ['overview', 'acquisition', 'behavior', 'audience', 'conversions'];
+
+    public function __construct(
+        private AnalyticsAggregator $agg,
+        private GoalAggregator $goals,
+    ) {}
+
+    public function show(Request $request, string $site)
     {
         $project = $request->get('project');
         $model = $project->sites()->findOrFail($site);
+
+        $tab = $request->input('tab');
+        $tab = in_array($tab, self::TABS, true) ? $tab : 'overview';
 
         $filters = $request->input('filters');
         $period = PeriodResolver::resolve(
             $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
             is_array($filters) ? $filters : [],
         );
-        $query = $period->query;
-        $comparison = $period->comparison();
-        $id = $model->id;
 
         return inertia('Analytics/Index', [
             'site' => [
@@ -31,45 +40,109 @@ class AnalyticsController extends Controller
                 'domain' => $model->domain,
                 'search_enabled' => $model->searchParams() !== [],
             ],
+            'tab' => $tab,
             'period' => $period->toArray(),
-            'filters' => (object) $query->filters,
-            'summary' => fn () => $agg->summary($id, $query),
-            'previousSummary' => fn () => $comparison === null ? null : $agg->summary($id, $comparison),
-            'liveVisitors' => fn () => $agg->liveVisitors($id),
-            'timeseries' => fn () => $agg->timeseries($id, $query),
-            'topPaths' => fn () => $agg->topPaths($id, $query),
-            'entryPages' => fn () => $agg->entryPages($id, $query),
-            'exitPages' => fn () => $agg->exitPages($id, $query),
-            'topReferrers' => fn () => $agg->topReferrers($id, $query),
-            'channels' => fn () => $agg->channels($id, $query),
-            'countries' => fn () => $agg->countriesWithCode($id, $query),
-            'languages' => fn () => $agg->breakdown($id, 'language', $query),
-            'clicksByCountry' => fn () => $agg->breakdownByCountryCode($id, $query),
-            'browsers' => fn () => $agg->breakdown($id, 'browser', $query),
-            'operatingSystems' => fn () => $agg->breakdown($id, 'os', $query),
-            'devices' => fn () => $agg->breakdown($id, 'device', $query),
-            'hourlyActivity' => fn () => $agg->hourlyActivity($id, $query),
-            'utmSources' => fn () => $agg->utmBreakdown($id, 'utm_source', $query),
-            'utmMediums' => fn () => $agg->utmBreakdown($id, 'utm_medium', $query),
-            'utmCampaigns' => fn () => $agg->utmBreakdown($id, 'utm_campaign', $query),
-            'utmSourceMediums' => fn () => $agg->utmSourceMedium($id, $query),
-            'utmTerms' => fn () => $agg->utmBreakdown($id, 'utm_term', $query),
-            'utmContents' => fn () => $agg->utmBreakdown($id, 'utm_content', $query),
-            'topEvents' => fn () => $goalAgg->topEvents($id, $query),
+            'filters' => (object) $period->query->filters,
+            'liveVisitors' => fn () => $this->agg->liveVisitors($model->id),
+            ...$this->tabProps($tab, $model, $period),
+        ]);
+    }
+
+    /** @return array<string, \Closure> */
+    private function tabProps(string $tab, Site $site, ResolvedPeriod $period): array
+    {
+        return match ($tab) {
+            'acquisition' => $this->acquisition($site->id, $period),
+            'behavior' => $this->behavior($site->id, $period),
+            'audience' => $this->audience($site->id, $period),
+            'conversions' => $this->conversions($site, $period),
+            default => $this->overview($site->id, $period),
+        };
+    }
+
+    /** @return array<string, \Closure> */
+    private function overview(string $id, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+        $comparison = $period->comparison();
+
+        return [
+            'summary' => fn () => $this->agg->summary($id, $query),
+            'previousSummary' => fn () => $comparison === null ? null : $this->agg->summary($id, $comparison),
+            'timeseries' => fn () => $this->agg->timeseries($id, $query),
+            'topPaths' => fn () => $this->agg->topPaths($id, $query, 6),
+            'channels' => fn () => $this->agg->channels($id, $query)->take(6)->values(),
+            'countries' => fn () => $this->agg->countriesWithCode($id, $query, 6),
+            'devices' => fn () => $this->agg->breakdown($id, 'device', $query, 6),
+        ];
+    }
+
+    /** @return array<string, \Closure> */
+    private function acquisition(string $id, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+
+        return [
+            'channels' => fn () => $this->agg->channels($id, $query),
+            'topReferrers' => fn () => $this->agg->topReferrers($id, $query),
+            'utmSources' => fn () => $this->agg->utmBreakdown($id, 'utm_source', $query),
+            'utmMediums' => fn () => $this->agg->utmBreakdown($id, 'utm_medium', $query),
+            'utmCampaigns' => fn () => $this->agg->utmBreakdown($id, 'utm_campaign', $query),
+            'utmSourceMediums' => fn () => $this->agg->utmSourceMedium($id, $query),
+            'utmTerms' => fn () => $this->agg->utmBreakdown($id, 'utm_term', $query),
+            'utmContents' => fn () => $this->agg->utmBreakdown($id, 'utm_content', $query),
+        ];
+    }
+
+    /** @return array<string, \Closure> */
+    private function behavior(string $id, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+
+        return [
+            'topPaths' => fn () => $this->agg->topPaths($id, $query),
+            'entryPages' => fn () => $this->agg->entryPages($id, $query),
+            'exitPages' => fn () => $this->agg->exitPages($id, $query),
+            'topEvents' => fn () => $this->goals->topEvents($id, $query),
             'interactions' => fn () => [
-                'outbound' => $goalAgg->eventBreakdown($id, $query, 'outbound_click', 'url'),
-                'downloads' => $goalAgg->eventBreakdown($id, $query, 'file_download', 'url'),
-                'searches' => $goalAgg->eventBreakdown($id, $query, 'site_search', 'term'),
-                'notFound' => $goalAgg->eventBreakdown($id, $query, 'not_found'),
+                'outbound' => $this->goals->eventBreakdown($id, $query, 'outbound_click', 'url'),
+                'downloads' => $this->goals->eventBreakdown($id, $query, 'file_download', 'url'),
+                'searches' => $this->goals->eventBreakdown($id, $query, 'site_search', 'term'),
+                'notFound' => $this->goals->eventBreakdown($id, $query, 'not_found'),
             ],
-            'goals' => fn () => $model->goals()->get()->map(fn (Goal $g) => array_merge([
+            'hourlyActivity' => fn () => $this->agg->hourlyActivity($id, $query),
+        ];
+    }
+
+    /** @return array<string, \Closure> */
+    private function audience(string $id, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+
+        return [
+            'clicksByCountry' => fn () => $this->agg->breakdownByCountryCode($id, $query),
+            'countries' => fn () => $this->agg->countriesWithCode($id, $query),
+            'languages' => fn () => $this->agg->breakdown($id, 'language', $query),
+            'devices' => fn () => $this->agg->breakdown($id, 'device', $query),
+            'browsers' => fn () => $this->agg->breakdown($id, 'browser', $query),
+            'operatingSystems' => fn () => $this->agg->breakdown($id, 'os', $query),
+        ];
+    }
+
+    /** @return array<string, \Closure> */
+    private function conversions(Site $site, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+
+        return [
+            'goals' => fn () => $site->goals()->get()->map(fn (Goal $g) => array_merge([
                 'id' => $g->id,
                 'name' => $g->name,
                 'type' => $g->type->value,
                 'match_value' => $g->match_value,
-            ], $goalAgg->conversions($g, $query), [
-                'byCampaign' => $goalAgg->conversionsByCampaign($g, $query),
+            ], $this->goals->conversions($g, $query), [
+                'byCampaign' => $this->goals->conversionsByCampaign($g, $query),
             ])),
-        ]);
+        ];
     }
 }

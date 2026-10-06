@@ -1,16 +1,18 @@
 import RankedList, { RankRow } from '@/Pages/Dashboard/RankedList';
+import { Link } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 export type BreakdownTab = { key: string; label: string; rows: RankRow[]; emptyLabel?: string };
 
-export default function BreakdownCard({ title, tabs, emptyLabel }: { title: string; tabs: BreakdownTab[]; emptyLabel: string }) {
+export default function BreakdownCard({ title, tabs, emptyLabel, more }: { title: string; tabs: BreakdownTab[]; emptyLabel: string; more?: { href: string; label: string } }) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
   const active = tabs.find((tab) => tab.key === activeKey) ?? tabs[0];
 
   return (
-    <section className="rounded-[var(--radius)] border border-line bg-surface shadow-[var(--shadow-sm)]">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-line bg-surface flex flex-col rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
+      <div className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+        <h2 className="text-foreground text-sm font-semibold">{title}</h2>
         {tabs.length > 1 && (
           <div role="tablist" className="flex flex-wrap gap-1">
             {tabs.map((tab) => (
@@ -20,7 +22,7 @@ export default function BreakdownCard({ title, tabs, emptyLabel }: { title: stri
                 role="tab"
                 aria-selected={tab.key === active.key}
                 onClick={() => setActiveKey(tab.key)}
-                className={`rounded-md px-2 py-1 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] ${
+                className={`rounded-md px-2 py-1 text-xs font-semibold focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
                   tab.key === active.key ? 'bg-accent-soft text-accent-soft-foreground' : 'text-muted hover:bg-elevated'
                 }`}
               >
@@ -30,9 +32,18 @@ export default function BreakdownCard({ title, tabs, emptyLabel }: { title: stri
           </div>
         )}
       </div>
-      <div role="tabpanel">
+      <div role="tabpanel" className="flex-1">
         <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
       </div>
+      {more && (
+        <Link
+          href={more.href}
+          className="border-line text-accent-soft-foreground hover:bg-elevated inline-flex items-center justify-end gap-1 rounded-b-[var(--radius)] border-t px-4 py-2.5 text-xs font-semibold"
+        >
+          {more.label}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
     </section>
   );
 }

@@ -76,6 +76,33 @@ return [
         'no_data' => 'Geen gegevens',
         'map_title' => 'Bezoekers per land',
 
+        'tabs' => [
+            'label' => 'Analytics-onderdelen',
+            'overview' => [
+                'label' => 'Overzicht',
+                'description' => 'De belangrijkste cijfers van uw website in één oogopslag.',
+            ],
+            'acquisition' => [
+                'label' => 'Acquisitie',
+                'description' => 'Waar uw bezoekers vandaan komen: kanalen, verwijzende websites en campagnes.',
+                'more' => 'Alle bronnen',
+            ],
+            'behavior' => [
+                'label' => 'Gedrag',
+                'description' => 'Wat bezoekers op uw website doen: pagina’s, interacties, events en actieve tijden.',
+                'more' => 'Alle pagina’s',
+            ],
+            'audience' => [
+                'label' => 'Doelgroep',
+                'description' => 'Wie uw bezoekers zijn: landen, talen, apparaten en browsers.',
+                'more' => 'Meer over uw doelgroep',
+            ],
+            'conversions' => [
+                'label' => 'Conversies',
+                'description' => 'Hoeveel bezoeken uw doelen bereiken.',
+            ],
+        ],
+
         'chart' => [
             'show_table' => 'Als tabel tonen',
             'show_chart' => 'Als grafiek tonen',

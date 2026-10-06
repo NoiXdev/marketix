@@ -76,6 +76,33 @@ return [
         'no_data' => 'Aucune donnée',
         'map_title' => 'Visiteurs par pays',
 
+        'tabs' => [
+            'label' => 'Sections d’analyse',
+            'overview' => [
+                'label' => 'Vue d’ensemble',
+                'description' => 'Les chiffres clés de votre site en un coup d’œil.',
+            ],
+            'acquisition' => [
+                'label' => 'Acquisition',
+                'description' => 'D’où viennent vos visiteurs : canaux, sites référents et campagnes.',
+                'more' => 'Toutes les sources',
+            ],
+            'behavior' => [
+                'label' => 'Comportement',
+                'description' => 'Ce que les visiteurs font sur votre site : pages, interactions, événements et heures d’activité.',
+                'more' => 'Toutes les pages',
+            ],
+            'audience' => [
+                'label' => 'Audience',
+                'description' => 'Qui sont vos visiteurs : pays, langues, appareils et navigateurs.',
+                'more' => 'En savoir plus sur l’audience',
+            ],
+            'conversions' => [
+                'label' => 'Conversions',
+                'description' => 'Combien de visites atteignent vos objectifs.',
+            ],
+        ],
+
         'chart' => [
             'show_table' => 'Afficher en tableau',
             'show_chart' => 'Afficher en graphique',

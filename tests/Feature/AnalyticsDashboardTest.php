@@ -11,6 +11,7 @@ use App\Models\Site;
 use App\Models\User;
 use App\Models\Visit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -18,23 +19,39 @@ class AnalyticsDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_renders_site_analytics_with_metrics(): void
-    {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
+    private User $user;
 
-        $visit = Visit::factory()->forSite($site)->create(['visitor_hash' => 'v1', 'pageview_count' => 2]);
+    private Project $project;
+
+    private Site $site;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->project = Project::create(['name' => 'Acme']);
+        $this->user->projects()->attach($this->project);
+        $this->site = Site::factory()->forProject($this->project)->create();
+    }
+
+    private function dashboard(string $query = ''): TestResponse
+    {
+        return $this->actingAs($this->user)
+            ->get(route('app.project.analytics.show', ['project' => $this->project->id, 'site' => $this->site->id]).$query);
+    }
+
+    public function test_overview_tab_is_the_default_and_only_loads_its_own_data(): void
+    {
+        $visit = Visit::factory()->forSite($this->site)->create(['visitor_hash' => 'v1', 'pageview_count' => 2]);
         PageView::factory()->forVisit($visit)->create(['visitor_hash' => 'v1', 'path' => '/home']);
         PageView::factory()->forVisit($visit)->create(['visitor_hash' => 'v1', 'path' => '/pricing']);
-        PageView::factory()->forSite($site)->create(['visitor_hash' => 'bot', 'is_bot' => true]);
+        PageView::factory()->forSite($this->site)->create(['visitor_hash' => 'bot', 'is_bot' => true]);
 
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=7')
+        $this->dashboard('?days=7')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('Analytics/Index')
+                ->where('tab', 'overview')
                 ->where('period.range', '7d')
                 ->where('period.days', 7)
                 ->where('period.interval', 'day')
@@ -43,32 +60,108 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('summary.visitors', 1)
                 ->where('previousSummary.page_views', 0)
                 ->has('timeseries', 7)
+                ->has('topPaths', 2)
+                ->has('channels')
+                ->has('countries')
+                ->has('devices')
+                ->has('liveVisitors')
+                ->where('site.search_enabled', false)
+                ->missing('utmSources')
+                ->missing('hourlyActivity')
+                ->missing('goals')
+                ->missing('clicksByCountry')
+            );
+    }
+
+    public function test_acquisition_tab(): void
+    {
+        Visit::factory()->forSite($this->site)->create(['visitor_hash' => 'v1', 'utm_source' => 'google', 'utm_medium' => 'cpc']);
+        Visit::factory()->forSite($this->site)->create(['visitor_hash' => 'v2']);
+
+        $this->dashboard('?tab=acquisition')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('tab', 'acquisition')
+                ->has('channels', 2)
+                ->has('topReferrers')
+                ->has('utmSources', 1)
+                ->has('utmMediums')
+                ->has('utmCampaigns')
+                ->has('utmSourceMediums')
+                ->has('utmTerms')
+                ->has('utmContents')
+                ->missing('summary')
+                ->missing('timeseries')
+            );
+    }
+
+    public function test_behavior_tab(): void
+    {
+        $visit = Visit::factory()->forSite($this->site)->create();
+        Event::factory()->forVisit($visit)->create(['name' => 'signup']);
+
+        $this->dashboard('?tab=behavior')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('tab', 'behavior')
                 ->has('topPaths')
                 ->has('entryPages')
                 ->has('exitPages')
-                ->has('topReferrers')
-                ->has('channels')
-                ->has('countries')
-                ->has('languages')
-                ->has('hourlyActivity', 1)
+                ->has('topEvents', 1)
+                ->where('topEvents.0.name', 'signup')
                 ->has('interactions.outbound')
                 ->has('interactions.downloads')
                 ->has('interactions.searches')
                 ->has('interactions.notFound')
-                ->where('site.search_enabled', false)
-                ->has('liveVisitors')
+                ->has('hourlyActivity', 1)
+                ->missing('summary')
             );
+    }
+
+    public function test_audience_tab(): void
+    {
+        $this->dashboard('?tab=audience')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('tab', 'audience')
+                ->has('clicksByCountry')
+                ->has('countries')
+                ->has('languages')
+                ->has('devices')
+                ->has('browsers')
+                ->has('operatingSystems')
+                ->missing('summary')
+            );
+    }
+
+    public function test_conversions_tab(): void
+    {
+        $visit = Visit::factory()->forSite($this->site)->create(['utm_source' => 'google']);
+        Event::factory()->forVisit($visit)->create(['name' => 'signup']);
+        Goal::factory()->forSite($this->site)->create(['type' => GoalType::Event, 'match_value' => 'signup', 'name' => 'Signup']);
+
+        $this->dashboard('?tab=conversions')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('tab', 'conversions')
+                ->has('goals', 1)
+                ->where('goals.0.conversions', 1)
+                ->where('goals.0.name', 'Signup')
+                ->has('goals.0.byCampaign')
+                ->missing('summary')
+            );
+    }
+
+    public function test_unknown_tab_falls_back_to_overview(): void
+    {
+        $this->dashboard('?tab=secret')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('tab', 'overview')->has('summary'));
     }
 
     public function test_today_range_uses_hourly_buckets(): void
     {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
-
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=1')
+        $this->dashboard('?days=1')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('period.range', 'today')
@@ -80,13 +173,8 @@ class AnalyticsDashboardTest extends TestCase
     public function test_custom_range_with_weekly_interval_and_year_comparison(): void
     {
         $this->travelTo(now()->setDate(2026, 10, 7)->setTime(12, 0));
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
 
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?range=custom&from=2026-09-01&to=2026-09-30&interval=week&compare=year')
+        $this->dashboard('?range=custom&from=2026-09-01&to=2026-09-30&interval=week&compare=year')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('period.range', 'custom')
@@ -103,13 +191,7 @@ class AnalyticsDashboardTest extends TestCase
 
     public function test_comparison_can_be_disabled(): void
     {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
-
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?range=12m&compare=none')
+        $this->dashboard('?range=12m&compare=none')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('period.compare', 'none')
@@ -120,88 +202,27 @@ class AnalyticsDashboardTest extends TestCase
 
     public function test_filters_scope_the_dashboard_and_unknown_keys_are_dropped(): void
     {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
-
-        $de = Visit::factory()->forSite($site)->create(['visitor_hash' => 'de', 'country_code' => 'DE']);
+        $de = Visit::factory()->forSite($this->site)->create(['visitor_hash' => 'de', 'country_code' => 'DE']);
         PageView::factory()->forVisit($de)->create(['visitor_hash' => 'de', 'country_code' => 'DE']);
-        $ch = Visit::factory()->forSite($site)->create(['visitor_hash' => 'ch', 'country_code' => 'CH']);
+        $ch = Visit::factory()->forSite($this->site)->create(['visitor_hash' => 'ch', 'country_code' => 'CH', 'utm_source' => 'google']);
         PageView::factory()->forVisit($ch)->count(2)->create(['visitor_hash' => 'ch', 'country_code' => 'CH']);
 
-        $url = route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]);
-
-        $this->actingAs($user)
-            ->get($url.'?days=30&filters[country_code]=CH&filters[evil]=x')
+        $this->dashboard('?days=30&filters[country_code]=CH&filters[evil]=x')
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->where('filters', ['country_code' => 'CH'])
                 ->where('summary.page_views', 2)
                 ->where('summary.sessions', 1)
-            );
-    }
-
-    public function test_dashboard_exposes_campaign_props(): void
-    {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
-
-        Visit::factory()->forSite($site)->create(['visitor_hash' => 'v1', 'utm_source' => 'google', 'utm_medium' => 'cpc']);
-        Visit::factory()->forSite($site)->create(['visitor_hash' => 'v2']); // organic
-
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=30')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Analytics/Index')
-                ->where('summary.sessions', 2)
-                ->where('summary.campaign_share', fn ($share) => (float) $share === 50.0)
-                ->has('utmSources')
-                ->has('utmMediums')
-                ->has('utmCampaigns')
-                ->has('utmSourceMediums')
-                ->has('utmTerms')
-                ->has('utmContents')
-            );
-    }
-
-    public function test_dashboard_exposes_events_and_goals(): void
-    {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
-        $site = Site::factory()->forProject($project)->create();
-
-        $visit = Visit::factory()->forSite($site)->create(['utm_source' => 'google']);
-        Event::factory()->forVisit($visit)->create(['name' => 'signup']);
-        Goal::factory()->forSite($site)->create(['type' => GoalType::Event, 'match_value' => 'signup', 'name' => 'Signup']);
-
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $site->id]).'?days=30')
-            ->assertOk()
-            ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Analytics/Index')
-                ->has('topEvents', 1)
-                ->where('topEvents.0.name', 'signup')
-                ->has('goals', 1)
-                ->where('goals.0.conversions', 1)
-                ->where('goals.0.name', 'Signup')
-                ->has('goals.0.byCampaign')
+                ->where('summary.campaign_share', fn ($share) => (float) $share === 100.0)
             );
     }
 
     public function test_foreign_project_site_is_not_found(): void
     {
-        $user = User::factory()->create();
-        $project = Project::create(['name' => 'Acme']);
-        $user->projects()->attach($project);
         $foreign = Site::factory()->create();
 
-        $this->actingAs($user)
-            ->get(route('app.project.analytics.show', ['project' => $project->id, 'site' => $foreign->id]))
+        $this->actingAs($this->user)
+            ->get(route('app.project.analytics.show', ['project' => $this->project->id, 'site' => $foreign->id]))
             ->assertNotFound();
     }
 }

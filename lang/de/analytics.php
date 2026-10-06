@@ -76,6 +76,33 @@ return [
         'no_data' => 'Keine Daten',
         'map_title' => 'Besucher nach Land',
 
+        'tabs' => [
+            'label' => 'Analytics-Bereiche',
+            'overview' => [
+                'label' => 'Übersicht',
+                'description' => 'Die wichtigsten Kennzahlen Ihrer Website auf einen Blick.',
+            ],
+            'acquisition' => [
+                'label' => 'Akquisition',
+                'description' => 'Woher Ihre Besucher kommen: Kanäle, verweisende Websites und Kampagnen.',
+                'more' => 'Alle Quellen',
+            ],
+            'behavior' => [
+                'label' => 'Verhalten',
+                'description' => 'Was Besucher auf Ihrer Website tun: Seiten, Interaktionen, Events und aktive Zeiten.',
+                'more' => 'Alle Seiten',
+            ],
+            'audience' => [
+                'label' => 'Zielgruppe',
+                'description' => 'Wer Ihre Besucher sind: Länder, Sprachen, Geräte und Browser.',
+                'more' => 'Mehr zur Zielgruppe',
+            ],
+            'conversions' => [
+                'label' => 'Conversions',
+                'description' => 'Wie viele Besuche Ihre Ziele erreichen.',
+            ],
+        ],
+
         'chart' => [
             'show_table' => 'Als Tabelle anzeigen',
             'show_chart' => 'Als Diagramm anzeigen',
