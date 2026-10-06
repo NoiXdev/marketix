@@ -126,10 +126,34 @@ return [
                 'label' => 'Conversions',
                 'description' => 'Wie viele Besuche Ihre Ziele erreichen – und wo Besucher auf dem Weg dorthin abspringen.',
             ],
+            'realtime' => [
+                'label' => 'Echtzeit',
+                'description' => 'Was gerade auf Ihrer Website passiert – in den letzten 30 Minuten.',
+            ],
             'revenue' => [
                 'label' => 'Umsatz',
                 'description' => 'Wie viel Umsatz Ihre Website erzielt – und welche Kanäle, Kampagnen und Seiten dazu beitragen.',
             ],
+        ],
+
+        'realtime' => [
+            'window' => 'Letzte 30 Minuten',
+            'auto_refresh' => 'Live – aktualisiert sich alle :seconds Sekunden automatisch.',
+            'active_now' => 'Gerade aktiv',
+            'active_hint' => 'Besucher mit Aktivität in den letzten 5 Minuten',
+            'visitors' => 'Besucher',
+            'last_30' => 'in den letzten 30 Minuten',
+            'per_minute' => 'Seitenaufrufe pro Minute',
+            'hover_hint' => 'Für Details mit der Maus über einen Balken fahren.',
+            'minute_detail' => ':when: :views Seitenaufrufe · :visitors Besucher',
+            'minutes_ago' => 'vor :count Min.',
+            'now' => 'Jetzt',
+            'active_pages' => 'Aktive Seiten',
+            'feed' => 'Letzte Aktivität',
+            'event' => 'Event „:name“',
+            'nobody' => 'Gerade niemand',
+            'empty_title' => 'Gerade keine Besucher',
+            'empty_text' => 'Sobald jemand Ihre Website besucht, erscheint das hier innerhalb weniger Sekunden.',
         ],
 
         'revenue' => [

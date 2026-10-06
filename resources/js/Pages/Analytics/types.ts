@@ -3,9 +3,9 @@ export type FilterKey =
 
 export type Filters = Partial<Record<FilterKey, string>>;
 
-export type TabKey = 'overview' | 'acquisition' | 'behavior' | 'audience' | 'conversions' | 'revenue';
+export type TabKey = 'overview' | 'realtime' | 'acquisition' | 'behavior' | 'audience' | 'conversions' | 'revenue';
 
-export const TABS: TabKey[] = ['overview', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
+export const TABS: TabKey[] = ['overview', 'realtime', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
 
 export type SiteInfo = { id: string; name: string; domain: string; search_enabled: boolean };
 
