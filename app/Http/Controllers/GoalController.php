@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\GoalType;
 use App\Http\Requests\GoalRequest;
+use App\Services\RevenueAggregator;
+use App\Support\Analytics\AnalyticsQuery;
 use Illuminate\Http\Request;
 
 class GoalController extends Controller
@@ -24,15 +26,22 @@ class GoalController extends Controller
                 'name' => $g->name,
                 'type' => $g->type->value,
                 'match_value' => $g->match_value,
+                'conditions' => $g->conditions ?? [],
+                'value' => $g->value,
+                'currency' => $g->currency,
             ]),
         ]);
     }
 
-    public function create(Request $request, string $site)
+    public function create(Request $request, RevenueAggregator $revenue, string $site)
     {
+        $model = $this->site($request, $site);
+
         return inertia('Goals/Create', [
-            'site' => ['id' => $this->site($request, $site)->id],
+            'site' => ['id' => $model->id],
             'goalTypes' => GoalType::options(),
+            // Prefill the goal value currency with the one the site's purchases use
+            'defaultCurrency' => $revenue->currencies($model->id, AnalyticsQuery::lastDays(365))[0]['currency'] ?? null,
         ]);
     }
 
@@ -52,7 +61,15 @@ class GoalController extends Controller
 
         return inertia('Goals/Edit', [
             'site' => ['id' => $model->id],
-            'goal' => ['id' => $g->id, 'name' => $g->name, 'type' => $g->type->value, 'match_value' => $g->match_value],
+            'goal' => [
+                'id' => $g->id,
+                'name' => $g->name,
+                'type' => $g->type->value,
+                'match_value' => $g->match_value,
+                'conditions' => $g->conditions ?? [],
+                'value' => $g->value,
+                'currency' => $g->currency,
+            ],
             'goalTypes' => GoalType::options(),
         ]);
     }

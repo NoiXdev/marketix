@@ -55,12 +55,26 @@ class GoalAggregator
 
     /**
      * Rows (events or page_views) that satisfy a goal or funnel step, in range, bot-excluded.
+     * Event goals can further require property values, e.g. plan = pro (all must match,
+     * compared as text).
+     *
+     * @param  list<array{property: string, value: string}>  $conditions
      */
-    public function matches(string $siteId, GoalType $type, string $value, AnalyticsQuery $query): Builder
+    public function matches(string $siteId, GoalType $type, string $value, AnalyticsQuery $query, array $conditions = []): Builder
     {
         $builder = $type === GoalType::Event
             ? Event::query()->where('name', $value)
             : PathMatcher::apply(PageView::query(), $value);
+
+        if ($type === GoalType::Event) {
+            $property = DB::connection()->getDriverName() === 'sqlite'
+                ? 'CAST(json_extract(props, ?) AS TEXT)'
+                : 'JSON_UNQUOTE(JSON_EXTRACT(props, ?))';
+
+            foreach ($conditions as $condition) {
+                $builder->whereRaw("{$property} = ?", ['$."'.$condition['property'].'"', $condition['value']]);
+            }
+        }
 
         return $this->scoped($builder, $siteId, $query)
             ->where('site_id', $siteId)
@@ -70,7 +84,7 @@ class GoalAggregator
 
     private function matchBase(Goal $goal, AnalyticsQuery $query): Builder
     {
-        return $this->matches($goal->site_id, $goal->type, $goal->match_value, $query);
+        return $this->matches($goal->site_id, $goal->type, $goal->match_value, $query, $goal->conditions ?? []);
     }
 
     private function scoped(Builder $builder, string $siteId, AnalyticsQuery $query): Builder
@@ -80,7 +94,11 @@ class GoalAggregator
         return $visits === null ? $builder : $builder->whereIn('visit_id', $visits);
     }
 
-    /** @return array{conversions: int, visitors: int, rate: float} */
+    /**
+     * The value is conversions times the goal's value per conversion (null when unset).
+     *
+     * @return array{conversions: int, visitors: int, rate: float, value: ?float, currency: ?string}
+     */
     public function conversions(Goal $goal, AnalyticsQuery|int $range): array
     {
         $query = AnalyticsQuery::from($range);
@@ -93,6 +111,8 @@ class GoalAggregator
             'conversions' => $conversions,
             'visitors' => $visitors,
             'rate' => $total > 0 ? round($conversions / $total * 100, 1) : 0.0,
+            'value' => $goal->value === null ? null : round($conversions * $goal->value, 2),
+            'currency' => $goal->currency,
         ];
     }
 

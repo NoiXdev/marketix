@@ -56,6 +56,44 @@ class GoalConversionTest extends TestCase
         $this->assertSame(50.0, $result['rate']); // 2 of 4 sessions
     }
 
+    public function test_event_goal_conditions_require_matching_properties(): void
+    {
+        $site = Site::factory()->create();
+        $props = [
+            ['plan' => 'pro', 'seats' => 3],
+            ['plan' => 'pro', 'seats' => 1],
+            ['plan' => 'free', 'seats' => 3],
+            null,
+        ];
+        foreach ($props as $p) {
+            $v = Visit::factory()->forSite($site)->create();
+            Event::factory()->forVisit($v)->create(['name' => 'signup', 'visitor_hash' => $v->visitor_hash, 'props' => $p]);
+        }
+
+        $pro = Goal::factory()->forSite($site)->create(['conditions' => [['property' => 'plan', 'value' => 'pro']]]);
+        // Numbers in the props are compared as text, and all conditions must hold
+        $proTeam = Goal::factory()->forSite($site)->create(['conditions' => [['property' => 'plan', 'value' => 'pro'], ['property' => 'seats', 'value' => '3']]]);
+        $any = Goal::factory()->forSite($site)->create(['conditions' => null]);
+
+        $this->assertSame(2, $this->agg->conversions($pro, 30)['conversions']);
+        $this->assertSame(1, $this->agg->conversions($proTeam, 30)['conversions']);
+        $this->assertSame(4, $this->agg->conversions($any, 30)['conversions']);
+    }
+
+    public function test_goal_value_is_conversions_times_value_per_conversion(): void
+    {
+        $site = Site::factory()->create();
+        foreach (Visit::factory()->forSite($site)->count(3)->create() as $v) {
+            Event::factory()->forVisit($v)->create(['name' => 'signup', 'visitor_hash' => $v->visitor_hash]);
+        }
+
+        $withValue = Goal::factory()->forSite($site)->create(['value' => 12.5, 'currency' => 'CHF']);
+        $withoutValue = Goal::factory()->forSite($site)->create();
+
+        $this->assertSame(['value' => 37.5, 'currency' => 'CHF'], array_intersect_key($this->agg->conversions($withValue, 30), ['value' => 0, 'currency' => 0]));
+        $this->assertNull($this->agg->conversions($withoutValue, 30)['value']);
+    }
+
     public function test_pageview_goal_prefix_matching(): void
     {
         $site = Site::factory()->create();

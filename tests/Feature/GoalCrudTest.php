@@ -50,6 +50,60 @@ class GoalCrudTest extends TestCase
         $this->assertDatabaseHas('goals', ['site_id' => $site->id, 'type' => 'pageview', 'match_value' => '/danke']);
     }
 
+    public function test_store_saves_event_conditions_and_value(): void
+    {
+        [$user, $project, $site] = $this->ctx();
+
+        $this->actingAs($user)
+            ->post(route('app.project.analytics.goals.store', ['project' => $project->id, 'site' => $site->id]), [
+                'name' => 'Pro signup',
+                'type' => 'event',
+                'match_value' => 'signup',
+                'conditions' => [['property' => 'plan', 'value' => 'pro'], ['property' => '', 'value' => '']],
+                'value' => '49.90',
+                'currency' => 'chf',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $goal = Goal::firstOrFail();
+        $this->assertSame([['property' => 'plan', 'value' => 'pro']], $goal->conditions); // blank row dropped
+        $this->assertSame(49.9, $goal->value);
+        $this->assertSame('CHF', $goal->currency);
+    }
+
+    public function test_pageview_goals_drop_conditions_and_currency_needs_a_value(): void
+    {
+        [$user, $project, $site] = $this->ctx();
+
+        $this->actingAs($user)
+            ->post(route('app.project.analytics.goals.store', ['project' => $project->id, 'site' => $site->id]), [
+                'name' => 'Thanks', 'type' => 'pageview', 'match_value' => '/danke',
+                'conditions' => [['property' => 'plan', 'value' => 'pro']],
+                'value' => '', 'currency' => 'CHF',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $goal = Goal::firstOrFail();
+        $this->assertNull($goal->conditions);
+        $this->assertNull($goal->value);
+        $this->assertNull($goal->currency);
+    }
+
+    public function test_invalid_conditions_and_missing_currency_are_rejected(): void
+    {
+        [$user, $project, $site] = $this->ctx();
+
+        $this->actingAs($user)
+            ->post(route('app.project.analytics.goals.store', ['project' => $project->id, 'site' => $site->id]), [
+                'name' => 'Bad', 'type' => 'event', 'match_value' => 'signup',
+                'conditions' => [['property' => 'plan"]', 'value' => 'pro'], ['property' => 'tier', 'value' => '']],
+                'value' => '10',
+            ])
+            ->assertSessionHasErrors(['conditions.0.property', 'conditions.1.value', 'currency']);
+
+        $this->assertSame(0, Goal::count());
+    }
+
     public function test_update_and_destroy(): void
     {
         [$user, $project, $site] = $this->ctx();

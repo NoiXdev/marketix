@@ -70,6 +70,8 @@ class GetSiteStatsTool extends Tool
                 'name' => $goal->name,
                 'type' => $goal->type->value,
                 'match_value' => $goal->match_value,
+                'conditions' => $goal->conditions ?? [],
+                'value_per_conversion' => $goal->value,
                 ...$this->goals->conversions($goal, $query),
             ])->all(),
             'revenue' => $currency === null ? null : [
