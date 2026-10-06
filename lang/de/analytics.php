@@ -225,8 +225,19 @@ return [
             'page_views' => 'Seitenaufrufe',
             'unique_visitors' => 'Eindeutige Besucher',
             'bounce_rate' => 'Absprungrate',
+            'bounce_hint' => 'Sitzungen mit nur einem Seitenaufruf',
+            'engagement_rate' => 'Engagement-Rate',
+            'engagement_hint' => 'Sitzungen über 10 s, mit 2+ Seiten oder einer Conversion',
             'avg_duration' => 'Ø Verweildauer',
             'from_campaigns' => 'Aus Kampagnen',
+        ],
+
+        'channel_table' => [
+            'channel' => 'Kanal',
+            'sessions' => 'Sitzungen',
+            'engagement' => 'Engagement',
+            'avg_duration' => 'Ø Dauer',
+            'hint' => 'Engagement-Rate: Anteil der Sitzungen, die länger als 10 Sekunden dauern, mindestens 2 Seiten umfassen oder eine Conversion auslösen – wie in Google Analytics 4.',
         ],
 
         'breakdown' => [

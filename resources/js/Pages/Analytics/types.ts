@@ -14,6 +14,7 @@ export type Summary = {
   visitors: number;
   sessions: number;
   bounce_rate: number;
+  engagement_rate: number;
   avg_duration: number;
   campaign_share: number;
 };
@@ -21,6 +22,8 @@ export type Summary = {
 export type Rank = Record<string, string | number> & { count: number };
 
 export type CampaignRow = { value: string; sessions: number; visitors: number };
+
+export type ChannelRow = { channel: string; count: number; visitors: number; engagement_rate: number | null; avg_duration: number };
 
 export type EventRow = { name: string; count: number; visitors: number };
 

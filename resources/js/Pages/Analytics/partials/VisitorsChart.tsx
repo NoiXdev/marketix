@@ -11,11 +11,12 @@ export type SeriesPoint = {
   visitors: number;
   sessions: number;
   bounce_rate: number | null;
+  engagement_rate: number | null;
   avg_duration: number | null;
   campaign_share: number | null;
 };
 
-type MetricKey = 'views' | 'visitors' | 'bounce_rate' | 'avg_duration' | 'campaign_share';
+type MetricKey = 'views' | 'visitors' | 'engagement_rate' | 'bounce_rate' | 'avg_duration' | 'campaign_share';
 
 type Metric = {
   key: MetricKey;
@@ -26,7 +27,7 @@ type Metric = {
 };
 
 const STORAGE_KEY = 'marketix.analytics.chart-metrics';
-const METRIC_KEYS: MetricKey[] = ['views', 'visitors', 'bounce_rate', 'avg_duration', 'campaign_share'];
+const METRIC_KEYS: MetricKey[] = ['views', 'visitors', 'engagement_rate', 'bounce_rate', 'avg_duration', 'campaign_share'];
 const DEFAULT_SELECTION: MetricKey[] = ['views', 'visitors'];
 const SLOT_GAP = 1;
 const MARK_GAP = 2;
@@ -87,6 +88,7 @@ export default function VisitorsChart({
   const metrics: Metric[] = [
     { key: 'views', kind: 'bar', color: 'var(--chart-views)', label: t('analytics.dashboard.kpi.page_views'), format: count },
     { key: 'visitors', kind: 'bar', color: 'var(--chart-visitors)', label: t('analytics.dashboard.kpi.unique_visitors'), format: count },
+    { key: 'engagement_rate', kind: 'line', color: 'var(--chart-engagement)', label: t('analytics.dashboard.kpi.engagement_rate'), format: percent },
     { key: 'bounce_rate', kind: 'line', color: 'var(--chart-bounce)', label: t('analytics.dashboard.kpi.bounce_rate'), format: percent },
     { key: 'avg_duration', kind: 'line', color: 'var(--chart-duration)', label: t('analytics.dashboard.kpi.avg_duration'), format: formatDuration },
     { key: 'campaign_share', kind: 'line', color: 'var(--chart-campaign)', label: t('analytics.dashboard.kpi.from_campaigns'), format: percent },
