@@ -14,6 +14,10 @@ import WidgetConfigForm from '@/Pages/Dashboard/WidgetConfigForm';
 
 const Grid = WidthProvider(Responsive);
 
+// Widgets whose content wraps onto more rows on narrow screens than in their
+// desktop cell (quick actions go from one row of four to two rows of two).
+const MOBILE_MIN_H: Partial<Record<W['type'], number>> = { quick_actions: 4 };
+
 interface DashboardMeta {
   id: string;
   name: string;
@@ -106,9 +110,23 @@ export default function Dashboard({ dashboards, active }: Props) {
     return { i: w.id, x: w.layout.x, y: w.layout.y, w: w.layout.w, h: w.layout.h, minW: def.minW, minH: def.minH, maxH: def.maxH };
   });
 
+  // Below `lg` the grid has a single column. Left to RGL, the desktop x/w
+  // values carry over and widgets drift off-screen, so stack them full-width
+  // in desktop reading order (top to bottom, then left to right).
+  const typeById = new Map(widgets.map((w) => [w.id, w.type]));
+  let stackedY = 0;
+  const mobileLayout: Layout = [...layout]
+    .sort((a, b) => a.y - b.y || a.x - b.x)
+    .map((item) => {
+      const h = Math.max(item.h, MOBILE_MIN_H[typeById.get(item.i)!] ?? 0);
+      const stacked = { i: item.i, x: 0, y: stackedY, w: 1, h, static: true };
+      stackedY += h;
+      return stacked;
+    });
+
   return (
     <AppLayout title={project.name}>
-      <div className="px-8 py-6">
+      <div className="px-4 py-6 sm:px-8">
         <div className="mb-4 flex items-center justify-between gap-3">
           <DashboardSwitcher dashboards={dashboards} active={active} />
           <div className="flex items-center gap-2">
@@ -130,7 +148,7 @@ export default function Dashboard({ dashboards, active }: Props) {
         </div>
         <Grid
           className="layout"
-          layouts={{ lg: layout }}
+          layouts={{ lg: layout, xs: mobileLayout }}
           breakpoints={{ lg: 1024, xs: 0 }}
           cols={{ lg: 12, xs: 1 }}
           rowHeight={64}
