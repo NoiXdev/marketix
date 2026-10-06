@@ -1,4 +1,37 @@
-## [2.4.1](https://github.com/NoiXdev/marketix/compare/v2.4.0...v) (2026-10-06)
+## [2.5.0](https://github.com/NoiXdev/marketix/compare/v2.4.1...v) (2026-10-06)
+
+
+### Features
+
+* **analytics:** add conversion funnels with step-by-step drop-off ([5d33ec8](https://github.com/NoiXdev/marketix/commit/5d33ec824570c095d4ad09bd7b85bda216c6ec1c))
+* **analytics:** add GA4-style engagement rate to KPIs, chart and channels ([c579f21](https://github.com/NoiXdev/marketix/commit/c579f21397c40115686b56e42c41d8596054f11e))
+* **analytics:** add realtime view for the last 30 minutes ([a90c002](https://github.com/NoiXdev/marketix/commit/a90c00286527d9297f224aa13078afb93e0b8bd7))
+* **analytics:** add region and city breakdowns ([82e182f](https://github.com/NoiXdev/marketix/commit/82e182f01676afcb72cadf000991d17eddaf24dd))
+* **analytics:** add revenue reporting based on purchase events ([626c508](https://github.com/NoiXdev/marketix/commit/626c508eb1202b147f1d615c9cd9e6417f04fb9f))
+* **analytics:** distinguish new and returning visitors ([b3b1011](https://github.com/NoiXdev/marketix/commit/b3b1011f604d81de81df7d56e4fd02e974548047))
+* **analytics:** goal conditions on event properties and goal values ([f8570df](https://github.com/NoiXdev/marketix/commit/f8570df8dc932269c998fa35b9ed3b6973196ba2))
+* **analytics:** highlight tracking snippet and show setup banner until first visit ([97b3140](https://github.com/NoiXdev/marketix/commit/97b3140c9b5c5c29e6c5a77bf4069434a880439d))
+* **analytics:** make analytics pages mobile ready ([90463d0](https://github.com/NoiXdev/marketix/commit/90463d0e6d9b797833c0b8b1158bc33525d220f6))
+* **analytics:** record page titles and hostnames ([6527ea3](https://github.com/NoiXdev/marketix/commit/6527ea38709693160200d55ac6abe8ceb7e6ba88))
+* **analytics:** redesign site create and edit forms ([3c78c31](https://github.com/NoiXdev/marketix/commit/3c78c31fe3a3fdd8963882a033f842333220f841))
+* **analytics:** redesign site overview as cards with 30-day stats ([d41439f](https://github.com/NoiXdev/marketix/commit/d41439f2bcc2443867dfd97d6a2ffbb7a5060979))
+* **analytics:** require typing the site name before deleting a site ([6ce396f](https://github.com/NoiXdev/marketix/commit/6ce396fdd6d26ce0fa7dd13e2dfb0c95ddf39b71))
+* **analytics:** show comparison period as dashed lines in the visitors chart ([eec3124](https://github.com/NoiXdev/marketix/commit/eec312441f10e9a3dffc1087e965f30f8076b55c))
+* **analytics:** unify empty states and highlight tracking code snippets ([e284f95](https://github.com/NoiXdev/marketix/commit/e284f95ca6bc2fa05b7c117bf7d535183517bbf6))
+* **links:** tag short links and QR codes with UTM parameters ([f11a08d](https://github.com/NoiXdev/marketix/commit/f11a08d01b24056f06fcdc51b0fed47325f6c066))
+* **mcp:** expose web analytics through the MCP server ([abf1725](https://github.com/NoiXdev/marketix/commit/abf1725b7ad65c7b40c6063d0af7597b2fe0c077))
+* **ui:** add mobile navigation drawer ([f112892](https://github.com/NoiXdev/marketix/commit/f112892a0e5b31e2f3490f86e85f28180f7e1a86))
+* **ui:** move analytics into its own sidebar section ([e891388](https://github.com/NoiXdev/marketix/commit/e891388768016624c0df071fc2bd5f55caca3cd2))
+* **ui:** replace SweetAlert with a themed confirmation dialog ([657214d](https://github.com/NoiXdev/marketix/commit/657214dc2785a31dcc14bd74c527c972ccfd5c28))
+* **ui:** style scrollbars to match the active theme ([24e1906](https://github.com/NoiXdev/marketix/commit/24e19062ae8614c727105a4c73169f2f196b5a3d))
+
+
+### Bug Fixes
+
+* **dashboard:** stack widgets on small screens ([9c02755](https://github.com/NoiXdev/marketix/commit/9c027552cf324a7b018e7ef1fb6473c518288c15))
+* **ui:** localize confirmation dialogs ([ea81a9d](https://github.com/NoiXdev/marketix/commit/ea81a9d1904a68dd77c3fa648973234743c6e2de))
+
+## [2.4.1](https://github.com/NoiXdev/marketix/compare/v2.4.0...v2.4.1) (2026-10-06)
 
 
 ### Bug Fixes
