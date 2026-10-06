@@ -5,6 +5,11 @@ return [
         'title' => 'Analytics — Sites',
         'back' => 'Terug naar sites',
         'create' => 'Site toevoegen',
+        'delete' => [
+            'title' => 'Site verwijderen',
+            'confirm' => '„:name” wordt verwijderd en meet vanaf nu geen bezoeken meer. Reeds verzamelde gegevens worden definitief verwijderd zodra de bewaartermijn verloopt.',
+            'action' => 'Site verwijderen',
+        ],
         'edit' => 'Site bewerken',
         'empty' => 'Nog geen sites.',
         'empty_hint' => 'Voeg je eerste site toe om te beginnen met tracken.',

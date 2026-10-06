@@ -5,6 +5,11 @@ return [
         'title' => 'Analytics — Sites',
         'back' => 'Retour aux sites',
         'create' => 'Ajouter un site',
+        'delete' => [
+            'title' => 'Supprimer le site',
+            'confirm' => '« :name » sera supprimé et cessera immédiatement de mesurer les visites. Les données déjà collectées seront définitivement supprimées à l’expiration de la durée de conservation.',
+            'action' => 'Supprimer le site',
+        ],
         'edit' => 'Modifier le site',
         'empty' => 'Aucun site pour le moment.',
         'empty_hint' => 'Ajoutez votre premier site pour commencer le suivi.',
