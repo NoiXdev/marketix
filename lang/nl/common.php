@@ -48,7 +48,7 @@ return [
     ],
     'dialog' => [
         'title' => 'Weet u het zeker?',
-        'type_to_confirm' => 'Typ „:value” om te bevestigen.',
+        'type_to_confirm' => 'Typ :value om te bevestigen.',
     ],
     'dashboard' => [
         'overview' => 'Overzicht',

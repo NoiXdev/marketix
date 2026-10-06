@@ -136,7 +136,6 @@ export default function LinksShow({
       text: t('links.reset_stats.confirm', { slug: link.slug }),
       match: link.slug,
       confirmText: t('links.reset_stats.button'),
-      mismatchText: t('links.reset_stats.mismatch', { slug: link.slug }),
     });
     if (!ok) return;
     router.delete(route('app.project.links.stats.reset', { project: project!.id, url: link.id }));

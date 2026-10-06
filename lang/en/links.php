@@ -38,7 +38,6 @@ return [
         'button' => 'Reset stats',
         'title' => 'Reset statistics?',
         'confirm' => 'This permanently deletes all click statistics for ":slug" and cannot be undone. Type the link slug to confirm.',
-        'mismatch' => 'Please type ":slug" to confirm.',
     ],
 
     'actions' => [

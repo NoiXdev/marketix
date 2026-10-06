@@ -1,5 +1,9 @@
+import ConfirmDialog, { ConfirmDialogProps } from '@/Components/ConfirmDialog';
 import { translate } from '@/lib/i18n';
-import Swal from 'sweetalert2';
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+
+const LEAVE_DURATION_MS = 200;
 
 let catalog: Record<string, unknown> = {};
 
@@ -9,144 +13,66 @@ export function setConfirmTranslations(translations: unknown) {
     }
 }
 
-function label(key: string, fallback: string, replacements?: Record<string, string | number>): string {
-    const value = translate(catalog, key, replacements);
+function label(key: string, fallback: string): string {
+    const value = translate(catalog, key);
     return value === key ? fallback : value;
 }
 
-// Token-driven button/popup styling. SweetAlert renders in a portal on
-// document.body, so `var(--…)` resolves against :root / .dark just like the
-// rest of the app — no JS theme branching needed.
-const POPUP = 'rounded-[var(--radius)] border border-line';
-const CANCEL_BTN =
-    'mr-3 inline-flex items-center rounded-[var(--radius-sm)] border border-line-strong bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
-const DANGER_BTN =
-    'inline-flex items-center rounded-[var(--radius-sm)] bg-[color:var(--danger-dot)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
-const PRIMARY_BTN =
-    'inline-flex items-center rounded-[var(--radius-sm)] bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]';
+function openDialog(props: Omit<ConfirmDialogProps, 'onResolve'>): Promise<boolean> {
+    return new Promise((resolve) => {
+        const host = document.createElement('div');
+        document.body.appendChild(host);
+        const root = createRoot(host);
 
-type ConfirmDeleteOptions = {
-    /** Dialog heading. Defaults to 'Are you sure?'. */
-    title?: string;
-    /** Body text — usually names the entity and notes irreversibility. */
-    text?: string;
-    /** Label for the confirm button. Defaults to 'Delete'. */
-    confirmText?: string;
-};
-
-/**
- * Themed delete confirmation backed by SweetAlert2. Resolves to `true` when the
- * user confirms, `false` otherwise. Styling follows the app's design tokens.
- */
-export async function confirmDelete(opts: ConfirmDeleteOptions = {}): Promise<boolean> {
-    const result = await Swal.fire({
-        title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
-        text: opts.text,
-        icon: 'warning',
-        iconColor: 'var(--danger-dot)',
-        showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? label('common.actions.delete', 'Delete'),
-        cancelButtonText: label('common.actions.cancel', 'Cancel'),
-        focusCancel: true,
-        reverseButtons: true,
-        buttonsStyling: false,
-        background: 'var(--surface)',
-        color: 'var(--foreground)',
-        customClass: {
-            popup: POPUP,
-            confirmButton: DANGER_BTN,
-            cancelButton: CANCEL_BTN,
-        },
+        root.render(
+            createElement(ConfirmDialog, {
+                ...props,
+                onResolve: (confirmed: boolean) => {
+                    resolve(confirmed);
+                    window.setTimeout(() => {
+                        root.unmount();
+                        host.remove();
+                    }, LEAVE_DURATION_MS);
+                },
+            }),
+        );
     });
-
-    return result.isConfirmed;
 }
 
-type ConfirmActionOptions = {
-    /** Dialog heading. Defaults to 'Are you sure?'. */
+type ConfirmOptions = {
     title?: string;
-    /** Body text. */
     text?: string;
-    /** Label for the confirm button. Defaults to 'Confirm'. */
     confirmText?: string;
 };
 
-/**
- * Themed non-destructive confirmation (accent confirm button). Resolves to
- * `true` when confirmed. Use for risky-but-not-deleting actions.
- */
-export async function confirmAction(opts: ConfirmActionOptions = {}): Promise<boolean> {
-    const result = await Swal.fire({
+export function confirmDelete(opts: ConfirmOptions = {}): Promise<boolean> {
+    return openDialog({
+        tone: 'danger',
         title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
         text: opts.text,
-        icon: 'warning',
-        iconColor: 'var(--warning-dot)',
-        showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
-        cancelButtonText: label('common.actions.cancel', 'Cancel'),
-        focusCancel: true,
-        reverseButtons: true,
-        buttonsStyling: false,
-        background: 'var(--surface)',
-        color: 'var(--foreground)',
-        customClass: {
-            popup: POPUP,
-            confirmButton: PRIMARY_BTN,
-            cancelButton: CANCEL_BTN,
-        },
+        confirmLabel: opts.confirmText ?? label('common.actions.delete', 'Delete'),
+        cancelLabel: label('common.actions.cancel', 'Cancel'),
     });
-
-    return result.isConfirmed;
 }
 
-type ConfirmTypedOptions = {
-    /** Dialog heading. */
-    title?: string;
-    /** Body text — names the entity and notes irreversibility. */
-    text?: string;
-    /** The exact string the user must type to enable confirmation. */
-    match: string;
-    /** Label for the confirm button. Defaults to 'Confirm'. */
-    confirmText?: string;
-    /** Validation message shown when the typed value does not match. */
-    mismatchText?: string;
-};
-
-/**
- * Themed destructive confirmation that requires the user to type an exact
- * string (e.g. the entity's slug) before confirming. Resolves to `true` only
- * when confirmed with a matching value.
- */
-export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> {
-    const result = await Swal.fire({
+export function confirmAction(opts: ConfirmOptions = {}): Promise<boolean> {
+    return openDialog({
+        tone: 'warning',
         title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
         text: opts.text,
-        icon: 'warning',
-        iconColor: 'var(--danger-dot)',
-        input: 'text',
-        inputPlaceholder: opts.match,
-        inputAttributes: { autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off' },
-        showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
-        cancelButtonText: label('common.actions.cancel', 'Cancel'),
-        focusCancel: false,
-        reverseButtons: true,
-        buttonsStyling: false,
-        background: 'var(--surface)',
-        color: 'var(--foreground)',
-        preConfirm: (value: string) => {
-            if (value !== opts.match) {
-                Swal.showValidationMessage(opts.mismatchText ?? label('common.dialog.type_to_confirm', `Please type "${opts.match}" to confirm.`, { value: opts.match }));
-                return false;
-            }
-            return true;
-        },
-        customClass: {
-            popup: POPUP,
-            confirmButton: DANGER_BTN,
-            cancelButton: CANCEL_BTN,
-        },
+        confirmLabel: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
+        cancelLabel: label('common.actions.cancel', 'Cancel'),
     });
+}
 
-    return result.isConfirmed;
+export function confirmTyped(opts: ConfirmOptions & { match: string }): Promise<boolean> {
+    return openDialog({
+        tone: 'danger',
+        title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
+        text: opts.text,
+        confirmLabel: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
+        cancelLabel: label('common.actions.cancel', 'Cancel'),
+        match: opts.match,
+        matchPrompt: label('common.dialog.type_to_confirm', 'Type :value to confirm.'),
+    });
 }

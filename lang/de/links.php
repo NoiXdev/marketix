@@ -38,7 +38,6 @@ return [
         'button' => 'Statistiken zurücksetzen',
         'title' => 'Statistiken zurücksetzen?',
         'confirm' => 'Dadurch werden alle Klickstatistiken für „:slug" dauerhaft gelöscht und können nicht wiederhergestellt werden. Geben Sie den Link-Slug ein, um zu bestätigen.',
-        'mismatch' => 'Bitte geben Sie „:slug" ein, um zu bestätigen.',
     ],
 
     'actions' => [

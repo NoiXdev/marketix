@@ -48,7 +48,7 @@ return [
     ],
     'dialog' => [
         'title' => 'Sind Sie sicher?',
-        'type_to_confirm' => 'Geben Sie „:value“ ein, um zu bestätigen.',
+        'type_to_confirm' => 'Geben Sie :value ein, um zu bestätigen.',
     ],
     'dashboard' => [
         'overview' => 'Überblick',

@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'destructive';
 export type ButtonSize = 'sm' | 'md';
 
 const base =
@@ -18,6 +18,7 @@ const variants: Record<ButtonVariant, string> = {
   ghost: 'text-muted hover:bg-elevated hover:text-foreground',
   danger:
     'text-danger-foreground border border-[color:color-mix(in_srgb,var(--danger-foreground)_35%,transparent)] hover:bg-danger-soft',
+  destructive: 'bg-[color:var(--danger-dot)] text-white hover:bg-[color:color-mix(in_srgb,var(--danger-dot)_85%,black)]',
 };
 
 export function buttonClasses(variant: ButtonVariant = 'primary', size: ButtonSize = 'md', className = ''): string {
