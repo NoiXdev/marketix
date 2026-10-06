@@ -48,7 +48,7 @@ return [
     ],
     'dialog' => [
         'title' => 'Are you sure?',
-        'type_to_confirm' => 'Please type “:value” to confirm.',
+        'type_to_confirm' => 'Type :value to confirm.',
     ],
     'dashboard' => [
         'overview' => 'Overview',

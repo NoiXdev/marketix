@@ -38,7 +38,6 @@ return [
         'button' => 'Statistieken resetten',
         'title' => 'Statistieken resetten?',
         'confirm' => 'Hiermee worden alle klikstatistieken voor ":slug" permanent verwijderd en dit kan niet ongedaan worden gemaakt. Typ de link-slug om te bevestigen.',
-        'mismatch' => 'Typ ":slug" om te bevestigen.',
     ],
 
     'actions' => [
