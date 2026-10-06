@@ -1,9 +1,9 @@
 import RankedList, { RankRow } from '@/Pages/Dashboard/RankedList';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 
-export type BreakdownTab = { key: string; label: string; rows: RankRow[]; emptyLabel?: string };
+export type BreakdownTab = { key: string; label: string; rows: RankRow[]; emptyLabel?: string; empty?: ReactNode };
 
 export default function BreakdownCard({ title, tabs, emptyLabel, more }: { title: string; tabs: BreakdownTab[]; emptyLabel: string; more?: { href: string; label: string } }) {
   const [activeKey, setActiveKey] = useState(tabs[0]?.key);
@@ -33,7 +33,11 @@ export default function BreakdownCard({ title, tabs, emptyLabel, more }: { title
         )}
       </div>
       <div role="tabpanel" className="flex-1">
-        <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
+        {active && active.rows.length === 0 && active.empty ? (
+          active.empty
+        ) : (
+          <RankedList rows={active?.rows ?? []} emptyLabel={active?.emptyLabel ?? emptyLabel} />
+        )}
       </div>
       {more && (
         <Link

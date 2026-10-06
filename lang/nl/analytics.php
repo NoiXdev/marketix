@@ -232,8 +232,11 @@ return [
             'search_title' => "Zoeken & foutpagina's",
             'searches' => 'Zoektermen',
             'not_found' => "404-pagina's",
-            'search_disabled' => 'Zoektermen worden voor deze website niet gemeten. U kunt dit inschakelen in de website-instellingen onder „Uitgebreide meting”.',
-            'not_found_hint' => "Nog geen 404-pagina's gemeten. Roep marketix('404') aan op uw foutpagina.",
+            'search_disabled_title' => 'Zoektermen zijn niet ingeschakeld',
+            'search_disabled_text' => 'Vul in de website-instellingen onder „Uitgebreide meting” de URL-parameters van uw zoekfunctie in (bijv. q). Daarna ziet u hier waar uw bezoekers naar zoeken.',
+            'open_settings' => 'Website-instellingen openen',
+            'not_found_empty_title' => 'Nog geen 404-pagina’s gemeten',
+            'not_found_empty_text' => 'Voeg deze aanroep toe aan uw foutpagina. Daarna ziet u hier welke niet-bestaande pagina’s worden opgevraagd.',
         ],
 
         'channels' => [

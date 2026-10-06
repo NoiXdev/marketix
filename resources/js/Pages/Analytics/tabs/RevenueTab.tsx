@@ -3,6 +3,7 @@ import { countryName } from '@/lib/displayNames';
 import { formatMoney, percentChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
+import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import RevenueChart, { RevenuePoint } from '@/Pages/Analytics/partials/RevenueChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
@@ -60,14 +61,13 @@ export default function RevenueTab({ revenue }: RevenueData) {
 
   if (revenue.currencies.length === 0 && !previousSummary?.orders) {
     return (
-      <div className="border-line bg-surface rounded-[var(--radius)] border border-dashed px-6 py-10 text-center">
-        <span className="bg-accent-soft text-accent-soft-foreground mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full">
-          <ShoppingBag className="h-5 w-5" />
-        </span>
-        <p className="text-foreground text-sm font-semibold">{t('analytics.dashboard.revenue.empty_title')}</p>
-        <p className="text-muted mx-auto mt-1 max-w-lg text-sm">{t('analytics.dashboard.revenue.empty_text')}</p>
-        <code className="bg-foreground text-canvas mx-auto mt-4 inline-block rounded-[var(--radius-sm)] px-3 py-2 text-left text-xs">{SNIPPET}</code>
-      </div>
+      <AnalyticsEmptyState
+        framed
+        icon={ShoppingBag}
+        title={t('analytics.dashboard.revenue.empty_title')}
+        text={t('analytics.dashboard.revenue.empty_text')}
+        code={SNIPPET}
+      />
     );
   }
 
