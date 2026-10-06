@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\PageView;
 use App\Models\Project;
 use App\Models\Site;
 use App\Models\User;
+use App\Models\Visit;
+use App\Services\SiteOverview;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -34,6 +37,35 @@ class SiteCrudTest extends TestCase
                 ->component('Sites/Index')
                 ->has('sites', 1)
                 ->where('sites.0.name', 'Marketing')
+            );
+    }
+
+    public function test_index_defers_per_site_stats(): void
+    {
+        [$user, $project] = $this->userWithProject();
+        $tracked = Site::factory()->forProject($project)->create(['name' => 'Tracked']);
+        $untracked = Site::factory()->forProject($project)->create(['name' => 'Untracked']);
+        $visit = Visit::factory()->forSite($tracked)->create([
+            'visitor_hash' => 'v1',
+            'started_at' => now()->subDay(),
+            'last_activity_at' => now()->subDay(),
+        ]);
+        PageView::factory()->forVisit($visit)->create(['visitor_hash' => 'v1', 'created_at' => now()->subDay()]);
+
+        $this->actingAs($user)
+            ->get(route('app.project.sites.index', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('sites.0.tracking_mode_label')
+                ->missing('stats')
+                ->loadDeferredProps(fn (AssertableInertia $reload) => $reload
+                    ->where("stats.{$tracked->id}.visitors", 1)
+                    ->where("stats.{$tracked->id}.previous_visitors", 0)
+                    ->where("stats.{$tracked->id}.page_views", 1)
+                    ->has("stats.{$tracked->id}.trend", SiteOverview::DAYS)
+                    ->has("stats.{$tracked->id}.last_seen_at")
+                    ->where("stats.{$untracked->id}", null)
+                )
             );
     }
 
