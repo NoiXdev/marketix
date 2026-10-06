@@ -24,10 +24,13 @@ const groups: NavGroup[] = [
     ],
   },
   {
+    labelKey: 'analytics',
+    items: [{ key: 'sites', icon: LineChart, routeName: 'app.project.sites.index', activeRoutes: ['app.project.analytics.*'] }],
+  },
+  {
     labelKey: 'insights',
     items: [
       { key: 'statistics', icon: BarChart3, routeName: 'app.project.statistics' },
-      { key: 'sites', icon: LineChart, routeName: 'app.project.sites.index', activeRoutes: ['app.project.analytics.*'] },
       { key: 'reports', icon: FileBarChart, routeName: 'app.project.reports.index' },
     ],
   },

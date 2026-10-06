@@ -8,7 +8,7 @@ return [
         'qrcodes' => 'QR Codes',
         'pixels' => 'Pixels',
         'statistics' => 'Statistics',
-        'sites' => 'Analytics',
+        'sites' => 'Websites',
         'activity' => 'Activity',
         'team' => 'Team',
         'reports' => 'Reports',
@@ -16,6 +16,7 @@ return [
         'groups' => [
             'overview' => 'Overview',
             'links_codes' => 'Links & Codes',
+            'analytics' => 'Web analytics',
             'insights' => 'Insights',
             'management' => 'Management',
             'docs_help' => 'Docs & Help',
