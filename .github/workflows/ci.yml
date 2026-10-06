@@ -56,6 +56,32 @@ jobs:
       - name: Run Pint
         run: vendor/bin/pint --test --format=txt
 
+  frontend:
+    name: Frontend (ESLint, Prettier, Vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          # Vitest 5 needs Node 22.12+
+          node-version: 24
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run ESLint
+        run: npm run lint:check
+
+      - name: Check formatting with Prettier
+        run: npm run format:check
+
+      - name: Run Vitest
+        run: npm run test:js
+
   test:
     name: PHPUnit
     runs-on: ubuntu-latest
