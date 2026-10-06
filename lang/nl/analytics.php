@@ -180,7 +180,12 @@ return [
             'show_table' => 'Als tabel tonen',
             'show_chart' => 'Als grafiek tonen',
             'week_of' => 'Week van :date',
-            'select_metric' => 'Selecteer minstens één metriek.',
+            'comparison' => 'Vergelijking',
+            'comparison_hint' => 'Stippellijnen tonen de vergelijkingsperiode.',
+            'change' => 'Verandering',
+            'current' => 'Huidig',
+            'previous' => 'Vergelijking',
+            'select_metric' =>'Selecteer minstens één metriek.',
             'scale_hint' => 'Paginaweergaven en unieke bezoekers delen één schaal; elke lijn is geschaald naar zijn piek in deze periode. Exacte waarden in de tooltip of de tabel.',
         ],
 

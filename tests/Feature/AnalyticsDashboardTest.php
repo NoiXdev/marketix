@@ -60,6 +60,7 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('summary.visitors', 1)
                 ->where('previousSummary.page_views', 0)
                 ->has('timeseries', 7)
+                ->has('previousTimeseries', 7)
                 ->has('topPaths', 2)
                 ->has('channels')
                 ->has('countries')
@@ -186,6 +187,8 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('timeseries', 5)
                 ->where('timeseries.0.date', '2026-08-31')
                 ->has('previousSummary')
+                ->has('previousTimeseries', 5)
+                ->where('previousTimeseries.0.date', '2025-09-01')
             );
     }
 
@@ -197,6 +200,7 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('period.compare', 'none')
                 ->where('period.compare_from', null)
                 ->where('previousSummary', null)
+                ->where('previousTimeseries', null)
             );
     }
 

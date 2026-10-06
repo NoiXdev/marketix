@@ -181,6 +181,11 @@ return [
             'show_chart' => 'Als Diagramm anzeigen',
             'week_of' => 'Woche ab :date',
             'select_metric' => 'Wählen Sie mindestens eine Metrik aus.',
+            'comparison' => 'Vergleich',
+            'comparison_hint' => 'Gestrichelte Linien zeigen den Vergleichszeitraum.',
+            'change' => 'Änderung',
+            'current' => 'Aktuell',
+            'previous' => 'Vergleich',
             'scale_hint' => 'Seitenaufrufe und eindeutige Besucher teilen sich eine Skala, jede Linie ist auf ihren Höchstwert im Zeitraum skaliert. Genaue Werte im Tooltip oder in der Tabelle.',
         ],
 
