@@ -1,18 +1,49 @@
+import { LinkButton } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
-import { GoalCard } from '@/Pages/Analytics/types';
+import FunnelCard from '@/Pages/Analytics/partials/FunnelCard';
+import { FunnelReport, GoalCard } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
+import { Filter, Plus } from 'lucide-react';
 
 export type ConversionsData = {
   goals: GoalCard[];
+  funnels: FunnelReport[];
 };
 
-export default function ConversionsTab({ goals }: ConversionsData) {
-  const { t } = useTranslation();
+export default function ConversionsTab({ goals, funnels }: ConversionsData) {
+  const { t, locale } = useTranslation();
   const { projectId, site } = useAnalytics();
+  const createFunnel = route('app.project.analytics.funnels.create', { project: projectId, site: site.id });
 
   return (
     <>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-muted text-sm font-semibold tracking-wide uppercase">{t('analytics.dashboard.funnels.title')}</h2>
+        {funnels.length > 0 && (
+          <Link href={createFunnel} className="text-accent-soft-foreground inline-flex items-center gap-1 text-sm hover:underline">
+            <Plus className="h-4 w-4" />
+            {t('analytics.dashboard.funnels.create')}
+          </Link>
+        )}
+      </div>
+      {funnels.length === 0 ? (
+        <div className="border-line bg-surface mb-8 flex flex-col items-center rounded-[var(--radius)] border border-dashed px-6 py-8 text-center">
+          <span className="bg-accent-soft text-accent-soft-foreground mb-3 grid h-10 w-10 place-items-center rounded-full">
+            <Filter className="h-5 w-5" />
+          </span>
+          <p className="text-foreground text-sm font-semibold">{t('analytics.dashboard.funnels.empty_title')}</p>
+          <p className="text-muted mt-1 mb-4 max-w-md text-sm">{t('analytics.dashboard.funnels.empty_text')}</p>
+          <LinkButton href={createFunnel}>{t('analytics.dashboard.funnels.create')}</LinkButton>
+        </div>
+      ) : (
+        <div className="mb-8 grid grid-cols-1 gap-3.5 xl:grid-cols-2">
+          {funnels.map((funnel) => (
+            <FunnelCard key={funnel.id} funnel={funnel} />
+          ))}
+        </div>
+      )}
+
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-muted text-sm font-semibold tracking-wide uppercase">{t('analytics.dashboard.goals.title')}</h2>
         <Link href={route('app.project.analytics.goals.index', { project: projectId, site: site.id })} className="text-accent-soft-foreground text-sm hover:underline">
@@ -32,7 +63,7 @@ export default function ConversionsTab({ goals }: ConversionsData) {
             <div key={g.id} className="border-line bg-surface rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)]">
               <div className="mb-2 flex items-baseline justify-between">
                 <h3 className="text-foreground text-sm font-semibold">{g.name}</h3>
-                <span className="text-foreground text-2xl font-bold tabular-nums">{g.rate} %</span>
+                <span className="text-foreground text-2xl font-bold tabular-nums">{g.rate.toLocaleString(locale)} %</span>
               </div>
               <p className="text-muted mb-3 text-xs">
                 {t('analytics.dashboard.goals.stats', { conversions: g.conversions, visitors: g.visitors })} <span className="font-mono">{g.match_value}</span>

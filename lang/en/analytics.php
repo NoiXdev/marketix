@@ -68,6 +68,31 @@ return [
         ],
     ],
 
+    'funnels' => [
+        'create' => 'Create funnel',
+        'edit' => 'Edit funnel',
+        'back' => 'Back to conversions',
+        'intro' => 'A funnel shows how many sessions on :site go through several steps in a row – and at which step visitors drop off.',
+        'delete' => 'Delete funnel',
+        'delete_confirm' => 'The funnel will be deleted. The recorded visit data is kept.',
+
+        'form' => [
+            'name' => 'Name',
+            'name_placeholder' => 'e.g. Checkout',
+            'steps' => 'Steps',
+            'steps_hint' => 'Counts sessions that reach the steps in this order. Other pages may be visited in between.',
+            'step' => 'Step :number',
+            'step_type' => 'Type',
+            'step_value' => 'Page or event',
+            'step_label' => 'Label (optional)',
+            'step_label_placeholder' => 'e.g. Viewed cart',
+            'add_step' => 'Add step',
+            'remove_step' => 'Remove step',
+            'move_up' => 'Move up',
+            'move_down' => 'Move down',
+        ],
+    ],
+
     'dashboard' => [
         'title' => 'Analytics — :name',
         'back' => 'Back to sites',
@@ -241,6 +266,18 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'No events yet',
+        ],
+
+        'funnels' => [
+            'title' => 'Funnels',
+            'create' => 'Create funnel',
+            'edit' => 'Edit funnel',
+            'summary' => ':entered sessions started · :completed completed',
+            'conversion_rate' => 'Completion rate',
+            'continued' => ':rate continued',
+            'dropped' => ':count dropped off',
+            'empty_title' => 'No funnels yet',
+            'empty_text' => 'A funnel shows how many visitors get from e.g. a product page via the cart to a purchase – and at which step they drop off.',
         ],
 
         'goals' => [

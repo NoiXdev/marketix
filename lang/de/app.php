@@ -14,4 +14,7 @@ return [
     'goal_created' => 'Ziel erstellt.',
     'goal_updated' => 'Ziel aktualisiert.',
     'goal_deleted' => 'Ziel gelöscht.',
+    'funnel_created' => 'Funnel erstellt.',
+    'funnel_updated' => 'Funnel aktualisiert.',
+    'funnel_deleted' => 'Funnel gelöscht.',
 ];

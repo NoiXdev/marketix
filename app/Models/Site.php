@@ -90,6 +90,11 @@ class Site extends Model
         return $this->hasMany(Goal::class);
     }
 
+    public function funnels(): HasMany
+    {
+        return $this->hasMany(Funnel::class);
+    }
+
     protected function casts(): array
     {
         return [

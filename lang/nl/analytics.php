@@ -68,6 +68,31 @@ return [
         ],
     ],
 
+    'funnels' => [
+        'create' => 'Trechter maken',
+        'edit' => 'Trechter bewerken',
+        'back' => 'Terug naar conversies',
+        'intro' => 'Een trechter toont hoeveel sessies op :site meerdere stappen na elkaar doorlopen – en bij welke stap bezoekers afhaken.',
+        'delete' => 'Trechter verwijderen',
+        'delete_confirm' => 'De trechter wordt verwijderd. De vastgelegde bezoekgegevens blijven behouden.',
+
+        'form' => [
+            'name' => 'Naam',
+            'name_placeholder' => 'bijv. Aankoopproces',
+            'steps' => 'Stappen',
+            'steps_hint' => 'Telt sessies die de stappen in deze volgorde bereiken. Daartussen mogen andere pagina’s bezocht worden.',
+            'step' => 'Stap :number',
+            'step_type' => 'Soort',
+            'step_value' => 'Pagina of event',
+            'step_label' => 'Label (optioneel)',
+            'step_label_placeholder' => 'bijv. Winkelwagen bekeken',
+            'add_step' => 'Stap toevoegen',
+            'remove_step' => 'Stap verwijderen',
+            'move_up' => 'Omhoog',
+            'move_down' => 'Omlaag',
+        ],
+    ],
+
     'dashboard' => [
         'title' => 'Analytics — :name',
         'back' => 'Terug naar sites',
@@ -241,6 +266,18 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'Nog geen events',
+        ],
+
+        'funnels' => [
+            'title' => 'Trechters',
+            'create' => 'Trechter maken',
+            'edit' => 'Trechter bewerken',
+            'summary' => ':entered sessies gestart · :completed voltooid',
+            'conversion_rate' => 'Voltooiingspercentage',
+            'continued' => ':rate ging verder',
+            'dropped' => ':count haakte af',
+            'empty_title' => 'Nog geen trechters',
+            'empty_text' => 'Een trechter toont hoeveel bezoekers bijv. van de productpagina via de winkelwagen tot de aankoop komen – en bij welke stap ze afhaken.',
         ],
 
         'goals' => [

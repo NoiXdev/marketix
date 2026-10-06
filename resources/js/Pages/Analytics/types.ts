@@ -28,6 +28,25 @@ export type ValueRow = { value: string; count: number; visitors: number };
 
 export type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
 
+export type FunnelStepReport = {
+  label: string | null;
+  type: 'pageview' | 'event';
+  value: string;
+  sessions: number;
+  rate: number;
+  step_rate: number | null;
+  drop_off: number;
+};
+
+export type FunnelReport = {
+  id: string;
+  name: string;
+  entered: number;
+  completed: number;
+  conversion_rate: number;
+  steps: FunnelStepReport[];
+};
+
 export type GoalCard = {
   id: string;
   name: string;

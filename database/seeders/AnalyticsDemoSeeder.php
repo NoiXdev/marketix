@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\ConsentMode;
 use App\Enums\GoalType;
 use App\Enums\TrackingMode;
+use App\Models\Funnel;
 use App\Models\Goal;
 use App\Models\Project;
 use App\Models\Site;
@@ -137,6 +138,7 @@ class AnalyticsDemoSeeder extends Seeder
         if ($site !== null) {
             DB::table('visits')->where('site_id', $site->id)->delete();
             $site->goals()->withTrashed()->forceDelete();
+            $site->funnels()->withTrashed()->forceDelete();
             $site->update(['site_search_params' => 'q']);
 
             return $site;
@@ -162,6 +164,28 @@ class AnalyticsDemoSeeder extends Seeder
             ['Kontaktseite besucht', GoalType::Pageview, '/kontakt'],
             ['Blog gelesen', GoalType::Pageview, '/blog/*'],
         ];
+
+        $funnels = [
+            'Kaufprozess' => [
+                ['type' => 'pageview', 'value' => '/produkte/*', 'label' => 'Produkt angesehen'],
+                ['type' => 'pageview', 'value' => '/warenkorb', 'label' => 'Warenkorb geöffnet'],
+                ['type' => 'event', 'value' => 'purchase', 'label' => 'Kauf abgeschlossen'],
+            ],
+            'Newsletter' => [
+                ['type' => 'pageview', 'value' => '/blog/*', 'label' => 'Blogartikel gelesen'],
+                ['type' => 'pageview', 'value' => '/newsletter', 'label' => 'Newsletter-Seite besucht'],
+                ['type' => 'event', 'value' => 'newsletter_subscribe', 'label' => 'Angemeldet'],
+            ],
+        ];
+
+        foreach ($funnels as $name => $steps) {
+            Funnel::create([
+                'project_id' => $this->site->project_id,
+                'site_id' => $this->site->id,
+                'name' => $name,
+                'steps' => $steps,
+            ]);
+        }
 
         foreach ($goals as [$name, $type, $match]) {
             Goal::create([
@@ -190,6 +214,10 @@ class AnalyticsDemoSeeder extends Seeder
         }
 
         $hourWeights = self::HOUR_WEIGHTS;
+        if ($day->isSunday() && $day->month === 3 && $day->day > 24) {
+            $hourWeights[1] = 0;
+            $hourWeights[2] = 0;
+        }
         if ($offset === 0) {
             $hourWeights = array_map(
                 fn (float $w, int $h) => $h < $this->now->hour ? $w : ($h === $this->now->hour ? $w * $this->now->minute / 60 : 0),

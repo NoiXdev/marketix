@@ -68,6 +68,31 @@ return [
         ],
     ],
 
+    'funnels' => [
+        'create' => 'Funnel erstellen',
+        'edit' => 'Funnel bearbeiten',
+        'back' => 'Zurück zu den Conversions',
+        'intro' => 'Ein Funnel zeigt, wie viele Sitzungen auf :site mehrere Schritte nacheinander durchlaufen – und an welchem Schritt Besucher abspringen.',
+        'delete' => 'Funnel löschen',
+        'delete_confirm' => 'Der Funnel wird gelöscht. Die erfassten Besuchsdaten bleiben erhalten.',
+
+        'form' => [
+            'name' => 'Name',
+            'name_placeholder' => 'z. B. Kaufprozess',
+            'steps' => 'Schritte',
+            'steps_hint' => 'Gezählt werden Sitzungen, die die Schritte in dieser Reihenfolge erreichen. Dazwischen dürfen weitere Seiten liegen.',
+            'step' => 'Schritt :number',
+            'step_type' => 'Art',
+            'step_value' => 'Seite oder Event',
+            'step_label' => 'Bezeichnung (optional)',
+            'step_label_placeholder' => 'z. B. Warenkorb angesehen',
+            'add_step' => 'Schritt hinzufügen',
+            'remove_step' => 'Schritt entfernen',
+            'move_up' => 'Nach oben verschieben',
+            'move_down' => 'Nach unten verschieben',
+        ],
+    ],
+
     'dashboard' => [
         'title' => 'Analytics — :name',
         'back' => 'Zurück zu den Sites',
@@ -241,6 +266,18 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'Noch keine Events',
+        ],
+
+        'funnels' => [
+            'title' => 'Funnels',
+            'create' => 'Funnel erstellen',
+            'edit' => 'Funnel bearbeiten',
+            'summary' => ':entered Sitzungen gestartet · :completed abgeschlossen',
+            'conversion_rate' => 'Abschlussrate',
+            'continued' => ':rate gingen weiter',
+            'dropped' => ':count abgesprungen',
+            'empty_title' => 'Noch keine Funnels',
+            'empty_text' => 'Mit einem Funnel sehen Sie, wie viele Besucher z. B. vom Produkt über den Warenkorb bis zum Kauf kommen – und an welchem Schritt sie abspringen.',
         ],
 
         'goals' => [
