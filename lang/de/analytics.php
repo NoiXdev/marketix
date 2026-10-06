@@ -5,6 +5,11 @@ return [
         'title' => 'Analytics — Websites',
         'back' => 'Zurück zu den Sites',
         'create' => 'Website hinzufügen',
+        'delete' => [
+            'title' => 'Website löschen',
+            'confirm' => '„:name“ wird entfernt und erfasst ab sofort keine Besuche mehr. Bereits erfasste Daten werden nach Ablauf der Aufbewahrungsfrist endgültig gelöscht.',
+            'action' => 'Website löschen',
+        ],
         'edit' => 'Website bearbeiten',
         'empty' => 'Noch keine Websites.',
         'empty_hint' => 'Fügen Sie Ihre erste Website hinzu, um mit dem Tracking zu beginnen.',

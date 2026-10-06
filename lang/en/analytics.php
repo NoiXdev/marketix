@@ -5,6 +5,11 @@ return [
         'title' => 'Analytics — Sites',
         'back' => 'Back to sites',
         'create' => 'Add site',
+        'delete' => [
+            'title' => 'Delete site',
+            'confirm' => '“:name” will be removed and stops tracking visits immediately. Data already collected is permanently deleted once the retention period expires.',
+            'action' => 'Delete site',
+        ],
         'edit' => 'Edit site',
         'empty' => 'No sites yet.',
         'empty_hint' => 'Add your first site to start tracking.',

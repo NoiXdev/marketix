@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
-import { confirmDelete } from '@/lib/confirm';
+import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { rowLink, ROW_LINK_CLASS } from '@/lib/rowLink';
 import { PageProps, Site } from '@/types';
@@ -12,7 +12,13 @@ export default function SitesIndex({ sites }: { sites: Site[] }) {
   const { t } = useTranslation();
 
   async function destroy(site: Site) {
-    if (!(await confirmDelete({ title: site.name }))) return;
+    const confirmed = await confirmTyped({
+      title: t('analytics.sites.delete.title'),
+      text: t('analytics.sites.delete.confirm', { name: site.name }),
+      match: site.name,
+      confirmText: t('analytics.sites.delete.action'),
+    });
+    if (!confirmed) return;
     router.delete(route('app.project.sites.destroy', { project: project!.id, site: site.id }));
   }
 
