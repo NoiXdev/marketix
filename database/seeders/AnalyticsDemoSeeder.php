@@ -339,7 +339,11 @@ class AnalyticsDemoSeeder extends Seeder
         foreach ($paths as $i => $path) {
             $engaged[$i] = isset($times[$i + 1])
                 ? (int) round($times[$i]->diffInSeconds($times[$i + 1]) * $this->random(0.6, 0.95))
-                : (str_starts_with($path, '/blog/') ? mt_rand(40, 420) : mt_rand(5, 180));
+                : match (true) {
+                    count($paths) === 1 && mt_rand(1, 100) <= 60 => mt_rand(0, 9),
+                    str_starts_with($path, '/blog/') => mt_rand(40, 420),
+                    default => mt_rand(5, 180),
+                };
         }
         $lastActivity = end($times)->addSeconds(end($engaged));
         if ($lastActivity->gt($this->now)) {

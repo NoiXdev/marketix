@@ -8,7 +8,7 @@ import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import VisitorsChart, { SeriesPoint } from '@/Pages/Analytics/partials/VisitorsChart';
 import { Rank, Summary } from '@/Pages/Analytics/types';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
-import { BarChart3, Clock, Megaphone, MousePointerClick, Users } from 'lucide-react';
+import { Activity, BarChart3, Clock, Megaphone, MousePointerClick, Users } from 'lucide-react';
 
 export type OverviewData = {
   summary: Summary;
@@ -26,13 +26,14 @@ export default function OverviewTab({ summary, previousSummary, timeseries, topP
   const { rows, channelLabel, engagementSub } = useRowBuilders();
 
   const noData = t('analytics.dashboard.no_data');
+  const percent = (value: number) => `${value.toLocaleString(locale)} %`;
   const delta = (key: keyof Summary) => (previousSummary ? percentChange(summary[key], previousSummary[key]) : undefined);
   const deltaLabel = t(period.compare === 'year' ? 'analytics.dashboard.compare.vs_year' : 'common.dashboard.vs_previous');
   const more = (tab: 'acquisition' | 'behavior' | 'audience') => ({ href: href({ tab }), label: t(`analytics.dashboard.tabs.${tab}.more`) });
 
   return (
     <>
-      <div className="mb-6 grid grid-cols-2 gap-3.5 md:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3.5 md:grid-cols-3 xl:grid-cols-6">
         <KpiTile
           compact={false}
           label={t('analytics.dashboard.kpi.page_views')}
@@ -44,10 +45,20 @@ export default function OverviewTab({ summary, previousSummary, timeseries, topP
         <KpiTile compact={false} label={t('analytics.dashboard.kpi.unique_visitors')} value={summary.visitors} deltaPct={delta('visitors')} deltaLabel={deltaLabel} icon={Users} />
         <KpiTile
           compact={false}
+          label={t('analytics.dashboard.kpi.engagement_rate')}
+          value={percent(summary.engagement_rate)}
+          deltaPct={delta('engagement_rate')}
+          deltaLabel={deltaLabel}
+          subtitle={t('analytics.dashboard.kpi.engagement_hint')}
+          icon={Activity}
+        />
+        <KpiTile
+          compact={false}
           label={t('analytics.dashboard.kpi.bounce_rate')}
-          value={`${summary.bounce_rate} %`}
+          value={percent(summary.bounce_rate)}
           deltaPct={delta('bounce_rate')}
           deltaLabel={deltaLabel}
+          subtitle={t('analytics.dashboard.kpi.bounce_hint')}
           lowerIsBetter
           icon={MousePointerClick}
         />
@@ -62,7 +73,7 @@ export default function OverviewTab({ summary, previousSummary, timeseries, topP
         <KpiTile
           compact={false}
           label={t('analytics.dashboard.kpi.from_campaigns')}
-          value={`${summary.campaign_share} %`}
+          value={percent(summary.campaign_share)}
           deltaPct={delta('campaign_share')}
           deltaLabel={deltaLabel}
           icon={Megaphone}

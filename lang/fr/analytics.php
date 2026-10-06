@@ -225,8 +225,19 @@ return [
             'page_views' => 'Pages vues',
             'unique_visitors' => 'Visiteurs uniques',
             'bounce_rate' => 'Taux de rebond',
+            'bounce_hint' => 'Sessions avec une seule page vue',
+            'engagement_rate' => 'Taux d’engagement',
+            'engagement_hint' => 'Sessions de plus de 10 s, avec 2+ pages ou une conversion',
             'avg_duration' => 'Durée moy.',
             'from_campaigns' => 'Depuis les campagnes',
+        ],
+
+        'channel_table' => [
+            'channel' => 'Canal',
+            'sessions' => 'Sessions',
+            'engagement' => 'Engagement',
+            'avg_duration' => 'Durée moy.',
+            'hint' => 'Taux d’engagement : part des sessions qui durent plus de 10 secondes, comptent au moins 2 pages ou déclenchent une conversion – comme dans Google Analytics 4.',
         ],
 
         'breakdown' => [

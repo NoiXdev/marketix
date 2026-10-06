@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\GoalType;
+use App\Models\Goal;
 use App\Models\PageView;
 use App\Models\Site;
 use App\Models\Visit;
@@ -17,6 +19,10 @@ class AnalyticsAggregator
 {
     public const LIVE_WINDOW_MINUTES = 5;
 
+    public const ENGAGED_MIN_SECONDS = 10;
+
+    public const ENGAGED_MIN_PAGE_VIEWS = 2;
+
     private const PAGE_VIEW_FILTERS = ['path', 'language', 'country_code', 'browser', 'os', 'device'];
 
     private const VISIT_FILTERS = ['entry_path', 'exit_path', 'referer_domain', 'country_code', 'browser', 'os', 'device', 'utm_source', 'utm_medium', 'utm_campaign'];
@@ -25,6 +31,9 @@ class AnalyticsAggregator
 
     /** @var array<string, ?string> */
     private array $siteDomains = [];
+
+    /** @var array<string, list<string>> */
+    private array $keyEvents = [];
 
     private function base(string $siteId, AnalyticsQuery|int $range): Builder
     {
@@ -129,11 +138,49 @@ class AnalyticsAggregator
         return DB::connection()->getDriverName() === 'sqlite';
     }
 
-    private function durationExpression(): string
+    private function sessionSecondsExpression(): string
     {
         return $this->isSqlite()
-            ? "AVG(strftime('%s', last_activity_at) - strftime('%s', started_at))"
-            : 'AVG(TIMESTAMPDIFF(SECOND, started_at, last_activity_at))';
+            ? "(strftime('%s', last_activity_at) - strftime('%s', started_at))"
+            : 'TIMESTAMPDIFF(SECOND, started_at, last_activity_at)';
+    }
+
+    private function durationExpression(): string
+    {
+        return 'AVG('.$this->sessionSecondsExpression().')';
+    }
+
+    /** @return list<string> */
+    private function keyEvents(string $siteId): array
+    {
+        if (! array_key_exists($siteId, $this->keyEvents)) {
+            $goalEvents = Goal::query()
+                ->where('site_id', $siteId)
+                ->where('type', GoalType::Event)
+                ->pluck('match_value')
+                ->all();
+
+            $this->keyEvents[$siteId] = array_values(array_unique([RevenueAggregator::EVENT, ...$goalEvents]));
+        }
+
+        return $this->keyEvents[$siteId];
+    }
+
+    /** @return array{0: string, 1: list<string>} */
+    private function engagedSumExpression(string $siteId): array
+    {
+        $events = $this->keyEvents($siteId);
+        $placeholders = implode(', ', array_fill(0, count($events), '?'));
+        $condition = 'pageview_count >= '.self::ENGAGED_MIN_PAGE_VIEWS
+            .' OR '.$this->sessionSecondsExpression().' >= '.self::ENGAGED_MIN_SECONDS
+            ." OR EXISTS (SELECT 1 FROM events WHERE events.visit_id = visits.id AND events.name IN ({$placeholders}))";
+
+        return ["SUM(CASE WHEN {$condition} THEN 1 ELSE 0 END) as engaged", $events];
+    }
+
+    private function rate(int $part, int $total): ?float
+    {
+        return $total > 0 ? round($part / $total * 100, 1) : null;
     }
 
     private function campaignCondition(): string
@@ -183,7 +230,7 @@ class AnalyticsAggregator
     }
 
     /**
-     * @return list<array{date: string, views: int, visitors: int, sessions: int, bounce_rate: ?float, avg_duration: ?int, campaign_share: ?float}>
+     * @return list<array{date: string, views: int, visitors: int, sessions: int, bounce_rate: ?float, engagement_rate: ?float, avg_duration: ?int, campaign_share: ?float}>
      */
     public function timeseries(string $siteId, AnalyticsQuery|int $range): array
     {
@@ -205,6 +252,7 @@ class AnalyticsAggregator
                 DB::raw($this->durationExpression().' as avg_duration'),
                 DB::raw('SUM(CASE WHEN '.$this->campaignCondition().' THEN 1 ELSE 0 END) as campaign'),
             )
+            ->selectRaw(...$this->engagedSumExpression($siteId))
             ->groupBy('bucket')->get()->keyBy('bucket');
 
         $out = [];
@@ -219,6 +267,7 @@ class AnalyticsAggregator
                 'visitors' => (int) ($v->visitors ?? 0),
                 'sessions' => $count,
                 'bounce_rate' => $count > 0 ? round((int) $s->bounced / $count * 100, 1) : null,
+                'engagement_rate' => $this->rate((int) ($s->engaged ?? 0), $count),
                 'avg_duration' => $count > 0 ? (int) round((float) $s->avg_duration) : null,
                 'campaign_share' => $count > 0 ? round((int) $s->campaign / $count * 100, 1) : null,
             ];
@@ -228,7 +277,7 @@ class AnalyticsAggregator
     }
 
     /**
-     * @return array{page_views: int, visitors: int, sessions: int, bounce_rate: float, avg_duration: int, campaign_share: float}
+     * @return array{page_views: int, visitors: int, sessions: int, bounce_rate: float, engagement_rate: float, avg_duration: int, campaign_share: float}
      */
     public function summary(string $siteId, AnalyticsQuery|int $range): array
     {
@@ -243,6 +292,7 @@ class AnalyticsAggregator
                 DB::raw($this->durationExpression().' as avg_duration'),
                 DB::raw('SUM(CASE WHEN '.$this->campaignCondition().' THEN 1 ELSE 0 END) as campaign'),
             )
+            ->selectRaw(...$this->engagedSumExpression($siteId))
             ->first();
 
         $count = (int) ($sessions->sessions ?? 0);
@@ -252,6 +302,7 @@ class AnalyticsAggregator
             'visitors' => (int) ($views->visitors ?? 0),
             'sessions' => $count,
             'bounce_rate' => $count > 0 ? round((int) $sessions->bounced / $count * 100, 1) : 0.0,
+            'engagement_rate' => $this->rate((int) ($sessions->engaged ?? 0), $count) ?? 0.0,
             'avg_duration' => $count > 0 ? (int) round((float) $sessions->avg_duration) : 0,
             'campaign_share' => $count > 0 ? round((int) $sessions->campaign / $count * 100, 1) : 0.0,
         ];
@@ -365,7 +416,14 @@ class AnalyticsAggregator
             ->selectRaw("{$sql} as channel", $bindings)
             ->selectRaw('COUNT(*) as count')
             ->selectRaw('COUNT(DISTINCT visitor_hash) as visitors')
-            ->groupBy('channel')->orderByDesc('count')->get();
+            ->selectRaw(...$this->engagedSumExpression($siteId))
+            ->selectRaw($this->durationExpression().' as avg_duration')
+            ->groupBy('channel')->orderByDesc('count')->get()
+            ->each(function ($row) {
+                $row->engagement_rate = $this->rate((int) $row->engaged, (int) $row->count);
+                $row->avg_duration = (int) round((float) $row->avg_duration);
+                unset($row->engaged);
+            });
     }
 
     /** @return Collection<int, \stdClass> */

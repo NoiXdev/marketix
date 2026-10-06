@@ -225,8 +225,19 @@ return [
             'page_views' => 'Page views',
             'unique_visitors' => 'Unique visitors',
             'bounce_rate' => 'Bounce rate',
+            'bounce_hint' => 'Sessions with a single page view',
+            'engagement_rate' => 'Engagement rate',
+            'engagement_hint' => 'Sessions over 10 s, with 2+ pages or a conversion',
             'avg_duration' => 'Avg. duration',
             'from_campaigns' => 'From campaigns',
+        ],
+
+        'channel_table' => [
+            'channel' => 'Channel',
+            'sessions' => 'Sessions',
+            'engagement' => 'Engagement',
+            'avg_duration' => 'Avg. duration',
+            'hint' => 'Engagement rate: share of sessions that last longer than 10 seconds, include at least 2 pages or trigger a conversion – as in Google Analytics 4.',
         ],
 
         'breakdown' => [

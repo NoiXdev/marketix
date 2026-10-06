@@ -225,8 +225,19 @@ return [
             'page_views' => 'Paginaweergaven',
             'unique_visitors' => 'Unieke bezoekers',
             'bounce_rate' => 'Bouncepercentage',
+            'bounce_hint' => 'Sessies met slechts één paginaweergave',
+            'engagement_rate' => 'Engagementpercentage',
+            'engagement_hint' => 'Sessies langer dan 10 s, met 2+ pagina’s of een conversie',
             'avg_duration' => 'Gem. duur',
             'from_campaigns' => 'Uit campagnes',
+        ],
+
+        'channel_table' => [
+            'channel' => 'Kanaal',
+            'sessions' => 'Sessies',
+            'engagement' => 'Engagement',
+            'avg_duration' => 'Gem. duur',
+            'hint' => 'Engagementpercentage: aandeel sessies die langer dan 10 seconden duren, minstens 2 pagina’s bevatten of een conversie opleveren – zoals in Google Analytics 4.',
         ],
 
         'breakdown' => [
