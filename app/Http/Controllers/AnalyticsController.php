@@ -79,6 +79,7 @@ class AnalyticsController extends Controller
             'summary' => fn () => $this->agg->summary($id, $query),
             'previousSummary' => fn () => $comparison === null ? null : $this->agg->summary($id, $comparison),
             'timeseries' => fn () => $this->agg->timeseries($id, $query),
+            'previousTimeseries' => fn () => $comparison === null ? null : $this->agg->timeseries($id, $comparison),
             'topPaths' => fn () => $this->agg->topPaths($id, $query, 6),
             'channels' => fn () => $this->agg->channels($id, $query)->take(6)->values(),
             'countries' => fn () => $this->agg->countriesWithCode($id, $query, 6),

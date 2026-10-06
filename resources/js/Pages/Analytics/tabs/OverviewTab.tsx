@@ -5,6 +5,7 @@ import { formatDuration, percentChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
+import { formatRange } from '@/Pages/Analytics/partials/period';
 import VisitorsChart, { SeriesPoint } from '@/Pages/Analytics/partials/VisitorsChart';
 import { Rank, Summary } from '@/Pages/Analytics/types';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
@@ -14,13 +15,14 @@ export type OverviewData = {
   summary: Summary;
   previousSummary: Summary | null;
   timeseries: SeriesPoint[];
+  previousTimeseries: SeriesPoint[] | null;
   topPaths: (Rank & { avg_engaged: number | null; avg_scroll: number | null })[];
   channels: (Rank & { channel: string; visitors: number })[];
   countries: Rank[];
   devices: Rank[];
 };
 
-export default function OverviewTab({ summary, previousSummary, timeseries, topPaths, channels, countries, devices }: OverviewData) {
+export default function OverviewTab({ summary, previousSummary, timeseries, previousTimeseries, topPaths, channels, countries, devices }: OverviewData) {
   const { t, locale } = useTranslation();
   const { period, go, href, addFilter } = useAnalytics();
   const { rows, channelLabel, engagementSub } = useRowBuilders();
@@ -83,6 +85,8 @@ export default function OverviewTab({ summary, previousSummary, timeseries, topP
       <VisitorsChart
         title={t('analytics.dashboard.chart_title')}
         data={timeseries}
+        previous={previousTimeseries}
+        comparisonRange={period.compare_from && period.compare_to ? formatRange(period.compare_from, period.compare_to, locale) : null}
         interval={period.interval}
         intervals={period.intervals}
         onIntervalChange={(interval) => go({ interval })}

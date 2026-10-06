@@ -180,7 +180,12 @@ return [
             'show_table' => 'Afficher en tableau',
             'show_chart' => 'Afficher en graphique',
             'week_of' => 'Semaine du :date',
-            'select_metric' => 'Sélectionnez au moins une métrique.',
+            'comparison' => 'Comparaison',
+            'comparison_hint' => 'Les lignes pointillées montrent la période de comparaison.',
+            'change' => 'Évolution',
+            'current' => 'Actuel',
+            'previous' => 'Comparaison',
+            'select_metric' =>'Sélectionnez au moins une métrique.',
             'scale_hint' => 'Pages vues et visiteurs uniques partagent une échelle ; chaque ligne est mise à l’échelle de son maximum sur la période. Valeurs exactes dans l’infobulle ou le tableau.',
         ],
 

@@ -180,7 +180,12 @@ return [
             'show_table' => 'Show as table',
             'show_chart' => 'Show as chart',
             'week_of' => 'Week of :date',
-            'select_metric' => 'Select at least one metric.',
+            'comparison' => 'Comparison',
+            'comparison_hint' => 'Dashed lines show the comparison period.',
+            'change' => 'Change',
+            'current' => 'Current',
+            'previous' => 'Comparison',
+            'select_metric' =>'Select at least one metric.',
             'scale_hint' => 'Page views and unique visitors share one scale; each line is scaled to its peak in this period. Exact values in the tooltip or the table.',
         ],
 
