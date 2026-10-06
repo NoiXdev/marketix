@@ -124,8 +124,32 @@ return [
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'Combien de visites atteignent vos objectifs.',
+                'description' => 'Combien de visites atteignent vos objectifs – et où les visiteurs abandonnent en chemin.',
             ],
+            'revenue' => [
+                'label' => 'Chiffre d’affaires',
+                'description' => 'Le chiffre d’affaires généré par votre site – et les canaux, campagnes et pages qui y contribuent.',
+            ],
+        ],
+
+        'revenue' => [
+            'chart_title' => 'Chiffre d’affaires dans le temps',
+            'orders_count' => ':count commandes',
+            'kpi' => [
+                'revenue' => 'Chiffre d’affaires',
+                'orders' => 'Commandes',
+                'average_order_value' => 'Panier moyen',
+                'purchase_rate' => 'Taux d’achat',
+                'revenue_per_visitor' => 'CA par visiteur',
+            ],
+            'by_channel' => 'CA par canal',
+            'by_campaign' => 'CA par campagne',
+            'by_landing_page' => 'CA par page d’entrée',
+            'by_country' => 'CA par pays',
+            'other_currencies' => 'Tous les montants en :currency. Autres devises sur la période : :others.',
+            'hint' => 'Le chiffre d’affaires provient des événements « purchase » avec une « value ». Il est attribué à la session de l’achat ; canal et campagne correspondent au premier contact de cette session. Taux d’achat = sessions avec achat ÷ toutes les sessions.',
+            'empty_title' => 'Aucun chiffre d’affaires enregistré',
+            'empty_text' => 'Envoyez un événement « purchase » avec le montant de la commande après un achat réussi. Vous verrez ensuite le chiffre d’affaires, les commandes et l’origine de vos acheteurs.',
         ],
 
         'chart' => [

@@ -33,12 +33,12 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, interacti
             {
               key: 'top',
               label: t('analytics.dashboard.breakdown.top_pages'),
-              rows: rows(topPaths, 'path', 'path', (r) => ({ sub: engagementSub(r.avg_engaged, r.avg_scroll) })),
+              rows: rows(topPaths, 'path', 'path', (r) => ({ note: engagementSub(r.avg_engaged, r.avg_scroll) })),
             },
             {
               key: 'entry',
               label: t('analytics.dashboard.breakdown.entry_pages'),
-              rows: rows(entryPages, 'entry_path', 'entry_path', (r) => ({ sub: t('analytics.dashboard.breakdown.bounce_sub', { rate: r.bounce_rate }) })),
+              rows: rows(entryPages, 'entry_path', 'entry_path', (r) => ({ note: t('analytics.dashboard.breakdown.bounce_sub', { rate: r.bounce_rate }) })),
             },
             { key: 'exit', label: t('analytics.dashboard.breakdown.exit_pages'), rows: rows(exitPages, 'exit_path', 'exit_path') },
           ]}

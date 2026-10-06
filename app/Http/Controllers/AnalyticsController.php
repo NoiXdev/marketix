@@ -8,18 +8,20 @@ use App\Models\Site;
 use App\Services\AnalyticsAggregator;
 use App\Services\FunnelAggregator;
 use App\Services\GoalAggregator;
+use App\Services\RevenueAggregator;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
-    public const TABS = ['overview', 'acquisition', 'behavior', 'audience', 'conversions'];
+    public const TABS = ['overview', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
 
     public function __construct(
         private AnalyticsAggregator $agg,
         private GoalAggregator $goals,
         private FunnelAggregator $funnels,
+        private RevenueAggregator $revenueReports,
     ) {}
 
     public function show(Request $request, string $site)
@@ -59,6 +61,7 @@ class AnalyticsController extends Controller
             'behavior' => $this->behavior($site->id, $period),
             'audience' => $this->audience($site->id, $period),
             'conversions' => $this->conversions($site, $period),
+            'revenue' => $this->revenue($site->id, $period),
             default => $this->overview($site->id, $period),
         };
     }
@@ -129,6 +132,32 @@ class AnalyticsController extends Controller
             'devices' => fn () => $this->agg->breakdown($id, 'device', $query),
             'browsers' => fn () => $this->agg->breakdown($id, 'browser', $query),
             'operatingSystems' => fn () => $this->agg->breakdown($id, 'os', $query),
+        ];
+    }
+
+    /** @return array<string, \Closure> */
+    private function revenue(string $id, ResolvedPeriod $period): array
+    {
+        $query = $period->query;
+
+        return [
+            'revenue' => function () use ($id, $query, $period) {
+                $currencies = $this->revenueReports->currencies($id, $query);
+                $currency = $currencies[0]['currency'] ?? '';
+                $comparison = $period->comparison();
+
+                return [
+                    'currency' => $currency,
+                    'currencies' => $currencies,
+                    'summary' => $this->revenueReports->summary($id, $query, $currency),
+                    'previousSummary' => $comparison === null ? null : $this->revenueReports->summary($id, $comparison, $currency),
+                    'timeseries' => $this->revenueReports->timeseries($id, $query, $currency),
+                    'channels' => $this->revenueReports->breakdown($id, $query, $currency, 'channel'),
+                    'campaigns' => $this->revenueReports->breakdown($id, $query, $currency, 'utm_campaign'),
+                    'landingPages' => $this->revenueReports->breakdown($id, $query, $currency, 'entry_path'),
+                    'countries' => $this->revenueReports->breakdown($id, $query, $currency, 'country_code'),
+                ];
+            },
         ];
     }
 

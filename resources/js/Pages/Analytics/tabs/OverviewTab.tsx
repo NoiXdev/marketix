@@ -82,7 +82,7 @@ export default function OverviewTab({ summary, previousSummary, timeseries, topP
           title={t('analytics.dashboard.breakdown.top_pages')}
           emptyLabel={noData}
           more={more('behavior')}
-          tabs={[{ key: 'top', label: '', rows: rows(topPaths, 'path', 'path', (r) => ({ sub: engagementSub(r.avg_engaged, r.avg_scroll) })) }]}
+          tabs={[{ key: 'top', label: '', rows: rows(topPaths, 'path', 'path', (r) => ({ note: engagementSub(r.avg_engaged, r.avg_scroll) })) }]}
         />
         <BreakdownCard
           title={t('analytics.dashboard.breakdown.channels')}
