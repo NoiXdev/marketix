@@ -32,6 +32,7 @@ class PageView extends Model
         'utm_content',
         'country',
         'country_code',
+        'region',
         'city',
         'browser',
         'os',

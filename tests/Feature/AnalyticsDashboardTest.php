@@ -129,6 +129,8 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('tab', 'audience')
                 ->has('clicksByCountry')
                 ->has('countries')
+                ->has('regions')
+                ->has('cities')
                 ->has('languages')
                 ->has('devices')
                 ->has('browsers')

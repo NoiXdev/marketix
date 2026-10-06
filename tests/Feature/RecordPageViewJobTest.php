@@ -51,6 +51,24 @@ class RecordPageViewJobTest extends TestCase
         ]);
     }
 
+    public function test_it_stores_region_and_city_from_geo_lookup(): void
+    {
+        $site = Site::factory()->create();
+
+        (new RecordPageViewJob(
+            $site->id,
+            $site->project_id,
+            'visitor-1',
+            'Mozilla/5.0 (Macintosh)',
+            '/home',
+            null,
+            'de',
+            ['country' => 'Switzerland', 'city' => 'Zürich', 'country_code' => 'CH', 'region' => 'Zurich'],
+        ))->handle();
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'country_code' => 'CH', 'region' => 'Zurich', 'city' => 'Zürich']);
+    }
+
     public function test_second_view_within_window_continues_same_visit(): void
     {
         $site = Site::factory()->create();

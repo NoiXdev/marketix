@@ -23,7 +23,7 @@ class AnalyticsAggregator
 
     public const ENGAGED_MIN_PAGE_VIEWS = 2;
 
-    private const PAGE_VIEW_FILTERS = ['path', 'language', 'country_code', 'browser', 'os', 'device'];
+    private const PAGE_VIEW_FILTERS = ['path', 'language', 'country_code', 'region', 'city', 'browser', 'os', 'device'];
 
     private const VISIT_FILTERS = ['entry_path', 'exit_path', 'referer_domain', 'country_code', 'browser', 'os', 'device', 'utm_source', 'utm_medium', 'utm_campaign'];
 
@@ -451,6 +451,24 @@ class AnalyticsAggregator
                 DB::raw('COUNT(*) as count'),
             )
             ->groupBy('country')->orderByDesc('count')->limit($limit)->get();
+    }
+
+    /**
+     * Regions or cities, kept apart per country so equal names in different
+     * countries do not merge.
+     *
+     * @return Collection<int, \stdClass>
+     */
+    public function locations(string $siteId, string $column, AnalyticsQuery|int $range, int $limit = 8): Collection
+    {
+        if (! in_array($column, ['region', 'city'], true)) {
+            throw new \InvalidArgumentException("Unknown location column: {$column}");
+        }
+
+        return $this->base($siteId, $range)
+            ->whereNotNull($column)->where($column, '!=', '')
+            ->select($column, 'country_code', DB::raw('COUNT(*) as count'))
+            ->groupBy($column, 'country_code')->orderByDesc('count')->limit($limit)->get();
     }
 
     /** @return Collection<int, \stdClass> */

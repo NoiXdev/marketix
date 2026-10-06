@@ -1,5 +1,5 @@
 export type FilterKey =
-  'path' | 'entry_path' | 'exit_path' | 'referer_domain' | 'channel' | 'country_code' | 'browser' | 'os' | 'device' | 'language' | 'utm_source' | 'utm_medium' | 'utm_campaign';
+  'path' | 'entry_path' | 'exit_path' | 'referer_domain' | 'channel' | 'country_code' | 'region' | 'city' | 'browser' | 'os' | 'device' | 'language' | 'utm_source' | 'utm_medium' | 'utm_campaign';
 
 export type Filters = Partial<Record<FilterKey, string>>;
 

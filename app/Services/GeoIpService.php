@@ -24,6 +24,7 @@ class GeoIpService
                 'country' => null,
                 'city' => null,
                 'country_code' => null,
+                'region' => null,
                 'subdivision_code' => null,
             ];
         }
@@ -35,6 +36,7 @@ class GeoIpService
                 'country' => $record->country->name,
                 'city' => $record->city->name,
                 'country_code' => $record->country->isoCode,
+                'region' => $record->mostSpecificSubdivision->name,
                 'subdivision_code' => $record->mostSpecificSubdivision->isoCode,
             ];
         } catch (\Exception) {
@@ -42,6 +44,7 @@ class GeoIpService
                 'country' => null,
                 'city' => null,
                 'country_code' => null,
+                'region' => null,
                 'subdivision_code' => null,
             ];
         }

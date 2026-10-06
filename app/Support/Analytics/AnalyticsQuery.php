@@ -13,6 +13,8 @@ final class AnalyticsQuery
         'referer_domain',
         'channel',
         'country_code',
+        'region',
+        'city',
         'browser',
         'os',
         'device',

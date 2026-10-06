@@ -57,6 +57,17 @@ class AnalyticsDemoSeeder extends Seeder
         'AU' => ['Australia', ['Sydney'], 1],
     ];
 
+    private const REGIONS = [
+        'Zürich' => 'Zurich', 'Bern' => 'Bern', 'Basel' => 'Basel-City', 'Luzern' => 'Lucerne', 'St. Gallen' => 'Saint Gallen',
+        'Genève' => 'Geneva', 'Lausanne' => 'Vaud', 'Berlin' => 'Land Berlin', 'München' => 'Bavaria', 'Hamburg' => 'Hamburg',
+        'Stuttgart' => 'Baden-Wurttemberg', 'Köln' => 'North Rhine-Westphalia', 'Wien' => 'Vienna', 'Graz' => 'Styria',
+        'Linz' => 'Upper Austria', 'New York' => 'New York', 'San Francisco' => 'California', 'Chicago' => 'Illinois',
+        'Paris' => 'Île-de-France', 'Lyon' => 'Auvergne-Rhône-Alpes', 'Milano' => 'Lombardy', 'Roma' => 'Lazio',
+        'Amsterdam' => 'North Holland', 'Rotterdam' => 'South Holland', 'London' => 'England', 'Manchester' => 'England',
+        'Madrid' => 'Madrid', 'Barcelona' => 'Catalonia', 'Stockholm' => 'Stockholm County', 'Warsaw' => 'Mazovia',
+        'Toronto' => 'Ontario', 'São Paulo' => 'São Paulo', 'Tokyo' => 'Tokyo', 'Sydney' => 'New South Wales',
+    ];
+
     private const LANGUAGES = [
         'CH' => ['de' => 70, 'fr' => 20, 'it' => 5, 'en' => 5],
         'DE' => ['de' => 92, 'en' => 8],
@@ -394,6 +405,7 @@ class AnalyticsDemoSeeder extends Seeder
                 'utm_content' => $i === 0 ? ($source['utm_content'] ?? null) : null,
                 'country' => $country,
                 'country_code' => $code,
+                'region' => self::REGIONS[$city] ?? null,
                 'city' => $city,
                 'browser' => $browser,
                 'os' => $os,
@@ -428,7 +440,7 @@ class AnalyticsDemoSeeder extends Seeder
             'id' => (string) Str::ulid(), 'visit_id' => $visitId, 'site_id' => $this->site->id,
             'project_id' => $this->site->project_id, 'visitor_hash' => $visitor, 'path' => $path, 'referer' => null,
             'referer_domain' => null, 'utm_source' => null, 'utm_medium' => null, 'utm_campaign' => null,
-            'utm_term' => null, 'utm_content' => null, 'country' => 'United States', 'country_code' => 'US',
+            'utm_term' => null, 'utm_content' => null, 'country' => 'United States', 'country_code' => 'US', 'region' => 'Virginia',
             'city' => 'Ashburn', 'browser' => 'Other', 'os' => 'Linux', 'device' => 'Desktop', 'language' => 'en',
             'engaged_seconds' => null, 'scroll_depth' => null, 'is_bot' => true, 'created_at' => $start,
         ];

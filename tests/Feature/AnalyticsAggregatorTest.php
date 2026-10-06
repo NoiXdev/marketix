@@ -6,6 +6,7 @@ use App\Models\PageView;
 use App\Models\Site;
 use App\Models\Visit;
 use App\Services\AnalyticsAggregator;
+use App\Support\Analytics\AnalyticsQuery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -69,5 +70,42 @@ class AnalyticsAggregatorTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->agg->breakdown(Site::factory()->create()->id, 'evil', 30);
+    }
+
+    public function test_locations_rank_regions_and_cities_per_country(): void
+    {
+        $site = Site::factory()->create();
+        $visit = Visit::factory()->forSite($site)->create();
+        PageView::factory()->forVisit($visit)->count(3)->create(['country_code' => 'CH', 'region' => 'Zurich', 'city' => 'Zürich']);
+        PageView::factory()->forVisit($visit)->create(['country_code' => 'CH', 'region' => 'Bern', 'city' => 'Bern']);
+        // Same city name in another country must not merge with the Swiss one
+        PageView::factory()->forVisit($visit)->count(2)->create(['country_code' => 'US', 'region' => 'Indiana', 'city' => 'Bern']);
+        PageView::factory()->forVisit($visit)->create(['country_code' => 'CH', 'region' => null, 'city' => null]);
+
+        $regions = $this->agg->locations($site->id, 'region', 30);
+        $this->assertSame(['Zurich', 'Indiana', 'Bern'], $regions->pluck('region')->all());
+        $this->assertSame('CH', $regions->first()->country_code);
+        $this->assertSame(3, (int) $regions->first()->count);
+
+        $cities = $this->agg->locations($site->id, 'city', 30);
+        $this->assertSame([['Zürich', 'CH', 3], ['Bern', 'US', 2], ['Bern', 'CH', 1]], $cities->map(fn ($r) => [$r->city, $r->country_code, (int) $r->count])->all());
+    }
+
+    public function test_locations_reject_unknown_column(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->agg->locations(Site::factory()->create()->id, 'country', 30);
+    }
+
+    public function test_region_and_city_filters_narrow_the_report(): void
+    {
+        $site = Site::factory()->create();
+        $visit = Visit::factory()->forSite($site)->create();
+        PageView::factory()->forVisit($visit)->count(2)->create(['region' => 'Zurich', 'city' => 'Zürich']);
+        PageView::factory()->forVisit($visit)->create(['region' => 'Zurich', 'city' => 'Winterthur']);
+        PageView::factory()->forVisit($visit)->create(['region' => 'Bern', 'city' => 'Bern']);
+
+        $this->assertSame(3, $this->agg->totalPageViews($site->id, AnalyticsQuery::lastDays(30, ['region' => 'Zurich'])));
+        $this->assertSame(2, $this->agg->totalPageViews($site->id, AnalyticsQuery::lastDays(30, ['city' => 'Zürich'])));
     }
 }

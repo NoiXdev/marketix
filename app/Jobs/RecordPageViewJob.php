@@ -83,6 +83,7 @@ class RecordPageViewJob implements ShouldQueue
             'referer_domain' => $refererDomain,
             'country' => $this->geo['country'] ?? null,
             'country_code' => $this->geo['country_code'] ?? null,
+            'region' => $this->geo['region'] ?? null,
             'city' => $this->geo['city'] ?? null,
             'browser' => $browser,
             'os' => $os,

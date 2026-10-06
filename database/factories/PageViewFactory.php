@@ -26,6 +26,7 @@ class PageViewFactory extends Factory
             'utm_content' => null,
             'country' => $this->faker->country(),
             'country_code' => $this->faker->countryCode(),
+            'region' => $this->faker->state(),
             'city' => $this->faker->city(),
             'browser' => 'Chrome',
             'os' => 'macOS',
