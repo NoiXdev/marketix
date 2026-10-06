@@ -46,6 +46,10 @@ return [
         'search' => 'Rechercher',
         'add' => 'Ajouter',
     ],
+    'dialog' => [
+        'title' => 'Êtes-vous sûr ?',
+        'type_to_confirm' => 'Saisissez « :value » pour confirmer.',
+    ],
     'dashboard' => [
         'overview' => 'Aperçu',
         'vs_previous' => 'vs période précédente',

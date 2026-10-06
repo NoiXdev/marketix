@@ -4,7 +4,8 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { setConfirmTranslations } from '@/lib/confirm';
+import { createInertiaApp, router } from '@inertiajs/react';
 import type { ComponentType } from 'react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
@@ -22,6 +23,9 @@ createInertiaApp({
             import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx'),
         ).then((module) => module.default),
     setup({ el, App, props }) {
+        setConfirmTranslations(props.initialPage.props.translations);
+        router.on('navigate', (event) => setConfirmTranslations(event.detail.page.props.translations));
+
         const root = createRoot(el);
 
         root.render(<App {...props} />);

@@ -46,6 +46,10 @@ return [
         'search' => 'Zoeken',
         'add' => 'Toevoegen',
     ],
+    'dialog' => [
+        'title' => 'Weet u het zeker?',
+        'type_to_confirm' => 'Typ „:value” om te bevestigen.',
+    ],
     'dashboard' => [
         'overview' => 'Overzicht',
         'vs_previous' => 't.o.v. vorige periode',

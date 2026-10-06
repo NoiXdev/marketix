@@ -1,4 +1,18 @@
+import { translate } from '@/lib/i18n';
 import Swal from 'sweetalert2';
+
+let catalog: Record<string, unknown> = {};
+
+export function setConfirmTranslations(translations: unknown) {
+    if (translations && typeof translations === 'object') {
+        catalog = translations as Record<string, unknown>;
+    }
+}
+
+function label(key: string, fallback: string, replacements?: Record<string, string | number>): string {
+    const value = translate(catalog, key, replacements);
+    return value === key ? fallback : value;
+}
 
 // Token-driven button/popup styling. SweetAlert renders in a portal on
 // document.body, so `var(--…)` resolves against :root / .dark just like the
@@ -26,13 +40,13 @@ type ConfirmDeleteOptions = {
  */
 export async function confirmDelete(opts: ConfirmDeleteOptions = {}): Promise<boolean> {
     const result = await Swal.fire({
-        title: opts.title ?? 'Are you sure?',
+        title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
         text: opts.text,
         icon: 'warning',
         iconColor: 'var(--danger-dot)',
         showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? 'Delete',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: opts.confirmText ?? label('common.actions.delete', 'Delete'),
+        cancelButtonText: label('common.actions.cancel', 'Cancel'),
         focusCancel: true,
         reverseButtons: true,
         buttonsStyling: false,
@@ -63,13 +77,13 @@ type ConfirmActionOptions = {
  */
 export async function confirmAction(opts: ConfirmActionOptions = {}): Promise<boolean> {
     const result = await Swal.fire({
-        title: opts.title ?? 'Are you sure?',
+        title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
         text: opts.text,
         icon: 'warning',
         iconColor: 'var(--warning-dot)',
         showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? 'Confirm',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
+        cancelButtonText: label('common.actions.cancel', 'Cancel'),
         focusCancel: true,
         reverseButtons: true,
         buttonsStyling: false,
@@ -105,7 +119,7 @@ type ConfirmTypedOptions = {
  */
 export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> {
     const result = await Swal.fire({
-        title: opts.title ?? 'Are you sure?',
+        title: opts.title ?? label('common.dialog.title', 'Are you sure?'),
         text: opts.text,
         icon: 'warning',
         iconColor: 'var(--danger-dot)',
@@ -113,8 +127,8 @@ export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> 
         inputPlaceholder: opts.match,
         inputAttributes: { autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off' },
         showCancelButton: true,
-        confirmButtonText: opts.confirmText ?? 'Confirm',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: opts.confirmText ?? label('common.actions.confirm', 'Confirm'),
+        cancelButtonText: label('common.actions.cancel', 'Cancel'),
         focusCancel: false,
         reverseButtons: true,
         buttonsStyling: false,
@@ -122,7 +136,7 @@ export async function confirmTyped(opts: ConfirmTypedOptions): Promise<boolean> 
         color: 'var(--foreground)',
         preConfirm: (value: string) => {
             if (value !== opts.match) {
-                Swal.showValidationMessage(opts.mismatchText ?? `Please type "${opts.match}" to confirm.`);
+                Swal.showValidationMessage(opts.mismatchText ?? label('common.dialog.type_to_confirm', `Please type "${opts.match}" to confirm.`, { value: opts.match }));
                 return false;
             }
             return true;
