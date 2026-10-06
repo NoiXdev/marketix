@@ -1,4 +1,11 @@
-## [2.4.0](https://github.com/NoiXdev/marketix/compare/v2.3.0...v) (2026-10-05)
+## [2.4.1](https://github.com/NoiXdev/marketix/compare/v2.4.0...v) (2026-10-06)
+
+
+### Bug Fixes
+
+* **sidebar:** highlight active nav item on subpages ([0e6f2b1](https://github.com/NoiXdev/marketix/commit/0e6f2b194aa37c6e4711380c02b01af5a913a723))
+
+## [2.4.0](https://github.com/NoiXdev/marketix/compare/v2.3.0...v2.4.0) (2026-10-05)
 
 
 ### Features
