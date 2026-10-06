@@ -8,6 +8,8 @@
         "build": "tsc && vite build",
         "dev": "vite",
         "lint": "eslint resources/js --fix",
+        "lint:check": "eslint resources/js",
+        "format:check": "prettier --check resources/js resources/analytics/mx.js",
         "test:js": "vitest run"
     },
     "devDependencies": {
