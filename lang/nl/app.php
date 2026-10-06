@@ -14,4 +14,7 @@ return [
     'goal_created' => 'Doel aangemaakt.',
     'goal_updated' => 'Doel bijgewerkt.',
     'goal_deleted' => 'Doel verwijderd.',
+    'funnel_created' => 'Trechter aangemaakt.',
+    'funnel_updated' => 'Trechter bijgewerkt.',
+    'funnel_deleted' => 'Trechter verwijderd.',
 ];

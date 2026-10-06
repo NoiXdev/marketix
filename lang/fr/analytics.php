@@ -68,6 +68,31 @@ return [
         ],
     ],
 
+    'funnels' => [
+        'create' => 'Créer un entonnoir',
+        'edit' => 'Modifier l’entonnoir',
+        'back' => 'Retour aux conversions',
+        'intro' => 'Un entonnoir montre combien de sessions sur :site franchissent plusieurs étapes successives – et à quelle étape les visiteurs abandonnent.',
+        'delete' => 'Supprimer l’entonnoir',
+        'delete_confirm' => 'L’entonnoir sera supprimé. Les données de visite enregistrées sont conservées.',
+
+        'form' => [
+            'name' => 'Nom',
+            'name_placeholder' => 'p. ex. Processus d’achat',
+            'steps' => 'Étapes',
+            'steps_hint' => 'Compte les sessions qui atteignent les étapes dans cet ordre. D’autres pages peuvent être visitées entre-temps.',
+            'step' => 'Étape :number',
+            'step_type' => 'Type',
+            'step_value' => 'Page ou événement',
+            'step_label' => 'Libellé (optionnel)',
+            'step_label_placeholder' => 'p. ex. Panier consulté',
+            'add_step' => 'Ajouter une étape',
+            'remove_step' => 'Supprimer l’étape',
+            'move_up' => 'Monter',
+            'move_down' => 'Descendre',
+        ],
+    ],
+
     'dashboard' => [
         'title' => 'Analytics — :name',
         'back' => 'Retour aux sites',
@@ -241,6 +266,18 @@ return [
         'events' => [
             'title' => 'Événements',
             'empty' => 'Aucun événement pour le moment',
+        ],
+
+        'funnels' => [
+            'title' => 'Entonnoirs',
+            'create' => 'Créer un entonnoir',
+            'edit' => 'Modifier l’entonnoir',
+            'summary' => ':entered sessions commencées · :completed terminées',
+            'conversion_rate' => 'Taux de complétion',
+            'continued' => ':rate ont continué',
+            'dropped' => ':count ont abandonné',
+            'empty_title' => 'Aucun entonnoir',
+            'empty_text' => 'Un entonnoir montre combien de visiteurs passent p. ex. de la page produit au panier jusqu’à l’achat – et à quelle étape ils abandonnent.',
         ],
 
         'goals' => [

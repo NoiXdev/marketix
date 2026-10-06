@@ -14,4 +14,7 @@ return [
     'goal_created' => 'Objectif créé.',
     'goal_updated' => 'Objectif mis à jour.',
     'goal_deleted' => 'Objectif supprimé.',
+    'funnel_created' => 'Entonnoir créé.',
+    'funnel_updated' => 'Entonnoir mis à jour.',
+    'funnel_deleted' => 'Entonnoir supprimé.',
 ];

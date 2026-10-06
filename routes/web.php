@@ -20,6 +20,7 @@ use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EventAnalyticsController;
 use App\Http\Controllers\FaviconController;
 use App\Http\Controllers\ForcePasswordChangeController;
+use App\Http\Controllers\FunnelController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
@@ -190,6 +191,11 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/analytics/{site}/goals/{goal}/edit', [GoalController::class, 'edit'])->name('app.project.analytics.goals.edit');
             Route::put('/analytics/{site}/goals/{goal}', [GoalController::class, 'update'])->name('app.project.analytics.goals.update');
             Route::delete('/analytics/{site}/goals/{goal}', [GoalController::class, 'destroy'])->name('app.project.analytics.goals.destroy');
+            Route::get('/analytics/{site}/funnels/create', [FunnelController::class, 'create'])->name('app.project.analytics.funnels.create');
+            Route::post('/analytics/{site}/funnels', [FunnelController::class, 'store'])->name('app.project.analytics.funnels.store');
+            Route::get('/analytics/{site}/funnels/{funnel}/edit', [FunnelController::class, 'edit'])->name('app.project.analytics.funnels.edit');
+            Route::put('/analytics/{site}/funnels/{funnel}', [FunnelController::class, 'update'])->name('app.project.analytics.funnels.update');
+            Route::delete('/analytics/{site}/funnels/{funnel}', [FunnelController::class, 'destroy'])->name('app.project.analytics.funnels.destroy');
             Route::get('/analytics/{site}/events', [EventAnalyticsController::class, 'show'])->name('app.project.analytics.events.show');
 
             // Team (project admins only)

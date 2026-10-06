@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Funnel;
 use App\Models\Goal;
 use App\Models\Site;
 use App\Services\AnalyticsAggregator;
+use App\Services\FunnelAggregator;
 use App\Services\GoalAggregator;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
@@ -17,6 +19,7 @@ class AnalyticsController extends Controller
     public function __construct(
         private AnalyticsAggregator $agg,
         private GoalAggregator $goals,
+        private FunnelAggregator $funnels,
     ) {}
 
     public function show(Request $request, string $site)
@@ -143,6 +146,11 @@ class AnalyticsController extends Controller
             ], $this->goals->conversions($g, $query), [
                 'byCampaign' => $this->goals->conversionsByCampaign($g, $query),
             ])),
+            'funnels' => fn () => $site->funnels()->oldest()->get()->map(fn (Funnel $funnel) => [
+                'id' => $funnel->id,
+                'name' => $funnel->name,
+                ...$this->funnels->report($funnel, $query),
+            ]),
         ];
     }
 }

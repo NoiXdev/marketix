@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Goal;
 use App\Models\PageView;
 use App\Support\Analytics\AnalyticsQuery;
+use App\Support\Analytics\PathMatcher;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -53,33 +54,23 @@ class GoalAggregator
     }
 
     /**
-     * Base query of the rows (events or page_views) that satisfy a goal, in range, bot-excluded.
+     * Rows (events or page_views) that satisfy a goal or funnel step, in range, bot-excluded.
      */
-    private function matchBase(Goal $goal, AnalyticsQuery $query): Builder
+    public function matches(string $siteId, GoalType $type, string $value, AnalyticsQuery $query): Builder
     {
-        if ($goal->type === GoalType::Event) {
-            return $this->scoped(Event::query(), $goal->site_id, $query)
-                ->where('site_id', $goal->site_id)
-                ->where('is_bot', false)
-                ->whereBetween('created_at', [$query->from, $query->to])
-                ->where('name', $goal->match_value);
-        }
+        $builder = $type === GoalType::Event
+            ? Event::query()->where('name', $value)
+            : PathMatcher::apply(PageView::query(), $value);
 
-        // pageview goal: exact path, or prefix when match_value ends with '/*'
-        $q = $this->scoped(PageView::query(), $goal->site_id, $query)
-            ->where('site_id', $goal->site_id)
+        return $this->scoped($builder, $siteId, $query)
+            ->where('site_id', $siteId)
             ->where('is_bot', false)
             ->whereBetween('created_at', [$query->from, $query->to]);
+    }
 
-        if (str_ends_with($goal->match_value, '/*')) {
-            $prefix = substr($goal->match_value, 0, -1); // keep trailing slash, drop '*'
-            $escaped = str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $prefix);
-            $q->whereRaw("path LIKE ? ESCAPE '!'", [$escaped.'%']);
-        } else {
-            $q->where('path', $goal->match_value);
-        }
-
-        return $q;
+    private function matchBase(Goal $goal, AnalyticsQuery $query): Builder
+    {
+        return $this->matches($goal->site_id, $goal->type, $goal->match_value, $query);
     }
 
     private function scoped(Builder $builder, string $siteId, AnalyticsQuery $query): Builder
