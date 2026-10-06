@@ -219,7 +219,7 @@ return [
         ],
 
         'realtime' => [
-            'window' =>'Last 30 minutes',
+            'window' => 'Last 30 minutes',
             'auto_refresh' => 'Live – refreshes automatically every :seconds seconds.',
             'active_now' => 'Active right now',
             'active_hint' => 'Visitors active in the last 5 minutes',
@@ -267,7 +267,7 @@ return [
             'change' => 'Change',
             'current' => 'Current',
             'previous' => 'Comparison',
-            'select_metric' =>'Select at least one metric.',
+            'select_metric' => 'Select at least one metric.',
             'scale_hint' => 'Page views and unique visitors share one scale; each line is scaled to its peak in this period. Exact values in the tooltip or the table.',
         ],
 
@@ -351,19 +351,12 @@ return [
         ],
 
         'visitor_types' => [
-
             'title' => 'New vs. returning visitors',
-
             'new' => 'New visitors',
-
             'returning' => 'Returning visitors',
-
             'note' => ':sessions sessions · :rate % engagement',
-
             'cookieless_hint' => 'Without cookies, visitors are only recognised again on the same day. Anyone coming back on another day counts as new.',
-
         ],
-
 
         'interactions' => [
             'title' => 'Interactions',

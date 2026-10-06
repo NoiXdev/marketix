@@ -219,7 +219,7 @@ return [
         ],
 
         'realtime' => [
-            'window' =>'30 dernières minutes',
+            'window' => '30 dernières minutes',
             'auto_refresh' => 'En direct – actualisation automatique toutes les :seconds secondes.',
             'active_now' => 'Actifs en ce moment',
             'active_hint' => 'Visiteurs actifs au cours des 5 dernières minutes',
@@ -267,7 +267,7 @@ return [
             'change' => 'Évolution',
             'current' => 'Actuel',
             'previous' => 'Comparaison',
-            'select_metric' =>'Sélectionnez au moins une métrique.',
+            'select_metric' => 'Sélectionnez au moins une métrique.',
             'scale_hint' => 'Pages vues et visiteurs uniques partagent une échelle ; chaque ligne est mise à l’échelle de son maximum sur la période. Valeurs exactes dans l’infobulle ou le tableau.',
         ],
 
@@ -351,19 +351,12 @@ return [
         ],
 
         'visitor_types' => [
-
             'title' => 'Nouveaux visiteurs et visiteurs récurrents',
-
             'new' => 'Nouveaux visiteurs',
-
             'returning' => 'Visiteurs récurrents',
-
             'note' => ':sessions sessions · :rate % d’engagement',
-
             'cookieless_hint' => 'Sans cookies, un visiteur n’est reconnu que le même jour. Toute personne qui revient un autre jour est comptée comme nouvelle.',
-
         ],
-
 
         'interactions' => [
             'title' => 'Interactions',

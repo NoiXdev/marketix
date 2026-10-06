@@ -69,43 +69,24 @@ return [
     ],
 
     'utm' => [
-
         'title' => 'Campagnetracking (UTM)',
-
         'description' => 'Deze parameters worden bij elke doorverwijzing aan de bestemming toegevoegd, ook bij targeting- en A/B-bestemmingen. Parameters die al in de bestemmings-URL staan, blijven ongewijzigd.',
-
         'fields' => [
-
             'source' => 'Bron (utm_source)',
-
             'medium' => 'Medium (utm_medium)',
-
             'campaign' => 'Campagne (utm_campaign)',
-
             'term' => 'Zoekwoord (utm_term)',
-
             'content' => 'Inhoud (utm_content)',
-
         ],
-
         'placeholders' => [
-
             'source' => 'bijv. newsletter of qr',
-
             'medium' => 'bijv. email, social of print',
-
             'campaign' => 'bijv. herfst-sale',
-
             'term' => 'optioneel',
-
             'content' => 'optioneel',
-
         ],
-
         'preview' => 'Verwijst door naar:',
-
     ],
-
 
     'targeting' => [
         'geo' => [
