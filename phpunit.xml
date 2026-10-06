@@ -34,5 +34,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="UPDATE_CHECK_ENABLED" value="false"/>
+        <env name="INERTIA_SSR_ENABLED" value="false"/>
     </php>
 </phpunit>
