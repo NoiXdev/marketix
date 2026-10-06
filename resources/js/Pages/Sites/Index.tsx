@@ -35,7 +35,7 @@ export default function SitesIndex({ sites, stats }: { sites: OverviewSite[]; st
 
   return (
     <AppLayout title={t('analytics.sites.title')}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <PageHeader title={t('analytics.sites.title')} subtitle={t('analytics.sites.overview.subtitle')} action={createBtn} />
         <Flash />
 

@@ -36,14 +36,14 @@ export default function EventDetail({
 
   return (
     <AppLayout title={t('analytics.events.page_title', { name: event })}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
             <BackLink href={route('app.project.analytics.show', { project: project!.id, site: site.id })}>
               {t('analytics.events.back')}
             </BackLink>
-            <h1 className="mt-1 font-mono text-2xl font-bold tracking-tight text-foreground">{event}</h1>
+            <h1 className="mt-1 font-mono text-2xl font-bold tracking-tight break-all text-foreground">{event}</h1>
             <p className="mt-1 text-sm text-muted">{t('analytics.events.subtitle', { total, name: site.name })}</p>
           </div>
           <RangeTabs days={days} onChange={setDays} />

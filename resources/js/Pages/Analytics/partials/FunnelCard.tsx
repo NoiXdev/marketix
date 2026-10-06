@@ -12,7 +12,7 @@ export default function FunnelCard({ funnel }: { funnel: FunnelReport }) {
 
   return (
     <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
-      <header className="border-line flex flex-wrap items-start justify-between gap-3 border-b px-5 py-4">
+      <header className="border-line flex items-start justify-between gap-3 border-b px-4 py-4 sm:px-5">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="text-foreground truncate text-sm font-semibold">{funnel.name}</h3>
@@ -27,22 +27,22 @@ export default function FunnelCard({ funnel }: { funnel: FunnelReport }) {
           </div>
           <p className="text-muted mt-0.5 text-xs">{t('analytics.dashboard.funnels.summary', { entered: number(funnel.entered), completed: number(funnel.completed) })}</p>
         </div>
-        <div className="text-right">
+        <div className="shrink-0 text-right">
           <p className="text-foreground text-2xl font-bold">{percent(funnel.conversion_rate)}</p>
           <p className="text-muted text-xs">{t('analytics.dashboard.funnels.conversion_rate')}</p>
         </div>
       </header>
 
-      <ol className="px-5 py-4">
+      <ol className="px-4 py-4 sm:px-5">
         {funnel.steps.map((step, i) => {
           const Icon = step.type === 'event' ? Zap : FileText;
           return (
             <li key={i}>
               {i > 0 && (
-                <p className="text-muted my-2 flex items-center gap-1.5 pl-9 text-xs">
+                <p className="text-muted my-2 flex flex-wrap items-center gap-x-1.5 pl-9 text-xs">
                   <ArrowDown className="h-3.5 w-3.5" />
-                  {t('analytics.dashboard.funnels.continued', { rate: percent(step.step_rate ?? 0) })}
-                  {step.drop_off > 0 && <span className="text-subtle">· {t('analytics.dashboard.funnels.dropped', { count: number(step.drop_off) })}</span>}
+                  <span className="whitespace-nowrap">{t('analytics.dashboard.funnels.continued', { rate: percent(step.step_rate ?? 0) })}</span>
+                  {step.drop_off > 0 && <span className="text-subtle whitespace-nowrap">· {t('analytics.dashboard.funnels.dropped', { count: number(step.drop_off) })}</span>}
                 </p>
               )}
               <div className="flex items-start gap-3">

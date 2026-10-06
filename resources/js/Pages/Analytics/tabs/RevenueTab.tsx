@@ -73,9 +73,10 @@ export default function RevenueTab({ revenue }: RevenueData) {
 
   return (
     <>
-      <div className="mb-6 grid grid-cols-2 gap-3.5 md:grid-cols-5">
+      <div className="mb-6 grid grid-cols-1 gap-3.5 min-[340px]:grid-cols-2 xl:grid-cols-6">
         <KpiTile
           compact={false}
+          className="min-[340px]:col-span-2"
           label={t('analytics.dashboard.revenue.kpi.revenue')}
           value={money(summary.revenue)}
           deltaPct={delta('revenue')}

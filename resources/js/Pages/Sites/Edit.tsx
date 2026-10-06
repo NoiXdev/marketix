@@ -66,7 +66,7 @@ export default function SitesEdit({
 
   return (
     <AppLayout title={t('analytics.sites.edit')}>
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <BackLink href={indexUrl}>{t('analytics.sites.back')}</BackLink>
         <div className="mt-3 mb-6 flex max-w-6xl flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">

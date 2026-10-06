@@ -226,7 +226,7 @@ return [
             'visitors' => 'Bezoekers',
             'last_30' => 'in de laatste 30 minuten',
             'per_minute' => 'Paginaweergaven per minuut',
-            'hover_hint' => 'Beweeg over een balk voor details.',
+            'hover_hint' => 'Beweeg over of tik op een balk voor details.',
             'minute_detail' => ':when: :views paginaweergaven · :visitors bezoekers',
             'minutes_ago' => ':count min geleden',
             'now' => 'Nu',

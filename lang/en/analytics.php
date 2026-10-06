@@ -226,7 +226,7 @@ return [
             'visitors' => 'Visitors',
             'last_30' => 'in the last 30 minutes',
             'per_minute' => 'Page views per minute',
-            'hover_hint' => 'Hover over a bar for details.',
+            'hover_hint' => 'Hover over or tap a bar for details.',
             'minute_detail' => ':when: :views page views · :visitors visitors',
             'minutes_ago' => ':count min ago',
             'now' => 'Now',

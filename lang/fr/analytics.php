@@ -226,7 +226,7 @@ return [
             'visitors' => 'Visiteurs',
             'last_30' => 'au cours des 30 dernières minutes',
             'per_minute' => 'Pages vues par minute',
-            'hover_hint' => 'Survolez une barre pour plus de détails.',
+            'hover_hint' => 'Survolez ou touchez une barre pour plus de détails.',
             'minute_detail' => ':when : :views pages vues · :visitors visiteurs',
             'minutes_ago' => 'il y a :count min',
             'now' => 'Maintenant',

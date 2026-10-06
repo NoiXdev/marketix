@@ -1,6 +1,7 @@
 import { Checkbox } from '@/Components/ui';
 import { formatAxisLabel, formatBucket as formatBucketLabel, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
+import { scrubHandlers } from '@/lib/chartScrub';
 import { formatDuration, percentChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -234,7 +235,7 @@ export default function VisitorsChart({
   const previousHeading = previousPoint ? (sameHeadings ? t('analytics.dashboard.chart.previous') : formatBucket(previousPoint.date)) : '';
 
   return (
-    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         <div className="flex flex-wrap items-center gap-3">
@@ -265,13 +266,13 @@ export default function VisitorsChart({
         </div>
       </div>
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-5 flex flex-wrap gap-1.5 sm:gap-2">
         {metrics.map((m) => {
           const on = selection.includes(m.key);
           return (
             <label
               key={m.key}
-              className={`inline-flex cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[13px] font-semibold transition-colors ${
+              className={`inline-flex cursor-pointer select-none items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
                 on ? 'border-line-strong bg-elevated text-foreground' : 'border-line text-muted hover:bg-elevated'
               }`}
             >
@@ -287,7 +288,7 @@ export default function VisitorsChart({
         })}
         {hasComparison && (
           <label
-            className={`inline-flex cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[13px] font-semibold transition-colors ${
+            className={`inline-flex cursor-pointer select-none items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition-colors sm:gap-2 sm:px-2.5 sm:py-1.5 sm:text-[13px] ${
               showComparison ? 'border-line-strong bg-elevated text-foreground' : 'border-line text-muted hover:bg-elevated'
             }`}
           >
@@ -344,13 +345,14 @@ export default function VisitorsChart({
               onKeyDown={onKeyDown}
               onFocus={() => setHovered((h) => h ?? data.length - 1)}
               onBlur={() => setHovered(null)}
-              className="relative flex h-48 border-b border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
+              {...scrubHandlers((slot) => setHovered(Number(slot)))}
+              className="relative flex h-48 touch-pan-y border-b border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)]"
               style={{ gap: SLOT_GAP }}
             >
               {data.map((p, i) => (
                 <div
                   key={p.date}
-                  onMouseEnter={() => setHovered(i)}
+                  data-slot={i}
                   className={`relative h-full min-w-0 flex-1 rounded-t-[4px] ${hovered === i ? 'bg-elevated' : ''}`}
                 >
                   {bars.length > 0 && (
@@ -410,17 +412,17 @@ export default function VisitorsChart({
             {point && active.length > 0 && (
               <div
                 ref={tipRef}
-                className="pointer-events-none absolute top-2 z-20 min-w-44 rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-[var(--shadow)]"
+                className="pointer-events-none absolute top-2 z-20 min-w-44 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-[var(--shadow)]"
                 style={{ left: tipLeft }}
               >
                 {previousPoint ? (
-                  <table className="whitespace-nowrap">
+                  <table>
                     <thead>
                       <tr className="text-muted">
                         <th />
-                        <th className="pb-1 pl-4 text-right font-semibold">{currentHeading}</th>
-                        <th className="pb-1 pl-4 text-right font-semibold">{previousHeading}</th>
-                        <th className="pb-1 pl-4 text-right font-semibold">{t('analytics.dashboard.chart.change')}</th>
+                        <th className="pb-1 pl-3 text-right align-bottom font-semibold sm:pl-4">{currentHeading}</th>
+                        <th className="pb-1 pl-3 text-right align-bottom font-semibold sm:pl-4">{previousHeading}</th>
+                        <th className="pb-1 pl-3 text-right align-bottom font-semibold sm:pl-4">{t('analytics.dashboard.chart.change')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -437,10 +439,10 @@ export default function VisitorsChart({
                                 {m.label}
                               </span>
                             </td>
-                            <td className="pl-4 text-right font-bold tabular-nums text-foreground">{value === null ? '—' : m.format(value)}</td>
-                            <td className="pl-4 text-right tabular-nums text-muted">{before === null ? '—' : m.format(before)}</td>
+                            <td className="whitespace-nowrap pl-3 text-right font-bold tabular-nums text-foreground sm:pl-4">{value === null ? '—' : m.format(value)}</td>
+                            <td className="whitespace-nowrap pl-3 text-right tabular-nums text-muted sm:pl-4">{before === null ? '—' : m.format(before)}</td>
                             <td
-                              className={`pl-4 text-right font-bold tabular-nums ${change === null || change === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
+                              className={`whitespace-nowrap pl-3 text-right font-bold tabular-nums sm:pl-4 ${change === null || change === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
                             >
                               {change === null ? '—' : change === 0 ? '± 0 %' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toLocaleString(locale)} %`}
                             </td>

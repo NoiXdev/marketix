@@ -3,6 +3,7 @@ import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import { TabKey, TABS } from '@/Pages/Analytics/types';
 import { Link } from '@inertiajs/react';
 import { Banknote, Globe2, LayoutDashboard, LucideIcon, Megaphone, MousePointerClick, Radio, Target } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 const ICONS: Record<TabKey, LucideIcon> = {
   overview: LayoutDashboard,
@@ -17,11 +18,25 @@ const ICONS: Record<TabKey, LucideIcon> = {
 export default function AnalyticsTabs() {
   const { t } = useTranslation();
   const { tab: active, href } = useAnalytics();
+  const navRef = useRef<HTMLElement>(null);
+
+  // On narrow screens the strip scrolls sideways: keep the active tab centred in view.
+  useEffect(() => {
+    const nav = navRef.current;
+    const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !current) return;
+    const offset = current.getBoundingClientRect().left - nav.getBoundingClientRect().left + nav.scrollLeft;
+    nav.scrollLeft = offset - (nav.clientWidth - current.offsetWidth) / 2;
+  }, [active]);
 
   return (
     <div className="mb-6">
-      <nav aria-label={t('analytics.dashboard.tabs.label')} className="overflow-x-auto overflow-y-hidden">
-        <ul className="flex min-w-full gap-1 shadow-[inset_0_-1px_0_var(--line)]">
+      <nav
+        ref={navRef}
+        aria-label={t('analytics.dashboard.tabs.label')}
+        className="-mx-4 overflow-x-auto overflow-y-hidden px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+      >
+        <ul className="flex w-max min-w-full gap-1 shadow-[inset_0_-1px_0_var(--line)]">
           {TABS.map((tab) => {
             const Icon = ICONS[tab];
             const current = tab === active;

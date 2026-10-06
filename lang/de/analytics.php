@@ -226,7 +226,7 @@ return [
             'visitors' => 'Besucher',
             'last_30' => 'in den letzten 30 Minuten',
             'per_minute' => 'Seitenaufrufe pro Minute',
-            'hover_hint' => 'Für Details mit der Maus über einen Balken fahren.',
+            'hover_hint' => 'Für Details auf einen Balken zeigen oder tippen.',
             'minute_detail' => ':when: :views Seitenaufrufe · :visitors Besucher',
             'minutes_ago' => 'vor :count Min.',
             'now' => 'Jetzt',

@@ -144,7 +144,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, liveVisitor
   return (
     <AppLayout title={t('analytics.dashboard.title', { name: site.name })}>
       <AnalyticsProvider projectId={project!.id} site={site} tab={tab} period={period} filters={filters}>
-        <div className="px-8 py-8">
+        <div className="px-4 py-6 sm:px-8 sm:py-8">
           <Header liveVisitors={liveVisitors} />
           <Flash />
           {site.has_data ? (

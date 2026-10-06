@@ -1,4 +1,5 @@
 import ScaleLegend from '@/Components/ScaleLegend';
+import { scrubHandlers } from '@/lib/chartScrub';
 import { scaleFill } from '@/lib/colorScale';
 import { browserTimeZone, HourBucket, weekdayHourGrid } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
@@ -27,7 +28,7 @@ export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) 
   const focus = hovered ? { ...hovered, value: grid[hovered.day]?.[hovered.hour] ?? 0 } : null;
 
   return (
-    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-6 shadow-[var(--shadow-sm)]">
+    <section className="mb-6 rounded-[var(--radius)] border border-line bg-surface p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-sm font-semibold text-foreground">{t('analytics.dashboard.heatmap.title')}</h2>
         <p className="text-xs text-muted">
@@ -39,30 +40,36 @@ export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) 
         </p>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="grid min-w-[520px] grid-cols-[2.5rem_repeat(24,minmax(0,1fr))] gap-[3px]" onMouseLeave={() => setHovered(null)}>
-          <span />
-          {HOURS.map((h) => (
-            <span key={h} className="text-center text-[10px] leading-4 text-subtle">
-              {h % 3 === 0 ? String(h).padStart(2, '0') : ''}
-            </span>
-          ))}
-          {grid.map((row, day) => (
-            <div key={day} className="contents">
-              <span className="self-center pr-1 text-[11px] font-semibold text-muted">{weekdays[day]}</span>
-              {row.map((value, hour) => (
-                <span
-                  key={hour}
-                  role="img"
-                  aria-label={t('analytics.dashboard.heatmap.cell', { day: weekdays[day], hours: hourRange(hour), count: value })}
-                  onMouseEnter={() => setHovered({ day, hour })}
-                  className={`h-5 rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-inset ring-[color:var(--foreground)]' : ''}`}
-                  style={{ background: scaleFill(value, max) }}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+      {/* All 24 hours fit the width, so phones see the whole day without scrolling */}
+      <div
+        className="grid touch-pan-y grid-cols-[2rem_repeat(24,minmax(0,1fr))] gap-[2px] sm:grid-cols-[2.5rem_repeat(24,minmax(0,1fr))] sm:gap-[3px]"
+        onMouseLeave={() => setHovered(null)}
+        {...scrubHandlers((slot) => {
+          const [day, hour] = slot.split(':').map(Number);
+          setHovered({ day, hour });
+        })}
+      >
+        <span />
+        {HOURS.map((h) => (
+          <span key={h} className="text-center text-[10px] leading-4 text-subtle">
+            {h % 3 === 0 && <span className={h % 6 === 0 ? '' : 'hidden sm:inline'}>{String(h).padStart(2, '0')}</span>}
+          </span>
+        ))}
+        {grid.map((row, day) => (
+          <div key={day} className="contents">
+            <span className="self-center pr-1 text-[11px] font-semibold text-muted">{weekdays[day]}</span>
+            {row.map((value, hour) => (
+              <span
+                key={hour}
+                role="img"
+                aria-label={t('analytics.dashboard.heatmap.cell', { day: weekdays[day], hours: hourRange(hour), count: value })}
+                data-slot={`${day}:${hour}`}
+                className={`h-4 rounded-[2px] sm:h-5 sm:rounded-[3px] ${hovered?.day === day && hovered?.hour === hour ? 'ring-2 ring-inset ring-[color:var(--foreground)]' : ''}`}
+                style={{ background: scaleFill(value, max) }}
+              />
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
