@@ -135,6 +135,8 @@ class AnalyticsController extends Controller
         return [
             'clicksByCountry' => fn () => $this->agg->breakdownByCountryCode($id, $query),
             'countries' => fn () => $this->agg->countriesWithCode($id, $query),
+            'regions' => fn () => $this->agg->locations($id, 'region', $query),
+            'cities' => fn () => $this->agg->locations($id, 'city', $query),
             'languages' => fn () => $this->agg->breakdown($id, 'language', $query),
             'devices' => fn () => $this->agg->breakdown($id, 'device', $query),
             'browsers' => fn () => $this->agg->breakdown($id, 'browser', $query),
