@@ -13,6 +13,9 @@ return [
         'team' => 'Team',
         'reports' => 'Rapporten',
         'data_privacy' => 'Privacy',
+        'open_menu' => 'Menu openen',
+        'close_menu' => 'Menu sluiten',
+        'toggle_sidebar' => 'Zijbalk in-/uitklappen',
         'groups' => [
             'overview' => 'Overzicht',
             'links_codes' => 'Links & Codes',

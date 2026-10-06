@@ -13,6 +13,9 @@ return [
         'team' => 'Team',
         'reports' => 'Reports',
         'data_privacy' => 'Data Privacy',
+        'open_menu' => 'Open menu',
+        'close_menu' => 'Close menu',
+        'toggle_sidebar' => 'Collapse/expand sidebar',
         'groups' => [
             'overview' => 'Overview',
             'links_codes' => 'Links & Codes',

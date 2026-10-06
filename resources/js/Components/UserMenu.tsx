@@ -14,7 +14,10 @@ function initials(name: string): string {
         .toUpperCase();
 }
 
-export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'down' } = {}) {
+export default function UserMenu({
+    direction = 'up',
+    hideNameOnMobile = false,
+}: { direction?: 'up' | 'down'; hideNameOnMobile?: boolean } = {}) {
     const { auth } = usePage<PageProps>().props;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -45,7 +48,7 @@ export default function UserMenu({ direction = 'up' }: { direction?: 'up' | 'dow
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent-soft-foreground">
                     {initials(auth.user.name)}
                 </span>
-                <span className="flex-1 truncate text-left text-sm font-medium">
+                <span className={`flex-1 truncate text-left text-sm font-medium ${hideNameOnMobile ? 'hidden sm:block' : ''}`}>
                     {auth.user.name}
                 </span>
                 <ChevronDown className="h-4 w-4 shrink-0 text-subtle" />
