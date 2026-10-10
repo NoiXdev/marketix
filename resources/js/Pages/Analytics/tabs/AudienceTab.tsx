@@ -53,12 +53,12 @@ export default function AudienceTab({ clicksByCountry, countries, regions, citie
             {
               key: 'regions',
               label: t('analytics.dashboard.breakdown.regions'),
-              rows: rows(regions, 'region', 'region', withFlag),
+              rows: rows(regions, 'region', 'region', (r) => ({ ...withFlag(r), label: String(r.region_name ?? r.region) })),
             },
             {
               key: 'cities',
               label: t('analytics.dashboard.breakdown.cities'),
-              rows: rows(cities, 'city', 'city', withFlag),
+              rows: rows(cities, 'city', 'city', (r) => ({ ...withFlag(r), label: String(r.city_name ?? r.city) })),
             },
             {
               key: 'languages',

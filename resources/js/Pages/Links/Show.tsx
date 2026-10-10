@@ -28,7 +28,9 @@ interface BreakdownRow {
 interface RecentClick {
   id: string;
   country: string | null;
+  country_code: string | null;
   city: string | null;
+  city_name: string | null;
   browser: string | null;
   os: string | null;
   domain: string | null;
@@ -57,7 +59,7 @@ interface Props {
   clicksByDay: DayClicks[];
   topCountries: (BreakdownRow & { country: string; country_code: string })[];
   clicksByCountry: CountryDatum[];
-  topCities: (BreakdownRow & { city: string })[];
+  topCities: (BreakdownRow & { city: string; city_name: string })[];
   topBrowsers: (BreakdownRow & { browser: string })[];
   topOs: (BreakdownRow & { os: string })[];
   topReferrers: (BreakdownRow & { domain: string })[];
@@ -266,7 +268,7 @@ export default function LinksShow({
             emptyLabel={t('links.show.no_data')}
             prefix={(r) => <CountryFlag code={String(r.country_code ?? '')} />}
           />
-          <Breakdown title={t('links.show.breakdown.cities')} rows={topCities} labelKey="city" emptyLabel={t('links.show.no_data')} />
+          <Breakdown title={t('links.show.breakdown.cities')} rows={topCities} labelKey="city_name" emptyLabel={t('links.show.no_data')} />
           <Breakdown
             title={t('links.show.breakdown.browsers')}
             rows={topBrowsers}
@@ -313,7 +315,9 @@ export default function LinksShow({
                 {recentClicks.map((c) => (
                   <tr key={c.id}>
                     <td className="text-muted px-4 py-2.5">{new Date(c.created_at).toLocaleString()}</td>
-                    <td className="text-muted px-4 py-2.5">{[c.city, c.country].filter(Boolean).join(', ') || '—'}</td>
+                    <td className="text-muted px-4 py-2.5">
+                      {[c.city_name ?? c.city, c.country_code ? countryName(c.country_code, locale, c.country ?? undefined) : c.country].filter(Boolean).join(', ') || '—'}
+                    </td>
                     <td className="text-muted px-4 py-2.5">{[c.browser, c.os].filter(Boolean).join(' · ') || '—'}</td>
                     <td className="text-muted px-4 py-2.5">{c.domain || '—'}</td>
                   </tr>

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Statistic;
 use App\Models\Url;
 use App\Support\CrawlerDetector;
+use App\Support\Geo\PlaceNames;
 use App\Support\UserAgent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -58,6 +59,8 @@ class RecordClickStatisticJob implements ShouldQueue
             'os' => UserAgent::os($this->userAgent),
             'is_bot' => $isBot,
         ]);
+
+        app(PlaceNames::class)->remember(PlaceNames::CITY, $this->geo['country_code'] ?? null, $this->geo['city'] ?? null, $this->geo['city_names'] ?? []);
 
         // Bots are recorded but never counted toward click totals.
         if (! $isBot) {

@@ -205,7 +205,7 @@ class StatisticsAggregator
             ->when($until, fn (Builder $q) => $q->where('created_at', '<=', $until))
             ->latest()
             ->limit($limit)
-            ->get(['id', 'country', 'city', 'browser', 'os', 'domain', 'created_at']);
+            ->get(['id', 'country', 'country_code', 'city', 'browser', 'os', 'domain', 'created_at']);
     }
 
     /**

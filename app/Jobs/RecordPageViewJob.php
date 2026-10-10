@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\PageView;
 use App\Models\Visit;
 use App\Support\CrawlerDetector;
+use App\Support\Geo\PlaceNames;
 use App\Support\UserAgent;
 use App\Support\VisitResolver;
 use Illuminate\Bus\Queueable;
@@ -101,5 +102,10 @@ class RecordPageViewJob implements ShouldQueue
             'utm_content' => $this->utm['utm_content'] ?? null,
             'created_at' => now(),
         ]);
+
+        $places = app(PlaceNames::class);
+        $countryCode = $this->geo['country_code'] ?? null;
+        $places->remember(PlaceNames::REGION, $countryCode, $this->geo['region'] ?? null, $this->geo['region_names'] ?? []);
+        $places->remember(PlaceNames::CITY, $countryCode, $this->geo['city'] ?? null, $this->geo['city_names'] ?? []);
     }
 }

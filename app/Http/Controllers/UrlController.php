@@ -8,6 +8,7 @@ use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\UrlRequest;
 use App\Models\Statistic;
 use App\Services\StatisticsAggregator;
+use App\Support\Geo\PlaceNames;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -43,7 +44,7 @@ class UrlController extends Controller
         ]);
     }
 
-    public function show(Request $request, StatisticsAggregator $stats, string $url)
+    public function show(Request $request, StatisticsAggregator $stats, PlaceNames $places, string $url)
     {
         $project = $request->get('project');
         $model = $project->urls()->with(['domain', 'qrCode'])->findOrFail($url);
@@ -79,11 +80,11 @@ class UrlController extends Controller
             'clicksByDay' => $stats->clicksByDay($project->id, $model->id, $days),
             'topCountries' => $stats->topCountriesWithCode($project->id, $model->id, $since, null, 8),
             'clicksByCountry' => $stats->breakdownByCountryCode($project->id, $model->id, $since),
-            'topCities' => $stats->breakdown($project->id, $model->id, 'city', $since),
+            'topCities' => $places->localize($stats->breakdown($project->id, $model->id, 'city', $since), PlaceNames::CITY, 'city'),
             'topBrowsers' => $stats->breakdown($project->id, $model->id, 'browser', $since),
             'topOs' => $stats->breakdown($project->id, $model->id, 'os', $since),
             'topReferrers' => $stats->breakdown($project->id, $model->id, 'domain', $since),
-            'recentClicks' => $stats->recentClicks($project->id, $model->id, $since),
+            'recentClicks' => $places->localize($stats->recentClicks($project->id, $model->id, $since), PlaceNames::CITY, 'city'),
         ]);
     }
 
