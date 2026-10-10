@@ -2,7 +2,10 @@
 
 return [
 
-    // https://www.cloudflare.com/ips/
+    // Written daily by marketix:cloudflare:update
+    'ranges_path' => storage_path('app/cloudflare/ip-ranges.json'),
+
+    // Used until the first update; https://www.cloudflare.com/ips/
     'ip_ranges' => [
         '173.245.48.0/20',
         '103.21.244.0/22',
