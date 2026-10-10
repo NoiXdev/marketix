@@ -62,6 +62,17 @@ class RecordClickStatisticJobTest extends TestCase
         ]);
     }
 
+    public function test_stores_city_translations(): void
+    {
+        $url = $this->makeUrl();
+
+        (new RecordClickStatisticJob($url->id, $url->project_id, 'hash-aaa', 'UA/1.0', null, 'en', [
+            'country' => 'Austria', 'city' => 'Vienna', 'country_code' => 'AT', 'city_names' => ['en' => 'Vienna', 'de' => 'Wien'],
+        ]))->handle();
+
+        $this->assertDatabaseHas('geo_names', ['type' => 'city', 'country_code' => 'AT', 'name' => 'Vienna']);
+    }
+
     public function test_same_hash_same_day_counts_unique_once(): void
     {
         $url = $this->makeUrl();

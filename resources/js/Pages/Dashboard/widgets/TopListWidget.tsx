@@ -34,7 +34,7 @@ export default function TopListWidget({ config, editing, onConfigure, onRemove }
       case 'referrers':
         return { key: `${r.domain}-${i}`, label: String(r.domain || '—'), value: Number(r.count), prefix: <Favicon domain={String(r.domain ?? '')} /> };
       default:
-        return { key: `${r.city}-${i}`, label: String(r.city || '—'), value: Number(r.count) };
+        return { key: `${r.city}-${i}`, label: String(r.city_name || r.city || '—'), value: Number(r.count) };
     }
   }
 
