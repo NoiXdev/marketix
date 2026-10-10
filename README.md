@@ -60,3 +60,21 @@ echo \$s->country.' / '.\$s->country_code.' / '.\$s->city.PHP_EOL;"
 
 Existing `NULL` rows cannot be backfilled — only the visitor hash is stored, not
 the raw IP.
+
+### Visitors behind Cloudflare
+
+When the app runs behind Cloudflare, the visitor's address arrives in the
+`CF-Connecting-IP` header. `TrustCloudflareClientIp` uses it only when the
+request came from one of Cloudflare's edge servers, so the header cannot be
+forged by requests that bypass Cloudflare.
+
+Cloudflare's IP ranges are refreshed daily by the scheduler and stored in
+`storage/app/cloudflare/ip-ranges.json`. Until the first successful update the
+list bundled in `config/cloudflare.php` is used. To refresh them by hand:
+
+```bash
+docker exec marketix-app-1 php artisan marketix:cloudflare:update
+# -> Saved 15 IPv4 and 7 IPv6 ranges.
+```
+
+A failed download or an unexpected response keeps the previous list.

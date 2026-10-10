@@ -26,6 +26,8 @@ class CloudflareClientIpTest extends TestCase
     {
         parent::setUp();
 
+        // Always the bundled list, never a file downloaded in this environment
+        config(['cloudflare.ranges_path' => sys_get_temp_dir().'/marketix-missing-cloudflare-ranges.json']);
         Route::get('/_test/client-ip', fn (Request $request) => $request->ip());
     }
 

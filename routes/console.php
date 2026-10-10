@@ -5,6 +5,7 @@ use App\Models\Domain;
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('marketix:geoip:update')->daily();
+Schedule::command('marketix:cloudflare:update')->daily();
 Schedule::command('activitylog:clean')->daily();
 Schedule::command('statistics:prune')->daily();
 Schedule::command('analytics:prune')->daily();

@@ -2,12 +2,15 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Cloudflare\CloudflareIpRanges;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\IpUtils;
 
 class TrustCloudflareClientIp
 {
+    public function __construct(private CloudflareIpRanges $cloudflare) {}
+
     public function handle(Request $request, Closure $next)
     {
         $visitor = $request->headers->get('CF-Connecting-IP');
@@ -21,7 +24,7 @@ class TrustCloudflareClientIp
 
     private function fromCloudflare(Request $request): bool
     {
-        $ranges = config('cloudflare.ip_ranges', []);
+        $ranges = $this->cloudflare->all();
         $remote = (string) $request->server->get('REMOTE_ADDR', '');
 
         if (IpUtils::checkIp($remote, $ranges)) {
