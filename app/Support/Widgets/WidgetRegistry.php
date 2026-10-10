@@ -6,6 +6,7 @@ use App\Enums\WidgetType;
 use App\Models\Activity;
 use App\Models\Project;
 use App\Services\StatisticsAggregator;
+use App\Support\Geo\PlaceNames;
 use Illuminate\Support\Carbon;
 
 class WidgetRegistry
@@ -17,7 +18,7 @@ class WidgetRegistry
     // UI-only preference shared by every widget type: render without the card frame.
     private const HIDE_FRAME = ['nullable', 'boolean'];
 
-    public function __construct(private StatisticsAggregator $stats) {}
+    public function __construct(private StatisticsAggregator $stats, private PlaceNames $places) {}
 
     /** @return array<string, array<int, string>> */
     public function configRules(WidgetType $type): array
@@ -106,6 +107,8 @@ class WidgetRegistry
             default => 'country',
         };
 
-        return $this->stats->breakdown($projectId, null, $column, $since, $until, $limit)->values()->all();
+        $rows = $this->stats->breakdown($projectId, null, $column, $since, $until, $limit);
+
+        return ($column === 'city' ? $this->places->localize($rows, PlaceNames::CITY, 'city') : $rows)->values()->all();
     }
 }

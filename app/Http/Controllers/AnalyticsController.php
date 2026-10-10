@@ -12,6 +12,7 @@ use App\Services\RealtimeAggregator;
 use App\Services\RevenueAggregator;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
+use App\Support\Geo\PlaceNames;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
@@ -24,6 +25,7 @@ class AnalyticsController extends Controller
         private FunnelAggregator $funnels,
         private RevenueAggregator $revenueReports,
         private RealtimeAggregator $realtimeReports,
+        private PlaceNames $places,
     ) {}
 
     public function show(Request $request, string $site)
@@ -54,6 +56,10 @@ class AnalyticsController extends Controller
             'tab' => $tab,
             'period' => $period->toArray(),
             'filters' => (object) $period->query->filters,
+            'filterLabels' => (object) collect([PlaceNames::REGION, PlaceNames::CITY])
+                ->filter(fn (string $key) => $period->query->filter($key) !== null)
+                ->mapWithKeys(fn (string $key) => [$key => $this->places->nameFor($key, $period->query->filter($key))])
+                ->all(),
             'liveVisitors' => fn () => $this->agg->liveVisitors($model->id),
             ...$this->tabProps($tab, $model, $period),
         ]);
@@ -137,8 +143,8 @@ class AnalyticsController extends Controller
         return [
             'clicksByCountry' => fn () => $this->agg->breakdownByCountryCode($id, $query),
             'countries' => fn () => $this->agg->countriesWithCode($id, $query),
-            'regions' => fn () => $this->agg->locations($id, 'region', $query),
-            'cities' => fn () => $this->agg->locations($id, 'city', $query),
+            'regions' => fn () => $this->places->localize($this->agg->locations($id, 'region', $query), PlaceNames::REGION, 'region'),
+            'cities' => fn () => $this->places->localize($this->agg->locations($id, 'city', $query), PlaceNames::CITY, 'city'),
             'languages' => fn () => $this->agg->breakdown($id, 'language', $query),
             'visitorTypes' => fn () => $this->agg->visitorTypes($id, $query),
             'devices' => fn () => $this->agg->breakdown($id, 'device', $query),

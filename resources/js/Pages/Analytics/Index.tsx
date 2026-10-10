@@ -30,6 +30,7 @@ type AnalyticsPageProps = {
   tab: TabKey;
   period: Period;
   filters: Filters;
+  filterLabels: Partial<Record<FilterKey, string>>;
   liveVisitors: number;
 } & Partial<TabData>;
 
@@ -92,7 +93,7 @@ function Header({ liveVisitors }: { liveVisitors: number }) {
   );
 }
 
-function ActiveFilters() {
+function ActiveFilters({ labels }: { labels: Partial<Record<FilterKey, string>> }) {
   const { t, locale } = useTranslation();
   const { filters, go } = useAnalytics();
 
@@ -109,6 +110,9 @@ function ActiveFilters() {
         );
       case 'language':
         return languageName(value, locale);
+      case 'region':
+      case 'city':
+        return labels[key] ?? value;
       case 'visitor_type':
         return t(`analytics.dashboard.visitor_types.${value}`);
       default:
@@ -127,7 +131,7 @@ function ActiveFilters() {
   );
 }
 
-export default function AnalyticsIndex({ site, tab, period, filters, liveVisitors, ...data }: AnalyticsPageProps) {
+export default function AnalyticsIndex({ site, tab, period, filters, filterLabels, liveVisitors, ...data }: AnalyticsPageProps) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -152,7 +156,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, liveVisitor
           {site.has_data ? (
             <>
               <AnalyticsTabs />
-              {tab !== 'realtime' && <ActiveFilters />}
+              {tab !== 'realtime' && <ActiveFilters labels={filterLabels} />}
               <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
                 <ActiveTab tab={tab} data={data} />
               </div>

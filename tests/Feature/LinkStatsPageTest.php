@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Statistic;
 use App\Models\Url;
 use App\Models\User;
+use App\Support\Geo\PlaceNames;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -72,6 +73,22 @@ class LinkStatsPageTest extends TestCase
                 ->where('topCountries.0.count', 2)
                 ->where('topBrowsers.0.browser', 'Chrome')
                 ->has('recentClicks', 2)
+            );
+    }
+
+    public function test_cities_are_shown_in_the_users_language(): void
+    {
+        [$user, $project, $url] = $this->makeProjectWithUrl();
+        $user->update(['locale' => 'de']);
+        Statistic::factory()->forUrl($url)->create(['visitor_hash' => hash('sha256', '10.0.0.1'), 'city' => 'Vienna', 'country' => 'Austria', 'country_code' => 'AT']);
+        app(PlaceNames::class)->remember(PlaceNames::CITY, 'AT', 'Vienna', ['en' => 'Vienna', 'de' => 'Wien']);
+
+        $this->actingAs($user)
+            ->get(route('app.project.links.show', ['project' => $project->id, 'url' => $url->id]))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('topCities.0.city_name', 'Wien')
+                ->where('recentClicks.0.city_name', 'Wien')
+                ->where('recentClicks.0.country_code', 'AT')
             );
     }
 
