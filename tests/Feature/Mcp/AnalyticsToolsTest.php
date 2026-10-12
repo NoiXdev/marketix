@@ -107,10 +107,15 @@ class AnalyticsToolsTest extends TestCase
     {
         $mine = $this->makeSite('Mine');
         $this->track($mine['site'], ['visitor_hash' => 'a'], [
-            ['path' => '/', 'city' => 'Zürich', 'region' => 'Zurich', 'country_code' => 'CH'],
-            ['path' => '/a', 'city' => 'Zürich', 'region' => 'Zurich', 'country_code' => 'CH'],
+            ['path' => '/', 'city' => 'Bern', 'region' => 'Bern', 'country_code' => 'CH'],
+            ['path' => '/a', 'city' => 'Bern', 'region' => 'Bern', 'country_code' => 'CH'],
             ['path' => '/b', 'city' => 'Bern', 'region' => 'Bern', 'country_code' => 'CH'],
         ]);
+        foreach (['b', 'c'] as $visitor) {
+            $this->track($mine['site'], ['visitor_hash' => $visitor], [
+                ['path' => '/', 'city' => 'Zürich', 'region' => 'Zurich', 'country_code' => 'CH'],
+            ]);
+        }
 
         MarketixServer::actingAs($mine['user'])
             ->tool(GetSiteBreakdownTool::class, ['site' => 'Mine Shop', 'dimension' => 'cities', 'limit' => 1])
