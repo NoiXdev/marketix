@@ -1,4 +1,4 @@
-import { Input, Pagination, Select } from '@/Components/ui';
+import { Input, Pagination } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { Paginated } from '@/types';
 import { router } from '@inertiajs/react';
@@ -42,15 +42,19 @@ export function ListFooter({ page, perPage, onPerPage }: { page: Paginated<unkno
       <p className="text-muted text-sm tabular-nums">{t('common.list.summary', { from: page.from ?? 0, to: page.to ?? 0, total: page.total })}</p>
       <div className="flex flex-wrap items-center gap-3">
         {page.last_page > 1 && <Pagination links={page.links} />}
-        <label className="text-muted flex items-center gap-2 text-sm">
+        <label className="text-muted flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
           {t('common.list.per_page')}
-          <Select value={perPage} onChange={(event) => onPerPage(Number(event.target.value))} className="w-auto py-1.5">
+          <select
+            value={perPage}
+            onChange={(event) => onPerPage(Number(event.target.value))}
+            className="border-line-strong bg-surface text-foreground focus-visible:border-accent rounded-[var(--radius-sm)] border py-1 pr-8 pl-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
+          >
             {PAGE_SIZES.map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
             ))}
-          </Select>
+          </select>
         </label>
       </div>
     </div>
