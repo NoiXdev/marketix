@@ -47,6 +47,7 @@ export interface Site {
   name: string;
   domain: string;
   additional_hostnames?: string | null;
+  timezone?: string;
   tracking_id: string;
   tracking_mode: string;
   consent_mode: string;

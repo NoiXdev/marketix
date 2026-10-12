@@ -25,11 +25,16 @@ class Site extends Model
 
     use HasUlids, LogsActivity, SetsActivityProject, SoftDeletes;
 
+    protected $attributes = [
+        'timezone' => 'UTC',
+    ];
+
     protected $fillable = [
         'project_id',
         'name',
         'domain',
         'additional_hostnames',
+        'timezone',
         'tracking_id',
         'tracking_mode',
         'consent_mode',
@@ -63,7 +68,7 @@ class Site extends Model
     {
         return LogOptions::defaults()
             ->useLogName('site')
-            ->logOnly(['name', 'domain', 'additional_hostnames', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
+            ->logOnly(['name', 'domain', 'additional_hostnames', 'timezone', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }

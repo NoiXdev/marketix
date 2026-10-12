@@ -11,6 +11,8 @@ use App\Support\Analytics\AnalyticsQuery;
 use App\Support\Analytics\ChannelClassifier;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use DateTimeImmutable;
+use DateTimeZone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +44,7 @@ class AnalyticsAggregator
         $builder = PageView::query()
             ->where('site_id', $siteId)
             ->where('is_bot', false)
-            ->whereBetween('created_at', [$query->from, $query->to]);
+            ->whereBetween('created_at', $query->storageRange());
 
         return $this->applyPageViewFilters($builder, $siteId, $query->filters);
     }
@@ -54,7 +56,7 @@ class AnalyticsAggregator
         $builder = Visit::query()
             ->where('site_id', $siteId)
             ->where('is_bot', false)
-            ->whereBetween('started_at', [$query->from, $query->to]);
+            ->whereBetween('started_at', $query->storageRange());
 
         return $this->applyVisitFilters($builder, $siteId, $query->filters);
     }
@@ -192,9 +194,51 @@ class AnalyticsAggregator
         return '('.implode(' OR ', array_map(fn ($c) => "{$c} IS NOT NULL", self::CAMPAIGN_COLUMNS)).')';
     }
 
+    /**
+     * Shifts a stored timestamp column (app time zone) into the query's time
+     * zone. The difference changes at the DST transitions of either zone, so
+     * every span between two transitions gets its own shift; the database
+     * needs no time zone tables for this.
+     */
+    private function localTime(string $column, AnalyticsQuery $query): string
+    {
+        [$from, $to] = $query->storageRange();
+        $site = new DateTimeZone($query->timezone());
+        $storage = new DateTimeZone(config('app.timezone'));
+        $offsetAt = fn (int $ts) => $site->getOffset(new DateTimeImmutable('@'.$ts)) - $storage->getOffset(new DateTimeImmutable('@'.$ts));
+
+        $boundaries = collect([$site, $storage])
+            ->flatMap(fn (DateTimeZone $zone) => array_column(array_slice($zone->getTransitions($from->getTimestamp(), $to->getTimestamp()), 1), 'ts'))
+            ->unique()->sort()->values();
+
+        $start = $from->getTimestamp();
+        $cases = [];
+        foreach ($boundaries as $boundary) {
+            $stored = (new DateTimeImmutable('@'.$boundary))->setTimezone($storage)->format('Y-m-d H:i:s');
+            $cases[] = "WHEN {$column} < '{$stored}' THEN ".$this->shifted($column, $offsetAt($start));
+            $start = $boundary;
+        }
+
+        return $cases === []
+            ? $this->shifted($column, $offsetAt($start))
+            : 'CASE '.implode(' ', $cases).' ELSE '.$this->shifted($column, $offsetAt($start)).' END';
+    }
+
+    private function shifted(string $column, int $seconds): string
+    {
+        if ($seconds === 0) {
+            return $column;
+        }
+
+        return $this->isSqlite()
+            ? "datetime({$column}, '".sprintf('%+d', $seconds)." seconds')"
+            : "DATE_ADD({$column}, INTERVAL {$seconds} SECOND)";
+    }
+
     public function bucketExpression(string $column, AnalyticsQuery $query): string
     {
         $sqlite = $this->isSqlite();
+        $column = $this->localTime($column, $query);
 
         return match ($query->interval) {
             'hour' => $sqlite ? "strftime('%Y-%m-%d %H:00', {$column})" : "DATE_FORMAT({$column}, '%Y-%m-%d %H:00')",
@@ -221,7 +265,8 @@ class AnalyticsAggregator
             $keys[] = $date->format($format);
         }
 
-        return $keys;
+        // The hour repeated when DST ends falls into one bucket.
+        return array_values(array_unique($keys));
     }
 
     /** @return list<array{date: string, views: int, visitors: int}> */
@@ -528,6 +573,7 @@ class AnalyticsAggregator
         $bucket = $this->isSqlite()
             ? "strftime('%Y-%m-%d %H', started_at)"
             : "DATE_FORMAT(started_at, '%Y-%m-%d %H')";
+
         $timezone = config('app.timezone');
 
         return $this->visitBase($siteId, $range)

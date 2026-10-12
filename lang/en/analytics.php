@@ -44,6 +44,8 @@ return [
             'additional_hostnames' => 'Additional hostnames',
             'additional_hostnames_placeholder' => 'example.de, shop.example.org',
             'additional_hostnames_hint' => 'Visits are only counted on :domain and its subdomains. List other domains this site runs on, separated by commas.',
+            'timezone' => 'Time zone',
+            'timezone_hint' => 'Days and hours in the reports follow this time zone.',
             'tracking_mode' => 'How are visitors recognised?',
             'consent_mode' => 'When does tracking start?',
             'recommended' => 'Recommended',

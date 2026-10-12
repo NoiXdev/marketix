@@ -13,6 +13,7 @@ use App\Services\RevenueAggregator;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
 use App\Support\Geo\PlaceNames;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
@@ -41,6 +42,7 @@ class AnalyticsController extends Controller
         $period = PeriodResolver::resolve(
             $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
             is_array($filters) ? $filters : [],
+            CarbonImmutable::now($model->timezone),
         );
 
         return inertia('Analytics/Index', [
@@ -52,6 +54,7 @@ class AnalyticsController extends Controller
                 'tracking_mode' => $model->tracking_mode->value,
                 'has_data' => $hasData,
                 'snippet' => $model->trackingSnippet(),
+                'timezone' => $model->timezone,
             ],
             'tab' => $tab,
             'period' => $period->toArray(),

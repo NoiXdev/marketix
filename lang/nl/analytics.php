@@ -44,6 +44,8 @@ return [
             'additional_hostnames' => 'Extra hostnamen',
             'additional_hostnames_placeholder' => 'example.de, shop.example.org',
             'additional_hostnames_hint' => 'Bezoeken worden alleen geteld op :domain en de subdomeinen ervan. Geef andere domeinen van deze site op, gescheiden door komma’s.',
+            'timezone' => 'Tijdzone',
+            'timezone_hint' => 'Dagen en uren in de rapporten volgen deze tijdzone.',
             'tracking_mode' => 'Hoe worden bezoekers herkend?',
             'consent_mode' => 'Wanneer start de meting?',
             'recommended' => 'Aanbevolen',

@@ -24,7 +24,7 @@ class GoalAggregator
         return $this->scoped(Event::query(), $siteId, $query)
             ->where('site_id', $siteId)
             ->where('is_bot', false)
-            ->whereBetween('created_at', [$query->from, $query->to])
+            ->whereBetween('created_at', $query->storageRange())
             ->select('name', DB::raw('COUNT(*) as count'), DB::raw('COUNT(DISTINCT visitor_hash) as visitors'))
             ->groupBy('name')->orderByDesc('count')->limit($limit)->get();
     }
@@ -46,7 +46,7 @@ class GoalAggregator
         return $this->scoped(Event::query(), $siteId, $query)
             ->where('site_id', $siteId)
             ->where('is_bot', false)
-            ->whereBetween('created_at', [$query->from, $query->to])
+            ->whereBetween('created_at', $query->storageRange())
             ->where('name', $event)
             ->whereRaw("{$value} IS NOT NULL")
             ->select(DB::raw("{$value} as value"), DB::raw('COUNT(*) as count'), DB::raw('COUNT(DISTINCT visitor_hash) as visitors'))
@@ -79,7 +79,7 @@ class GoalAggregator
         return $this->scoped($builder, $siteId, $query)
             ->where('site_id', $siteId)
             ->where('is_bot', false)
-            ->whereBetween('created_at', [$query->from, $query->to]);
+            ->whereBetween('created_at', $query->storageRange());
     }
 
     private function matchBase(Goal $goal, AnalyticsQuery $query): Builder

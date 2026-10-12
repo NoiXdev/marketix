@@ -16,12 +16,14 @@ export default function SitesEdit({
   site,
   trackingModes,
   consentModes,
+  timezones,
   snippet,
   lastSeenAt,
 }: {
   site: Site;
   trackingModes: Option[];
   consentModes: Option[];
+  timezones: string[];
   snippet: string;
   lastSeenAt: string | null;
 }) {
@@ -34,6 +36,7 @@ export default function SitesEdit({
     name: site.name,
     domain: site.domain,
     additional_hostnames: site.additional_hostnames ?? '',
+    timezone: site.timezone ?? 'UTC',
     tracking_mode: site.tracking_mode,
     consent_mode: site.consent_mode,
     consent_signal: site.consent_signal ?? '',
@@ -123,6 +126,7 @@ export default function SitesEdit({
             form={form}
             trackingModes={trackingModes}
             consentModes={consentModes}
+            timezones={timezones}
             submitLabel={t('common.actions.save')}
             cancelHref={indexUrl}
             onSubmit={() => form.put(route('app.project.sites.update', { project: projectId, site: site.id }))}

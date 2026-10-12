@@ -1,5 +1,6 @@
 import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { browserTimeZone } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
 import SiteForm, { Option, SiteFormData } from '@/Pages/Sites/partials/SiteForm';
 import { PageProps } from '@/types';
@@ -8,13 +9,14 @@ import { ShieldCheck } from 'lucide-react';
 
 const STEPS = ['create', 'install', 'watch'] as const;
 
-export default function SitesCreate({ trackingModes, consentModes }: { trackingModes: Option[]; consentModes: Option[] }) {
+export default function SitesCreate({ trackingModes, consentModes, timezones }: { trackingModes: Option[]; consentModes: Option[]; timezones: string[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const form = useForm<SiteFormData>({
     name: '',
     domain: '',
     additional_hostnames: '',
+    timezone: timezones.includes(browserTimeZone()) ? browserTimeZone() : 'UTC',
     tracking_mode: 'cookieless',
     consent_mode: 'immediate',
     consent_signal: '',
@@ -44,6 +46,7 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
               form={form}
               trackingModes={trackingModes}
               consentModes={consentModes}
+              timezones={timezones}
               submitLabel={t('analytics.sites.create')}
               cancelHref={indexUrl}
               onSubmit={() => form.post(route('app.project.sites.store', { project: project!.id }))}

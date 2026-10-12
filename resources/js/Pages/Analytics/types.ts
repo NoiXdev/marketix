@@ -25,7 +25,16 @@ export type TabKey = 'overview' | 'realtime' | 'acquisition' | 'behavior' | 'aud
 
 export const TABS: TabKey[] = ['overview', 'realtime', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
 
-export type SiteInfo = { id: string; name: string; domain: string; search_enabled: boolean; tracking_mode: 'cookie' | 'cookieless'; has_data: boolean; snippet: string };
+export type SiteInfo = {
+  id: string;
+  name: string;
+  domain: string;
+  search_enabled: boolean;
+  tracking_mode: 'cookie' | 'cookieless';
+  has_data: boolean;
+  snippet: string;
+  timezone: string;
+};
 
 export type Summary = {
   page_views: number;

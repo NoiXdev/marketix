@@ -136,7 +136,7 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, hostnames
         />
       </div>
 
-      {period.days >= 7 && <ActivityHeatmap buckets={hourlyActivity} />}
+      {period.days >= 7 && <ActivityHeatmap buckets={hourlyActivity} timezone={site.timezone} />}
     </>
   );
 }

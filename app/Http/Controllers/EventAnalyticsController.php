@@ -17,7 +17,7 @@ class EventAnalyticsController extends Controller
         $days = in_array($days, [1, 7, 30, 90], true) ? $days : 30;
 
         $result = $name !== ''
-            ? $agg->forEvent($model->id, $name, $days)
+            ? $agg->forEvent($model->id, $name, $days, $model->timezone)
             : ['total' => 0, 'keys' => []];
 
         return inertia('Analytics/EventDetail', [

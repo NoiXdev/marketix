@@ -42,7 +42,7 @@ class GetSiteStatsTool extends Tool
             return Response::error('Site not found, ambiguous or access denied. Pass the site id from list_sites.');
         }
 
-        $period = $this->resolvePeriod($request);
+        $period = $this->resolvePeriod($request, $site);
         $query = $period->query;
         $comparison = $period->comparison();
 
