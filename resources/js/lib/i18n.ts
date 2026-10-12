@@ -23,7 +23,9 @@ export function translate(catalog: Catalog, key: string, replacements?: Replacem
     return node;
   }
 
-  return Object.entries(replacements).reduce((acc, [name, value]) => acc.replaceAll(`:${name}`, String(value)), node);
+  return Object.entries(replacements)
+    .sort(([a], [b]) => b.length - a.length)
+    .reduce((acc, [name, value]) => acc.replaceAll(`:${name}`, String(value)), node);
 }
 
 export function useTranslation() {

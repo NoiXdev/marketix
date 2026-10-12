@@ -15,6 +15,10 @@ describe('translate', () => {
     expect(translate(catalog, 'links.count', { count: 5 })).toBe('5 links');
   });
 
+  it('replaces longer placeholders before their prefixes', () => {
+    expect(translate({ range: ':from–:to of :total' }, 'range', { from: 1, to: 25, total: 120 })).toBe('1–25 of 120');
+  });
+
   it('returns the key when missing', () => {
     expect(translate(catalog, 'auth.nope')).toBe('auth.nope');
   });
