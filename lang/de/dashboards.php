@@ -13,4 +13,8 @@ return [
         'delete' => 'Löschen',
         'delete_confirm' => '„:name“ löschen?',
     ],
+    'errors' => [
+        'malformed_widget' => 'Ungültiges Widget.',
+        'unknown_widget' => 'Unbekannter Widget-Typ: :type',
+    ],
 ];

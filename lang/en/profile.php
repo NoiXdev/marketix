@@ -13,6 +13,9 @@ return [
         'submit' => 'Save',
     ],
     'two_factor' => [
+        'already_enabled' => 'Two-factor authentication is already enabled.',
+        'not_in_progress' => 'Two-factor setup is not in progress.',
+        'invalid_code' => 'The provided code was invalid.',
         'heading' => 'Two-factor authentication',
         'recovery_codes_notice' => 'Store these recovery codes somewhere safe. They are shown only once.',
         'enable' => 'Enable two-factor authentication',

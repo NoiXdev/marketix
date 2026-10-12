@@ -81,4 +81,16 @@ class RedirectGuardsTest extends TestCase
         $this->post('http://links.test/promo', ['password' => 'nope'])
             ->assertSessionHasErrors('password');
     }
+
+    public function test_password_gate_uses_the_visitors_language(): void
+    {
+        $this->makeUrl(['password' => Hash::make('secret')]);
+
+        $this->get('http://links.test/promo', ['Accept-Language' => 'de'])
+            ->assertSee('<html lang="de">', false)
+            ->assertSee('Passwort erforderlich');
+
+        $this->post('http://links.test/promo', ['password' => 'nope'], ['Accept-Language' => 'de'])
+            ->assertSessionHasErrors(['password' => 'Falsches Passwort.']);
+    }
 }

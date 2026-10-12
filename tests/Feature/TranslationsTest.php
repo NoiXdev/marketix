@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
-class FlashTranslationTest extends TestCase
+class TranslationsTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -25,14 +25,25 @@ class FlashTranslationTest extends TestCase
             ->assertSessionHas('success', 'Pixel gelöscht.');
     }
 
-    public function test_every_locale_defines_every_flash_message(): void
+    public function test_login_errors_use_the_visitors_language(): void
     {
-        $expected = array_keys($this->flatten(require lang_path('en/flash.php')));
+        User::factory()->create(['email' => 'jane@example.test']);
 
-        foreach (File::directories(lang_path()) as $directory) {
-            $keys = array_keys($this->flatten(require $directory.'/flash.php'));
+        $this->post(route('app.auth.login'), ['email' => 'jane@example.test', 'password' => 'wrong'], ['Accept-Language' => 'de'])
+            ->assertSessionHasErrors(['email' => 'Diese Zugangsdaten stimmen nicht mit unseren Daten überein.']);
+    }
 
-            $this->assertEqualsCanonicalizing($expected, $keys, basename($directory));
+    public function test_every_locale_defines_every_translation(): void
+    {
+        foreach (File::files(lang_path('en')) as $file) {
+            $expected = array_keys($this->flatten(require $file->getPathname()));
+
+            foreach (File::directories(lang_path()) as $directory) {
+                $path = $directory.'/'.$file->getFilename();
+                $keys = File::exists($path) ? array_keys($this->flatten(require $path)) : [];
+
+                $this->assertEqualsCanonicalizing($expected, $keys, basename($directory).'/'.$file->getFilename());
+            }
         }
     }
 

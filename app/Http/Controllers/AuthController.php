@@ -29,7 +29,7 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             throw ValidationException::withMessages([
-                'email' => "Too many login attempts. Please try again in {$seconds} seconds.",
+                'email' => __('auth.login.throttle', ['seconds' => $seconds]),
             ]);
         }
 
@@ -37,7 +37,7 @@ class AuthController extends Controller
             RateLimiter::hit($key); // 1 decay minute (default)
 
             return back()->withErrors([
-                'email' => 'These credentials do not match our records.',
+                'email' => __('auth.login.failed'),
             ])->onlyInput('email');
         }
 

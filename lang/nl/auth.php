@@ -2,6 +2,8 @@
 
 return [
     'login' => [
+        'failed' => 'Deze inloggegevens komen niet overeen met onze gegevens.',
+        'throttle' => 'Te veel inlogpogingen. Probeer het over :seconds seconden opnieuw.',
         'head' => 'Inloggen',
         'title' => 'Welkom terug',
         'description' => 'Log in op je account',
@@ -57,6 +59,9 @@ return [
         'submit' => 'Wachtwoord bijwerken',
     ],
     'two_factor_challenge' => [
+        'invalid_code' => 'De ingevoerde code is ongeldig.',
+        'invalid_recovery_code' => 'De ingevoerde herstelcode is ongeldig.',
+        'code_required' => 'Voer uw authenticatie- of herstelcode in.',
         'head' => 'Tweestapsverificatie',
         'title' => 'Tweestapsverificatie',
         'description' => 'Bevestig toegang tot je account',

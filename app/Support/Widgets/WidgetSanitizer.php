@@ -19,11 +19,11 @@ class WidgetSanitizer
         $out = [];
         foreach ($widgets as $w) {
             if (! is_array($w) || ! isset($w['id'], $w['type'], $w['config'], $w['layout'])) {
-                throw ValidationException::withMessages(['widgets' => 'Malformed widget.']);
+                throw ValidationException::withMessages(['widgets' => __('dashboards.errors.malformed_widget')]);
             }
             $type = WidgetType::tryFrom((string) $w['type']);
             if ($type === null) {
-                throw ValidationException::withMessages(['widgets' => "Unknown widget type: {$w['type']}"]);
+                throw ValidationException::withMessages(['widgets' => __('dashboards.errors.unknown_widget', ['type' => $w['type']])]);
             }
 
             $config = Validator::make((array) $w['config'], $this->registry->configRules($type))->validate();

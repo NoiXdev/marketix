@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Redirecting…</title>
+    <title>{{ __('redirect.redirecting') }}</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -111,7 +111,7 @@
 <body>
     <div class="wrap">
         <div class="spinner"></div>
-        <p>Redirecting…</p>
+        <p>{{ __('redirect.redirecting') }}</p>
     </div>
     <script>
         setTimeout(function () {

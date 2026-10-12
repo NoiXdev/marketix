@@ -13,6 +13,9 @@ return [
         'submit' => 'Enregistrer',
     ],
     'two_factor' => [
+        'already_enabled' => 'L\'authentification à deux facteurs est déjà activée.',
+        'not_in_progress' => 'La configuration de l\'authentification à deux facteurs n\'a pas été lancée.',
+        'invalid_code' => 'Le code saisi est invalide.',
         'heading' => 'Authentification à deux facteurs',
         'recovery_codes_notice' => 'Conservez ces codes de récupération dans un endroit sûr. Ils ne sont affichés qu\'une seule fois.',
         'enable' => 'Activer l\'authentification à deux facteurs',

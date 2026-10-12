@@ -16,7 +16,7 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if ($user->hasTwoFactorEnabled()) {
-            return back()->withErrors(['code' => 'Two-factor authentication is already enabled.']);
+            return back()->withErrors(['code' => __('profile.two_factor.already_enabled')]);
         }
 
         $user->forceFill([
@@ -35,11 +35,11 @@ class TwoFactorController extends Controller
         $user = $request->user();
 
         if (! $user->two_factor_secret || $user->hasTwoFactorEnabled()) {
-            return back()->withErrors(['code' => 'Two-factor setup is not in progress.']);
+            return back()->withErrors(['code' => __('profile.two_factor.not_in_progress')]);
         }
 
         if (! $this->twoFactor->verify($user->two_factor_secret, $request->string('code')->toString())) {
-            return back()->withErrors(['code' => 'The provided code was invalid.']);
+            return back()->withErrors(['code' => __('profile.two_factor.invalid_code')]);
         }
 
         $plain = $this->twoFactor->generateRecoveryCodes();
