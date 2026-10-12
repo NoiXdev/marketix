@@ -33,6 +33,7 @@ export default function SitesEdit({
   const form = useForm<SiteFormData>({
     name: site.name,
     domain: site.domain,
+    additional_hostnames: site.additional_hostnames ?? '',
     tracking_mode: site.tracking_mode,
     consent_mode: site.consent_mode,
     consent_signal: site.consent_signal ?? '',

@@ -64,6 +64,7 @@ class SiteController extends Controller
                 'id' => $model->id,
                 'name' => $model->name,
                 'domain' => $model->domain,
+                'additional_hostnames' => $model->additional_hostnames,
                 'tracking_id' => $model->tracking_id,
                 'tracking_mode' => $model->tracking_mode->value,
                 'consent_mode' => $model->consent_mode->value,

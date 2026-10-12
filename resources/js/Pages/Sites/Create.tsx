@@ -14,6 +14,7 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
   const form = useForm<SiteFormData>({
     name: '',
     domain: '',
+    additional_hostnames: '',
     tracking_mode: 'cookieless',
     consent_mode: 'immediate',
     consent_signal: '',

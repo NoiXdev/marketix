@@ -12,6 +12,7 @@ export type Option = { value: string; label: string };
 export type SiteFormData = {
   name: string;
   domain: string;
+  additional_hostnames: string;
   tracking_mode: string;
   consent_mode: string;
   consent_signal: string;
@@ -71,6 +72,19 @@ export default function SiteForm({
             </div>
           </Field>
         </div>
+        <Field
+          label={t('analytics.sites.form.additional_hostnames')}
+          htmlFor="additional_hostnames"
+          hint={t('analytics.sites.form.additional_hostnames_hint', { domain: data.domain || t('analytics.sites.form.domain_placeholder') })}
+          error={errors.additional_hostnames}
+        >
+          <Input
+            id="additional_hostnames"
+            value={data.additional_hostnames}
+            placeholder={t('analytics.sites.form.additional_hostnames_placeholder')}
+            onChange={(e) => setData('additional_hostnames', e.target.value)}
+          />
+        </Field>
       </FormSection>
 
       <FormSection title={t('analytics.sites.form.sections.privacy_title')} description={t('analytics.sites.form.sections.privacy_text')}>

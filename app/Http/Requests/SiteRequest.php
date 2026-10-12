@@ -19,6 +19,7 @@ class SiteRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255'],
+            'additional_hostnames' => ['nullable', 'string', 'max:1000', 'regex:/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/'],
             'tracking_mode' => ['required', Rule::in(array_column(TrackingMode::cases(), 'value'))],
             'consent_mode' => ['required', Rule::in(ConsentMode::selectableValues())],
             'consent_signal' => ['nullable', 'required_if:consent_mode,'.ConsentMode::ThirdPartySignal->value, 'string', 'max:255'],
@@ -35,6 +36,7 @@ class SiteRequest extends FormRequest
         return [
             'name' => __('analytics.sites.form.name'),
             'domain' => __('analytics.sites.form.domain'),
+            'additional_hostnames' => __('analytics.sites.form.additional_hostnames'),
             'consent_signal' => __('analytics.sites.form.consent_signal'),
             'retention_days' => __('analytics.sites.form.retention_days'),
             'site_search_params' => __('analytics.sites.measurement.search_params'),
@@ -50,6 +52,11 @@ class SiteRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        if (is_string($this->input('additional_hostnames'))) {
+            $hosts = preg_split('/[\s,]+/', strtolower($this->input('additional_hostnames')), -1, PREG_SPLIT_NO_EMPTY);
+            $this->merge(['additional_hostnames' => $hosts === [] ? null : implode(', ', array_unique($hosts))]);
+        }
+
         if (! $this->has('site_search_params')) {
             return;
         }
