@@ -21,12 +21,12 @@ class LinkStatsPageTest extends TestCase
     /**
      * @return array{0: User, 1: Project, 2: Url}
      */
-    private function makeProjectWithUrl(string $slug = 'promo'): array
+    private function makeProjectWithUrl(string $slug = 'promo', string $domainName = 'links.test'): array
     {
         $user = User::factory()->create();
         $project = Project::create(['name' => 'Acme']);
         $user->projects()->attach($project);
-        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => 'links.test']);
+        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => $domainName]);
 
         $url = Url::create([
             'project_id' => $project->id,
@@ -120,7 +120,7 @@ class LinkStatsPageTest extends TestCase
     public function test_a_user_cannot_view_a_link_from_another_project(): void
     {
         [$user] = $this->makeProjectWithUrl('mine');
-        [, $otherProject, $otherUrl] = $this->makeProjectWithUrl('theirs');
+        [, $otherProject, $otherUrl] = $this->makeProjectWithUrl('theirs', 'other.test');
 
         $this->actingAs($user)
             ->get(route('app.project.links.show', ['project' => $otherProject->id, 'url' => $otherUrl->id]))
@@ -133,7 +133,7 @@ class LinkStatsPageTest extends TestCase
         // belongs to a different project. Middleware lets them in; the
         // $project->urls() scope must then 404 the foreign url.
         [$user, $project] = $this->makeProjectWithUrl('mine');
-        [, , $foreignUrl] = $this->makeProjectWithUrl('theirs');
+        [, , $foreignUrl] = $this->makeProjectWithUrl('theirs', 'other.test');
 
         $this->actingAs($user)
             ->get(route('app.project.links.show', ['project' => $project->id, 'url' => $foreignUrl->id]))

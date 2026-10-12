@@ -20,12 +20,12 @@ class ResetLinkStatsTest extends TestCase
     /**
      * @return array{0: User, 1: Project, 2: Url}
      */
-    private function makeProjectWithUrl(string $slug = 'promo'): array
+    private function makeProjectWithUrl(string $slug = 'promo', string $domainName = 'links.test'): array
     {
         $user = User::factory()->create();
         $project = Project::create(['name' => 'Acme']);
         $user->projects()->attach($project);
-        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => 'links.test']);
+        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => $domainName]);
 
         $url = Url::create([
             'project_id' => $project->id,
@@ -89,7 +89,7 @@ class ResetLinkStatsTest extends TestCase
     public function test_a_user_cannot_reset_a_link_in_another_project(): void
     {
         [$user] = $this->makeProjectWithUrl('mine');
-        [, $otherProject, $otherUrl] = $this->makeProjectWithUrl('theirs');
+        [, $otherProject, $otherUrl] = $this->makeProjectWithUrl('theirs', 'other.test');
 
         $this->actingAs($user)
             ->delete(route('app.project.links.stats.reset', ['project' => $otherProject->id, 'url' => $otherUrl->id]))
@@ -99,7 +99,7 @@ class ResetLinkStatsTest extends TestCase
     public function test_resetting_a_foreign_url_in_own_project_is_not_found(): void
     {
         [$user, $project] = $this->makeProjectWithUrl('mine');
-        [, , $foreignUrl] = $this->makeProjectWithUrl('theirs');
+        [, , $foreignUrl] = $this->makeProjectWithUrl('theirs', 'other.test');
 
         $this->actingAs($user)
             ->delete(route('app.project.links.stats.reset', ['project' => $project->id, 'url' => $foreignUrl->id]))

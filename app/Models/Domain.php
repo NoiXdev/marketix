@@ -18,6 +18,8 @@ class Domain extends Model
 {
     use HasFactory, HasUlids, LogsActivity, SetsActivityProject, SoftDeletes;
 
+    protected $hidden = ['active_name'];
+
     protected $fillable = [
         'project_id',
         'name',
