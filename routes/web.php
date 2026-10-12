@@ -24,6 +24,7 @@ use App\Http\Controllers\FunnelController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MoveToProjectController;
 use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PixelController;
@@ -144,15 +145,18 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::patch('/links/{url}/toggle-status', [UrlController::class, 'toggleStatus'])->name('app.project.links.toggle-status');
             Route::delete('/links/{url}', [UrlController::class, 'destroy'])->name('app.project.links.destroy');
             Route::delete('/links/{url}/stats', [UrlController::class, 'resetStats'])->name('app.project.links.stats.reset');
+            Route::post('/links/{url}/move', [MoveToProjectController::class, 'url'])->name('app.project.links.move');
 
             // Domains
             Route::get('/domains', [DomainController::class, 'index'])->name('app.project.domains.index');
+            Route::get('/domains/options', [DomainController::class, 'options'])->name('app.project.domains.options');
             Route::get('/domains/create', [DomainController::class, 'create'])->name('app.project.domains.create');
             Route::post('/domains', [DomainController::class, 'store'])->name('app.project.domains.store');
             Route::get('/domains/{domain}/edit', [DomainController::class, 'edit'])->name('app.project.domains.edit');
             Route::put('/domains/{domain}', [DomainController::class, 'update'])->name('app.project.domains.update');
             Route::delete('/domains/{domain}', [DomainController::class, 'destroy'])->name('app.project.domains.destroy');
             Route::post('/domains/{domain}/check', [DomainController::class, 'check'])->name('app.project.domains.check');
+            Route::post('/domains/{domain}/move', [MoveToProjectController::class, 'domain'])->name('app.project.domains.move');
 
             // QR Codes
             Route::get('/qr-codes', [QrCodeController::class, 'index'])->name('app.project.qrcodes.index');
@@ -162,6 +166,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::put('/qr-codes/{qrCode}', [QrCodeController::class, 'update'])->name('app.project.qrcodes.update');
             Route::post('/qr-codes/{qrCode}/versions/{version}/restore', [QrCodeController::class, 'restore'])->name('app.project.qrcodes.versions.restore');
             Route::delete('/qr-codes/{qrCode}', [QrCodeController::class, 'destroy'])->name('app.project.qrcodes.destroy');
+            Route::post('/qr-codes/{qrCode}/move', [MoveToProjectController::class, 'qrCode'])->name('app.project.qrcodes.move');
 
             // QR brand templates
             Route::get('/qr-templates', [QrTemplateController::class, 'index'])->name('app.project.qr-templates.index');
@@ -169,6 +174,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::post('/qr-templates', [QrTemplateController::class, 'store'])->name('app.project.qr-templates.store');
             Route::put('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'update'])->name('app.project.qr-templates.update');
             Route::delete('/qr-templates/{qrTemplate}', [QrTemplateController::class, 'destroy'])->name('app.project.qr-templates.destroy');
+            Route::post('/qr-templates/{qrTemplate}/move', [MoveToProjectController::class, 'qrTemplate'])->name('app.project.qr-templates.move');
 
             // Pixels
             Route::get('/pixels', [PixelController::class, 'index'])->name('app.project.pixels.index');
@@ -177,6 +183,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/pixels/{pixel}/edit', [PixelController::class, 'edit'])->name('app.project.pixels.edit');
             Route::put('/pixels/{pixel}', [PixelController::class, 'update'])->name('app.project.pixels.update');
             Route::delete('/pixels/{pixel}', [PixelController::class, 'destroy'])->name('app.project.pixels.destroy');
+            Route::post('/pixels/{pixel}/move', [MoveToProjectController::class, 'pixel'])->name('app.project.pixels.move');
 
             // Sites (analytics)
             Route::get('/sites', [SiteController::class, 'index'])->name('app.project.sites.index');
@@ -187,6 +194,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
             Route::post('/sites/{site}/favorite', [SiteFavoriteController::class, 'store'])->name('app.project.sites.favorite.store');
             Route::delete('/sites/{site}/favorite', [SiteFavoriteController::class, 'destroy'])->name('app.project.sites.favorite.destroy');
+            Route::post('/sites/{site}/move', [MoveToProjectController::class, 'site'])->name('app.project.sites.move');
             Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
             Route::get('/analytics/{site}/goals', [GoalController::class, 'index'])->name('app.project.analytics.goals.index');
             Route::get('/analytics/{site}/goals/create', [GoalController::class, 'create'])->name('app.project.analytics.goals.create');

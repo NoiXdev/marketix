@@ -1,5 +1,6 @@
 import CodeSnippet from '@/Components/CodeSnippet';
 import { Favicon } from '@/Components/icons/Favicon';
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink, Button, Flash, LinkButton } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmTyped } from '@/lib/confirm';
@@ -117,6 +118,8 @@ export default function SitesEdit({
               </p>
               {!lastSeenAt && <p className="text-muted mt-2 text-xs leading-relaxed">{t('analytics.sites.form.status.waiting_hint')}</p>}
             </section>
+
+            <MoveToProjectSection name={site.name} hint={t('move.hints.site')} action={route('app.project.sites.move', { project: projectId, site: site.id })} />
 
             <section className="bg-surface rounded-[var(--radius)] border border-[color:color-mix(in_srgb,var(--danger-foreground)_30%,transparent)] p-5">
               <h2 className="text-danger-foreground text-sm font-semibold">{t('analytics.sites.form.danger.title')}</h2>

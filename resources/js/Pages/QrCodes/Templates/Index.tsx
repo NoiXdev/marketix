@@ -1,4 +1,5 @@
-import { BackLink, Button, Card, Field, IconButton, Input, PageHeader } from '@/Components/ui';
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
+import { BackLink, Button, Card, Field, Flash, IconButton, Input, PageHeader } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { DEFAULT_STYLE, QrStyle } from '@/data/qrTypes';
 import { confirmDelete } from '@/lib/confirm';
@@ -27,6 +28,7 @@ export default function QrTemplatesIndex() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
+  const selected = templates.find((template) => template.id === selectedId);
 
   useEffect(() => {
     if (!project) return;
@@ -109,6 +111,7 @@ export default function QrTemplatesIndex() {
           />
         </div>
 
+        <Flash />
         {status && <p className={`mb-4 text-sm ${status.kind === 'error' ? 'text-danger-foreground' : 'text-success-foreground'}`}>{status.message}</p>}
 
         <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
@@ -142,29 +145,39 @@ export default function QrTemplatesIndex() {
             )}
           </Card>
 
-          <Card className="p-5">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-6 md:grid-cols-[1fr_auto]">
-                <Field label={t('qr.template.name_label')} htmlFor="preset-name">
-                  <Input id="preset-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('qr.template.save_prompt')} />
-                </Field>
-                <div
-                  className="border-line w-[160px] shrink-0 overflow-hidden rounded-[12px] border [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
-                  style={{ background: style.background }}
-                  dangerouslySetInnerHTML={{ __html: preview.svg }}
-                />
-              </div>
+          <div className="space-y-4">
+            <Card className="p-5">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid gap-6 md:grid-cols-[1fr_auto]">
+                  <Field label={t('qr.template.name_label')} htmlFor="preset-name">
+                    <Input id="preset-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('qr.template.save_prompt')} />
+                  </Field>
+                  <div
+                    className="border-line w-[160px] shrink-0 overflow-hidden rounded-[12px] border [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+                    style={{ background: style.background }}
+                    dangerouslySetInnerHTML={{ __html: preview.svg }}
+                  />
+                </div>
 
-              <QrStyleForm style={style} onChange={setStyle} />
+                <QrStyleForm style={style} onChange={setStyle} />
 
-              <div className="border-line flex items-center gap-3 border-t pt-4">
-                <Button type="submit" loading={saving} disabled={!name.trim()}>
-                  {selectedId ? t('qr.template.update') : t('qr.template.save')}
-                </Button>
-                <p className="text-muted text-xs">{t('qr.template.update_hint')}</p>
-              </div>
-            </form>
-          </Card>
+                <div className="border-line flex items-center gap-3 border-t pt-4">
+                  <Button type="submit" loading={saving} disabled={!name.trim()}>
+                    {selectedId ? t('qr.template.update') : t('qr.template.save')}
+                  </Button>
+                  <p className="text-muted text-xs">{t('qr.template.update_hint')}</p>
+                </div>
+              </form>
+            </Card>
+            {selected && (
+              <MoveToProjectSection
+                key={selected.id}
+                name={selected.name}
+                hint={t('move.hints.default')}
+                action={route('app.project.qr-templates.move', { project: project!.id, qrTemplate: selected.id })}
+              />
+            )}
+          </div>
         </div>
       </div>
     </AppLayout>

@@ -23,6 +23,9 @@ const KNOWN_LABEL_CODES = new Set([
 ]);
 
 function describe(a: ActivityEntry, t: (key: string, replacements?: Record<string, string | number>) => string): string {
+  if ((a.description === 'moved_in' || a.description === 'moved_out') && a.subject_type) {
+    return t(`activity.feed.${a.description}`, { subject: a.subject_type, project: String(a.properties.project ?? '') });
+  }
   const verb = KNOWN_LABEL_CODES.has(a.description) ? t(`activity.feed.labels.${a.description}`) : a.description;
   if (['created', 'updated', 'deleted'].includes(a.description) && a.subject_type) {
     return t('activity.feed.subject_line', { verb, subject: a.subject_type });

@@ -1,4 +1,5 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
@@ -73,6 +74,7 @@ export default function LinksEdit({ url, domains, pixels, history }: { url: UrlD
               put(route('app.project.links.update', { project: project!.id, url: url.id }));
             }}
           />
+          <MoveToProjectSection name={url.slug} hint={t('move.hints.url')} action={route('app.project.links.move', { project: project!.id, url: url.id })} withDomain />
           <ActivityHistory history={history} />
         </div>
       </div>

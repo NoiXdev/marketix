@@ -1,4 +1,5 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink, Button, Field, FormSection, Input, Select } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
@@ -97,6 +98,7 @@ export default function PixelsEdit({
               </Link>
             </div>
           </form>
+          <MoveToProjectSection name={pixel.name} hint={t('move.hints.pixel')} action={route('app.project.pixels.move', { project: project!.id, pixel: pixel.id })} />
           <ActivityHistory history={history} />
         </div>
       </div>
