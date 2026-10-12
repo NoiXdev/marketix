@@ -39,7 +39,7 @@ class PixelController extends Controller
         $project->pixels()->create($request->validated());
 
         return redirect()->route('app.project.pixels.index')
-            ->with('success', 'Pixel created.');
+            ->with('success', __('flash.pixels.created'));
     }
 
     public function edit(Request $request, string $pixel)
@@ -69,7 +69,7 @@ class PixelController extends Controller
         $model->update($request->validated());
 
         return redirect()->route('app.project.pixels.index')
-            ->with('success', 'Pixel updated.');
+            ->with('success', __('flash.pixels.updated'));
     }
 
     public function destroy(Request $request, string $pixel)
@@ -78,6 +78,6 @@ class PixelController extends Controller
         $project->pixels()->findOrFail($pixel)->delete();
 
         return redirect()->route('app.project.pixels.index')
-            ->with('success', 'Pixel deleted.');
+            ->with('success', __('flash.pixels.deleted'));
     }
 }

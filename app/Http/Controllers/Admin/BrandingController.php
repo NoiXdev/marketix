@@ -52,7 +52,7 @@ class BrandingController extends Controller
 
         $settings->save();
 
-        return redirect()->route('app.admin.branding.edit')->with('success', 'Branding saved.');
+        return redirect()->route('app.admin.branding.edit')->with('success', __('flash.admin.branding_saved'));
     }
 
     private function deleteIfPresent(?string $path): void

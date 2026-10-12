@@ -71,7 +71,7 @@ class InvitationController extends Controller
         } elseif (! $request->user() || $request->user()->id !== $user->id) {
             // Existing account but not logged in as them — send to login first.
             return redirect()->route('app.auth.show-login')
-                ->with('warning', 'Please log in as '.$invitation->email.' to accept this invitation.');
+                ->with('warning', __('flash.team.login_as', ['email' => $invitation->email]));
         }
 
         $invitation->project->users()->syncWithoutDetaching([

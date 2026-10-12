@@ -53,7 +53,7 @@ class MailerController extends Controller
 
         $settings->save();
 
-        return redirect()->route('app.admin.mailer.edit')->with('success', 'Mailer settings saved.');
+        return redirect()->route('app.admin.mailer.edit')->with('success', __('flash.admin.mailer_saved'));
     }
 
     public function test(Request $request)
@@ -65,9 +65,9 @@ class MailerController extends Controller
         try {
             Mail::to($to)->send(new TestMail);
         } catch (Throwable $e) {
-            return back()->with('error', 'Test email failed: '.$e->getMessage());
+            return back()->with('error', __('flash.admin.test_mail_failed', ['error' => $e->getMessage()]));
         }
 
-        return back()->with('success', 'Test email sent to '.$to.'.');
+        return back()->with('success', __('flash.admin.test_mail_sent', ['email' => $to]));
     }
 }

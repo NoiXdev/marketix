@@ -108,7 +108,7 @@ class UrlController extends Controller
         $this->syncUrlPixels($url, $pixelIds);
 
         return redirect()->route('app.project.links.index')
-            ->with('success', 'Link created.');
+            ->with('success', __('flash.links.created'));
     }
 
     public function edit(Request $request, string $url)
@@ -157,7 +157,7 @@ class UrlController extends Controller
         $this->syncUrlPixels($model, $pixelIds);
 
         return redirect()->route('app.project.links.index')
-            ->with('success', 'Link updated.');
+            ->with('success', __('flash.links.updated'));
     }
 
     public function toggleStatus(Request $request, string $url)
@@ -170,7 +170,7 @@ class UrlController extends Controller
             : UrlStatus::ACTIVATED;
         $model->save();
 
-        return back()->with('success', 'Status updated.');
+        return back()->with('success', __('flash.links.status_updated'));
     }
 
     public function destroy(Request $request, string $url)
@@ -179,7 +179,7 @@ class UrlController extends Controller
         $project->urls()->findOrFail($url)->delete();
 
         return redirect()->route('app.project.links.index')
-            ->with('success', 'Link deleted.');
+            ->with('success', __('flash.links.deleted'));
     }
 
     public function resetStats(Request $request, string $url)
@@ -198,6 +198,6 @@ class UrlController extends Controller
                 ->log('Stats reset');
         });
 
-        return back()->with('success', 'Statistics reset.');
+        return back()->with('success', __('flash.links.stats_reset'));
     }
 }

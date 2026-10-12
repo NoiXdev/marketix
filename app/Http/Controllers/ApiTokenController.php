@@ -20,6 +20,6 @@ class ApiTokenController extends Controller
     {
         $request->user()->tokens()->where('id', $token)->firstOrFail()->delete();
 
-        return back()->with('success', 'API token revoked.');
+        return back()->with('success', __('flash.profile.token_revoked'));
     }
 }

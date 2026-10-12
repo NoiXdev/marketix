@@ -65,7 +65,7 @@ class TeamController extends Controller
         ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
-            ->with('success', 'Invitation sent.');
+            ->with('success', __('flash.team.invitation_sent'));
     }
 
     public function destroyInvitation(Request $request, string $invitation)
@@ -80,7 +80,7 @@ class TeamController extends Controller
         $invite->delete();
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
-            ->with('success', 'Invitation revoked.');
+            ->with('success', __('flash.team.invitation_revoked'));
     }
 
     public function resendInvitation(Request $request, string $invitation)
@@ -91,7 +91,7 @@ class TeamController extends Controller
         $invite = $project->invitations()->whereNull('accepted_at')->findOrFail($invitation);
 
         if (! $invite->canResend()) {
-            return back()->with('error', 'Please wait a moment before resending this invitation.');
+            return back()->with('error', __('flash.team.invitation_resend_wait'));
         }
 
         $this->sendInvitation($invite);
@@ -101,7 +101,7 @@ class TeamController extends Controller
         ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
-            ->with('success', 'Invitation resent.');
+            ->with('success', __('flash.team.invitation_resent'));
     }
 
     public function updateMember(Request $request, string $user)
@@ -111,7 +111,7 @@ class TeamController extends Controller
         $data = $request->validate(['role' => ['required', Rule::enum(ProjectRole::class)]]);
 
         if ($data['role'] === ProjectRole::Member->value && $this->isLastAdmin($project, $user)) {
-            return back()->with('error', 'A project must keep at least one admin.');
+            return back()->with('error', __('flash.team.last_admin'));
         }
 
         $project->users()->updateExistingPivot($user, ['role' => $data['role']]);
@@ -122,7 +122,7 @@ class TeamController extends Controller
         ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
-            ->with('success', 'Member updated.');
+            ->with('success', __('flash.team.member_updated'));
     }
 
     public function destroyMember(Request $request, string $user)
@@ -131,11 +131,11 @@ class TeamController extends Controller
         $project = $request->get('project');
 
         if ($user === $request->user()->id) {
-            return back()->with('error', 'You cannot remove yourself from the project.');
+            return back()->with('error', __('flash.team.cannot_remove_self'));
         }
 
         if ($this->isLastAdmin($project, $user)) {
-            return back()->with('error', 'A project must keep at least one admin.');
+            return back()->with('error', __('flash.team.last_admin'));
         }
 
         $project->users()->detach($user);
@@ -145,7 +145,7 @@ class TeamController extends Controller
         ]);
 
         return redirect()->route('app.project.team.index', ['project' => $project->id])
-            ->with('success', 'Member removed.');
+            ->with('success', __('flash.team.member_removed'));
     }
 
     private function sendInvitation(ProjectInvitation $invitation): void

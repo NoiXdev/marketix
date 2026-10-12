@@ -53,7 +53,7 @@ class UserController extends Controller
         $user->force_password_change = (bool) ($data['force_password_change'] ?? false);
         $user->save();
 
-        return redirect()->route('app.admin.users.index')->with('success', 'User created.');
+        return redirect()->route('app.admin.users.index')->with('success', __('flash.admin.user_created'));
     }
 
     public function edit(string $user)
@@ -97,7 +97,7 @@ class UserController extends Controller
 
         $wantsSuperAdmin = (bool) ($data['super_admin'] ?? false);
         if ($model->id === $request->user()->id && $model->super_admin && ! $wantsSuperAdmin) {
-            return back()->with('error', 'You cannot remove your own super-admin access.');
+            return back()->with('error', __('flash.admin.cannot_revoke_own_super_admin'));
         }
 
         $model->name = $data['name'];
@@ -109,20 +109,20 @@ class UserController extends Controller
         $model->force_password_change = (bool) ($data['force_password_change'] ?? false);
         $model->save();
 
-        return redirect()->route('app.admin.users.index')->with('success', 'User updated.');
+        return redirect()->route('app.admin.users.index')->with('success', __('flash.admin.user_updated'));
     }
 
     public function destroy(Request $request, string $user)
     {
         if ($user === $request->user()->id) {
-            return back()->with('error', 'You cannot delete your own account.');
+            return back()->with('error', __('flash.admin.cannot_delete_self'));
         }
 
         $model = User::findOrFail($user);
         $model->projects()->detach();
         $model->delete();
 
-        return redirect()->route('app.admin.users.index')->with('success', 'User deleted.');
+        return redirect()->route('app.admin.users.index')->with('success', __('flash.admin.user_deleted'));
     }
 
     public function sendPasswordReset(string $user)
@@ -132,7 +132,7 @@ class UserController extends Controller
         $status = Password::sendResetLink(['email' => $model->email]);
 
         if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('success', 'Password reset link sent.');
+            return back()->with('success', __('flash.admin.password_reset_link_sent'));
         }
 
         return back()->with('error', __($status));
