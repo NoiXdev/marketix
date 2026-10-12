@@ -35,6 +35,7 @@ use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScheduledReportController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SiteFavoriteController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TwoFactorChallengeController;
@@ -184,6 +185,8 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/sites/{site}/edit', [SiteController::class, 'edit'])->name('app.project.sites.edit');
             Route::put('/sites/{site}', [SiteController::class, 'update'])->name('app.project.sites.update');
             Route::delete('/sites/{site}', [SiteController::class, 'destroy'])->name('app.project.sites.destroy');
+            Route::post('/sites/{site}/favorite', [SiteFavoriteController::class, 'store'])->name('app.project.sites.favorite.store');
+            Route::delete('/sites/{site}/favorite', [SiteFavoriteController::class, 'destroy'])->name('app.project.sites.favorite.destroy');
             Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
             Route::get('/analytics/{site}/goals', [GoalController::class, 'index'])->name('app.project.analytics.goals.index');
             Route::get('/analytics/{site}/goals/create', [GoalController::class, 'create'])->name('app.project.analytics.goals.create');

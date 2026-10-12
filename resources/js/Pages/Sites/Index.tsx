@@ -2,12 +2,10 @@ import { EmptyState, Flash, LinkButton, PageHeader } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
-import SiteCard, { SiteStats } from '@/Pages/Sites/partials/SiteCard';
+import SiteCard, { OverviewSite, SiteStats } from '@/Pages/Sites/partials/SiteCard';
 import { PageProps, Site } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { LineChart, Plus } from 'lucide-react';
-
-type OverviewSite = Site & { tracking_mode_label: string };
 
 export default function SitesIndex({ sites, stats }: { sites: OverviewSite[]; stats?: Record<string, SiteStats | null> }) {
   const { project } = usePage<PageProps>().props;
@@ -23,6 +21,16 @@ export default function SitesIndex({ sites, stats }: { sites: OverviewSite[]; st
     });
     if (!confirmed) return;
     router.delete(route('app.project.sites.destroy', { project: projectId, site: site.id }));
+  }
+
+  function toggleFavorite(site: OverviewSite) {
+    const params = { project: projectId, site: site.id };
+    const options = { preserveScroll: true, only: ['sites'] };
+    if (site.is_favorite) {
+      router.delete(route('app.project.sites.favorite.destroy', params), options);
+    } else {
+      router.post(route('app.project.sites.favorite.store', params), {}, options);
+    }
   }
 
   const createUrl = route('app.project.sites.create', { project: projectId });
@@ -60,6 +68,7 @@ export default function SitesIndex({ sites, stats }: { sites: OverviewSite[]; st
                 stats={stats === undefined ? undefined : (stats[site.id] ?? null)}
                 analyticsUrl={route('app.project.analytics.show', { project: projectId, site: site.id })}
                 editUrl={route('app.project.sites.edit', { project: projectId, site: site.id })}
+                onToggleFavorite={() => toggleFavorite(site)}
                 onDelete={() => destroy(site)}
               />
             ))}

@@ -42,6 +42,11 @@ class User extends Authenticatable implements HasLocalePreference, PasskeyUser
         return $this->hasMany(Dashboard::class);
     }
 
+    public function favoriteSites(): BelongsToMany
+    {
+        return $this->belongsToMany(Site::class, 'site_favorites');
+    }
+
     public function roleInProject(Model $project): ?ProjectRole
     {
         return $this->projects()->whereKey($project->getKey())->first()?->pivot->role;

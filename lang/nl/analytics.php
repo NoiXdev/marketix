@@ -22,6 +22,8 @@ return [
             'no_data_text' => 'Voeg de trackingcode toe om bezoeken te meten.',
             'setup' => 'Trackingcode',
             'add_hint' => 'Nog een website of shop meten',
+            'favorite' => 'Toevoegen aan favorieten',
+            'unfavorite' => 'Verwijderen uit favorieten',
         ],
         'edit' => 'Site bewerken',
         'empty' => 'Nog geen sites.',
