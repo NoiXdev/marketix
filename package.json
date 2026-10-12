@@ -13,7 +13,7 @@
         "test:js": "vitest run"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.5",
+        "@eslint/js": "^10.0.1",
         "@headlessui/react": "^2.2.10",
         "@inertiajs/react": "^3.9.1",
         "@tailwindcss/forms": "^0.5.11",
