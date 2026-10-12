@@ -1,10 +1,11 @@
+import { ListFilters, ListFooter, ListSearch, NoResults, visitList } from '@/Components/ListControls';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
 import StatusPills from '@/Pages/Domains/Partials/StatusPills';
-import { Domain, PageProps } from '@/types';
+import { Domain, PageProps, Paginated } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Globe, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -19,9 +20,10 @@ function relativeTime(iso: string | null, locale: string, neverLabel: string): s
   return rtf.format(-Math.floor(s / 86400), 'day');
 }
 
-export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain: string }) {
+export default function DomainsIndex({ domains, filters }: { domains: Paginated<Domain>; filters: ListFilters; appDomain: string }) {
   const { project } = usePage<PageProps>().props;
   const { t, locale } = useTranslation();
+  const listUrl = route('app.project.domains.index', { project: project!.id });
   const [checking, setChecking] = useState<string | null>(null);
 
   async function destroy(domain: Domain) {
@@ -46,7 +48,7 @@ export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain
         <PageHeader title={t('domains.title')} subtitle={t('domains.subtitle')} action={createBtn} />
         <Flash />
 
-        {domains.length === 0 ? (
+        {domains.total === 0 && !filters.search ? (
           <EmptyState
             icon={Globe}
             title={t('domains.empty')}
@@ -58,50 +60,60 @@ export default function DomainsIndex({ domains }: { domains: Domain[]; appDomain
             }
           />
         ) : (
-          <TableCard
-            columns={[
-              { label: t('domains.columns.domain') },
-              { label: t('domains.columns.root_redirect') },
-              { label: t('domains.columns.not_found_redirect') },
-              { label: t('domains.columns.status') },
-              { label: '' },
-            ]}
-          >
-            <tbody className="divide-line divide-y">
-              {domains.map((domain) => (
-                <tr key={domain.id} onClick={rowLink(route('app.project.domains.edit', { project: project!.id, domain: domain.id }))} className={`group ${ROW_LINK_CLASS}`}>
-                  <td className="text-foreground px-4 py-3 font-medium">
-                    <Link href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} className="hover:text-accent-soft-foreground">
-                      {domain.name}
-                    </Link>
-                  </td>
-                  <td className="text-muted px-4 py-3">
-                    {domain.redirect_root ? <span className="block max-w-xs truncate">{domain.redirect_root}</span> : <span className="text-subtle">—</span>}
-                  </td>
-                  <td className="text-muted px-4 py-3">
-                    {domain.redirect_not_found ? <span className="block max-w-xs truncate">{domain.redirect_not_found}</span> : <span className="text-subtle">—</span>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1">
-                      <StatusPills domain={domain} />
-                      <span className="text-subtle text-xs">{relativeTime(domain.last_checked_at, locale, t('domains.never_checked'))}</span>
-                    </div>
-                  </td>
-                  <RowActions>
-                    <IconButton
-                      icon={RefreshCw}
-                      label={t('domains.actions.check')}
-                      onClick={() => check(domain)}
-                      disabled={checking === domain.id}
-                      spinning={checking === domain.id}
-                    />
-                    <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} />
-                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(domain)} />
-                  </RowActions>
-                </tr>
-              ))}
-            </tbody>
-          </TableCard>
+          <>
+            <ListSearch value={filters.search} placeholder={t('domains.search_placeholder')} onSearch={(search) => visitList(listUrl, { ...filters, search })} />
+            {domains.data.length === 0 && filters.search ? (
+              <NoResults term={filters.search} />
+            ) : (
+              <>
+                <TableCard
+                  columns={[
+                    { label: t('domains.columns.domain') },
+                    { label: t('domains.columns.root_redirect') },
+                    { label: t('domains.columns.not_found_redirect') },
+                    { label: t('domains.columns.status') },
+                    { label: '' },
+                  ]}
+                >
+                  <tbody className="divide-line divide-y">
+                    {domains.data.map((domain) => (
+                      <tr key={domain.id} onClick={rowLink(route('app.project.domains.edit', { project: project!.id, domain: domain.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                        <td className="text-foreground px-4 py-3 font-medium">
+                          <Link href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} className="hover:text-accent-soft-foreground">
+                            {domain.name}
+                          </Link>
+                        </td>
+                        <td className="text-muted px-4 py-3">
+                          {domain.redirect_root ? <span className="block max-w-xs truncate">{domain.redirect_root}</span> : <span className="text-subtle">—</span>}
+                        </td>
+                        <td className="text-muted px-4 py-3">
+                          {domain.redirect_not_found ? <span className="block max-w-xs truncate">{domain.redirect_not_found}</span> : <span className="text-subtle">—</span>}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-col gap-1">
+                            <StatusPills domain={domain} />
+                            <span className="text-subtle text-xs">{relativeTime(domain.last_checked_at, locale, t('domains.never_checked'))}</span>
+                          </div>
+                        </td>
+                        <RowActions>
+                          <IconButton
+                            icon={RefreshCw}
+                            label={t('domains.actions.check')}
+                            onClick={() => check(domain)}
+                            disabled={checking === domain.id}
+                            spinning={checking === domain.id}
+                          />
+                          <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.domains.edit', { project: project!.id, domain: domain.id })} />
+                          <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(domain)} />
+                        </RowActions>
+                      </tr>
+                    ))}
+                  </tbody>
+                </TableCard>
+                <ListFooter page={domains} perPage={filters.per_page} onPerPage={(per_page) => visitList(listUrl, { ...filters, per_page })} />
+              </>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

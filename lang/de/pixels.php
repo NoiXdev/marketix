@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Name oder ID suchen…',
     'title' => 'Pixel',
     'subtitle' => 'Tracking-Pixel für Ihre Kurzlinks verwalten',
     'create' => 'Pixel hinzufügen',

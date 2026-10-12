@@ -1,9 +1,10 @@
+import { ListFilters, ListFooter, ListSearch, NoResults, visitList } from '@/Components/ListControls';
 import { EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
-import { PageProps, Pixel } from '@/types';
+import { PageProps, Paginated, Pixel } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Pencil, Plus, Trash2, Zap } from 'lucide-react';
 
@@ -30,9 +31,10 @@ const PROVIDER_COLORS: Record<string, string> = {
   tiktok: 'bg-pink-50 text-pink-700 dark:bg-pink-500/15 dark:text-pink-300',
 };
 
-export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { created_at: string })[]; providers: ProviderOption[] }) {
+export default function PixelsIndex({ pixels, filters, providers }: { pixels: Paginated<Pixel & { created_at: string }>; filters: ListFilters; providers: ProviderOption[] }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const listUrl = route('app.project.pixels.index', { project: project!.id });
 
   const providerLabel = (value: string) => providers.find((p) => p.value === value)?.label ?? value;
 
@@ -53,7 +55,7 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
         <PageHeader title={t('pixels.title')} subtitle={t('pixels.subtitle')} action={createBtn} />
         <Flash />
 
-        {pixels.length === 0 ? (
+        {pixels.total === 0 && !filters.search ? (
           <EmptyState
             icon={Zap}
             title={t('pixels.empty')}
@@ -65,31 +67,41 @@ export default function PixelsIndex({ pixels, providers }: { pixels: (Pixel & { 
             }
           />
         ) : (
-          <TableCard columns={[{ label: t('pixels.columns.name') }, { label: t('pixels.columns.provider') }, { label: t('pixels.columns.tag') }, { label: '' }]}>
-            <tbody className="divide-line divide-y">
-              {pixels.map((pixel) => (
-                <tr key={pixel.id} onClick={rowLink(route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id }))} className={`group ${ROW_LINK_CLASS}`}>
-                  <td className="text-foreground px-4 py-3 font-medium">
-                    <Link href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} className="hover:text-accent-soft-foreground">
-                      {pixel.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${PROVIDER_COLORS[pixel.provider] ?? 'bg-neutral-soft text-neutral-foreground'}`}
-                    >
-                      {providerLabel(pixel.provider)}
-                    </span>
-                  </td>
-                  <td className="text-muted px-4 py-3 font-mono text-xs">{pixel.tag}</td>
-                  <RowActions>
-                    <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} />
-                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(pixel)} />
-                  </RowActions>
-                </tr>
-              ))}
-            </tbody>
-          </TableCard>
+          <>
+            <ListSearch value={filters.search} placeholder={t('pixels.search_placeholder')} onSearch={(search) => visitList(listUrl, { ...filters, search })} />
+            {pixels.data.length === 0 && filters.search ? (
+              <NoResults term={filters.search} />
+            ) : (
+              <>
+                <TableCard columns={[{ label: t('pixels.columns.name') }, { label: t('pixels.columns.provider') }, { label: t('pixels.columns.tag') }, { label: '' }]}>
+                  <tbody className="divide-line divide-y">
+                    {pixels.data.map((pixel) => (
+                      <tr key={pixel.id} onClick={rowLink(route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                        <td className="text-foreground px-4 py-3 font-medium">
+                          <Link href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} className="hover:text-accent-soft-foreground">
+                            {pixel.name}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${PROVIDER_COLORS[pixel.provider] ?? 'bg-neutral-soft text-neutral-foreground'}`}
+                          >
+                            {providerLabel(pixel.provider)}
+                          </span>
+                        </td>
+                        <td className="text-muted px-4 py-3 font-mono text-xs">{pixel.tag}</td>
+                        <RowActions>
+                          <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.pixels.edit', { project: project!.id, pixel: pixel.id })} />
+                          <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(pixel)} />
+                        </RowActions>
+                      </tr>
+                    ))}
+                  </tbody>
+                </TableCard>
+                <ListFooter page={pixels} perPage={filters.per_page} onPerPage={(per_page) => visitList(listUrl, { ...filters, per_page })} />
+              </>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

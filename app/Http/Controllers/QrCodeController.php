@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\CreateQrCode;
 use App\Enums\RedirectType;
 use App\Enums\UrlStatus;
+use App\Http\Controllers\Concerns\FiltersIndex;
 use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\QrCodeRequest;
 use App\Models\Project;
@@ -17,7 +18,7 @@ use Inertia\Inertia;
 
 class QrCodeController extends Controller
 {
-    use InteractsWithUrlSettings;
+    use FiltersIndex, InteractsWithUrlSettings;
 
     // ── Default style applied to new QR codes ─────────────────────────────
     private array $defaultStyle = [
@@ -49,24 +50,34 @@ class QrCodeController extends Controller
     public function index(Request $request)
     {
         $project = $request->get('project');
+        $search = $this->search($request);
 
         return inertia('QrCodes/Index', [
-            'qrCodes' => $project->qrCodes()->with('url.domain')->latest()->get()->map(fn ($q) => [
-                'id' => $q->id,
-                'name' => $q->name,
-                'type' => $q->type,
-                'is_dynamic' => $q->is_dynamic,
-                'scans' => $q->url?->clicks ?? 0,
-                'unique_scans' => $q->url?->unique_clicks ?? 0,
-                'created_at' => $q->created_at->toISOString(),
-                // Content + style let the list render and download the QR
-                // client-side without opening the editor.
-                'content' => $q->content,
-                'style' => $q->style,
-                'dynamic_url' => $q->url && $q->url->domain
-                    ? 'https://'.$q->url->domain->name.'/'.$q->url->slug
-                    : null,
-            ]),
+            'qrCodes' => $project->qrCodes()
+                ->with('url.domain')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('url', fn ($url) => $url->where('slug', 'like', "%{$search}%"))))
+                ->latest()
+                ->paginate($this->perPage($request))
+                ->withQueryString()
+                ->through(fn ($q) => [
+                    'id' => $q->id,
+                    'name' => $q->name,
+                    'type' => $q->type,
+                    'is_dynamic' => $q->is_dynamic,
+                    'scans' => $q->url?->clicks ?? 0,
+                    'unique_scans' => $q->url?->unique_clicks ?? 0,
+                    'created_at' => $q->created_at->toISOString(),
+                    // Content + style let the list render and download the QR
+                    // client-side without opening the editor.
+                    'content' => $q->content,
+                    'style' => $q->style,
+                    'dynamic_url' => $q->url && $q->url->domain
+                        ? 'https://'.$q->url->domain->name.'/'.$q->url->slug
+                        : null,
+                ]),
+            'filters' => $this->filters($request),
         ]);
     }
 

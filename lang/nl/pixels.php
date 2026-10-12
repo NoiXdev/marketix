@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Zoek op naam of ID…',
     'title' => 'Pixels',
     'subtitle' => 'Beheer trackingpixels gekoppeld aan je verkorte links',
     'create' => 'Pixel toevoegen',

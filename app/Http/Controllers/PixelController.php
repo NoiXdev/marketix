@@ -3,24 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PixelProvider;
+use App\Http\Controllers\Concerns\FiltersIndex;
 use App\Http\Requests\PixelRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PixelController extends Controller
 {
+    use FiltersIndex;
+
     public function index(Request $request)
     {
         $project = $request->get('project');
+        $search = $this->search($request);
 
         return inertia('Pixels/Index', [
-            'pixels' => $project->pixels()->latest()->get()->map(fn ($p) => [
-                'id' => $p->id,
-                'provider' => $p->provider->value,
-                'name' => $p->name,
-                'tag' => $p->tag,
-                'created_at' => $p->created_at->toISOString(),
-            ]),
+            'pixels' => $project->pixels()
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('tag', 'like', "%{$search}%")))
+                ->latest()
+                ->paginate($this->perPage($request))
+                ->withQueryString()
+                ->through(fn ($p) => [
+                    'id' => $p->id,
+                    'provider' => $p->provider->value,
+                    'name' => $p->name,
+                    'tag' => $p->tag,
+                    'created_at' => $p->created_at->toISOString(),
+                ]),
+            'filters' => $this->filters($request),
             'providers' => PixelProvider::options(),
         ]);
     }

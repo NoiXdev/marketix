@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateLink;
 use App\Enums\UrlStatus;
+use App\Http\Controllers\Concerns\FiltersIndex;
 use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\UrlRequest;
 use App\Models\Statistic;
@@ -15,18 +16,24 @@ use Inertia\Inertia;
 
 class UrlController extends Controller
 {
-    use InteractsWithUrlSettings;
+    use FiltersIndex, InteractsWithUrlSettings;
 
     public function index(Request $request)
     {
         $project = $request->get('project');
+        $search = $this->search($request);
 
         return inertia('Links/Index', [
             'urls' => $project->urls()
                 ->with('domain')
+                ->when($search, fn ($query) => $query->where(fn ($query) => $query
+                    ->where('slug', 'like', "%{$search}%")
+                    ->orWhere('url', 'like', "%{$search}%")
+                    ->orWhereHas('domain', fn ($domain) => $domain->where('name', 'like', "%{$search}%"))))
                 ->latest()
-                ->get()
-                ->map(fn ($url) => [
+                ->paginate($this->perPage($request))
+                ->withQueryString()
+                ->through(fn ($url) => [
                     'id' => $url->id,
                     'slug' => $url->slug,
                     'url' => $url->url,
@@ -41,6 +48,7 @@ class UrlController extends Controller
                         ? ['id' => $url->domain->id, 'name' => $url->domain->name]
                         : null,
                 ]),
+            'filters' => $this->filters($request),
         ]);
     }
 
