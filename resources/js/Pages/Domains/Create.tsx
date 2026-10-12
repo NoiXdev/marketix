@@ -29,54 +29,50 @@ export default function DomainsCreate({ appDomain }: { appDomain: string }) {
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('domains.form.add_title')}</h1>
         </div>
 
-        <div className="max-w-lg">
-          <DnsInfoBox appDomain={appDomain} />
-        </div>
+        <DnsInfoBox appDomain={appDomain} />
 
-        <div className="max-w-lg">
-          <form onSubmit={submit} className="space-y-5">
-            <FormSection>
-              <Field
-                label={
-                  <>
-                    {t('domains.form.name')} <span className="text-danger-foreground">*</span>
-                  </>
-                }
-                htmlFor="name"
-                error={errors.name}
-              >
-                <Input id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('domains.form.name_placeholder')} />
-              </Field>
-              <Field label={t('domains.form.root_redirect')} htmlFor="redirect_root" hint={t('domains.form.root_redirect_hint')} error={errors.redirect_root}>
-                <Input
-                  id="redirect_root"
-                  type="url"
-                  value={data.redirect_root}
-                  onChange={(e) => setData('redirect_root', e.target.value)}
-                  placeholder={t('domains.form.root_redirect_placeholder')}
-                />
-              </Field>
-              <Field label={t('domains.form.not_found_redirect')} htmlFor="redirect_not_found" hint={t('domains.form.not_found_redirect_hint')} error={errors.redirect_not_found}>
-                <Input
-                  id="redirect_not_found"
-                  type="url"
-                  value={data.redirect_not_found}
-                  onChange={(e) => setData('redirect_not_found', e.target.value)}
-                  placeholder={t('domains.form.not_found_redirect_placeholder')}
-                />
-              </Field>
-            </FormSection>
+        <form onSubmit={submit} className="space-y-5">
+          <FormSection>
+            <Field
+              label={
+                <>
+                  {t('domains.form.name')} <span className="text-danger-foreground">*</span>
+                </>
+              }
+              htmlFor="name"
+              error={errors.name}
+            >
+              <Input id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('domains.form.name_placeholder')} />
+            </Field>
+            <Field label={t('domains.form.root_redirect')} htmlFor="redirect_root" hint={t('domains.form.root_redirect_hint')} error={errors.redirect_root}>
+              <Input
+                id="redirect_root"
+                type="url"
+                value={data.redirect_root}
+                onChange={(e) => setData('redirect_root', e.target.value)}
+                placeholder={t('domains.form.root_redirect_placeholder')}
+              />
+            </Field>
+            <Field label={t('domains.form.not_found_redirect')} htmlFor="redirect_not_found" hint={t('domains.form.not_found_redirect_hint')} error={errors.redirect_not_found}>
+              <Input
+                id="redirect_not_found"
+                type="url"
+                value={data.redirect_not_found}
+                onChange={(e) => setData('redirect_not_found', e.target.value)}
+                placeholder={t('domains.form.not_found_redirect_placeholder')}
+              />
+            </Field>
+          </FormSection>
 
-            <div className="flex items-center gap-3">
-              <Button type="submit" loading={processing}>
-                {t('domains.form.create_submit')}
-              </Button>
-              <Link href={route('app.project.domains.index', { project: project!.id })} className="text-muted hover:text-foreground text-sm transition-colors">
-                {t('common.actions.cancel')}
-              </Link>
-            </div>
-          </form>
-        </div>
+          <div className="flex items-center gap-3">
+            <Button type="submit" loading={processing}>
+              {t('domains.form.create_submit')}
+            </Button>
+            <Link href={route('app.project.domains.index', { project: project!.id })} className="text-muted hover:text-foreground text-sm transition-colors">
+              {t('common.actions.cancel')}
+            </Link>
+          </div>
+        </form>
       </div>
     </AppLayout>
   );

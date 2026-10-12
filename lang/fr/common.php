@@ -50,6 +50,10 @@ return [
         'search' => 'Rechercher',
         'add' => 'Ajouter',
     ],
+    'danger' => [
+        'title' => 'Zone de danger',
+        'text' => 'La suppression est irréversible.',
+    ],
     'dialog' => [
         'title' => 'Êtes-vous sûr ?',
         'type_to_confirm' => 'Saisissez :value pour confirmer.',

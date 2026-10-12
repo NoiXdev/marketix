@@ -25,7 +25,7 @@ export default function AdminUsersCreate() {
           <h1 className="text-foreground mt-2 text-2xl font-bold tracking-tight">{t('admin.users.create.title')}</h1>
         </div>
 
-        <form onSubmit={submit} className="max-w-md">
+        <form onSubmit={submit}>
           <FormSection>
             <Field label={t('admin.users.fields.name')} error={errors.name}>
               <Input value={data.name} onChange={(e) => setData('name', e.target.value)} />

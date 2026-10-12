@@ -7,7 +7,7 @@ import { UtmParams } from '@/Pages/Links/partials/UtmSection';
 import { PixelOption } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ChevronDown } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, ReactNode, useState } from 'react';
 import QrContentForm from './QrContentForm';
 import QrPreview from './QrPreview';
 import QrStyleForm from './QrStyleForm';
@@ -54,6 +54,7 @@ interface Props {
   // Presets seed a *new* QR code's style; they are hidden when editing an
   // existing one so an applied preset can never silently restyle it.
   showTemplates?: boolean;
+  aside?: ReactNode;
 }
 
 export default function QrEditor({
@@ -70,6 +71,7 @@ export default function QrEditor({
   pixels,
   linkHasPassword,
   showTemplates = false,
+  aside,
 }: Props) {
   const { t } = useTranslation();
   const [tab, setTab] = useState<'content' | 'style'>('content');
@@ -266,10 +268,11 @@ export default function QrEditor({
         </div>
 
         {/* ── Right: sticky preview ── */}
-        <div className="lg:sticky lg:top-8 lg:self-start">
+        <div className="space-y-4 lg:sticky lg:top-8 lg:self-start">
           <FormSection title={t('qr.editor.preview')}>
             <QrPreview data={qrContent} style={data.style} name={data.name || 'qr-code'} />
           </FormSection>
+          {aside}
         </div>
       </div>
     </form>

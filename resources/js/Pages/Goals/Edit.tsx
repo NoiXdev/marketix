@@ -1,9 +1,11 @@
+import { DangerSection, EditLayout } from '@/Components/EditLayout';
 import { BackLink, Button, ErrorSummary } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import GoalFields, { GoalFormData } from '@/Pages/Goals/partials/GoalFields';
 import { Goal, PageProps } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
 
 type Option = { value: string; label: string };
@@ -25,6 +27,11 @@ export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: strin
     put(route('app.project.analytics.goals.update', { project: project!.id, site: site.id, goal: goal.id }));
   }
 
+  async function destroy() {
+    if (!(await confirmDelete({ title: goal.name }))) return;
+    router.delete(route('app.project.analytics.goals.destroy', { project: project!.id, site: site.id, goal: goal.id }));
+  }
+
   const errorMessages = Object.values(errors).filter(Boolean) as string[];
 
   return (
@@ -35,7 +42,7 @@ export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: strin
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('analytics.goals.edit')}</h1>
         </div>
 
-        <div className="max-w-2xl">
+        <EditLayout aside={<DangerSection onDelete={destroy} />}>
           <form onSubmit={submit} className="space-y-5">
             <ErrorSummary title={t('links.form.save_error_title')} errors={errorMessages} />
 
@@ -45,7 +52,7 @@ export default function GoalsEdit({ site, goal, goalTypes }: { site: { id: strin
               {t('common.actions.save')}
             </Button>
           </form>
-        </div>
+        </EditLayout>
       </div>
     </AppLayout>
   );

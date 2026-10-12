@@ -39,21 +39,19 @@ export default function ReportsCreate({ links, sites, types }: { links: LinkOpti
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('reports.form.create_title')}</h1>
         </div>
 
-        <div className="max-w-2xl">
-          <ReportForm
-            data={data}
-            setData={setData}
-            errors={errors}
-            processing={processing}
-            submitLabel={t('reports.form.submit_create')}
-            cancelHref={route('app.project.reports.index', { project: project!.id })}
-            links={links}
-            sites={sites}
-            types={types}
-            locale={locale}
-            onSubmit={submit}
-          />
-        </div>
+        <ReportForm
+          data={data}
+          setData={setData}
+          errors={errors}
+          processing={processing}
+          submitLabel={t('reports.form.submit_create')}
+          cancelHref={route('app.project.reports.index', { project: project!.id })}
+          links={links}
+          sites={sites}
+          types={types}
+          locale={locale}
+          onSubmit={submit}
+        />
       </div>
     </AppLayout>
   );

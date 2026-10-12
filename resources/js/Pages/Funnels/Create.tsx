@@ -29,18 +29,16 @@ export default function FunnelsCreate({ site, stepTypes, limits }: { site: { id:
           <p className="text-muted mt-1 max-w-2xl text-sm">{t('analytics.funnels.intro', { site: site.name })}</p>
         </div>
 
-        <div className="max-w-2xl">
-          <FunnelForm
-            data={data}
-            errors={errors as Record<string, string | undefined>}
-            stepTypes={stepTypes}
-            limits={limits}
-            processing={processing}
-            submitLabel={t('analytics.funnels.create')}
-            onChange={(next) => setData(next)}
-            onSubmit={() => post(route('app.project.analytics.funnels.store', { project: project!.id, site: site.id }))}
-          />
-        </div>
+        <FunnelForm
+          data={data}
+          errors={errors as Record<string, string | undefined>}
+          stepTypes={stepTypes}
+          limits={limits}
+          processing={processing}
+          submitLabel={t('analytics.funnels.create')}
+          onChange={(next) => setData(next)}
+          onSubmit={() => post(route('app.project.analytics.funnels.store', { project: project!.id, site: site.id }))}
+        />
       </div>
     </AppLayout>
   );

@@ -33,22 +33,20 @@ export default function LinksCreate({ domains, pixels }: { domains: Pick<Domain,
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('links.create')}</h1>
         </div>
 
-        <div className="max-w-2xl">
-          <LinkForm
-            data={data}
-            setData={setData}
-            errors={errors}
-            processing={processing}
-            submitLabel={t('links.create')}
-            cancelHref={route('app.project.links.index', { project: project!.id })}
-            domains={domains}
-            pixels={pixels}
-            onSubmit={(e) => {
-              e.preventDefault();
-              post(route('app.project.links.store', { project: project!.id }));
-            }}
-          />
-        </div>
+        <LinkForm
+          data={data}
+          setData={setData}
+          errors={errors}
+          processing={processing}
+          submitLabel={t('links.create')}
+          cancelHref={route('app.project.links.index', { project: project!.id })}
+          domains={domains}
+          pixels={pixels}
+          onSubmit={(e) => {
+            e.preventDefault();
+            post(route('app.project.links.store', { project: project!.id }));
+          }}
+        />
       </div>
     </AppLayout>
   );

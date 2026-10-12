@@ -20,7 +20,7 @@ export default function AdminProjectsCreate() {
           <h1 className="text-foreground mt-2 text-2xl font-bold tracking-tight">{t('admin.projects.create.title')}</h1>
         </div>
 
-        <form onSubmit={submit} className="max-w-md">
+        <form onSubmit={submit}>
           <FormSection>
             <Field label={t('admin.projects.fields.name')} error={errors.name}>
               <Input value={data.name} onChange={(e) => setData('name', e.target.value)} />

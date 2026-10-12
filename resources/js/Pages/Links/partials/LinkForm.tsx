@@ -56,8 +56,8 @@ export default function LinkForm({ data, setData, errors, processing, submitLabe
       <ErrorSummary title={t('links.form.save_error_title')} errors={errorMessages} />
 
       <FormSection title={t('links.form.section_settings')}>
-        <div className="flex gap-3">
-          <div className="w-48 shrink-0">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
             <Field
               label={
                 <>
@@ -77,7 +77,7 @@ export default function LinkForm({ data, setData, errors, processing, submitLabe
               </Select>
             </Field>
           </div>
-          <div className="flex-1">
+          <div>
             <Field
               label={
                 <>

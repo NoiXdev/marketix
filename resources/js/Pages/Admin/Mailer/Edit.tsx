@@ -54,7 +54,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
 
         <Flash />
 
-        <form onSubmit={submit} className="max-w-md space-y-4">
+        <form onSubmit={submit} className="space-y-4">
           <Field label={t('admin.mailer.fields.default_mailer')} htmlFor="default_mailer" error={errors.default_mailer}>
             <Select id="default_mailer" value={data.default_mailer} onChange={(e) => setData('default_mailer', e.target.value)}>
               <option value="postal">{t('admin.mailer.options.postal')}</option>
@@ -139,7 +139,7 @@ export default function AdminMailerEdit({ settings, has_postal_key, has_smtp_pas
           </Button>
         </form>
 
-        <form onSubmit={sendTest} className="mt-8 max-w-md">
+        <form onSubmit={sendTest} className="mt-8">
           <FormSection title={t('admin.mailer.test.title')}>
             <Field label={t('admin.mailer.test.recipient_label')} htmlFor="test_email" error={testForm.errors.test_email}>
               <Input id="test_email" type="email" value={testForm.data.test_email} onChange={(e) => testForm.setData('test_email', e.target.value)} />

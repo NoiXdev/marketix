@@ -1,10 +1,12 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { DangerSection, EditLayout } from '@/Components/EditLayout';
 import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink, Button, Field, FormSection, Input, Select } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, PageProps, Pixel } from '@/types';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 
 interface ProviderOption {
   value: string;
@@ -29,6 +31,11 @@ export default function PixelsEdit({
     tag: pixel.tag,
   });
 
+  async function destroy() {
+    if (!(await confirmDelete({ title: t('pixels.delete.title'), text: t('pixels.delete.confirm', { name: pixel.name }) }))) return;
+    router.delete(route('app.project.pixels.destroy', { project: project!.id, pixel: pixel.id }));
+  }
+
   return (
     <AppLayout title={t('pixels.form.edit_page_title')}>
       <div className="px-8 py-8">
@@ -39,7 +46,14 @@ export default function PixelsEdit({
           </h1>
         </div>
 
-        <div className="max-w-lg space-y-4">
+        <EditLayout
+          aside={
+            <>
+              <MoveToProjectSection name={pixel.name} hint={t('move.hints.pixel')} action={route('app.project.pixels.move', { project: project!.id, pixel: pixel.id })} />
+              <DangerSection onDelete={destroy} />
+            </>
+          }
+        >
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -98,9 +112,8 @@ export default function PixelsEdit({
               </Link>
             </div>
           </form>
-          <MoveToProjectSection name={pixel.name} hint={t('move.hints.pixel')} action={route('app.project.pixels.move', { project: project!.id, pixel: pixel.id })} />
           <ActivityHistory history={history} />
-        </div>
+        </EditLayout>
       </div>
     </AppLayout>
   );

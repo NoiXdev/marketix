@@ -27,66 +27,64 @@ export default function PixelsCreate({ providers }: { providers: ProviderOption[
           <h1 className="text-foreground mt-3 text-2xl font-bold tracking-tight">{t('pixels.form.add_title')}</h1>
         </div>
 
-        <div className="max-w-lg">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              post(route('app.project.pixels.store', { project: project!.id }));
-            }}
-            className="space-y-5"
-          >
-            <FormSection title={t('pixels.form.section')}>
-              <Field
-                label={
-                  <>
-                    {t('pixels.form.provider')} <span className="text-danger-foreground">*</span>
-                  </>
-                }
-                htmlFor="provider"
-                error={errors.provider}
-              >
-                <Select id="provider" value={data.provider} onChange={(e) => setData('provider', e.target.value)}>
-                  {providers.map((p) => (
-                    <option key={p.value} value={p.value}>
-                      {p.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <Field
-                label={
-                  <>
-                    {t('pixels.form.name')} <span className="text-danger-foreground">*</span>
-                  </>
-                }
-                htmlFor="name"
-                error={errors.name}
-              >
-                <Input id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('pixels.form.name_placeholder')} />
-              </Field>
-              <Field
-                label={
-                  <>
-                    {t('pixels.form.tag')} <span className="text-danger-foreground">*</span>
-                  </>
-                }
-                htmlFor="tag"
-                error={errors.tag}
-              >
-                <Input id="tag" type="text" value={data.tag} onChange={(e) => setData('tag', e.target.value)} placeholder={t('pixels.form.tag_placeholder')} />
-              </Field>
-            </FormSection>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            post(route('app.project.pixels.store', { project: project!.id }));
+          }}
+          className="space-y-5"
+        >
+          <FormSection title={t('pixels.form.section')}>
+            <Field
+              label={
+                <>
+                  {t('pixels.form.provider')} <span className="text-danger-foreground">*</span>
+                </>
+              }
+              htmlFor="provider"
+              error={errors.provider}
+            >
+              <Select id="provider" value={data.provider} onChange={(e) => setData('provider', e.target.value)}>
+                {providers.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field
+              label={
+                <>
+                  {t('pixels.form.name')} <span className="text-danger-foreground">*</span>
+                </>
+              }
+              htmlFor="name"
+              error={errors.name}
+            >
+              <Input id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder={t('pixels.form.name_placeholder')} />
+            </Field>
+            <Field
+              label={
+                <>
+                  {t('pixels.form.tag')} <span className="text-danger-foreground">*</span>
+                </>
+              }
+              htmlFor="tag"
+              error={errors.tag}
+            >
+              <Input id="tag" type="text" value={data.tag} onChange={(e) => setData('tag', e.target.value)} placeholder={t('pixels.form.tag_placeholder')} />
+            </Field>
+          </FormSection>
 
-            <div className="flex items-center gap-3">
-              <Button type="submit" loading={processing}>
-                {t('pixels.form.create_submit')}
-              </Button>
-              <Link href={route('app.project.pixels.index', { project: project!.id })} className="text-muted hover:text-foreground text-sm transition-colors">
-                {t('common.actions.cancel')}
-              </Link>
-            </div>
-          </form>
-        </div>
+          <div className="flex items-center gap-3">
+            <Button type="submit" loading={processing}>
+              {t('pixels.form.create_submit')}
+            </Button>
+            <Link href={route('app.project.pixels.index', { project: project!.id })} className="text-muted hover:text-foreground text-sm transition-colors">
+              {t('common.actions.cancel')}
+            </Link>
+          </div>
+        </form>
       </div>
     </AppLayout>
   );

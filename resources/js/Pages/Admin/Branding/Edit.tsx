@@ -64,7 +64,7 @@ export default function AdminBrandingEdit(props: Props) {
 
         <Flash />
 
-        <form onSubmit={submit} className="max-w-md space-y-6">
+        <form onSubmit={submit} className="space-y-6">
           <Field label={t('admin.branding.fields.app_name')} hint={t('admin.branding.fields.app_name_hint')} error={errors.app_name}>
             <Input value={data.app_name} onChange={(e) => setData('app_name', e.target.value)} placeholder="Marketix" />
           </Field>

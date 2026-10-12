@@ -76,7 +76,7 @@ export default function AdminUsersEdit({ user, memberships, availableProjects }:
         <Flash />
 
         {/* Account */}
-        <form onSubmit={saveAccount} className="mb-8 max-w-2xl">
+        <form onSubmit={saveAccount} className="mb-8">
           <FormSection title={t('admin.users.sections.account')}>
             <Field label={t('admin.users.fields.name')} error={account.errors.name}>
               <Input value={account.data.name} onChange={(e) => account.setData('name', e.target.value)} />
@@ -110,7 +110,7 @@ export default function AdminUsersEdit({ user, memberships, availableProjects }:
         </form>
 
         {/* Security actions */}
-        <div className="mb-8 max-w-2xl">
+        <div className="mb-8">
           <FormSection title={t('admin.users.sections.security')}>
             <p className="text-muted text-sm">{t('admin.users.security.reset_description')}</p>
             <Button variant="secondary" onClick={sendPasswordReset}>
@@ -120,7 +120,7 @@ export default function AdminUsersEdit({ user, memberships, availableProjects }:
         </div>
 
         {/* Project memberships */}
-        <div className="mb-8 max-w-2xl">
+        <div className="mb-8">
           <FormSection title={t('admin.users.memberships.title')}>
             {memberships.length === 0 ? (
               <EmptyState icon={Users} title={t('admin.users.memberships.empty')} />

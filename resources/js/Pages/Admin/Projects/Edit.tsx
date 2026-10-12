@@ -61,7 +61,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
       <div className="px-8 py-8">
         <PageHeader title={t('admin.projects.edit.title')} action={openBtn} />
 
-        <form onSubmit={saveDetails} className="mb-10 max-w-md">
+        <form onSubmit={saveDetails} className="mb-10">
           <FormSection>
             <Field label={t('admin.projects.fields.name')} error={details.errors.name}>
               <Input value={details.data.name} onChange={(e) => details.setData('name', e.target.value)} />
@@ -116,7 +116,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
           </div>
         )}
 
-        <form onSubmit={assignUser} className="flex max-w-2xl items-end gap-2">
+        <form onSubmit={assignUser} className="flex items-end gap-2">
           <div className="flex-1">
             <Field label={t('admin.projects.members.assign_label')} error={assign.errors.user_id}>
               <Select value={assign.data.user_id} onChange={(e) => assign.setData('user_id', e.target.value)}>
