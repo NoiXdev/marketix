@@ -40,7 +40,7 @@ class DomainController extends Controller
         $project->domains()->create($request->validated());
 
         return redirect()->route('app.project.domains.index')
-            ->with('success', 'Domain created.');
+            ->with('success', __('flash.domains.created'));
     }
 
     public function edit(Request $request, string $domain)
@@ -66,7 +66,7 @@ class DomainController extends Controller
         $model->update($request->validated());
 
         return redirect()->route('app.project.domains.index')
-            ->with('success', 'Domain updated.');
+            ->with('success', __('flash.domains.updated'));
     }
 
     public function check(Request $request, string $domain)
@@ -78,7 +78,7 @@ class DomainController extends Controller
         CheckDomainStatusJob::dispatchSync($model);
 
         return redirect()->route('app.project.domains.index')
-            ->with('success', 'Domain status refreshed.');
+            ->with('success', __('flash.domains.status_refreshed'));
     }
 
     public function destroy(Request $request, string $domain)
@@ -88,6 +88,6 @@ class DomainController extends Controller
         $project->domains()->findOrFail($domain)->delete();
 
         return redirect()->route('app.project.domains.index')
-            ->with('success', 'Domain deleted.');
+            ->with('success', __('flash.domains.deleted'));
     }
 }

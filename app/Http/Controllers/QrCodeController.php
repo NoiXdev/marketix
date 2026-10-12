@@ -83,7 +83,7 @@ class QrCodeController extends Controller
             if ($link->qrCode !== null) {
                 return redirect()
                     ->route('app.project.qrcodes.edit', ['project' => $project->id, 'qrCode' => $link->qrCode->id])
-                    ->with('success', 'This link already has a QR code.');
+                    ->with('success', __('flash.qrcodes.link_has_qr'));
             }
 
             $attachUrl = [
@@ -121,7 +121,7 @@ class QrCodeController extends Controller
         $createQrCode->handle($project, $request->user(), $data);
 
         return redirect()->route('app.project.qrcodes.index')
-            ->with('success', 'QR code created.');
+            ->with('success', __('flash.qrcodes.created'));
     }
 
     public function edit(Request $request, string $qrCode)
@@ -192,7 +192,7 @@ class QrCodeController extends Controller
         });
 
         return redirect()->route('app.project.qrcodes.index')
-            ->with('success', 'QR code updated.');
+            ->with('success', __('flash.qrcodes.updated'));
     }
 
     public function restore(Request $request, string $qrCode, string $version)
@@ -221,7 +221,7 @@ class QrCodeController extends Controller
 
             if ($taken) {
                 return redirect()->back()
-                    ->with('error', "That version's short link is already in use. Free up the slug and try again.");
+                    ->with('error', __('flash.qrcodes.restore_slug_taken'));
             }
         }
 
@@ -231,7 +231,7 @@ class QrCodeController extends Controller
         });
 
         return redirect()->route('app.project.qrcodes.index')
-            ->with('success', 'QR code restored.');
+            ->with('success', __('flash.qrcodes.restored'));
     }
 
     public function destroy(Request $request, string $qrCode)
@@ -245,7 +245,7 @@ class QrCodeController extends Controller
         });
 
         return redirect()->route('app.project.qrcodes.index')
-            ->with('success', 'QR code deleted.');
+            ->with('success', __('flash.qrcodes.deleted'));
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

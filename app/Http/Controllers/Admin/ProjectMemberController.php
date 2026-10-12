@@ -22,7 +22,7 @@ class ProjectMemberController extends Controller
             $data['user_id'] => ['role' => $data['role'], 'active' => true],
         ]);
 
-        return back()->with('success', 'Member assigned.');
+        return back()->with('success', __('flash.admin.member_assigned'));
     }
 
     public function update(Request $request, string $project, string $user)
@@ -35,7 +35,7 @@ class ProjectMemberController extends Controller
 
         $model->users()->updateExistingPivot($user, ['role' => $data['role']]);
 
-        return back()->with('success', 'Member updated.');
+        return back()->with('success', __('flash.admin.member_updated'));
     }
 
     public function destroy(string $project, string $user)
@@ -45,6 +45,6 @@ class ProjectMemberController extends Controller
         // last-admin guard that applies to regular project members.
         Project::findOrFail($project)->users()->detach($user);
 
-        return back()->with('success', 'Member removed.');
+        return back()->with('success', __('flash.admin.member_removed'));
     }
 }

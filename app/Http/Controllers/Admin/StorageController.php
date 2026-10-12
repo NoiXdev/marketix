@@ -48,7 +48,7 @@ class StorageController extends Controller
 
         $settings->save();
 
-        return redirect()->route('app.admin.storage.edit')->with('success', 'Storage settings saved.');
+        return redirect()->route('app.admin.storage.edit')->with('success', __('flash.admin.storage_saved'));
     }
 
     public function test(StorageTestRequest $request)
@@ -75,9 +75,9 @@ class StorageController extends Controller
             $disk->get($path);
             $disk->delete($path);
         } catch (Throwable $e) {
-            return back()->with('error', 'Storage test failed: '.$e->getMessage());
+            return back()->with('error', __('flash.admin.storage_test_failed', ['error' => $e->getMessage()]));
         }
 
-        return back()->with('success', 'Storage connection OK.');
+        return back()->with('success', __('flash.admin.storage_ok'));
     }
 }

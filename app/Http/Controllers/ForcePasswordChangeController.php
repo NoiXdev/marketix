@@ -22,6 +22,6 @@ class ForcePasswordChangeController extends Controller
 
         ActivityRecorder::security('password_changed', $user);
 
-        return redirect('/')->with('success', 'Password updated.');
+        return redirect('/')->with('success', __('flash.profile.password_updated'));
     }
 }

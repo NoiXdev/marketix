@@ -22,7 +22,7 @@ class UserProjectController extends Controller
             $data['project_id'] => ['role' => $data['role'], 'active' => true],
         ]);
 
-        return back()->with('success', 'Project assigned.');
+        return back()->with('success', __('flash.admin.project_assigned'));
     }
 
     public function update(Request $request, string $user, string $project)
@@ -32,13 +32,13 @@ class UserProjectController extends Controller
 
         $model->projects()->updateExistingPivot($project, ['role' => $data['role']]);
 
-        return back()->with('success', 'Membership updated.');
+        return back()->with('success', __('flash.admin.membership_updated'));
     }
 
     public function destroy(string $user, string $project)
     {
         User::findOrFail($user)->projects()->detach($project);
 
-        return back()->with('success', 'Project removed.');
+        return back()->with('success', __('flash.admin.project_removed'));
     }
 }

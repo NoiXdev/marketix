@@ -39,7 +39,7 @@ class ProjectController extends Controller
     {
         Project::create($request->validated());
 
-        return redirect()->route('app.admin.projects.index')->with('success', 'Project created.');
+        return redirect()->route('app.admin.projects.index')->with('success', __('flash.admin.project_created'));
     }
 
     public function edit(string $project)
@@ -64,13 +64,13 @@ class ProjectController extends Controller
         $model = Project::findOrFail($project);
         $model->update($request->validated());
 
-        return redirect()->route('app.admin.projects.index')->with('success', 'Project updated.');
+        return redirect()->route('app.admin.projects.index')->with('success', __('flash.admin.project_updated'));
     }
 
     public function destroy(string $project)
     {
         Project::findOrFail($project)->delete();
 
-        return redirect()->route('app.admin.projects.index')->with('success', 'Project deleted.');
+        return redirect()->route('app.admin.projects.index')->with('success', __('flash.admin.project_deleted'));
     }
 }
