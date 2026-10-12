@@ -77,7 +77,8 @@ class QrCodeRequest extends FormRequest
                     'required', 'string', 'max:255', 'alpha_dash',
                     Rule::unique('urls', 'slug')
                         ->where('domain_id', $this->input('domain_id'))
-                        ->ignore($ignoreUrlId),
+                        ->ignore($ignoreUrlId)
+                        ->withoutTrashed(),
                 ];
             }
 

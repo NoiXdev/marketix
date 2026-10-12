@@ -32,7 +32,8 @@ class UrlRequest extends FormRequest
                 'required', 'string', 'max:255', 'alpha_dash',
                 Rule::unique('urls', 'slug')
                     ->where('domain_id', $this->input('domain_id'))
-                    ->ignore($ignoreId),
+                    ->ignore($ignoreId)
+                    ->withoutTrashed(),
             ],
             'url' => ['required', 'url', 'max:2048'],
             'type' => ['required', 'integer', Rule::in(array_column(RedirectType::cases(), 'value'))],

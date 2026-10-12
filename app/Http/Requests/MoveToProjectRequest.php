@@ -48,8 +48,7 @@ class MoveToProjectRequest extends FormRequest
             throw ValidationException::withMessages(['domain_id' => __('move.errors.domain')]);
         }
 
-        $taken = Url::withTrashed()
-            ->where('domain_id', $domain->id)
+        $taken = Url::where('domain_id', $domain->id)
             ->where('slug', $url->slug)
             ->whereKeyNot($url->id)
             ->exists();

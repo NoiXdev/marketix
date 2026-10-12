@@ -9,7 +9,6 @@ use App\Http\Controllers\Concerns\InteractsWithUrlSettings;
 use App\Http\Requests\QrCodeRequest;
 use App\Models\Project;
 use App\Models\QrCode;
-use App\Models\Url;
 use App\Support\QrTarget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -270,20 +269,7 @@ class QrCodeController extends Controller
             if ($model->url_id) {
                 $model->url->update($attrs);
             } else {
-                // A previously owned soft-deleted URL with the same slug may
-                // still occupy the unique index. Restore it instead of inserting.
-                $existing = Url::withTrashed()
-                    ->where('domain_id', $attrs['domain_id'])
-                    ->where('slug', $attrs['slug'])
-                    ->first();
-
-                if ($existing && $existing->trashed()) {
-                    $existing->restore();
-                    $existing->update($attrs);
-                    $model->url_id = $existing->id;
-                } else {
-                    $model->url_id = $project->urls()->create($attrs)->id;
-                }
+                $model->url_id = $project->urls()->create($attrs)->id;
             }
         } elseif ($model->url_id) {
             // Switched dynamic → static: the backing link is no longer needed.
