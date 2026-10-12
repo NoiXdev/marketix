@@ -2,6 +2,8 @@
 
 return [
     'login' => [
+        'failed' => 'Diese Zugangsdaten stimmen nicht mit unseren Daten überein.',
+        'throttle' => 'Zu viele Anmeldeversuche. Bitte versuchen Sie es in :seconds Sekunden erneut.',
         'head' => 'Anmelden',
         'title' => 'Willkommen zurück',
         'description' => 'Melden Sie sich bei Ihrem Konto an',
@@ -57,6 +59,9 @@ return [
         'submit' => 'Passwort aktualisieren',
     ],
     'two_factor_challenge' => [
+        'invalid_code' => 'Der eingegebene Code ist ungültig.',
+        'invalid_recovery_code' => 'Der eingegebene Wiederherstellungscode ist ungültig.',
+        'code_required' => 'Geben Sie Ihren Authentifizierungs- oder Wiederherstellungscode ein.',
         'head' => 'Zwei-Faktor-Authentifizierung',
         'title' => 'Zwei-Faktor-Authentifizierung',
         'description' => 'Bestätigen Sie den Zugriff auf Ihr Konto',

@@ -2,6 +2,8 @@
 
 return [
     'login' => [
+        'failed' => 'These credentials do not match our records.',
+        'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
         'head' => 'Login',
         'title' => 'Welcome back',
         'description' => 'Sign in to your account',
@@ -57,6 +59,9 @@ return [
         'submit' => 'Update password',
     ],
     'two_factor_challenge' => [
+        'invalid_code' => 'The provided code was invalid.',
+        'invalid_recovery_code' => 'The provided recovery code was invalid.',
+        'code_required' => 'Enter your authentication or recovery code.',
         'head' => 'Two-factor authentication',
         'title' => 'Two-factor authentication',
         'description' => 'Confirm access to your account',

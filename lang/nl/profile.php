@@ -13,6 +13,9 @@ return [
         'submit' => 'Opslaan',
     ],
     'two_factor' => [
+        'already_enabled' => 'Tweestapsverificatie is al ingeschakeld.',
+        'not_in_progress' => 'Het instellen van tweestapsverificatie is niet gestart.',
+        'invalid_code' => 'De ingevoerde code is ongeldig.',
         'heading' => 'Tweestapsverificatie',
         'recovery_codes_notice' => 'Bewaar deze herstelcodes op een veilige plek. Ze worden slechts eenmalig getoond.',
         'enable' => 'Tweestapsverificatie inschakelen',

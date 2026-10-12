@@ -13,4 +13,8 @@ return [
         'delete' => 'Verwijderen',
         'delete_confirm' => '":name" verwijderen?',
     ],
+    'errors' => [
+        'malformed_widget' => 'Ongeldige widget.',
+        'unknown_widget' => 'Onbekend widgettype: :type',
+    ],
 ];

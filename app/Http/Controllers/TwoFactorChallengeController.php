@@ -45,14 +45,14 @@ class TwoFactorChallengeController extends Controller
 
         if (filled($validated['recovery_code'] ?? null)) {
             if (! $this->redeemRecoveryCode($user, $validated['recovery_code'])) {
-                throw ValidationException::withMessages(['recovery_code' => 'The provided recovery code was invalid.']);
+                throw ValidationException::withMessages(['recovery_code' => __('auth.two_factor_challenge.invalid_recovery_code')]);
             }
         } elseif (filled($validated['code'] ?? null)) {
             if (! $this->twoFactor->verify($user->two_factor_secret, $validated['code'])) {
-                throw ValidationException::withMessages(['code' => 'The provided code was invalid.']);
+                throw ValidationException::withMessages(['code' => __('auth.two_factor_challenge.invalid_code')]);
             }
         } else {
-            throw ValidationException::withMessages(['code' => 'Enter your authentication or recovery code.']);
+            throw ValidationException::withMessages(['code' => __('auth.two_factor_challenge.code_required')]);
         }
 
         $this->completeLogin($request, $user);

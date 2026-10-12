@@ -2,6 +2,8 @@
 
 return [
     'login' => [
+        'failed' => 'Ces identifiants ne correspondent pas à nos enregistrements.',
+        'throttle' => 'Trop de tentatives de connexion. Veuillez réessayer dans :seconds secondes.',
         'head' => 'Connexion',
         'title' => 'Bon retour',
         'description' => 'Connectez-vous à votre compte',
@@ -57,6 +59,9 @@ return [
         'submit' => 'Mettre à jour le mot de passe',
     ],
     'two_factor_challenge' => [
+        'invalid_code' => 'Le code saisi est invalide.',
+        'invalid_recovery_code' => 'Le code de récupération saisi est invalide.',
+        'code_required' => 'Saisissez votre code d\'authentification ou de récupération.',
         'head' => 'Authentification à deux facteurs',
         'title' => 'Authentification à deux facteurs',
         'description' => 'Confirmez l\'accès à votre compte',

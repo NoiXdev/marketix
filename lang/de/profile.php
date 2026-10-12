@@ -13,6 +13,9 @@ return [
         'submit' => 'Speichern',
     ],
     'two_factor' => [
+        'already_enabled' => 'Die Zwei-Faktor-Authentifizierung ist bereits aktiviert.',
+        'not_in_progress' => 'Die Einrichtung der Zwei-Faktor-Authentifizierung wurde nicht gestartet.',
+        'invalid_code' => 'Der eingegebene Code ist ungültig.',
         'heading' => 'Zwei-Faktor-Authentifizierung',
         'recovery_codes_notice' => 'Bewahren Sie diese Wiederherstellungscodes an einem sicheren Ort auf. Sie werden nur einmal angezeigt.',
         'enable' => 'Zwei-Faktor-Authentifizierung aktivieren',

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Password Protected Link</title>
+    <title>{{ __('redirect.password.title') }}</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -61,17 +61,17 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
         </div>
-        <h1>Password required</h1>
-        <p>This link is protected. Enter the password to continue.</p>
+        <h1>{{ __('redirect.password.heading') }}</h1>
+        <p>{{ __('redirect.password.text') }}</p>
 
         <form method="POST" action="/{{ $slug }}">
             @csrf
-            <label for="password">Password</label>
+            <label for="password">{{ __('redirect.password.label') }}</label>
             <input id="password" type="password" name="password" autofocus autocomplete="off">
             @error('password')
                 <p class="error">{{ $message }}</p>
             @enderror
-            <button type="submit">Continue</button>
+            <button type="submit">{{ __('redirect.password.submit') }}</button>
         </form>
     </div>
 </body>

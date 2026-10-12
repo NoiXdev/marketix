@@ -73,7 +73,7 @@ class RedirectController extends Controller
         $url = Url::where('domain_id', $domain->id)->where('slug', $slug)->with(['pixels', 'qrCode'])->firstOrFail();
 
         if (! $url->password || ! Hash::check((string) $request->input('password'), $url->password)) {
-            return back()->withErrors(['password' => 'Incorrect password.']);
+            return back()->withErrors(['password' => __('redirect.password.incorrect')]);
         }
 
         $request->session()->put("url_verified_{$url->id}", true);
