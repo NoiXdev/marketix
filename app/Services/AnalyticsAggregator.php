@@ -474,7 +474,7 @@ class AnalyticsAggregator
 
         return $this->base($siteId, $range)
             ->whereNotNull($column)->where($column, '!=', '')
-            ->select($column, DB::raw('COUNT(*) as count'))
+            ->select($column, DB::raw('COUNT(DISTINCT visitor_hash) as count'))
             ->groupBy($column)->orderByDesc('count')->limit($limit)->get();
     }
 
@@ -486,7 +486,7 @@ class AnalyticsAggregator
             ->select(
                 'country',
                 DB::raw('MAX(country_code) as country_code'),
-                DB::raw('COUNT(*) as count'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as count'),
             )
             ->groupBy('country')->orderByDesc('count')->limit($limit)->get();
     }
@@ -505,7 +505,7 @@ class AnalyticsAggregator
 
         return $this->base($siteId, $range)
             ->whereNotNull($column)->where($column, '!=', '')
-            ->select($column, 'country_code', DB::raw('COUNT(*) as count'))
+            ->select($column, 'country_code', DB::raw('COUNT(DISTINCT visitor_hash) as count'))
             ->groupBy($column, 'country_code')->orderByDesc('count')->limit($limit)->get();
     }
 
@@ -517,7 +517,7 @@ class AnalyticsAggregator
             ->select(
                 'country_code',
                 DB::raw('MAX(country) as country'),
-                DB::raw('COUNT(*) as count'),
+                DB::raw('COUNT(DISTINCT visitor_hash) as count'),
             )
             ->groupBy('country_code')->orderByDesc('count')->limit($limit)->get();
     }

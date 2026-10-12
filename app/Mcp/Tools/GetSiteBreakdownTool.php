@@ -92,7 +92,7 @@ class GetSiteBreakdownTool extends Tool
             ...$this->periodSchema($schema),
             'dimension' => $schema->string()
                 ->enum(self::DIMENSIONS)
-                ->description('What to rank. Counts are page views for page, location and technology dimensions and sessions for entry/exit pages, channels and UTM parameters.')
+                ->description('What to rank. Counts are page views for pages, unique visitors for location and technology dimensions and sessions for entry/exit pages, channels and UTM parameters.')
                 ->required(),
             'limit' => $schema->integer()->min(1)->max(100)->default(20)
                 ->description('Maximum number of rows.'),
