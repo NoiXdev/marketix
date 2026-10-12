@@ -1,3 +1,4 @@
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import QrVersionsPanel, { QrVersionEntry } from '@/Components/QrVersionsPanel';
 import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
@@ -113,6 +114,12 @@ export default function QrCodesEdit({ qrCode, domains, versions, pixels }: { qrC
             pixels={pixels}
             linkHasPassword={qrCode.has_password}
             onSubmit={submit}
+          />
+          <MoveToProjectSection
+            name={qrCode.name}
+            hint={t(qrCode.is_dynamic ? 'move.hints.qrcode' : 'move.hints.default')}
+            action={route('app.project.qrcodes.move', { project: project!.id, qrCode: qrCode.id })}
+            withDomain={qrCode.is_dynamic}
           />
           <QrVersionsPanel qrId={qrCode.id} versions={versions} />
         </div>

@@ -24,6 +24,8 @@ return [
             'invitation_accepted' => 'hat eine Einladung angenommen',
         ],
         'subject_line' => ':verb :subject',
+        'moved_out' => 'hat :subject nach „:project“ verschoben',
+        'moved_in' => 'hat :subject aus „:project“ hierher verschoben',
     ],
     'history' => [
         'title' => 'Verlauf',

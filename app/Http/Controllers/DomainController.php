@@ -19,6 +19,13 @@ class DomainController extends Controller
         ]);
     }
 
+    public function options(Request $request)
+    {
+        return response()->json([
+            'domains' => $request->get('project')->domains()->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
     public function create()
     {
         return inertia('Domains/Create', [

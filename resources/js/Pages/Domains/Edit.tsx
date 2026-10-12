@@ -1,4 +1,5 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink, Button, Field, FormSection, Input } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
@@ -123,7 +124,8 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
           </form>
         </div>
 
-        <div className="mb-6 max-w-lg">
+        <div className="mb-6 max-w-lg space-y-4">
+          <MoveToProjectSection name={domain.name} hint={t('move.hints.domain')} action={route('app.project.domains.move', { project: project!.id, domain: domain.id })} />
           <ActivityHistory history={history} />
         </div>
       </div>

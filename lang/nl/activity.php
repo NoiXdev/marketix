@@ -24,6 +24,8 @@ return [
             'invitation_accepted' => 'heeft een uitnodiging geaccepteerd',
         ],
         'subject_line' => ':verb :subject',
+        'moved_out' => 'heeft :subject naar “:project” verplaatst',
+        'moved_in' => 'heeft :subject vanuit “:project” hierheen verplaatst',
     ],
     'history' => [
         'title' => 'Geschiedenis',
