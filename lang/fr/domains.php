@@ -26,6 +26,7 @@ return [
         'confirm' => 'Supprimer « :name » ? Cette action est irréversible.',
     ],
     'form' => [
+        'name_taken' => 'Ce domaine est déjà utilisé dans Marketix.',
         'back' => 'Retour aux domaines',
         'add_title' => 'Ajouter un domaine',
         'edit_title' => 'Modifier',

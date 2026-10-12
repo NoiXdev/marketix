@@ -26,6 +26,7 @@ return [
         'confirm' => '":name" verwijderen? Dit kan niet ongedaan worden gemaakt.',
     ],
     'form' => [
+        'name_taken' => 'Dit domein wordt al gebruikt in Marketix.',
         'back' => 'Terug naar domeinen',
         'add_title' => 'Domein toevoegen',
         'edit_title' => 'Bewerken',

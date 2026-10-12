@@ -20,12 +20,12 @@ class AttachQrToLinkTest extends TestCase
     /**
      * @return array{0: User, 1: Project, 2: Domain}
      */
-    private function makeProject(): array
+    private function makeProject(string $domainName = 'links.test'): array
     {
         $user = User::factory()->create();
         $project = Project::create(['name' => 'Acme']);
         $user->projects()->attach($project);
-        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => 'links.test']);
+        $domain = Domain::firstOrCreate(['project_id' => $project->id, 'name' => $domainName]);
 
         return [$user, $project, $domain];
     }
@@ -125,7 +125,7 @@ class AttachQrToLinkTest extends TestCase
     public function test_create_404s_for_a_foreign_link(): void
     {
         [$user, $project] = $this->makeProject();
-        [$other, $otherProject, $otherDomain] = $this->makeProject();
+        [$other, $otherProject, $otherDomain] = $this->makeProject('other.test');
         $foreign = $this->makeLink($otherProject, $otherDomain, $other, 'theirs');
 
         $this->actingAs($user)
@@ -191,7 +191,7 @@ class AttachQrToLinkTest extends TestCase
     public function test_store_rejects_a_foreign_url_id(): void
     {
         [$user, $project, $domain] = $this->makeProject();
-        [$other, $otherProject, $otherDomain] = $this->makeProject();
+        [$other, $otherProject, $otherDomain] = $this->makeProject('other.test');
         $foreign = $this->makeLink($otherProject, $otherDomain, $other, 'theirs');
 
         $this->actingAs($user)

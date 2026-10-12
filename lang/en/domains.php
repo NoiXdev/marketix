@@ -26,6 +26,7 @@ return [
         'confirm' => 'Delete ":name"? This cannot be undone.',
     ],
     'form' => [
+        'name_taken' => 'This domain is already in use in Marketix.',
         'back' => 'Back to domains',
         'add_title' => 'Add domain',
         'edit_title' => 'Edit',

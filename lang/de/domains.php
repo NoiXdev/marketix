@@ -26,6 +26,7 @@ return [
         'confirm' => '„:name" löschen? Dies kann nicht rückgängig gemacht werden.',
     ],
     'form' => [
+        'name_taken' => 'Diese Domain wird in Marketix bereits verwendet.',
         'back' => 'Zurück zu den Domains',
         'add_title' => 'Domain hinzufügen',
         'edit_title' => 'Bearbeiten',
