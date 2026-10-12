@@ -60,6 +60,10 @@
     scrollbar-width:thin;
     scrollbar-color:var(--scrollbar-thumb) transparent;
   }
+
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor:pointer;
+  }
 }
 
 /* Fallback for engines without the standard properties (Safari) */
