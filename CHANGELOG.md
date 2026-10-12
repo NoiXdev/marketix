@@ -1,4 +1,12 @@
-## [2.5.1](https://github.com/NoiXdev/marketix/compare/v2.5.0...v) (2026-10-07)
+## [2.5.2](https://github.com/NoiXdev/marketix/compare/v2.5.1...v) (2026-10-12)
+
+
+### Features
+
+* **analytics:** show place names in the UI language ([4de81d8](https://github.com/NoiXdev/marketix/commit/4de81d8e39597495ed98ccefbdaa641026b7bf11))
+* refresh Cloudflare IP ranges daily ([11decd5](https://github.com/NoiXdev/marketix/commit/11decd510a654a0e8cf825389c61e829951583dd))
+
+## [2.5.1](https://github.com/NoiXdev/marketix/compare/v2.5.0...v2.5.1) (2026-10-07)
 
 
 ### Bug Fixes
