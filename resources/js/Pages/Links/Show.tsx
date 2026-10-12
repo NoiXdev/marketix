@@ -160,21 +160,14 @@ export default function LinksShow({
       <div className="px-8 py-8">
         {/* Header / detail card */}
         <div className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-6 shadow-[var(--shadow-sm)]">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="text-foreground flex items-center gap-1 text-xl font-bold">
-                {link.domain && <span className="text-subtle">{link.domain.name}/</span>}
-                <span className="truncate">{link.slug}</span>
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-1">
+                <h1 className="text-foreground min-w-0 text-xl leading-snug font-bold [overflow-wrap:anywhere]">
+                  {link.domain && <span className="text-subtle font-semibold">{link.domain.name}/</span>}
+                  {link.slug}
+                </h1>
                 <CopyButton text={shortUrl} />
-                {link.status === 1 ? (
-                  <span className="ml-2">
-                    <StatusPill status="success">{t('links.status.active')}</StatusPill>
-                  </span>
-                ) : (
-                  <span className="ml-2">
-                    <StatusPill status="neutral">{t('links.status.inactive')}</StatusPill>
-                  </span>
-                )}
               </div>
               <a
                 href={link.url}
@@ -186,6 +179,7 @@ export default function LinksShow({
                 <ExternalLink className="h-3 w-3 shrink-0" />
               </a>
               <div className="text-subtle mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                {link.status === 1 ? <StatusPill status="success">{t('links.status.active')}</StatusPill> : <StatusPill status="neutral">{t('links.status.inactive')}</StatusPill>}
                 <span>{link.type_label}</span>
                 <span>{t('links.show.created', { date: new Date(link.created_at).toLocaleDateString() })}</span>
                 {link.expired_at && <span className="text-warning-foreground">{t('links.expires', { date: new Date(link.expired_at).toLocaleDateString() })}</span>}
@@ -196,7 +190,7 @@ export default function LinksShow({
                 )}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               {!link.has_qr_code && (
                 <LinkButton variant="secondary" size="sm" href={route('app.project.qrcodes.create', { project: project!.id, link: link.id })}>
                   <QrCodeIcon className="h-4 w-4" />
@@ -207,8 +201,8 @@ export default function LinksShow({
                 <Pencil className="h-4 w-4" />
                 {t('common.actions.edit')}
               </LinkButton>
-              <ReportDownloadButton projectId={project!.id} urlId={link.id} />
-              <Button variant="danger" onClick={resetStats}>
+              <ReportDownloadButton projectId={project!.id} urlId={link.id} size="sm" />
+              <Button variant="danger" size="sm" onClick={resetStats}>
                 <RotateCcw className="h-4 w-4" />
                 {t('links.reset_stats.button')}
               </Button>

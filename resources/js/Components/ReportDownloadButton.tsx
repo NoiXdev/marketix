@@ -1,11 +1,12 @@
 import { Button, Input } from '@/Components/ui';
+import { ButtonSize } from '@/Components/ui/Button';
 import { useTranslation } from '@/lib/i18n';
 import { Download } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-type Props = { projectId: string; urlId?: string };
+type Props = { projectId: string; urlId?: string; size?: ButtonSize };
 
-export default function ReportDownloadButton({ projectId, urlId }: Props) {
+export default function ReportDownloadButton({ projectId, urlId, size }: Props) {
   const [open, setOpen] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -39,7 +40,7 @@ export default function ReportDownloadButton({ projectId, urlId }: Props) {
 
   return (
     <div className="relative" ref={ref}>
-      <Button type="button" variant="secondary" onClick={() => setOpen((v) => !v)} aria-haspopup="true" aria-expanded={open}>
+      <Button type="button" variant="secondary" size={size} onClick={() => setOpen((v) => !v)} aria-haspopup="true" aria-expanded={open}>
         <Download className="h-4 w-4" /> {t('common.report.download_pdf')}
       </Button>
       {open && (
