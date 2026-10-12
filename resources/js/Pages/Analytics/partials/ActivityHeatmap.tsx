@@ -1,7 +1,7 @@
 import ScaleLegend from '@/Components/ScaleLegend';
 import { scrubHandlers } from '@/lib/chartScrub';
 import { scaleFill } from '@/lib/colorScale';
-import { browserTimeZone, HourBucket, weekdayHourGrid } from '@/lib/heatmap';
+import { HourBucket, weekdayHourGrid } from '@/lib/heatmap';
 import { useTranslation } from '@/lib/i18n';
 import { useMemo, useState } from 'react';
 
@@ -11,10 +11,9 @@ function hourRange(hour: number) {
   return `${String(hour).padStart(2, '0')}:00 – ${String((hour + 1) % 24).padStart(2, '0')}:00`;
 }
 
-export default function ActivityHeatmap({ buckets }: { buckets: HourBucket[] }) {
+export default function ActivityHeatmap({ buckets, timezone }: { buckets: HourBucket[]; timezone: string }) {
   const { t, locale } = useTranslation();
   const [hovered, setHovered] = useState<{ day: number; hour: number } | null>(null);
-  const timezone = useMemo(() => browserTimeZone(), []);
   const grid = useMemo(() => weekdayHourGrid(buckets, timezone), [buckets, timezone]);
 
   const weekdays = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }));

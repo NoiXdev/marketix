@@ -44,6 +44,8 @@ return [
             'additional_hostnames' => 'Noms d\'hôte supplémentaires',
             'additional_hostnames_placeholder' => 'example.de, shop.example.org',
             'additional_hostnames_hint' => 'Les visites ne sont comptées que sur :domain et ses sous-domaines. Indiquez les autres domaines de ce site, séparés par des virgules.',
+            'timezone' => 'Fuseau horaire',
+            'timezone_hint' => 'Les jours et les heures des rapports suivent ce fuseau horaire.',
             'tracking_mode' => 'Comment les visiteurs sont-ils reconnus ?',
             'consent_mode' => 'Quand la mesure démarre-t-elle ?',
             'recommended' => 'Recommandé',

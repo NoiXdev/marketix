@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Event;
+use Carbon\CarbonImmutable;
 
 class EventPropertyAggregator
 {
@@ -20,13 +21,13 @@ class EventPropertyAggregator
      *   }>
      * }
      */
-    public function forEvent(string $siteId, string $name, int $days): array
+    public function forEvent(string $siteId, string $name, int $days, string $timezone = 'UTC'): array
     {
         $base = Event::query()
             ->where('site_id', $siteId)
             ->where('name', $name)
             ->where('is_bot', false)
-            ->where('created_at', '>=', now()->subDays($days - 1)->startOfDay());
+            ->where('created_at', '>=', CarbonImmutable::now($timezone)->subDays($days - 1)->startOfDay()->setTimezone(config('app.timezone')));
 
         $total = (clone $base)->count();
 

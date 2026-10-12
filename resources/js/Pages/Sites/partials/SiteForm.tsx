@@ -1,4 +1,4 @@
-import { Button, ErrorSummary, Field, FormSection, Input, LinkButton } from '@/Components/ui';
+import { Button, ErrorSummary, Field, FormSection, Input, LinkButton, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import ChoiceCards from '@/Pages/Sites/partials/ChoiceCards';
 import EnhancedMeasurementSection from '@/Pages/Sites/partials/EnhancedMeasurementSection';
@@ -13,6 +13,7 @@ export type SiteFormData = {
   name: string;
   domain: string;
   additional_hostnames: string;
+  timezone: string;
   tracking_mode: string;
   consent_mode: string;
   consent_signal: string;
@@ -25,10 +26,20 @@ export type SiteFormData = {
 
 const THIRD_PARTY_SIGNAL = 'third_party_signal';
 
+function groupTimezones(timezones: string[]): [string, string[]][] {
+  const groups = new Map<string, string[]>();
+  for (const zone of timezones) {
+    const region = zone.includes('/') ? zone.slice(0, zone.indexOf('/')) : '';
+    groups.set(region, [...(groups.get(region) ?? []), zone]);
+  }
+  return [...groups.entries()];
+}
+
 export default function SiteForm({
   form,
   trackingModes,
   consentModes,
+  timezones,
   submitLabel,
   cancelHref,
   onSubmit,
@@ -36,6 +47,7 @@ export default function SiteForm({
   form: InertiaFormProps<SiteFormData>;
   trackingModes: Option[];
   consentModes: Option[];
+  timezones: string[];
   submitLabel: string;
   cancelHref: string;
   onSubmit: () => void;
@@ -84,6 +96,27 @@ export default function SiteForm({
             placeholder={t('analytics.sites.form.additional_hostnames_placeholder')}
             onChange={(e) => setData('additional_hostnames', e.target.value)}
           />
+        </Field>
+        <Field label={t('analytics.sites.form.timezone')} htmlFor="timezone" hint={t('analytics.sites.form.timezone_hint')} error={errors.timezone}>
+          <Select id="timezone" value={data.timezone} onChange={(e) => setData('timezone', e.target.value)}>
+            {groupTimezones(timezones).map(([region, zones]) =>
+              region === '' ? (
+                zones.map((zone) => (
+                  <option key={zone} value={zone}>
+                    {zone}
+                  </option>
+                ))
+              ) : (
+                <optgroup key={region} label={region}>
+                  {zones.map((zone) => (
+                    <option key={zone} value={zone}>
+                      {zone.slice(region.length + 1).replaceAll('_', ' ')}
+                    </option>
+                  ))}
+                </optgroup>
+              ),
+            )}
+          </Select>
         </Field>
       </FormSection>
 

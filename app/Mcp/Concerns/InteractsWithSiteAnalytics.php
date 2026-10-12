@@ -6,6 +6,7 @@ use App\Models\Site;
 use App\Support\Analytics\AnalyticsQuery;
 use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Collection;
@@ -44,7 +45,7 @@ trait InteractsWithSiteAnalytics
         return $matches->count() === 1 ? $matches->first() : null;
     }
 
-    protected function resolvePeriod(Request $request): ResolvedPeriod
+    protected function resolvePeriod(Request $request, Site $site): ResolvedPeriod
     {
         $filters = $request->get('filters');
 
@@ -56,6 +57,7 @@ trait InteractsWithSiteAnalytics
                 'compare' => $request->get('compare'),
             ], fn ($value) => $value !== null),
             is_array($filters) ? $filters : [],
+            CarbonImmutable::now($site->timezone),
         );
     }
 

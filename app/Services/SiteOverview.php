@@ -27,13 +27,13 @@ class SiteOverview
             ->selectRaw('site_id, MAX(last_activity_at) as last_seen_at')
             ->pluck('last_seen_at', 'site_id');
 
-        $query = AnalyticsQuery::lastDays(self::DAYS);
-
-        return $sites->mapWithKeys(function (Site $site) use ($lastSeen, $query) {
+        return $sites->mapWithKeys(function (Site $site) use ($lastSeen) {
             $seen = $lastSeen->get($site->id);
             if ($seen === null) {
                 return [$site->id => null];
             }
+
+            $query = AnalyticsQuery::lastDays(self::DAYS, [], $site->timezone);
 
             $summary = $this->analytics->summary($site->id, $query);
 

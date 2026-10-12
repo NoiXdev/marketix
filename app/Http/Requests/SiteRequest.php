@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
+use DateTimeZone;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,6 +21,7 @@ class SiteRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255'],
             'additional_hostnames' => ['nullable', 'string', 'max:1000', 'regex:/^[a-z0-9.-]+(, [a-z0-9.-]+)*$/'],
+            'timezone' => ['sometimes', 'required', 'string', Rule::in(DateTimeZone::listIdentifiers())],
             'tracking_mode' => ['required', Rule::in(array_column(TrackingMode::cases(), 'value'))],
             'consent_mode' => ['required', Rule::in(ConsentMode::selectableValues())],
             'consent_signal' => ['nullable', 'required_if:consent_mode,'.ConsentMode::ThirdPartySignal->value, 'string', 'max:255'],
@@ -37,6 +39,7 @@ class SiteRequest extends FormRequest
             'name' => __('analytics.sites.form.name'),
             'domain' => __('analytics.sites.form.domain'),
             'additional_hostnames' => __('analytics.sites.form.additional_hostnames'),
+            'timezone' => __('analytics.sites.form.timezone'),
             'consent_signal' => __('analytics.sites.form.consent_signal'),
             'retention_days' => __('analytics.sites.form.retention_days'),
             'site_search_params' => __('analytics.sites.measurement.search_params'),

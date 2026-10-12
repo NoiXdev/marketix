@@ -7,6 +7,7 @@ use App\Enums\TrackingMode;
 use App\Http\Requests\SiteRequest;
 use App\Services\SiteOverview;
 use Carbon\CarbonImmutable;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,6 +42,7 @@ class SiteController extends Controller
     {
         return inertia('Sites/Create', [
             'trackingModes' => TrackingMode::options(),
+            'timezones' => DateTimeZone::listIdentifiers(),
             'consentModes' => ConsentMode::selectableOptions(),
         ]);
     }
@@ -65,6 +67,7 @@ class SiteController extends Controller
                 'name' => $model->name,
                 'domain' => $model->domain,
                 'additional_hostnames' => $model->additional_hostnames,
+                'timezone' => $model->timezone,
                 'tracking_id' => $model->tracking_id,
                 'tracking_mode' => $model->tracking_mode->value,
                 'consent_mode' => $model->consent_mode->value,
@@ -76,6 +79,7 @@ class SiteController extends Controller
                 'retention_days' => $model->retention_days,
             ],
             'trackingModes' => TrackingMode::options(),
+            'timezones' => DateTimeZone::listIdentifiers(),
             'consentModes' => ConsentMode::selectableOptions(),
             'snippet' => $model->trackingSnippet(),
             'lastSeenAt' => fn () => ($seen = $model->visits()->where('is_bot', false)->max('last_activity_at'))

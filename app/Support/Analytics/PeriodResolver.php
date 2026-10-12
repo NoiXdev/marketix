@@ -71,8 +71,8 @@ final class PeriodResolver
         }
 
         try {
-            $start = CarbonImmutable::createFromFormat('!Y-m-d', $from);
-            $end = CarbonImmutable::createFromFormat('!Y-m-d', $to);
+            $start = CarbonImmutable::createFromFormat('!Y-m-d', $from, $now->getTimezone());
+            $end = CarbonImmutable::createFromFormat('!Y-m-d', $to, $now->getTimezone());
         } catch (Throwable) {
             return null;
         }

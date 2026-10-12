@@ -39,9 +39,9 @@ final class AnalyticsQuery
     ) {}
 
     /** @param array<string, mixed> $filters */
-    public static function lastDays(int $days, array $filters = []): self
+    public static function lastDays(int $days, array $filters = [], string $timezone = 'UTC'): self
     {
-        $now = CarbonImmutable::now();
+        $now = CarbonImmutable::now($timezone);
 
         return new self($now->subDays($days - 1)->startOfDay(), $now, self::sanitizeFilters($filters), $days === 1 ? 'hour' : 'day');
     }
@@ -63,6 +63,24 @@ final class AnalyticsQuery
     public function days(): int
     {
         return self::spanInDays($this->from, $this->to);
+    }
+
+    /**
+     * Day boundaries are computed in the site's time zone, but timestamps are
+     * stored in the app time zone: bind this range, never from/to, in queries.
+     *
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
+     */
+    public function storageRange(): array
+    {
+        $storage = config('app.timezone');
+
+        return [$this->from->setTimezone($storage), $this->to->setTimezone($storage)];
+    }
+
+    public function timezone(): string
+    {
+        return $this->from->getTimezone()->getName();
     }
 
     public function previous(): self
