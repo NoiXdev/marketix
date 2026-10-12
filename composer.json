@@ -2,8 +2,8 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "noixdev/marketix",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Self-hosted marketing suite for short links, QR codes and privacy-friendly visitor statistics.",
+    "keywords": ["marketing", "short-links", "url-shortener", "qr-codes", "analytics", "self-hosted"],
     "license": "MIT",
     "require": {
         "php": "^8.3",

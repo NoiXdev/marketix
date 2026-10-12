@@ -3,6 +3,12 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/NoiXdev/marketix/security/advisories/new
     about: Please report security issues privately — do not open a public issue.
+  - name: Documentation
+    url: https://docs.noix.dev/marketix/admin/introduction/
+    about: Setup, operations and reference documentation.
+  - name: Community chat
+    url: https://discord.gg/8mrgcgFbpY
+    about: Join the NoiXdev Discord for help and quick questions.
   - name: Question or discussion
     url: https://github.com/NoiXdev/marketix/discussions
     about: For general questions, ideas, or usage help.
