@@ -1,4 +1,30 @@
-## [2.5.2](https://github.com/NoiXdev/marketix/compare/v2.5.1...v) (2026-10-12)
+## [2.6.0](https://github.com/NoiXdev/marketix/compare/v2.5.2...v) (2026-10-12)
+
+
+### Features
+
+* **analytics:** let users favorite sites and list favorites first ([71b34db](https://github.com/NoiXdev/marketix/commit/71b34dbc6e2744984d36ff6cfeff210d0879a11d))
+* **analytics:** only accept hits from the site's own hostnames ([ad4cb3c](https://github.com/NoiXdev/marketix/commit/ad4cb3c4f1ecb0d170857b4c41183d27935b5c55))
+* **analytics:** report days and hours in each site's time zone ([8b5d213](https://github.com/NoiXdev/marketix/commit/8b5d2132182c454275c620435ba20f1c6cc84807))
+* full-width create and edit pages with a sticky action sidebar ([9264666](https://github.com/NoiXdev/marketix/commit/926466645f2ec8b5b6c77446f197c8a55ff25dd4))
+* move links, QR codes, domains, sites, pixels and QR templates to another project ([a1b0745](https://github.com/NoiXdev/marketix/commit/a1b07455f9aa06f6b6479f9cae0ada853fce3f5c))
+* paginate and search the link, QR code, domain and pixel lists ([65a0f93](https://github.com/NoiXdev/marketix/commit/65a0f9326ecdddbdd4bb6858084013d563aafa38))
+
+
+### Bug Fixes
+
+* **activity:** translate activity descriptions and log names ([086afdc](https://github.com/NoiXdev/marketix/commit/086afdc3b3567581c65e985642592454017c0b9e))
+* **analytics:** count visitors in location and technology breakdowns ([7178b6a](https://github.com/NoiXdev/marketix/commit/7178b6a43fc29435a853c903bd11cf45086f83e9))
+* **domains:** keep domain names unique across projects ([ed3042d](https://github.com/NoiXdev/marketix/commit/ed3042d4c1cb17d6150133aabb9755fe28624066))
+* **i18n:** replace longer placeholders before their prefixes ([27f2f51](https://github.com/NoiXdev/marketix/commit/27f2f51363b9e21ef7a6b963d75809240fb4d0fc))
+* keep the page size picker compact and on one line ([c5893e8](https://github.com/NoiXdev/marketix/commit/c5893e87a6466756ffe4a9b850c36cc38cccca47))
+* **links:** allow reusing the slug of a deleted link ([42bacaf](https://github.com/NoiXdev/marketix/commit/42bacaf3cb03c31336b484be89af94e0c2dc85fe))
+* **links:** tidy up the link detail header ([15c34bd](https://github.com/NoiXdev/marketix/commit/15c34bd2b33ac433463a6e894cbfdcde91e30b09))
+* show a pointer cursor on all enabled buttons ([80893d2](https://github.com/NoiXdev/marketix/commit/80893d27b13637cf7d9c29c6a62da826ce263426))
+* translate flash messages ([7059dd0](https://github.com/NoiXdev/marketix/commit/7059dd0f70f6ff425ecb5c753e380a5e5199bb24))
+* translate login, two-factor and link password messages ([db433be](https://github.com/NoiXdev/marketix/commit/db433be9700b3219dbbfa580db1825866ad91c29))
+
+## [2.5.2](https://github.com/NoiXdev/marketix/compare/v2.5.1...v2.5.2) (2026-10-12)
 
 
 ### Features
