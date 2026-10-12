@@ -50,6 +50,10 @@ return [
         'search' => 'Search',
         'add' => 'Add',
     ],
+    'danger' => [
+        'title' => 'Danger zone',
+        'text' => 'Deleting cannot be undone.',
+    ],
     'dialog' => [
         'title' => 'Are you sure?',
         'type_to_confirm' => 'Type :value to confirm.',

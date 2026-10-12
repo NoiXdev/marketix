@@ -37,7 +37,7 @@ export default function SitesCreate({ trackingModes, consentModes }: { trackingM
           <p className="text-muted mt-1 text-sm">{t('analytics.sites.form.create_subtitle')}</p>
         </div>
 
-        <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0">
             <SiteForm
               form={form}

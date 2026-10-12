@@ -50,6 +50,10 @@ return [
         'search' => 'Zoeken',
         'add' => 'Toevoegen',
     ],
+    'danger' => [
+        'title' => 'Gevarenzone',
+        'text' => 'Verwijderen kan niet ongedaan worden gemaakt.',
+    ],
     'dialog' => [
         'title' => 'Weet u het zeker?',
         'type_to_confirm' => 'Typ :value om te bevestigen.',

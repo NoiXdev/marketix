@@ -1,14 +1,15 @@
 import CodeSnippet from '@/Components/CodeSnippet';
+import { DangerSection, EditLayout, SidebarSection } from '@/Components/EditLayout';
 import { Favicon } from '@/Components/icons/Favicon';
 import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
-import { BackLink, Button, Flash, LinkButton } from '@/Components/ui';
+import { BackLink, Flash, LinkButton } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { confirmTyped } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import SiteForm, { Option, SiteFormData } from '@/Pages/Sites/partials/SiteForm';
 import { PageProps, Site } from '@/types';
 import { router, useForm, usePage } from '@inertiajs/react';
-import { ArrowRight, Trash2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 export default function SitesEdit({
@@ -69,7 +70,7 @@ export default function SitesEdit({
     <AppLayout title={t('analytics.sites.edit')}>
       <div className="px-4 py-6 sm:px-8 sm:py-8">
         <BackLink href={indexUrl}>{t('analytics.sites.back')}</BackLink>
-        <div className="mt-3 mb-6 flex max-w-6xl flex-wrap items-center justify-between gap-4">
+        <div className="mt-3 mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <span className="border-line bg-surface grid h-11 w-11 shrink-0 place-items-center rounded-lg border">
               <Favicon domain={site.domain} className="h-5 w-5 rounded-[3px]" />
@@ -89,48 +90,43 @@ export default function SitesEdit({
 
         <Flash />
 
-        <div className="grid max-w-6xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="min-w-0 space-y-5">
-            <section className="border-line bg-surface rounded-[var(--radius)] border p-5">
-              <h2 className="text-foreground text-sm font-semibold">{t('analytics.sites.snippet_title')}</h2>
-              <p className="text-muted mt-1 mb-3 text-xs">{t('analytics.sites.snippet_hint', { domain: site.domain })}</p>
-              <CodeSnippet code={snippet} language="html" wrap className="w-full" />
-            </section>
+        <EditLayout
+          aside={
+            <>
+              <SidebarSection title={t('analytics.sites.form.status.title')}>
+                <p className="flex items-start gap-2 text-sm">
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${lastSeenAt ? 'bg-[color:var(--success-dot)]' : 'bg-[color:var(--warning-dot)]'}`} />
+                  <span className="text-foreground">
+                    {lastSeenAt ? t('analytics.sites.form.status.receiving', { time: lastSeen(lastSeenAt) }) : t('analytics.sites.form.status.waiting')}
+                  </span>
+                </p>
+                {!lastSeenAt && <p className="text-muted mt-2 text-xs leading-relaxed">{t('analytics.sites.form.status.waiting_hint')}</p>}
+              </SidebarSection>
+              <MoveToProjectSection name={site.name} hint={t('move.hints.site')} action={route('app.project.sites.move', { project: projectId, site: site.id })} />
+              <DangerSection
+                title={t('analytics.sites.form.danger.title')}
+                text={t('analytics.sites.form.danger.text')}
+                label={t('analytics.sites.delete.action')}
+                onDelete={destroy}
+              />
+            </>
+          }
+        >
+          <section className="border-line bg-surface rounded-[var(--radius)] border p-5">
+            <h2 className="text-foreground text-sm font-semibold">{t('analytics.sites.snippet_title')}</h2>
+            <p className="text-muted mt-1 mb-3 text-xs">{t('analytics.sites.snippet_hint', { domain: site.domain })}</p>
+            <CodeSnippet code={snippet} language="html" wrap className="w-full" />
+          </section>
 
-            <SiteForm
-              form={form}
-              trackingModes={trackingModes}
-              consentModes={consentModes}
-              submitLabel={t('common.actions.save')}
-              cancelHref={indexUrl}
-              onSubmit={() => form.put(route('app.project.sites.update', { project: projectId, site: site.id }))}
-            />
-          </div>
-
-          <aside className="space-y-4 lg:sticky lg:top-6">
-            <section className="border-line bg-surface rounded-[var(--radius)] border p-5 shadow-[var(--shadow-sm)]">
-              <h2 className="text-foreground text-sm font-semibold">{t('analytics.sites.form.status.title')}</h2>
-              <p className="mt-2 flex items-start gap-2 text-sm">
-                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${lastSeenAt ? 'bg-[color:var(--success-dot)]' : 'bg-[color:var(--warning-dot)]'}`} />
-                <span className="text-foreground">
-                  {lastSeenAt ? t('analytics.sites.form.status.receiving', { time: lastSeen(lastSeenAt) }) : t('analytics.sites.form.status.waiting')}
-                </span>
-              </p>
-              {!lastSeenAt && <p className="text-muted mt-2 text-xs leading-relaxed">{t('analytics.sites.form.status.waiting_hint')}</p>}
-            </section>
-
-            <MoveToProjectSection name={site.name} hint={t('move.hints.site')} action={route('app.project.sites.move', { project: projectId, site: site.id })} />
-
-            <section className="bg-surface rounded-[var(--radius)] border border-[color:color-mix(in_srgb,var(--danger-foreground)_30%,transparent)] p-5">
-              <h2 className="text-danger-foreground text-sm font-semibold">{t('analytics.sites.form.danger.title')}</h2>
-              <p className="text-muted mt-1 text-xs leading-relaxed">{t('analytics.sites.form.danger.text')}</p>
-              <Button variant="danger" size="sm" className="mt-3" onClick={destroy}>
-                <Trash2 className="h-3.5 w-3.5" />
-                {t('analytics.sites.delete.action')}
-              </Button>
-            </section>
-          </aside>
-        </div>
+          <SiteForm
+            form={form}
+            trackingModes={trackingModes}
+            consentModes={consentModes}
+            submitLabel={t('common.actions.save')}
+            cancelHref={indexUrl}
+            onSubmit={() => form.put(route('app.project.sites.update', { project: projectId, site: site.id }))}
+          />
+        </EditLayout>
       </div>
     </AppLayout>
   );

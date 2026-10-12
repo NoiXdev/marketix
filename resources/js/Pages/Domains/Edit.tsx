@@ -1,7 +1,9 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { DangerSection, EditLayout, SidebarSection } from '@/Components/EditLayout';
 import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink, Button, Field, FormSection, Input } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import DnsInfoBox from '@/Pages/Domains/Partials/DnsInfoBox';
 import StatusPills from '@/Pages/Domains/Partials/StatusPills';
@@ -32,6 +34,11 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
     router.post(route('app.project.domains.check', { project: project!.id, domain: domain.id }), {}, { preserveScroll: true, onFinish: () => setChecking(false) });
   }
 
+  async function destroy() {
+    if (!(await confirmDelete({ title: t('domains.delete.title'), text: t('domains.delete.confirm', { name: domain.name }) }))) return;
+    router.delete(route('app.project.domains.destroy', { project: project!.id, domain: domain.id }));
+  }
+
   return (
     <AppLayout title={t('domains.form.edit_page_title')}>
       <div className="px-8 py-8">
@@ -42,44 +49,49 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
           </h1>
         </div>
 
-        <div className="mb-6 max-w-lg space-y-4">
+        <EditLayout
+          aside={
+            <>
+              <SidebarSection
+                title={t('domains.form.status_title')}
+                action={
+                  <Button variant="secondary" size="sm" onClick={check} disabled={checking}>
+                    <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
+                    {t('domains.form.check_now')}
+                  </Button>
+                }
+              >
+                <StatusPills domain={domain} />
+                <dl className="text-muted mt-3 space-y-1 text-xs">
+                  {domain.check_details?.dns?.domain_ips && (
+                    <div>
+                      {t('domains.form.resolves_to')} {domain.check_details.dns.domain_ips.join(', ') || '—'}
+                    </div>
+                  )}
+                  {domain.check_details?.ssl?.error && (
+                    <div>
+                      {t('domains.form.ssl_error')} {domain.check_details.ssl.error}
+                    </div>
+                  )}
+                  {domain.check_details?.reachable?.error && (
+                    <div>
+                      {t('domains.form.reachable_error')} {domain.check_details.reachable.error}
+                    </div>
+                  )}
+                  {domain.last_checked_at && (
+                    <div>
+                      {t('domains.form.last_checked')} {new Date(domain.last_checked_at).toLocaleString()}
+                    </div>
+                  )}
+                </dl>
+              </SidebarSection>
+              <MoveToProjectSection name={domain.name} hint={t('move.hints.domain')} action={route('app.project.domains.move', { project: project!.id, domain: domain.id })} />
+              <DangerSection onDelete={destroy} />
+            </>
+          }
+        >
           <DnsInfoBox appDomain={appDomain} />
 
-          <FormSection>
-            <div className="flex items-center justify-between">
-              <h2 className="text-foreground text-sm font-semibold">{t('domains.form.status_title')}</h2>
-              <Button variant="secondary" size="sm" onClick={check} disabled={checking}>
-                <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
-                {t('domains.form.check_now')}
-              </Button>
-            </div>
-            <StatusPills domain={domain} />
-            <dl className="text-muted space-y-1 text-xs">
-              {domain.check_details?.dns?.domain_ips && (
-                <div>
-                  {t('domains.form.resolves_to')} {domain.check_details.dns.domain_ips.join(', ') || '—'}
-                </div>
-              )}
-              {domain.check_details?.ssl?.error && (
-                <div>
-                  {t('domains.form.ssl_error')} {domain.check_details.ssl.error}
-                </div>
-              )}
-              {domain.check_details?.reachable?.error && (
-                <div>
-                  {t('domains.form.reachable_error')} {domain.check_details.reachable.error}
-                </div>
-              )}
-              {domain.last_checked_at && (
-                <div>
-                  {t('domains.form.last_checked')} {new Date(domain.last_checked_at).toLocaleString()}
-                </div>
-              )}
-            </dl>
-          </FormSection>
-        </div>
-
-        <div className="max-w-lg">
           <form onSubmit={submit} className="space-y-5">
             <FormSection>
               <Field
@@ -122,12 +134,9 @@ export default function DomainsEdit({ domain, appDomain, history }: { domain: Do
               </Link>
             </div>
           </form>
-        </div>
 
-        <div className="mb-6 max-w-lg space-y-4">
-          <MoveToProjectSection name={domain.name} hint={t('move.hints.domain')} action={route('app.project.domains.move', { project: project!.id, domain: domain.id })} />
           <ActivityHistory history={history} />
-        </div>
+        </EditLayout>
       </div>
     </AppLayout>
   );

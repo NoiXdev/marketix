@@ -1,10 +1,12 @@
 import ActivityHistory from '@/Components/ActivityHistory';
+import { DangerSection, EditLayout } from '@/Components/EditLayout';
 import { MoveToProjectSection } from '@/Components/MoveToProjectDialog';
 import { BackLink } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, Domain, PageProps, PixelOption } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import LinkForm, { LinkFormData } from './partials/LinkForm';
 import { AbVariant, DeviceRule, GeoRule, LanguageRule } from './partials/TargetingSection';
 import { UtmParams } from './partials/UtmSection';
@@ -48,6 +50,11 @@ export default function LinksEdit({ url, domains, pixels, history }: { url: UrlD
     pixel_ids: url.pixel_ids ?? [],
   });
 
+  async function destroy() {
+    if (!(await confirmDelete({ title: t('links.delete.title'), text: t('links.delete.confirm', { slug: url.slug }) }))) return;
+    router.delete(route('app.project.links.destroy', { project: project!.id, url: url.id }));
+  }
+
   return (
     <AppLayout title={t('common.actions.edit')}>
       <div className="px-8 py-8">
@@ -58,7 +65,14 @@ export default function LinksEdit({ url, domains, pixels, history }: { url: UrlD
           </h1>
         </div>
 
-        <div className="max-w-2xl space-y-4">
+        <EditLayout
+          aside={
+            <>
+              <MoveToProjectSection name={url.slug} hint={t('move.hints.url')} action={route('app.project.links.move', { project: project!.id, url: url.id })} withDomain />
+              <DangerSection onDelete={destroy} />
+            </>
+          }
+        >
           <LinkForm
             data={data}
             setData={setData}
@@ -74,9 +88,8 @@ export default function LinksEdit({ url, domains, pixels, history }: { url: UrlD
               put(route('app.project.links.update', { project: project!.id, url: url.id }));
             }}
           />
-          <MoveToProjectSection name={url.slug} hint={t('move.hints.url')} action={route('app.project.links.move', { project: project!.id, url: url.id })} withDomain />
           <ActivityHistory history={history} />
-        </div>
+        </EditLayout>
       </div>
     </AppLayout>
   );

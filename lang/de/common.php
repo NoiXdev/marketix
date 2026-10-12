@@ -50,6 +50,10 @@ return [
         'search' => 'Suchen',
         'add' => 'Hinzufügen',
     ],
+    'danger' => [
+        'title' => 'Gefahrenzone',
+        'text' => 'Das Löschen kann nicht rückgängig gemacht werden.',
+    ],
     'dialog' => [
         'title' => 'Sind Sie sicher?',
         'type_to_confirm' => 'Geben Sie :value ein, um zu bestätigen.',

@@ -48,7 +48,7 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
 
         <Flash />
 
-        <form onSubmit={submit} className="max-w-md space-y-4">
+        <form onSubmit={submit} className="space-y-4">
           <Field label={t('admin.storage.fields.driver')} htmlFor="driver" error={errors.driver}>
             <Select id="driver" value={data.driver} onChange={(e) => setData('driver', e.target.value)}>
               <option value="local">{t('admin.storage.options.local')}</option>
@@ -56,7 +56,7 @@ export default function AdminStorageEdit({ settings, has_s3_secret }: Props) {
             </Select>
           </Field>
 
-          {driverChanged && <div className="bg-warning-soft text-warning-foreground max-w-md rounded-md px-4 py-3 text-sm">{t('admin.storage.driver_changed_warning')}</div>}
+          {driverChanged && <div className="bg-warning-soft text-warning-foreground rounded-md px-4 py-3 text-sm">{t('admin.storage.driver_changed_warning')}</div>}
 
           {data.driver === 's3' && (
             <fieldset className="border-line space-y-4 rounded-md border p-4">

@@ -1,3 +1,4 @@
+import { SidebarSection } from '@/Components/EditLayout';
 import { Button, Field, Input, Select } from '@/Components/ui';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
@@ -29,15 +30,13 @@ export function MoveToProjectSection(props: Omit<Props, 'onClose'>) {
   if (targets.length === 0) return null;
 
   return (
-    <section className="border-line bg-surface rounded-[var(--radius)] border p-5">
-      <h2 className="text-foreground text-sm font-semibold">{t('move.action')}</h2>
-      <p className="text-muted mt-1 text-xs leading-relaxed">{props.hint}</p>
-      <Button variant="secondary" size="sm" className="mt-3" onClick={() => setOpen(true)}>
+    <SidebarSection title={t('move.action')} description={props.hint}>
+      <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
         <FolderInput className="h-3.5 w-3.5" />
         {t('move.open')}
       </Button>
       {open && <MoveToProjectDialog {...props} onClose={() => setOpen(false)} />}
-    </section>
+    </SidebarSection>
   );
 }
 
@@ -80,6 +79,7 @@ export default function MoveToProjectDialog({ name, action, hint, withDomain = f
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    event.stopPropagation();
     if (!ready) return;
     form.post(action, { preserveScroll: true, preserveState: 'errors' });
   }
