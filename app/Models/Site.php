@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Models\Concerns\SetsActivityProject;
+use App\Support\Analytics\ChannelClassifier;
 use Database\Factories\SiteFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,7 @@ class Site extends Model
         'project_id',
         'name',
         'domain',
+        'additional_hostnames',
         'tracking_id',
         'tracking_mode',
         'consent_mode',
@@ -61,7 +63,7 @@ class Site extends Model
     {
         return LogOptions::defaults()
             ->useLogName('site')
-            ->logOnly(['name', 'domain', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
+            ->logOnly(['name', 'domain', 'additional_hostnames', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
@@ -111,6 +113,35 @@ class Site extends Model
             'track_file_downloads' => 'boolean',
             'retention_days' => 'integer',
         ];
+    }
+
+    /**
+     * The site's domain and any additional hostnames, without "www."; their
+     * subdomains are accepted as well.
+     *
+     * @return list<string>
+     */
+    public function trackedDomains(): array
+    {
+        $domains = array_map(
+            fn (string $domain) => ChannelClassifier::normalizeDomain($domain),
+            [$this->domain, ...explode(',', (string) $this->additional_hostnames)],
+        );
+
+        return array_values(array_unique(array_filter($domains)));
+    }
+
+    public function acceptsHostname(string $hostname): bool
+    {
+        $hostname = strtolower($hostname);
+
+        foreach ($this->trackedDomains() as $domain) {
+            if ($hostname === $domain || str_ends_with($hostname, '.'.$domain)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return list<string> */

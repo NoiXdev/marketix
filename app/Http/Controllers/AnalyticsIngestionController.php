@@ -101,6 +101,10 @@ class AnalyticsIngestionController extends Controller
             return $noop; // unknown/deleted site — silent, no info leak
         }
 
+        if (! $this->fromTrackedHost($request, $site, $data['hostname'] ?? null)) {
+            return $noop;
+        }
+
         if ($site->respect_dnt && $request->header('DNT') === '1') {
             return $noop;
         }
@@ -174,6 +178,23 @@ class AnalyticsIngestionController extends Controller
         );
 
         return response('', 202);
+    }
+
+    /**
+     * Browsers send an Origin header that page scripts cannot change, so it
+     * wins over the hostname in the payload. Hits that name neither come from
+     * non-browser clients, which could forge both anyway.
+     */
+    private function fromTrackedHost(Request $request, Site $site, ?string $payloadHostname): bool
+    {
+        $origin = $request->headers->get('Origin');
+        $host = $origin !== null ? parse_url($origin, PHP_URL_HOST) : $this->hostname($payloadHostname);
+
+        if ($origin !== null && ! is_string($host)) {
+            return false;
+        }
+
+        return $host === null || $site->acceptsHostname($host);
     }
 
     private function hostname(?string $hostname): ?string

@@ -136,7 +136,7 @@ class AnalyticsIngestionTest extends TestCase
 
     public function test_page_view_stores_normalized_hostname_and_title(): void
     {
-        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+        $site = Site::factory()->create(['domain' => 'example.com', 'tracking_mode' => TrackingMode::Cookieless]);
 
         $body = json_encode([
             'site' => $site->tracking_id,
