@@ -41,7 +41,7 @@ class ActivityController extends Controller
                 'from' => $request->string('from')->toString() ?: null,
                 'to' => $request->string('to')->toString() ?: null,
             ],
-            'logNames' => ['url', 'domain', 'qrcode', 'pixel', 'project', 'membership', 'invitation', 'security'],
+            'logNames' => ['url', 'domain', 'qrcode', 'pixel', 'site', 'goal', 'funnel', 'project', 'membership', 'invitation', 'security'],
             'projects' => Project::query()->orderBy('name')->get(['id', 'name']),
         ]);
     }

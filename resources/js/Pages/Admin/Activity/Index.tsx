@@ -1,6 +1,7 @@
 import ActivityFeed from '@/Components/ActivityFeed';
 import { Input, PageHeader, Pagination, Select } from '@/Components/ui';
 import AdminLayout from '@/Layouts/AdminLayout';
+import { logNameLabel } from '@/lib/activity';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry } from '@/types';
 import { router } from '@inertiajs/react';
@@ -48,7 +49,7 @@ export default function AdminActivityIndex({
               <option value="">{t('admin.activity.filters.all_types')}</option>
               {logNames.map((n) => (
                 <option key={n} value={n}>
-                  {n}
+                  {logNameLabel(n, t)}
                 </option>
               ))}
             </Select>
