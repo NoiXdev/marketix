@@ -1,3 +1,4 @@
+import { describeActivity } from '@/lib/activity';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry } from '@/types';
 import { router } from '@inertiajs/react';
@@ -54,7 +55,7 @@ export default function ActivityHistory({ history }: { history?: ActivityEntry[]
               {history.map((a) => (
                 <li key={a.id} className="py-2">
                   <p className="text-muted text-sm">
-                    <span className="text-foreground font-medium">{a.causer?.name ?? 'System'}</span> {a.description}{' '}
+                    <span className="text-foreground font-medium">{a.causer?.name ?? 'System'}</span> {describeActivity(a, t)}{' '}
                     <span className="text-subtle text-xs">{new Date(a.created_at).toLocaleString()}</span>
                   </p>
                   <Diff changes={a.changes} />

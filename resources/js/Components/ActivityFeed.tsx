@@ -1,37 +1,7 @@
 import { Badge } from '@/Components/ui';
+import { describeActivity, logNameLabel } from '@/lib/activity';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry } from '@/types';
-
-const KNOWN_LABEL_CODES = new Set([
-  'created',
-  'updated',
-  'deleted',
-  'login',
-  'password_changed',
-  'password_reset',
-  'two_factor_enabled',
-  'two_factor_disabled',
-  'passkey_added',
-  'passkey_removed',
-  'passkey_renamed',
-  'member_removed',
-  'role_changed',
-  'invitation_sent',
-  'invitation_revoked',
-  'invitation_resent',
-  'invitation_accepted',
-]);
-
-function describe(a: ActivityEntry, t: (key: string, replacements?: Record<string, string | number>) => string): string {
-  if ((a.description === 'moved_in' || a.description === 'moved_out') && a.subject_type) {
-    return t(`activity.feed.${a.description}`, { subject: a.subject_type, project: String(a.properties.project ?? '') });
-  }
-  const verb = KNOWN_LABEL_CODES.has(a.description) ? t(`activity.feed.labels.${a.description}`) : a.description;
-  if (['created', 'updated', 'deleted'].includes(a.description) && a.subject_type) {
-    return t('activity.feed.subject_line', { verb, subject: a.subject_type });
-  }
-  return verb;
-}
 
 export default function ActivityFeed({ activities, showProject = false }: { activities: ActivityEntry[]; showProject?: boolean }) {
   const { t } = useTranslation();
@@ -49,10 +19,10 @@ export default function ActivityFeed({ activities, showProject = false }: { acti
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-muted truncate text-sm">
-              <span className="text-foreground font-medium">{a.causer?.name ?? 'System'}</span> {describe(a, t)}
+              <span className="text-foreground font-medium">{a.causer?.name ?? 'System'}</span> {describeActivity(a, t)}
             </p>
             <p className="text-subtle text-xs">
-              <Badge>{a.log_name}</Badge> {showProject && a.project && <Badge>{a.project.name}</Badge>}
+              <Badge>{logNameLabel(a.log_name, t)}</Badge> {showProject && a.project && <Badge>{a.project.name}</Badge>}
               {showProject && a.project && ' '}
               {new Date(a.created_at).toLocaleString()}
             </p>

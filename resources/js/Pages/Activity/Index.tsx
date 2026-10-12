@@ -1,6 +1,7 @@
 import ActivityFeed from '@/Components/ActivityFeed';
 import { PageHeader, Pagination, Select } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
+import { logNameLabel } from '@/lib/activity';
 import { useTranslation } from '@/lib/i18n';
 import { ActivityEntry, PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
@@ -27,7 +28,7 @@ export default function ActivityIndex({ activities, logName, logNames }: { activ
         <option value="">{t('activity.all')}</option>
         {logNames.map((n) => (
           <option key={n} value={n}>
-            {n}
+            {logNameLabel(n, t)}
           </option>
         ))}
       </Select>
