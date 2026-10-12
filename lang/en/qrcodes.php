@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Search name or short link…',
     'title' => 'QR Codes',
     'subtitle' => 'Generate and manage your QR codes',
     'create' => 'Create QR code',

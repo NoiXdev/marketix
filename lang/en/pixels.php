@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Search name or ID…',
     'title' => 'Pixels',
     'subtitle' => 'Manage tracking pixels attached to your short links',
     'create' => 'Add pixel',

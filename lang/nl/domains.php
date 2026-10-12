@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Domeinen zoeken…',
     'title' => 'Domeinen',
     'subtitle' => 'Beheer aangepaste domeinen voor dit project',
     'create' => 'Domein toevoegen',

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Rechercher un nom ou un ID…',
     'title' => 'Pixels',
     'subtitle' => 'Gérez les pixels de suivi liés à vos liens courts',
     'create' => 'Ajouter un pixel',

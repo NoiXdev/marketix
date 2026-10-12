@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Search domains…',
     'title' => 'Domains',
     'subtitle' => 'Manage custom domains for this project',
     'create' => 'Add domain',

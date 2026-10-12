@@ -1,3 +1,4 @@
+import { ListFilters, ListFooter, ListSearch, NoResults, visitList } from '@/Components/ListControls';
 import { Badge, EmptyState, Flash, IconButton, LinkButton, PageHeader, RowActions, TableCard } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import QrDownloadMenu from '@/Pages/QrCodes/partials/QrDownloadMenu';
@@ -5,7 +6,7 @@ import { QrStyle, QrType } from '@/data/qrTypes';
 import { confirmDelete } from '@/lib/confirm';
 import { useTranslation } from '@/lib/i18n';
 import { ROW_LINK_CLASS, rowLink } from '@/lib/rowLink';
-import { PageProps } from '@/types';
+import { PageProps, Paginated } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Palette, Pencil, Plus, QrCode, Trash2 } from 'lucide-react';
 
@@ -22,9 +23,10 @@ interface QrRow {
   dynamic_url: string | null;
 }
 
-export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
+export default function QrCodesIndex({ qrCodes, filters }: { qrCodes: Paginated<QrRow>; filters: ListFilters }) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
+  const listUrl = route('app.project.qrcodes.index', { project: project!.id });
 
   async function destroy(qr: QrRow) {
     if (!(await confirmDelete({ title: t('qrcodes.delete.title'), text: t('qrcodes.delete.confirm', { name: qr.name }) }))) return;
@@ -48,7 +50,7 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
         <PageHeader title={t('qrcodes.title')} subtitle={t('qrcodes.subtitle')} action={createBtn} />
         <Flash />
 
-        {qrCodes.length === 0 ? (
+        {qrCodes.total === 0 && !filters.search ? (
           <EmptyState
             icon={QrCode}
             title={t('qrcodes.empty')}
@@ -60,37 +62,47 @@ export default function QrCodesIndex({ qrCodes }: { qrCodes: QrRow[] }) {
             }
           />
         ) : (
-          <TableCard
-            columns={[
-              { label: t('qrcodes.columns.name') },
-              { label: t('qrcodes.columns.type') },
-              { label: t('qrcodes.columns.kind') },
-              { label: t('qrcodes.columns.scans'), align: 'right' },
-              { label: '' },
-            ]}
-          >
-            <tbody className="divide-line divide-y">
-              {qrCodes.map((qr) => (
-                <tr key={qr.id} onClick={rowLink(route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id }))} className={`group ${ROW_LINK_CLASS}`}>
-                  <td className="text-foreground px-4 py-3 font-medium">
-                    <Link href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} className="hover:text-accent-soft-foreground">
-                      {qr.name}
-                    </Link>
-                  </td>
-                  <td className="text-muted px-4 py-3 capitalize">{qr.type.replace('_', ' ')}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={qr.is_dynamic ? 'accent' : 'neutral'}>{qr.is_dynamic ? t('qrcodes.kind.dynamic') : t('qrcodes.kind.static')}</Badge>
-                  </td>
-                  <td className="text-muted px-4 py-3 text-right tabular-nums">{qr.is_dynamic ? qr.scans.toLocaleString() : '—'}</td>
-                  <RowActions>
-                    <QrDownloadMenu name={qr.name} type={qr.type} isDynamic={qr.is_dynamic} content={qr.content} dynamicUrl={qr.dynamic_url} style={qr.style} />
-                    <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} />
-                    <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(qr)} />
-                  </RowActions>
-                </tr>
-              ))}
-            </tbody>
-          </TableCard>
+          <>
+            <ListSearch value={filters.search} placeholder={t('qrcodes.search_placeholder')} onSearch={(search) => visitList(listUrl, { ...filters, search })} />
+            {qrCodes.data.length === 0 && filters.search ? (
+              <NoResults term={filters.search} />
+            ) : (
+              <>
+                <TableCard
+                  columns={[
+                    { label: t('qrcodes.columns.name') },
+                    { label: t('qrcodes.columns.type') },
+                    { label: t('qrcodes.columns.kind') },
+                    { label: t('qrcodes.columns.scans'), align: 'right' },
+                    { label: '' },
+                  ]}
+                >
+                  <tbody className="divide-line divide-y">
+                    {qrCodes.data.map((qr) => (
+                      <tr key={qr.id} onClick={rowLink(route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id }))} className={`group ${ROW_LINK_CLASS}`}>
+                        <td className="text-foreground px-4 py-3 font-medium">
+                          <Link href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} className="hover:text-accent-soft-foreground">
+                            {qr.name}
+                          </Link>
+                        </td>
+                        <td className="text-muted px-4 py-3 capitalize">{qr.type.replace('_', ' ')}</td>
+                        <td className="px-4 py-3">
+                          <Badge variant={qr.is_dynamic ? 'accent' : 'neutral'}>{qr.is_dynamic ? t('qrcodes.kind.dynamic') : t('qrcodes.kind.static')}</Badge>
+                        </td>
+                        <td className="text-muted px-4 py-3 text-right tabular-nums">{qr.is_dynamic ? qr.scans.toLocaleString() : '—'}</td>
+                        <RowActions>
+                          <QrDownloadMenu name={qr.name} type={qr.type} isDynamic={qr.is_dynamic} content={qr.content} dynamicUrl={qr.dynamic_url} style={qr.style} />
+                          <IconButton icon={Pencil} label={t('common.actions.edit')} href={route('app.project.qrcodes.edit', { project: project!.id, qrCode: qr.id })} />
+                          <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={() => destroy(qr)} />
+                        </RowActions>
+                      </tr>
+                    ))}
+                  </tbody>
+                </TableCard>
+                <ListFooter page={qrCodes} perPage={filters.per_page} onPerPage={(per_page) => visitList(listUrl, { ...filters, per_page })} />
+              </>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

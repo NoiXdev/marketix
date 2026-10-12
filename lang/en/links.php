@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Search slug, target or domain…',
     'title' => 'Links',
     'create' => 'Create link',
     'empty' => 'No links yet',

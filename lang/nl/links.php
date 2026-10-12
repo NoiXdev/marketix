@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Zoek op slug, doel of domein…',
     'title' => 'Links',
     'create' => 'Link aanmaken',
     'empty' => 'Nog geen links',

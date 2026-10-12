@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'search_placeholder' => 'Zoek op naam of korte link…',
     'title' => 'QR-codes',
     'subtitle' => 'Genereer en beheer je QR-codes',
     'create' => 'QR-code maken',

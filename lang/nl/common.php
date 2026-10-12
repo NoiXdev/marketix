@@ -113,4 +113,9 @@ return [
         'reset' => 'Weergave resetten',
         'zoom_hint' => 'Houd Ctrl ingedrukt en scroll om te zoomen',
     ],
+    'list' => [
+        'no_results' => 'Geen resultaten voor “:term”.',
+        'summary' => ':from–:to van :total',
+        'per_page' => 'Per pagina',
+    ],
 ];

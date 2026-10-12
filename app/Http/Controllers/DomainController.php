@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\FiltersIndex;
 use App\Http\Requests\DomainRequest;
 use App\Jobs\CheckDomainStatusJob;
 use Illuminate\Http\Request;
@@ -9,12 +10,20 @@ use Inertia\Inertia;
 
 class DomainController extends Controller
 {
+    use FiltersIndex;
+
     public function index(Request $request)
     {
         $project = $request->get('project');
+        $search = $this->search($request);
 
         return inertia('Domains/Index', [
-            'domains' => $project->domains()->latest()->get(),
+            'domains' => $project->domains()
+                ->when($search, fn ($query) => $query->where('name', 'like', "%{$search}%"))
+                ->latest()
+                ->paginate($this->perPage($request))
+                ->withQueryString(),
+            'filters' => $this->filters($request),
             'appDomain' => config('app.domain'),
         ]);
     }

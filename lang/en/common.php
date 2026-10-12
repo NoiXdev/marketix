@@ -113,4 +113,9 @@ return [
         'reset' => 'Reset view',
         'zoom_hint' => 'Hold Ctrl and scroll to zoom',
     ],
+    'list' => [
+        'no_results' => 'No results for “:term”.',
+        'summary' => ':from–:to of :total',
+        'per_page' => 'Per page',
+    ],
 ];
