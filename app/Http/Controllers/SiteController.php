@@ -15,11 +15,16 @@ class SiteController extends Controller
     public function index(Request $request, SiteOverview $overview)
     {
         $project = $request->get('project');
-        $sites = $project->sites()->latest()->get();
+        $sites = $project->sites()
+            ->withExists(['favoritedBy as is_favorite' => fn ($query) => $query->whereKey($request->user()->id)])
+            ->orderByDesc('is_favorite')
+            ->latest()
+            ->get();
 
         return inertia('Sites/Index', [
             'sites' => $sites->map(fn ($s) => [
                 'id' => $s->id,
+                'is_favorite' => $s->is_favorite,
                 'name' => $s->name,
                 'domain' => $s->domain,
                 'tracking_id' => $s->tracking_id,

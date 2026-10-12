@@ -22,6 +22,8 @@ return [
             'no_data_text' => 'Binden Sie den Tracking-Code ein, um Besuche zu erfassen.',
             'setup' => 'Tracking-Code',
             'add_hint' => 'Weitere Website oder Shop erfassen',
+            'favorite' => 'Zu Favoriten hinzufügen',
+            'unfavorite' => 'Aus Favoriten entfernen',
         ],
         'edit' => 'Website bearbeiten',
         'empty' => 'Noch keine Websites.',

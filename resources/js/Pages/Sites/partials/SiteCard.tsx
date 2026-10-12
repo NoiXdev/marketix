@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/i18n';
 import Sparkline from '@/Pages/Sites/partials/Sparkline';
 import { Site } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ArrowRight, Code2, Pencil, Trash2 } from 'lucide-react';
+import { ArrowRight, Code2, Pencil, Star, Trash2 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 
 export type SiteStats = {
@@ -18,11 +18,14 @@ export type SiteStats = {
   last_seen_at: string;
 };
 
+export type OverviewSite = Site & { tracking_mode_label: string; is_favorite: boolean };
+
 type Props = {
-  site: Site & { tracking_mode_label: string };
+  site: OverviewSite;
   stats: SiteStats | null | undefined;
   analyticsUrl: string;
   editUrl: string;
+  onToggleFavorite: () => void;
   onDelete: () => void;
 };
 
@@ -52,7 +55,7 @@ function Skeleton() {
   );
 }
 
-export default function SiteCard({ site, stats, analyticsUrl, editUrl, onDelete }: Props) {
+export default function SiteCard({ site, stats, analyticsUrl, editUrl, onToggleFavorite, onDelete }: Props) {
   const { t, locale } = useTranslation();
   const number = (n: number) => n.toLocaleString(locale);
   const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
@@ -84,6 +87,12 @@ export default function SiteCard({ site, stats, analyticsUrl, editUrl, onDelete 
           <p className="text-muted truncate text-sm">{site.domain}</p>
         </div>
         <div className="relative z-10 -mt-1 -mr-1.5 flex items-center gap-0.5">
+          <IconButton
+            icon={Star}
+            label={t(site.is_favorite ? 'analytics.sites.overview.unfavorite' : 'analytics.sites.overview.favorite')}
+            pressed={site.is_favorite}
+            onClick={onToggleFavorite}
+          />
           <IconButton icon={Pencil} label={t('common.actions.edit')} href={editUrl} />
           <IconButton icon={Trash2} label={t('common.actions.delete')} variant="danger" onClick={onDelete} />
         </div>

@@ -22,6 +22,8 @@ return [
             'no_data_text' => 'Intégrez le code de suivi pour commencer à mesurer les visites.',
             'setup' => 'Code de suivi',
             'add_hint' => 'Mesurer un autre site ou une boutique',
+            'favorite' => 'Ajouter aux favoris',
+            'unfavorite' => 'Retirer des favoris',
         ],
         'edit' => 'Modifier le site',
         'empty' => 'Aucun site pour le moment.',

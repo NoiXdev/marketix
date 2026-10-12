@@ -22,6 +22,8 @@ return [
             'no_data_text' => 'Add the tracking code to start collecting visits.',
             'setup' => 'Tracking code',
             'add_hint' => 'Track another website or shop',
+            'favorite' => 'Add to favorites',
+            'unfavorite' => 'Remove from favorites',
         ],
         'edit' => 'Edit site',
         'empty' => 'No sites yet.',

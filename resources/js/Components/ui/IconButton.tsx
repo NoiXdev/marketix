@@ -7,6 +7,7 @@ const variants = {
   default: 'text-subtle hover:bg-elevated hover:text-foreground',
   danger: 'text-subtle hover:bg-danger-soft hover:text-danger-foreground',
 };
+const pressedCls = 'text-[color:var(--warning-dot)] hover:bg-elevated';
 
 export function IconButton({
   icon: Icon,
@@ -16,6 +17,7 @@ export function IconButton({
   variant = 'default',
   disabled,
   spinning,
+  pressed,
 }: {
   icon: LucideIcon;
   label: string;
@@ -24,9 +26,10 @@ export function IconButton({
   variant?: 'default' | 'danger';
   disabled?: boolean;
   spinning?: boolean;
+  pressed?: boolean;
 }) {
-  const cls = `${base} ${variants[variant]}`;
-  const inner = <Icon className={`h-4 w-4 ${spinning ? 'animate-spin' : ''}`} />;
+  const cls = `${base} ${pressed ? pressedCls : variants[variant]}`;
+  const inner = <Icon className={`h-4 w-4 ${spinning ? 'animate-spin' : ''} ${pressed ? 'fill-current' : ''}`} />;
   if (href) {
     return (
       <Link href={href} title={label} aria-label={label} className={cls}>
@@ -35,7 +38,7 @@ export function IconButton({
     );
   }
   return (
-    <button type="button" title={label} aria-label={label} onClick={onClick} disabled={disabled} className={cls}>
+    <button type="button" title={label} aria-label={label} aria-pressed={pressed} onClick={onClick} disabled={disabled} className={cls}>
       {inner}
     </button>
   );
