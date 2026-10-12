@@ -28,6 +28,8 @@ class Url extends Model
 
     use HasUlids, LogsActivity, SetsActivityProject, SoftDeletes;
 
+    protected $hidden = ['active_slug'];
+
     protected $fillable = [
         'project_id',
         'domain_id',

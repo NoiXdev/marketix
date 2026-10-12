@@ -63,7 +63,7 @@ class CreateLinkTool extends Tool
             ['slug' => $slug],
             ['slug' => [
                 'required', 'string', 'max:255', 'alpha_dash',
-                Rule::unique('urls', 'slug')->where('domain_id', $domain->id),
+                Rule::unique('urls', 'slug')->where('domain_id', $domain->id)->withoutTrashed(),
             ]],
         )->validate();
 

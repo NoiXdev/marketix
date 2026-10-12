@@ -109,7 +109,7 @@ class MoveToProjectTest extends TestCase
     {
         $url = $this->link(Domain::create(['project_id' => $this->source->id, 'name' => 'source.test']));
         $targetDomain = Domain::create(['project_id' => $this->target->id, 'name' => 'target.test']);
-        Url::factory()->create(['project_id' => $this->target->id, 'domain_id' => $targetDomain->id, 'slug' => 'promo'])->delete();
+        Url::factory()->create(['project_id' => $this->target->id, 'domain_id' => $targetDomain->id, 'slug' => 'promo']);
 
         $this->actingAs($this->user)
             ->post(route('app.project.links.move', ['project' => $this->source->id, 'url' => $url->id]), [
@@ -119,6 +119,22 @@ class MoveToProjectTest extends TestCase
             ->assertSessionHasErrors('domain_id');
 
         $this->assertSame($this->source->id, $url->fresh()->project_id);
+    }
+
+    public function test_link_can_take_the_slug_of_a_deleted_link_on_the_target_domain(): void
+    {
+        $url = $this->link(Domain::create(['project_id' => $this->source->id, 'name' => 'source.test']));
+        $targetDomain = Domain::create(['project_id' => $this->target->id, 'name' => 'target.test']);
+        Url::factory()->create(['project_id' => $this->target->id, 'domain_id' => $targetDomain->id, 'slug' => 'promo'])->delete();
+
+        $this->actingAs($this->user)
+            ->post(route('app.project.links.move', ['project' => $this->source->id, 'url' => $url->id]), [
+                'project_id' => $this->target->id,
+                'domain_id' => $targetDomain->id,
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame($this->target->id, $url->fresh()->project_id);
     }
 
     public function test_link_needs_a_domain_of_the_target_project(): void
