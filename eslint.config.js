@@ -4,6 +4,10 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import { createRequire } from 'node:module';
+
+// eslint-plugin-react's version detection calls context.getFilename(), which ESLint 10 removed
+const reactVersion = createRequire(import.meta.url)('react/package.json').version;
 
 export default [
   js.configs.recommended,
@@ -19,7 +23,7 @@ export default [
       globals: { ...globals.browser, ...globals.node },
     },
     settings: {
-      react: { version: 'detect' },
+      react: { version: reactVersion },
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
