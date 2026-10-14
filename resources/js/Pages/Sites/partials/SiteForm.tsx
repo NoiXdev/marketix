@@ -25,6 +25,7 @@ export type SiteFormData = {
 };
 
 const THIRD_PARTY_SIGNAL = 'third_party_signal';
+const HYBRID = 'hybrid';
 
 function groupTimezones(timezones: string[]): [string, string[]][] {
   const groups = new Map<string, string[]>();
@@ -56,6 +57,8 @@ export default function SiteForm({
   const { data, setData, errors, processing, isDirty } = form;
   const errorMessages = Object.values(errors).filter(Boolean) as string[];
   const label = (group: string, value: string, part: string) => t(`analytics.sites.form.${group}.${value}.${part}`);
+  // Hybrid mode always starts without cookies and only needs the signal for the cookie
+  const hybrid = data.tracking_mode === HYBRID;
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -134,20 +137,27 @@ export default function SiteForm({
           }))}
         />
 
-        <ChoiceCards
-          legend={t('analytics.sites.form.consent_mode')}
-          name="consent_mode"
-          value={data.consent_mode}
-          onChange={(value) => setData('consent_mode', value)}
-          options={consentModes.map((mode) => ({
-            value: mode.value,
-            title: label('consent', mode.value, 'title'),
-            text: label('consent', mode.value, 'text'),
-          }))}
-        />
+        {!hybrid && (
+          <ChoiceCards
+            legend={t('analytics.sites.form.consent_mode')}
+            name="consent_mode"
+            value={data.consent_mode}
+            onChange={(value) => setData('consent_mode', value)}
+            options={consentModes.map((mode) => ({
+              value: mode.value,
+              title: label('consent', mode.value, 'title'),
+              text: label('consent', mode.value, 'text'),
+            }))}
+          />
+        )}
 
-        {data.consent_mode === THIRD_PARTY_SIGNAL && (
-          <Field label={t('analytics.sites.form.consent_signal')} htmlFor="consent_signal" hint={t('analytics.sites.form.consent_signal_hint')} error={errors.consent_signal}>
+        {(hybrid || data.consent_mode === THIRD_PARTY_SIGNAL) && (
+          <Field
+            label={t('analytics.sites.form.consent_signal')}
+            htmlFor="consent_signal"
+            hint={t(hybrid ? 'analytics.sites.form.consent_signal_hybrid_hint' : 'analytics.sites.form.consent_signal_hint')}
+            error={errors.consent_signal}
+          >
             <Input
               id="consent_signal"
               className="font-mono"

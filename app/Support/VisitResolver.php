@@ -2,7 +2,10 @@
 
 namespace App\Support;
 
+use App\Models\Event;
+use App\Models\PageView;
 use App\Models\Visit;
+use Illuminate\Support\Facades\DB;
 
 class VisitResolver
 {
@@ -51,5 +54,40 @@ class VisitResolver
             'utm_term' => $firstTouch['utm_term'] ?? null,
             'utm_content' => $firstTouch['utm_content'] ?? null,
         ]);
+    }
+
+    /**
+     * Move the open anonymous session over to the visitor id once the visitor
+     * consents, so the page that asked for consent does not start a second visit.
+     */
+    public function adopt(string $siteId, string $anonymousHash, string $visitorHash): ?Visit
+    {
+        if ($this->openVisit($siteId, $visitorHash) !== null) {
+            return null;
+        }
+
+        $visit = $this->openVisit($siteId, $anonymousHash);
+        if ($visit === null) {
+            return null;
+        }
+
+        $returning = Visit::where('site_id', $siteId)->where('visitor_hash', $visitorHash)->exists();
+
+        DB::transaction(function () use ($visit, $visitorHash, $returning) {
+            $visit->update(['visitor_hash' => $visitorHash, 'is_returning' => $returning]);
+            PageView::where('visit_id', $visit->id)->update(['visitor_hash' => $visitorHash]);
+            Event::where('visit_id', $visit->id)->update(['visitor_hash' => $visitorHash]);
+        });
+
+        return $visit;
+    }
+
+    private function openVisit(string $siteId, string $visitorHash): ?Visit
+    {
+        return Visit::where('site_id', $siteId)
+            ->where('visitor_hash', $visitorHash)
+            ->where('last_activity_at', '>=', now()->subMinutes(self::SESSION_WINDOW_MINUTES))
+            ->latest('last_activity_at')
+            ->first();
     }
 }

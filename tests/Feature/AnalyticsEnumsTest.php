@@ -16,6 +16,7 @@ class AnalyticsEnumsTest extends TestCase
             ['value' => 'cookie', 'label' => TrackingMode::Cookie->label()],
             TrackingMode::options(),
         );
+        $this->assertSame(['cookieless', 'hybrid', 'cookie'], array_column(TrackingMode::options(), 'value'));
     }
 
     public function test_consent_mode_has_three_cases(): void

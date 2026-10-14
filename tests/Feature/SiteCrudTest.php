@@ -147,6 +147,40 @@ class SiteCrudTest extends TestCase
             ->assertSessionHasErrors('consent_signal');
     }
 
+    public function test_hybrid_mode_requires_a_signal_name(): void
+    {
+        [$user, $project] = $this->userWithProject();
+
+        $this->actingAs($user)
+            ->post(route('app.project.sites.store', ['project' => $project->id]), [
+                'name' => 'Shop',
+                'domain' => 'shop.example.com',
+                'tracking_mode' => 'hybrid',
+                'consent_mode' => 'immediate',
+                'consent_signal' => '',
+            ])
+            ->assertSessionHasErrors('consent_signal');
+    }
+
+    public function test_update_switches_to_hybrid_mode(): void
+    {
+        [$user, $project] = $this->userWithProject();
+        $site = Site::factory()->forProject($project)->create();
+
+        $this->actingAs($user)
+            ->put(route('app.project.sites.update', ['project' => $project->id, 'site' => $site->id]), [
+                'name' => $site->name,
+                'domain' => $site->domain,
+                'tracking_mode' => 'hybrid',
+                'consent_mode' => 'immediate',
+                'consent_signal' => 'UC_UI',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('sites', ['id' => $site->id, 'tracking_mode' => 'hybrid', 'consent_signal' => 'UC_UI']);
+    }
+
     public function test_update_changes_mode(): void
     {
         [$user, $project] = $this->userWithProject();
