@@ -24,7 +24,7 @@ class SiteRequest extends FormRequest
             'timezone' => ['sometimes', 'required', 'string', Rule::in(DateTimeZone::listIdentifiers())],
             'tracking_mode' => ['required', Rule::in(array_column(TrackingMode::cases(), 'value'))],
             'consent_mode' => ['required', Rule::in(ConsentMode::selectableValues())],
-            'consent_signal' => ['nullable', 'required_if:consent_mode,'.ConsentMode::ThirdPartySignal->value, 'string', 'max:255'],
+            'consent_signal' => ['nullable', Rule::requiredIf(fn () => $this->needsConsentSignal()), 'string', 'max:255'],
             'respect_dnt' => ['boolean'],
             'track_outbound_links' => ['boolean'],
             'track_file_downloads' => ['boolean'],
@@ -49,8 +49,14 @@ class SiteRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'consent_signal.required_if' => __('analytics.sites.form.consent_signal_required'),
+            'consent_signal.required' => __('analytics.sites.form.consent_signal_required'),
         ];
+    }
+
+    private function needsConsentSignal(): bool
+    {
+        return $this->input('tracking_mode') === TrackingMode::Hybrid->value
+            || $this->input('consent_mode') === ConsentMode::ThirdPartySignal->value;
     }
 
     protected function prepareForValidation(): void

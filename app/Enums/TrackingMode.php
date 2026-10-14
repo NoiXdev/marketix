@@ -5,12 +5,14 @@ namespace App\Enums;
 enum TrackingMode: string
 {
     case Cookieless = 'cookieless';
+    case Hybrid = 'hybrid';
     case Cookie = 'cookie';
 
     public function label(): string
     {
         return match ($this) {
             self::Cookieless => __('app.tracking_mode_cookieless'),
+            self::Hybrid => __('app.tracking_mode_hybrid'),
             self::Cookie => __('app.tracking_mode_cookie'),
         };
     }

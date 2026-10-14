@@ -82,4 +82,53 @@ class VisitResolverTest extends TestCase
         $this->assertTrue($later->is_returning);
         $this->assertFalse($otherSite->is_returning); // history is per site
     }
+
+    public function test_adopt_continues_the_open_anonymous_visit_under_the_visitor_id(): void
+    {
+        $site = Site::factory()->create();
+        $resolver = new VisitResolver;
+
+        $anonymous = $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
+        $adopted = $resolver->adopt($site->id, 'anon', 'id');
+        $next = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $this->firstTouch());
+
+        $this->assertSame($anonymous->id, $adopted?->id);
+        $this->assertSame('id', $adopted->fresh()->visitor_hash);
+        $this->assertFalse($adopted->fresh()->is_returning);
+        $this->assertSame($anonymous->id, $next->id);
+    }
+
+    public function test_an_adopted_visit_is_returning_when_the_visitor_id_was_seen_before(): void
+    {
+        $site = Site::factory()->create();
+        $resolver = new VisitResolver;
+
+        Carbon::setTestNow(now());
+        $resolver->resolve($site->id, $site->project_id, 'id', false, '/lp', $this->firstTouch());
+        Carbon::setTestNow(now()->addDay());
+        $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
+        $adopted = $resolver->adopt($site->id, 'anon', 'id');
+        Carbon::setTestNow();
+
+        $this->assertTrue($adopted?->fresh()->is_returning);
+    }
+
+    public function test_adopt_leaves_closed_sessions_and_identified_visitors_alone(): void
+    {
+        $site = Site::factory()->create();
+        $resolver = new VisitResolver;
+
+        Carbon::setTestNow(now());
+        $closed = $resolver->resolve($site->id, $site->project_id, 'anon-closed', false, '/lp', $this->firstTouch());
+        Carbon::setTestNow(now()->addMinutes(31));
+        $resolver->resolve($site->id, $site->project_id, 'id', false, '/lp', $this->firstTouch());
+        $open = $resolver->resolve($site->id, $site->project_id, 'anon-open', false, '/lp', $this->firstTouch());
+
+        $this->assertNull($resolver->adopt($site->id, 'anon-closed', 'other-id'));
+        $this->assertNull($resolver->adopt($site->id, 'anon-open', 'id'));
+        Carbon::setTestNow();
+
+        $this->assertSame('anon-closed', $closed->fresh()->visitor_hash);
+        $this->assertSame('anon-open', $open->fresh()->visitor_hash);
+    }
 }
