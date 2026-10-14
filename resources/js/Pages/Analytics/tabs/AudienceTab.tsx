@@ -92,7 +92,7 @@ export default function AudienceTab({ clicksByCountry, countries, regions, citie
           title={t('analytics.dashboard.visitor_types.title')}
           emptyLabel={noData}
           // Without a cookie the visitor hash changes daily, so only same-day returns are recognised
-          hint={site.tracking_mode === 'cookieless' ? t('analytics.dashboard.visitor_types.cookieless_hint') : undefined}
+          hint={site.tracking_mode === 'cookie' ? undefined : t(`analytics.dashboard.visitor_types.${site.tracking_mode}_hint`)}
           tabs={[
             {
               key: 'types',

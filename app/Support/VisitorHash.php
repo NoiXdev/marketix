@@ -19,6 +19,15 @@ class VisitorHash
         return hash('sha256', ($ip ?? '').'|'.$userAgent.'|'.self::dailySalt());
     }
 
+    /**
+     * Identifier for a visitor recognised by the snippet's first-party id,
+     * scoped to the site so the same id cannot be linked across sites.
+     */
+    public static function forVisitorId(string $visitorId, string $siteId): string
+    {
+        return hash('sha256', $visitorId.'|'.$siteId);
+    }
+
     private static function dailySalt(): string
     {
         return Cache::remember(

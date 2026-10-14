@@ -52,6 +52,7 @@ return [
             'consent_signal' => 'Name des Consent-Signals',
             'consent_signal_placeholder' => 'z. B. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Ihr Consent-Tool setzt window.<name> = true, sobald die Einwilligung erteilt ist, und löst das Event \'marketix:consent\' aus.',
+            'consent_signal_hybrid_hint' => 'Ihr Consent-Tool setzt window.<name> = true, sobald die Einwilligung erteilt ist, und löst das Event \'marketix:consent\' aus. Wird die Einwilligung widerrufen, entfernt Marketix das Cookie und zählt den Besucher wieder ohne Cookies.',
             'consent_signal_required' => 'Bitte geben Sie den Namen des Consent-Signals an, damit Marketix weiss, wann die Einwilligung erteilt wurde.',
             'retention_days' => 'Aufbewahrungsdauer',
             'retention_days_placeholder' => 'Projektstandard',
@@ -72,6 +73,10 @@ return [
                 'cookieless' => [
                     'title' => 'Ohne Cookies',
                     'text' => 'Setzt keine Cookies. Besucher werden über einen täglich wechselnden, anonymen Hash gezählt.',
+                ],
+                'hybrid' => [
+                    'title' => 'Cookie nach Einwilligung',
+                    'text' => 'Zählt alle Besucher ohne Cookies. Wer in Ihrem Consent-Tool einwilligt, wird zusätzlich über mehrere Tage hinweg wiedererkannt.',
                 ],
                 'cookie' => [
                     'title' => 'Mit Cookie',
@@ -376,6 +381,7 @@ return [
             'returning' => 'Wiederkehrende Besucher',
             'note' => ':sessions Sitzungen · :rate % Engagement',
             'cookieless_hint' => 'Ohne Cookies wird ein Besucher nur am selben Tag wiedererkannt. Wer an einem anderen Tag zurückkommt, zählt als neu.',
+            'hybrid_hint' => 'Über mehrere Tage werden nur Besucher wiedererkannt, die dem Cookie zugestimmt haben. Alle anderen zählen an einem anderen Tag als neu.',
         ],
 
         'interactions' => [

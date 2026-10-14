@@ -2,6 +2,7 @@
 
 return [
     'tracking_mode_cookieless' => 'Cookieloos',
+    'tracking_mode_hybrid' => 'Hybride',
     'tracking_mode_cookie' => 'Cookie',
     'consent_mode_immediate' => 'Direct',
     'consent_mode_third_party_signal' => 'Toestemmingssignaal van derde partij',
