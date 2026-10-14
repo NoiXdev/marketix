@@ -37,3 +37,8 @@ CVE-2026-56854 exp:2026-10-31
 # xDS server DoS (fixed in 1.82.2 / 1.83.2). Still 1.81.1 on FrankenPHP main.
 CVE-2026-84304 exp:2026-10-31
 CVE-2026-84445 exp:2026-10-31
+
+# golang.org/x/net v0.59.0 — HTTP/2 DoS via excessive SETTINGS frames (fixed in
+# 0.60.0). FrankenPHP listens on plain HTTP (:8000, no h2c) behind Traefik,
+# which terminates TLS and HTTP/2, so client HTTP/2 frames never reach it.
+CVE-2026-78669 exp:2026-10-31
