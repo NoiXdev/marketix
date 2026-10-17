@@ -283,7 +283,7 @@ class AnalyticsIngestionTest extends TestCase
 
         $this->hit($site, ['path' => '/lp'])->assertStatus(202);
 
-        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)'), $site->visits()->sole()->visitor_hash);
+        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id), $site->visits()->sole()->visitor_hash);
     }
 
     public function test_hybrid_mode_recognises_consenting_visitors_across_days(): void
@@ -327,6 +327,6 @@ class AnalyticsIngestionTest extends TestCase
         $this->hit($site, ['path' => '/lp'])->assertStatus(202);
         $this->hit($site, ['type' => 'consent', 'path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(204);
 
-        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)'), $site->visits()->sole()->visitor_hash);
+        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id), $site->visits()->sole()->visitor_hash);
     }
 }

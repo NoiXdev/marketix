@@ -12,11 +12,12 @@ class VisitorHash
      * The full IP is hashed together with the user agent and a random daily
      * salt that expires after 48h. Once the salt is gone the hash can no longer
      * be linked back to an IP, so stored hashes are anonymous, not merely
-     * pseudonymous.
+     * pseudonymous. The scope (a site, or a project for link clicks) keeps the
+     * same visitor from being linked across sites and projects.
      */
-    public static function for(?string $ip, string $userAgent): string
+    public static function for(?string $ip, string $userAgent, string $scope): string
     {
-        return hash('sha256', ($ip ?? '').'|'.$userAgent.'|'.self::dailySalt());
+        return hash('sha256', ($ip ?? '').'|'.$userAgent.'|'.$scope.'|'.self::dailySalt());
     }
 
     /**

@@ -243,7 +243,7 @@ class RedirectController extends Controller
         RecordClickStatisticJob::dispatch(
             $url->id,
             $url->project_id,
-            VisitorHash::for($request->ip(), $userAgent),
+            VisitorHash::for($request->ip(), $userAgent, $url->project_id),
             $userAgent,
             $request->header('Referer') ?: null,
             substr($request->header('Accept-Language', ''), 0, 2) ?: null,

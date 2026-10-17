@@ -120,14 +120,14 @@ class AnalyticsIngestionController extends Controller
             return $noop; // cookie mode requires consent-provided id; no silent fallback
         }
 
-        $visitorHash = $identified ? VisitorHash::forVisitorId($visitorId, $site->id) : VisitorHash::for($ip, $userAgent);
+        $visitorHash = $identified ? VisitorHash::forVisitorId($visitorId, $site->id) : VisitorHash::for($ip, $userAgent, $site->id);
 
         if (($data['type'] ?? 'pageview') === 'consent') {
             if ($site->tracking_mode !== TrackingMode::Hybrid || ! $identified) {
                 return $noop;
             }
 
-            RecordConsentJob::dispatch($site->id, VisitorHash::for($ip, $userAgent), $visitorHash);
+            RecordConsentJob::dispatch($site->id, VisitorHash::for($ip, $userAgent, $site->id), $visitorHash);
 
             return response('', 202);
         }
