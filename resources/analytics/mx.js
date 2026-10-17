@@ -130,7 +130,7 @@
     var id = firstPartyId();
     if (sentAnonymously) {
       sentAnonymously = false;
-      // Lets the server continue this session's anonymous hits under the id
+      // Lets the next visit under the id keep the anonymous visit's campaign source
       transport({ site: site, type: 'consent', path: location.pathname, visitor_id: id });
     }
     return id;
