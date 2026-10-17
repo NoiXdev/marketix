@@ -30,6 +30,12 @@
     document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax' + secure;
   }
 
+  function deleteCookie(name) {
+    if (getCookie(name) === null) return;
+    var secure = location.protocol === 'https:' ? ';Secure' : '';
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax' + secure;
+  }
+
   function randomId() {
     if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
     return String(Date.now()) + '-' + Math.floor(Math.random() * 1e9);
@@ -113,8 +119,36 @@
     return vid;
   }
 
+  var sentAnonymously = false;
+
+  function hybridVisitorId() {
+    if (!consentGranted(siteConfig.consent_signal)) {
+      deleteCookie(VID_COOKIE);
+      sentAnonymously = true;
+      return null;
+    }
+    var id = firstPartyId();
+    if (sentAnonymously) {
+      sentAnonymously = false;
+      // Lets the next visit under the id keep the anonymous visit's campaign source
+      transport({ site: site, type: 'consent', path: location.pathname, visitor_id: id });
+    }
+    return id;
+  }
+
   function visitorId() {
-    return siteConfig && siteConfig.tracking_mode === 'cookie' ? firstPartyId() : null;
+    if (!siteConfig) return null;
+    if (siteConfig.tracking_mode === 'cookie') return firstPartyId();
+    if (siteConfig.tracking_mode === 'hybrid') return hybridVisitorId();
+    return null;
+  }
+
+  function onHybridConsentChange() {
+    if (consentGranted(siteConfig.consent_signal)) {
+      hybridVisitorId();
+    } else {
+      deleteCookie(VID_COOKIE);
+    }
   }
 
   var pendingEvents = [];
@@ -140,7 +174,7 @@
     }
 
     if (siteConfig.tracking_mode !== 'cookie') {
-      postEvent(name, props, null);
+      postEvent(name, props, visitorId());
       return;
     }
 
@@ -188,7 +222,7 @@
 
   function trackingAllowed() {
     if (!siteConfig) return false;
-    // cookieless: server derives a daily hash from IP + UA
+    // cookieless and hybrid: without an id the server derives a daily hash from IP + UA
     if (siteConfig.tracking_mode !== 'cookie') return true;
     if (siteConfig.consent_mode === 'immediate') return true;
     if (siteConfig.consent_mode === 'third_party_signal') return consentGranted(siteConfig.consent_signal);
@@ -348,6 +382,10 @@
   }
 
   function start() {
+    if (siteConfig.tracking_mode === 'hybrid') {
+      window.addEventListener('marketix:consent', onHybridConsentChange);
+    }
+
     if (trackingAllowed()) {
       trackPageview(document.referrer);
       return;

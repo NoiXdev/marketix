@@ -49,9 +49,11 @@ return [
             'tracking_mode' => 'Hoe worden bezoekers herkend?',
             'consent_mode' => 'Wanneer start de meting?',
             'recommended' => 'Aanbevolen',
+            'recommended_with_consent_tool' => 'Aanbevolen met consenttool',
             'consent_signal' => 'Naam van het consentsignaal',
             'consent_signal_placeholder' => 'bijv. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Uw consenttool zet window.<name> = true zodra toestemming is gegeven en verstuurt het event \'marketix:consent\'.',
+            'consent_signal_hybrid_hint' => 'Uw consenttool zet window.<name> = true zodra toestemming is gegeven en verstuurt het event \'marketix:consent\'. Wordt de toestemming ingetrokken, dan verwijdert Marketix de cookie en telt de bezoeker weer zonder cookies.',
             'consent_signal_required' => 'Vul de naam van het consentsignaal in, zodat Marketix weet wanneer toestemming is gegeven.',
             'retention_days' => 'Bewaartermijn',
             'retention_days_placeholder' => 'Projectstandaard',
@@ -72,6 +74,10 @@ return [
                 'cookieless' => [
                     'title' => 'Zonder cookies',
                     'text' => 'Plaatst geen cookies. Bezoekers worden geteld via een anonieme hash die dagelijks wisselt.',
+                ],
+                'hybrid' => [
+                    'title' => 'Cookie na toestemming',
+                    'text' => 'Telt alle bezoekers zonder cookies. Wie in uw consenttool toestemming geeft, wordt daarnaast over meerdere dagen herkend.',
                 ],
                 'cookie' => [
                     'title' => 'Met cookie',
@@ -376,6 +382,7 @@ return [
             'returning' => 'Terugkerende bezoekers',
             'note' => ':sessions sessies · :rate % betrokkenheid',
             'cookieless_hint' => 'Zonder cookies wordt een bezoeker alleen op dezelfde dag herkend. Wie op een andere dag terugkomt, telt als nieuw.',
+            'hybrid_hint' => 'Alleen bezoekers die toestemming voor de cookie hebben gegeven, worden over meerdere dagen herkend. Alle anderen tellen als nieuw wanneer ze op een andere dag terugkomen.',
         ],
 
         'interactions' => [

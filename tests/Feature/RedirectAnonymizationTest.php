@@ -61,7 +61,7 @@ class RedirectAnonymizationTest extends TestCase
 
         // The stored value is the hash of the IP, never the IP itself.
         $this->assertDatabaseMissing('statistics', ['visitor_hash' => '203.0.113.9']);
-        $expected = VisitorHash::for('203.0.113.9', '');
+        $expected = VisitorHash::for('203.0.113.9', '', $url->project_id);
         $this->assertDatabaseHas('statistics', [
             'url_id' => $url->id,
             'visitor_hash' => $expected,

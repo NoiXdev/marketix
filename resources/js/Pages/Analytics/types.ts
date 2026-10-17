@@ -30,7 +30,7 @@ export type SiteInfo = {
   name: string;
   domain: string;
   search_enabled: boolean;
-  tracking_mode: 'cookie' | 'cookieless';
+  tracking_mode: 'cookie' | 'cookieless' | 'hybrid';
   has_data: boolean;
   snippet: string;
   timezone: string;

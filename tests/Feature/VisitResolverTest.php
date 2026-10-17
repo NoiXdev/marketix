@@ -82,4 +82,45 @@ class VisitResolverTest extends TestCase
         $this->assertTrue($later->is_returning);
         $this->assertFalse($otherSite->is_returning); // history is per site
     }
+
+    public function test_after_consent_a_new_visit_keeps_only_the_campaign_source_of_the_anonymous_visit(): void
+    {
+        $site = Site::factory()->create();
+        $resolver = new VisitResolver;
+
+        $anonymous = $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
+        $resolver->handOver($site->id, 'anon', 'id');
+        $identified = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', ['referer_domain' => 'example.com', 'utm_source' => null] + $this->firstTouch());
+
+        $this->assertNotSame($anonymous->id, $identified->id);
+        $this->assertSame('anon', $anonymous->fresh()->visitor_hash);
+        $this->assertSame('/lp', $identified->entry_path);
+        $this->assertSame('/pricing', $identified->exit_path);
+        $this->assertSame('google.com', $identified->referer_domain);
+        $this->assertSame('google', $identified->utm_source);
+        $this->assertSame('cpc', $identified->utm_medium);
+    }
+
+    public function test_the_handover_applies_once_and_only_while_the_anonymous_visit_is_open(): void
+    {
+        $site = Site::factory()->create();
+        $resolver = new VisitResolver;
+        $direct = ['referer_domain' => null, 'utm_source' => null, 'utm_medium' => null] + $this->firstTouch();
+
+        Carbon::setTestNow(now());
+        $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
+        $resolver->handOver($site->id, 'anon', 'id');
+        $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $direct);
+        Carbon::setTestNow(now()->addMinutes(31));
+        $later = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $direct);
+
+        $resolver->handOver($site->id, 'anon', 'other-id');
+        $afterAnonymousEnded = $resolver->resolve($site->id, $site->project_id, 'other-id', false, '/pricing', $direct);
+        Carbon::setTestNow();
+
+        $this->assertSame('/pricing', $later->entry_path);
+        $this->assertNull($later->utm_source);
+        $this->assertSame('/pricing', $afterAnonymousEnded->entry_path);
+        $this->assertNull($afterAnonymousEnded->utm_source);
+    }
 }

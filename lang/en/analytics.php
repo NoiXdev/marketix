@@ -49,9 +49,11 @@ return [
             'tracking_mode' => 'How are visitors recognised?',
             'consent_mode' => 'When does tracking start?',
             'recommended' => 'Recommended',
+            'recommended_with_consent_tool' => 'Recommended with a consent tool',
             'consent_signal' => 'Consent signal name',
             'consent_signal_placeholder' => 'e.g. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Your consent tool sets window.<name> = true once consent is given and dispatches the \'marketix:consent\' event.',
+            'consent_signal_hybrid_hint' => 'Your consent tool sets window.<name> = true once consent is given and dispatches the \'marketix:consent\' event. If consent is withdrawn, Marketix removes the cookie and counts the visitor without cookies again.',
             'consent_signal_required' => 'Enter the consent signal name so Marketix knows when consent has been given.',
             'retention_days' => 'Retention period',
             'retention_days_placeholder' => 'Project default',
@@ -72,6 +74,10 @@ return [
                 'cookieless' => [
                     'title' => 'Without cookies',
                     'text' => 'Sets no cookies. Visitors are counted via an anonymous hash that changes daily.',
+                ],
+                'hybrid' => [
+                    'title' => 'Cookie after consent',
+                    'text' => 'Counts every visitor without cookies. Visitors who consent in your consent tool are also recognised across several days.',
                 ],
                 'cookie' => [
                     'title' => 'With cookie',
@@ -376,6 +382,7 @@ return [
             'returning' => 'Returning visitors',
             'note' => ':sessions sessions · :rate % engagement',
             'cookieless_hint' => 'Without cookies, visitors are only recognised again on the same day. Anyone coming back on another day counts as new.',
+            'hybrid_hint' => 'Only visitors who consented to the cookie are recognised across several days. Everyone else counts as new when they come back on another day.',
         ],
 
         'interactions' => [

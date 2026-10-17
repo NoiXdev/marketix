@@ -49,9 +49,11 @@ return [
             'tracking_mode' => 'Comment les visiteurs sont-ils reconnus ?',
             'consent_mode' => 'Quand la mesure démarre-t-elle ?',
             'recommended' => 'Recommandé',
+            'recommended_with_consent_tool' => 'Recommandé avec un outil de consentement',
             'consent_signal' => 'Nom du signal de consentement',
             'consent_signal_placeholder' => 'p. ex. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Votre outil de consentement définit window.<name> = true dès que le consentement est donné et déclenche l’événement \'marketix:consent\'.',
+            'consent_signal_hybrid_hint' => 'Votre outil de consentement définit window.<name> = true dès que le consentement est donné et déclenche l’événement \'marketix:consent\'. Si le consentement est retiré, Marketix supprime le cookie et compte à nouveau le visiteur sans cookies.',
             'consent_signal_required' => 'Indiquez le nom du signal de consentement pour que Marketix sache quand le consentement a été donné.',
             'retention_days' => 'Durée de conservation',
             'retention_days_placeholder' => 'Valeur du projet',
@@ -72,6 +74,10 @@ return [
                 'cookieless' => [
                     'title' => 'Sans cookies',
                     'text' => 'Ne dépose aucun cookie. Les visiteurs sont comptés via un hachage anonyme qui change chaque jour.',
+                ],
+                'hybrid' => [
+                    'title' => 'Cookie après consentement',
+                    'text' => 'Compte tous les visiteurs sans cookies. Les visiteurs qui donnent leur consentement dans votre outil de consentement sont en plus reconnus sur plusieurs jours.',
                 ],
                 'cookie' => [
                     'title' => 'Avec cookie',
@@ -376,6 +382,7 @@ return [
             'returning' => 'Visiteurs récurrents',
             'note' => ':sessions sessions · :rate % d’engagement',
             'cookieless_hint' => 'Sans cookies, un visiteur n’est reconnu que le même jour. Toute personne qui revient un autre jour est comptée comme nouvelle.',
+            'hybrid_hint' => 'Seuls les visiteurs qui ont accepté le cookie sont reconnus sur plusieurs jours. Les autres sont comptés comme nouveaux lorsqu’ils reviennent un autre jour.',
         ],
 
         'interactions' => [

@@ -6,9 +6,13 @@ use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Jobs\RecordPageViewJob;
 use App\Models\Event;
+use App\Models\PageView;
 use App\Models\Site;
+use App\Support\VisitorHash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class AnalyticsIngestionTest extends TestCase
@@ -262,5 +266,76 @@ class AnalyticsIngestionTest extends TestCase
         $this->call('POST', route('app.analytics.event'), [], [], [], ['CONTENT_TYPE' => 'text/plain'], $ev)->assertStatus(204);
 
         $this->assertDatabaseMissing('events', ['site_id' => $site->id, 'name' => 'huge']);
+    }
+
+    private function hit(Site $site, array $payload, string $ip = '203.0.113.9'): TestResponse
+    {
+        return $this->call('POST', route('app.analytics.event'), [], [], [], [
+            'CONTENT_TYPE' => 'text/plain',
+            'REMOTE_ADDR' => $ip,
+            'HTTP_USER_AGENT' => 'Mozilla/5.0 (TestAgent)',
+        ], json_encode(['site' => $site->tracking_id] + $payload));
+    }
+
+    public function test_hybrid_mode_counts_visitors_without_consent_anonymously(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Hybrid, 'consent_signal' => 'UC_UI']);
+
+        $this->hit($site, ['path' => '/lp'])->assertStatus(202);
+
+        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id), $site->visits()->sole()->visitor_hash);
+    }
+
+    public function test_hybrid_mode_recognises_consenting_visitors_across_days(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Hybrid, 'consent_signal' => 'UC_UI']);
+
+        Carbon::setTestNow(now());
+        $this->hit($site, ['path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(202);
+        Carbon::setTestNow(now()->addDays(3));
+        $this->hit($site, ['path' => '/lp', 'visitor_id' => 'abc'], '198.51.100.7')->assertStatus(202);
+        Carbon::setTestNow();
+
+        $visits = $site->visits()->oldest('started_at')->get();
+        $this->assertCount(2, $visits);
+        $this->assertSame([VisitorHash::forVisitorId('abc', $site->id)], $visits->pluck('visitor_hash')->unique()->values()->all());
+        $this->assertFalse($visits[0]->is_returning);
+        $this->assertTrue($visits[1]->is_returning);
+    }
+
+    public function test_after_consent_only_the_campaign_source_carries_over_to_the_visitor_id(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Hybrid, 'consent_signal' => 'UC_UI']);
+        $anonymousHash = VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id);
+        $id = VisitorHash::forVisitorId('abc', $site->id);
+
+        $this->hit($site, ['path' => '/lp', 'referrer' => 'https://news.example/', 'utm' => ['source' => 'newsletter']])->assertStatus(202);
+        $this->hit($site, ['type' => 'event', 'name' => 'signup', 'path' => '/lp'])->assertStatus(202);
+        $this->hit($site, ['type' => 'consent', 'path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(202);
+        $this->hit($site, ['type' => 'engagement', 'path' => '/lp', 'engaged_ms' => 5000, 'visitor_id' => 'abc'])->assertStatus(202);
+        $this->hit($site, ['path' => '/pricing', 'referrer' => 'https://example.com/lp', 'visitor_id' => 'abc'])->assertStatus(202);
+
+        $anonymous = $site->visits()->where('visitor_hash', $anonymousHash)->sole();
+        $identified = $site->visits()->where('visitor_hash', $id)->sole();
+
+        $this->assertSame(['/lp'], PageView::where('visit_id', $anonymous->id)->pluck('path')->all());
+        $this->assertSame([$anonymousHash], PageView::where('visit_id', $anonymous->id)->pluck('visitor_hash')->all());
+        $this->assertSame($anonymousHash, Event::where('site_id', $site->id)->sole()->visitor_hash);
+        $this->assertSame(5, PageView::where('visit_id', $anonymous->id)->sole()->engaged_seconds);
+
+        $this->assertSame(['/pricing'], PageView::where('visit_id', $identified->id)->pluck('path')->all());
+        $this->assertSame('/lp', $identified->entry_path);
+        $this->assertSame('news.example', $identified->referer_domain);
+        $this->assertSame('newsletter', $identified->utm_source);
+    }
+
+    public function test_consent_hit_is_ignored_outside_hybrid_mode(): void
+    {
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $this->hit($site, ['path' => '/lp'])->assertStatus(202);
+        $this->hit($site, ['type' => 'consent', 'path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(204);
+
+        $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id), $site->visits()->sole()->visitor_hash);
     }
 }

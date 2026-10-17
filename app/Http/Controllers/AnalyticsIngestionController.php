@@ -9,6 +9,7 @@ use App\Jobs\RecordPageViewJob;
 use App\Models\Site;
 use App\Services\GeoIpService;
 use App\Support\VisitorHash;
+use App\Support\VisitResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -87,7 +88,7 @@ class AnalyticsIngestionController extends Controller
             'utm.campaign' => ['nullable', 'string', 'max:255'],
             'utm.term' => ['nullable', 'string', 'max:255'],
             'utm.content' => ['nullable', 'string', 'max:255'],
-            'type' => ['nullable', 'in:pageview,event,engagement'],
+            'type' => ['nullable', 'in:pageview,event,engagement,consent'],
             'name' => ['nullable', 'required_if:type,event', 'string', 'max:255'],
             'props' => ['nullable', 'array'],
             'engaged_ms' => ['nullable', 'integer', 'min:0', 'max:86400000'],
@@ -112,14 +113,23 @@ class AnalyticsIngestionController extends Controller
         $ip = $request->ip();
         $userAgent = $request->userAgent() ?? '';
 
-        if ($site->tracking_mode === TrackingMode::Cookie) {
-            $visitorId = $data['visitor_id'] ?? null;
-            if ($visitorId === null || $visitorId === '') {
-                return $noop; // cookie mode requires consent-provided id; no silent fallback
+        $visitorId = $data['visitor_id'] ?? null;
+        $identified = $visitorId !== null && $visitorId !== '' && $site->tracking_mode !== TrackingMode::Cookieless;
+
+        if ($site->tracking_mode === TrackingMode::Cookie && ! $identified) {
+            return $noop; // cookie mode requires consent-provided id; no silent fallback
+        }
+
+        $visitorHash = $identified ? VisitorHash::forVisitorId($visitorId, $site->id) : VisitorHash::for($ip, $userAgent, $site->id);
+
+        if (($data['type'] ?? 'pageview') === 'consent') {
+            if ($site->tracking_mode !== TrackingMode::Hybrid || ! $identified) {
+                return $noop;
             }
-            $visitorHash = hash('sha256', $visitorId.'|'.$site->id);
-        } else {
-            $visitorHash = VisitorHash::for($ip, $userAgent);
+
+            app(VisitResolver::class)->handOver($site->id, VisitorHash::for($ip, $userAgent, $site->id), $visitorHash);
+
+            return response('', 202);
         }
 
         // Path only, query string stripped for privacy.
