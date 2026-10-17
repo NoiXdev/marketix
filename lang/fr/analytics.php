@@ -49,6 +49,7 @@ return [
             'tracking_mode' => 'Comment les visiteurs sont-ils reconnus ?',
             'consent_mode' => 'Quand la mesure démarre-t-elle ?',
             'recommended' => 'Recommandé',
+            'recommended_with_consent_tool' => 'Recommandé avec un outil de consentement',
             'consent_signal' => 'Nom du signal de consentement',
             'consent_signal_placeholder' => 'p. ex. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Votre outil de consentement définit window.<name> = true dès que le consentement est donné et déclenche l’événement \'marketix:consent\'.',

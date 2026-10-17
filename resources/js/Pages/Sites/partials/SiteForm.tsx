@@ -59,6 +59,10 @@ export default function SiteForm({
   const label = (group: string, value: string, part: string) => t(`analytics.sites.form.${group}.${value}.${part}`);
   // Hybrid mode always starts without cookies and only needs the signal for the cookie
   const hybrid = data.tracking_mode === HYBRID;
+  const modeBadges: Record<string, string> = {
+    cookieless: t('analytics.sites.form.recommended'),
+    [HYBRID]: t('analytics.sites.form.recommended_with_consent_tool'),
+  };
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -133,7 +137,7 @@ export default function SiteForm({
             value: mode.value,
             title: label('modes', mode.value, 'title'),
             text: label('modes', mode.value, 'text'),
-            badge: mode.value === 'cookieless' ? t('analytics.sites.form.recommended') : undefined,
+            badge: modeBadges[mode.value],
           }))}
         />
 
