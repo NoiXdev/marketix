@@ -83,52 +83,44 @@ class VisitResolverTest extends TestCase
         $this->assertFalse($otherSite->is_returning); // history is per site
     }
 
-    public function test_adopt_continues_the_open_anonymous_visit_under_the_visitor_id(): void
+    public function test_after_consent_a_new_visit_keeps_only_the_campaign_source_of_the_anonymous_visit(): void
     {
         $site = Site::factory()->create();
         $resolver = new VisitResolver;
 
         $anonymous = $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
-        $adopted = $resolver->adopt($site->id, 'anon', 'id');
-        $next = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $this->firstTouch());
+        $resolver->handOver($site->id, 'anon', 'id');
+        $identified = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', ['referer_domain' => 'example.com', 'utm_source' => null] + $this->firstTouch());
 
-        $this->assertSame($anonymous->id, $adopted?->id);
-        $this->assertSame('id', $adopted->fresh()->visitor_hash);
-        $this->assertFalse($adopted->fresh()->is_returning);
-        $this->assertSame($anonymous->id, $next->id);
+        $this->assertNotSame($anonymous->id, $identified->id);
+        $this->assertSame('anon', $anonymous->fresh()->visitor_hash);
+        $this->assertSame('/lp', $identified->entry_path);
+        $this->assertSame('/pricing', $identified->exit_path);
+        $this->assertSame('google.com', $identified->referer_domain);
+        $this->assertSame('google', $identified->utm_source);
+        $this->assertSame('cpc', $identified->utm_medium);
     }
 
-    public function test_an_adopted_visit_is_returning_when_the_visitor_id_was_seen_before(): void
+    public function test_the_handover_applies_once_and_only_while_the_anonymous_visit_is_open(): void
     {
         $site = Site::factory()->create();
         $resolver = new VisitResolver;
+        $direct = ['referer_domain' => null, 'utm_source' => null, 'utm_medium' => null] + $this->firstTouch();
 
         Carbon::setTestNow(now());
-        $resolver->resolve($site->id, $site->project_id, 'id', false, '/lp', $this->firstTouch());
-        Carbon::setTestNow(now()->addDay());
         $resolver->resolve($site->id, $site->project_id, 'anon', false, '/lp', $this->firstTouch());
-        $adopted = $resolver->adopt($site->id, 'anon', 'id');
-        Carbon::setTestNow();
-
-        $this->assertTrue($adopted?->fresh()->is_returning);
-    }
-
-    public function test_adopt_leaves_closed_sessions_and_identified_visitors_alone(): void
-    {
-        $site = Site::factory()->create();
-        $resolver = new VisitResolver;
-
-        Carbon::setTestNow(now());
-        $closed = $resolver->resolve($site->id, $site->project_id, 'anon-closed', false, '/lp', $this->firstTouch());
+        $resolver->handOver($site->id, 'anon', 'id');
+        $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $direct);
         Carbon::setTestNow(now()->addMinutes(31));
-        $resolver->resolve($site->id, $site->project_id, 'id', false, '/lp', $this->firstTouch());
-        $open = $resolver->resolve($site->id, $site->project_id, 'anon-open', false, '/lp', $this->firstTouch());
+        $later = $resolver->resolve($site->id, $site->project_id, 'id', false, '/pricing', $direct);
 
-        $this->assertNull($resolver->adopt($site->id, 'anon-closed', 'other-id'));
-        $this->assertNull($resolver->adopt($site->id, 'anon-open', 'id'));
+        $resolver->handOver($site->id, 'anon', 'other-id');
+        $afterAnonymousEnded = $resolver->resolve($site->id, $site->project_id, 'other-id', false, '/pricing', $direct);
         Carbon::setTestNow();
 
-        $this->assertSame('anon-closed', $closed->fresh()->visitor_hash);
-        $this->assertSame('anon-open', $open->fresh()->visitor_hash);
+        $this->assertSame('/pricing', $later->entry_path);
+        $this->assertNull($later->utm_source);
+        $this->assertSame('/pricing', $afterAnonymousEnded->entry_path);
+        $this->assertNull($afterAnonymousEnded->utm_source);
     }
 }

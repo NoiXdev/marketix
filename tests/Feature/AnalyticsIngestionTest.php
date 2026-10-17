@@ -303,21 +303,30 @@ class AnalyticsIngestionTest extends TestCase
         $this->assertTrue($visits[1]->is_returning);
     }
 
-    public function test_consent_hit_continues_the_anonymous_session_under_the_visitor_id(): void
+    public function test_after_consent_only_the_campaign_source_carries_over_to_the_visitor_id(): void
     {
         $site = Site::factory()->create(['tracking_mode' => TrackingMode::Hybrid, 'consent_signal' => 'UC_UI']);
+        $anonymousHash = VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id);
+        $id = VisitorHash::forVisitorId('abc', $site->id);
 
-        $this->hit($site, ['path' => '/lp'])->assertStatus(202);
+        $this->hit($site, ['path' => '/lp', 'referrer' => 'https://news.example/', 'utm' => ['source' => 'newsletter']])->assertStatus(202);
         $this->hit($site, ['type' => 'event', 'name' => 'signup', 'path' => '/lp'])->assertStatus(202);
         $this->hit($site, ['type' => 'consent', 'path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(202);
-        $this->hit($site, ['path' => '/pricing', 'visitor_id' => 'abc'])->assertStatus(202);
+        $this->hit($site, ['type' => 'engagement', 'path' => '/lp', 'engaged_ms' => 5000, 'visitor_id' => 'abc'])->assertStatus(202);
+        $this->hit($site, ['path' => '/pricing', 'referrer' => 'https://example.com/lp', 'visitor_id' => 'abc'])->assertStatus(202);
 
-        $id = VisitorHash::forVisitorId('abc', $site->id);
-        $visit = $site->visits()->sole();
-        $this->assertSame($id, $visit->visitor_hash);
-        $this->assertSame(2, $visit->pageview_count);
-        $this->assertSame([$id], PageView::where('site_id', $site->id)->pluck('visitor_hash')->unique()->values()->all());
-        $this->assertSame($id, Event::where('site_id', $site->id)->sole()->visitor_hash);
+        $anonymous = $site->visits()->where('visitor_hash', $anonymousHash)->sole();
+        $identified = $site->visits()->where('visitor_hash', $id)->sole();
+
+        $this->assertSame(['/lp'], PageView::where('visit_id', $anonymous->id)->pluck('path')->all());
+        $this->assertSame([$anonymousHash], PageView::where('visit_id', $anonymous->id)->pluck('visitor_hash')->all());
+        $this->assertSame($anonymousHash, Event::where('site_id', $site->id)->sole()->visitor_hash);
+        $this->assertSame(5, PageView::where('visit_id', $anonymous->id)->sole()->engaged_seconds);
+
+        $this->assertSame(['/pricing'], PageView::where('visit_id', $identified->id)->pluck('path')->all());
+        $this->assertSame('/lp', $identified->entry_path);
+        $this->assertSame('news.example', $identified->referer_domain);
+        $this->assertSame('newsletter', $identified->utm_source);
     }
 
     public function test_consent_hit_is_ignored_outside_hybrid_mode(): void
