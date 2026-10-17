@@ -49,6 +49,7 @@ return [
             'tracking_mode' => 'How are visitors recognised?',
             'consent_mode' => 'When does tracking start?',
             'recommended' => 'Recommended',
+            'recommended_with_consent_tool' => 'Recommended with a consent tool',
             'consent_signal' => 'Consent signal name',
             'consent_signal_placeholder' => 'e.g. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Your consent tool sets window.<name> = true once consent is given and dispatches the \'marketix:consent\' event.',
