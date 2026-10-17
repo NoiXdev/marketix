@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TrackingMode;
-use App\Jobs\RecordConsentJob;
 use App\Jobs\RecordEngagementJob;
 use App\Jobs\RecordEventJob;
 use App\Jobs\RecordPageViewJob;
 use App\Models\Site;
 use App\Services\GeoIpService;
 use App\Support\VisitorHash;
+use App\Support\VisitResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -127,7 +127,7 @@ class AnalyticsIngestionController extends Controller
                 return $noop;
             }
 
-            RecordConsentJob::dispatch($site->id, VisitorHash::for($ip, $userAgent, $site->id), $visitorHash);
+            app(VisitResolver::class)->handOver($site->id, VisitorHash::for($ip, $userAgent, $site->id), $visitorHash);
 
             return response('', 202);
         }

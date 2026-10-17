@@ -32,7 +32,7 @@ class RecordEngagementJob implements ShouldQueue
             ->where('visitor_hash', $this->visitorHash)
             ->where('last_activity_at', '>=', now()->subMinutes(VisitResolver::SESSION_WINDOW_MINUTES))
             ->latest('last_activity_at')
-            ->first();
+            ->first() ?? app(VisitResolver::class)->visitBeforeConsent($this->siteId, $this->visitorHash);
 
         if ($visit === null) {
             return;
