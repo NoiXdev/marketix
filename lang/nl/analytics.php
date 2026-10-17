@@ -49,6 +49,7 @@ return [
             'tracking_mode' => 'Hoe worden bezoekers herkend?',
             'consent_mode' => 'Wanneer start de meting?',
             'recommended' => 'Aanbevolen',
+            'recommended_with_consent_tool' => 'Aanbevolen met consenttool',
             'consent_signal' => 'Naam van het consentsignaal',
             'consent_signal_placeholder' => 'bijv. UC_UI (Usercentrics)',
             'consent_signal_hint' => 'Uw consenttool zet window.<name> = true zodra toestemming is gegeven en verstuurt het event \'marketix:consent\'.',
