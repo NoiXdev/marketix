@@ -45,6 +45,12 @@ return [
         'fields' => [
             'name' => 'Naam',
             'locked' => 'Vergrendeld',
+            'client_name' => 'Naam van de klant',
+            'client_address' => 'Adres van de klant',
+            'client_address_hint' => 'Volledig postadres.',
+        ],
+        'sections' => [
+            'client' => 'Klant',
         ],
         'create' => [
             'title' => 'Project toevoegen',

@@ -45,6 +45,12 @@ return [
         'fields' => [
             'name' => 'Name',
             'locked' => 'Locked',
+            'client_name' => 'Client name',
+            'client_address' => 'Client address',
+            'client_address_hint' => 'Full postal address.',
+        ],
+        'sections' => [
+            'client' => 'Client',
         ],
         'create' => [
             'title' => 'Add project',

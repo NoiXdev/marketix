@@ -19,6 +19,8 @@ class Project extends Model
 
     protected $fillable = [
         'name',
+        'client_name',
+        'client_address',
         'locked',
     ];
 
@@ -33,7 +35,7 @@ class Project extends Model
     {
         return LogOptions::defaults()
             ->useLogName('project')
-            ->logOnly(['name', 'locked'])
+            ->logOnly(['name', 'client_name', 'client_address', 'locked'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }

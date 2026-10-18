@@ -4,7 +4,12 @@ import { useTranslation } from '@/lib/i18n';
 import { Link, useForm } from '@inertiajs/react';
 
 export default function AdminProjectsCreate() {
-  const { data, setData, post, processing, errors } = useForm({ name: '', locked: false as boolean });
+  const { data, setData, post, processing, errors } = useForm({
+    name: '',
+    locked: false as boolean,
+    client_name: '',
+    client_address: '',
+  });
   const { t } = useTranslation();
 
   function submit(e: React.FormEvent) {
@@ -40,6 +45,15 @@ export default function AdminProjectsCreate() {
                 {t('common.actions.cancel')}
               </Link>
             </div>
+          </FormSection>
+
+          <FormSection title={t('admin.projects.sections.client')}>
+            <Field label={t('admin.projects.fields.client_name')} error={errors.client_name}>
+              <Input value={data.client_name} onChange={(e) => setData('client_name', e.target.value)} />
+            </Field>
+            <Field label={t('admin.projects.fields.client_address')} hint={t('admin.projects.fields.client_address_hint')} error={errors.client_address}>
+              <Input value={data.client_address} onChange={(e) => setData('client_address', e.target.value)} />
+            </Field>
           </FormSection>
         </form>
       </div>
