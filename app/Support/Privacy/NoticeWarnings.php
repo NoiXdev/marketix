@@ -12,6 +12,11 @@ use App\Enums\TrackingMode;
  * risky. Unlike NoticeComposer, nothing here is ever published — it tells
  * the operator what to fix, so it may say plainly what is wrong instead of
  * describing it neutrally.
+ *
+ * For the same reason these strings follow the app locale, not the notice's
+ * language: they are Marketix UI text shown next to the generator form, so
+ * generating a French notice must not hand a German operator French
+ * warnings.
  */
 final class NoticeWarnings
 {
@@ -19,8 +24,8 @@ final class NoticeWarnings
     public static function for(ProcessingSnapshot $snapshot, NoticeOptions $options): array
     {
         $warnings = [
-            self::pixelsWithoutConsent($snapshot, $options),
-            self::cookieWithoutConsent($snapshot, $options),
+            self::pixelsWithoutConsent($snapshot),
+            self::cookieWithoutConsent($snapshot),
             self::missingPartyDetails($options),
             self::consentClaimedForLinkClicks($snapshot, $options),
         ];
@@ -36,7 +41,7 @@ final class NoticeWarnings
      * product, so § 25 TDDDG is violated the moment one is attached to a
      * link.
      */
-    private static function pixelsWithoutConsent(ProcessingSnapshot $snapshot, NoticeOptions $options): ?array
+    private static function pixelsWithoutConsent(ProcessingSnapshot $snapshot): ?array
     {
         if ($snapshot->pixelProviders() === []) {
             return null;
@@ -44,7 +49,7 @@ final class NoticeWarnings
 
         return [
             'key' => 'pixels_without_consent',
-            'message' => trans('privacy_notice.warnings.pixels_without_consent', [], $options->locale),
+            'message' => trans('privacy_notice.warnings.pixels_without_consent'),
         ];
     }
 
@@ -56,7 +61,7 @@ final class NoticeWarnings
      * consent lawful, and the consent variant of the notice is not the only
      * place the problem shows up.
      */
-    private static function cookieWithoutConsent(ProcessingSnapshot $snapshot, NoticeOptions $options): ?array
+    private static function cookieWithoutConsent(ProcessingSnapshot $snapshot): ?array
     {
         $domains = array_values(array_map(
             fn (SiteProcessing $site) => $site->domain,
@@ -75,7 +80,7 @@ final class NoticeWarnings
             'key' => 'cookie_without_consent',
             'message' => trans('privacy_notice.warnings.cookie_without_consent', [
                 'domains' => implode(', ', $domains),
-            ], $options->locale),
+            ]),
         ];
     }
 
@@ -105,7 +110,7 @@ final class NoticeWarnings
 
         foreach ($fields as $field => $value) {
             if ($value === null || trim($value) === '') {
-                $missing[] = trans('privacy_notice.warnings.fields.'.$field, [], $options->locale);
+                $missing[] = trans('privacy_notice.warnings.fields.'.$field);
             }
         }
 
@@ -117,7 +122,7 @@ final class NoticeWarnings
             'key' => 'missing_party_details',
             'message' => trans('privacy_notice.warnings.missing_party_details', [
                 'fields' => implode(', ', $missing),
-            ], $options->locale),
+            ]),
         ];
     }
 
@@ -138,7 +143,7 @@ final class NoticeWarnings
 
         return [
             'key' => 'consent_claimed_for_link_clicks',
-            'message' => trans('privacy_notice.warnings.consent_claimed_for_link_clicks', [], $options->locale),
+            'message' => trans('privacy_notice.warnings.consent_claimed_for_link_clicks'),
         ];
     }
 }
