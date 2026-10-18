@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Docs;
 
+use App\Enums\ControllerRole;
+use App\Enums\LegalBasis;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +54,64 @@ class DataPrivacyPageTest extends TestCase
         $this->actingAs($user)
             ->get(route('app.project.docs.privacy', ['project' => $otherProject->id]))
             ->assertForbidden();
+    }
+
+    public function test_the_page_exposes_the_snapshot_and_party_defaults(): void
+    {
+        [$user, $project] = $this->projectForMember();
+
+        $this->actingAs($user)
+            ->get(route('app.project.docs.privacy', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('Docs/DataPrivacy')
+                ->has('snapshot')
+                ->has('parties')
+                ->where('defaults.role', ControllerRole::OwnCompany->value)
+                ->where('defaults.legalBasis', LegalBasis::LegitimateInterest->value)
+                ->where('defaults.locale', app()->getLocale())
+            );
+    }
+
+    public function test_the_page_defaults_to_the_client_role_when_the_project_carries_client_details(): void
+    {
+        [$user, $project] = $this->projectForMember();
+        $project->update(['client_name' => 'Client GmbH', 'client_address' => 'Musterweg 1, 50672 Köln']);
+
+        $this->actingAs($user)
+            ->get(route('app.project.docs.privacy', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('defaults.role', ControllerRole::Client->value)
+                ->where('parties.client_name', 'Client GmbH')
+                ->where('parties.client_address', 'Musterweg 1, 50672 Köln')
+            );
+    }
+
+    public function test_a_non_super_admin_sees_can_edit_client_false(): void
+    {
+        [$user, $project] = $this->projectForMember();
+
+        $this->actingAs($user)
+            ->get(route('app.project.docs.privacy', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('canEditClient', false)
+            );
+    }
+
+    public function test_a_super_admin_sees_can_edit_client_true(): void
+    {
+        [, $project] = $this->projectForMember();
+        $admin = User::factory()->create(['super_admin' => true]);
+        $admin->projects()->attach($project);
+
+        $this->actingAs($admin)
+            ->get(route('app.project.docs.privacy', ['project' => $project->id]))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('canEditClient', true)
+            );
     }
 
     public function test_all_locales_define_the_same_privacy_doc_keys(): void
