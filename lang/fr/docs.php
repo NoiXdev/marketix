@@ -109,6 +109,7 @@ return [
                     'flag' => 'Sans consentement',
                     'providers' => 'Fournisseurs : :providers',
                     'links' => 'Liens courts concernés : :count',
+                    'required' => 'Cette mention ne peut pas être désactivée : la transmission a lieu à chaque clic et doit figurer dans le texte.',
                 ],
                 'outbound' => [
                     'title' => 'Liens sortants et téléchargements',

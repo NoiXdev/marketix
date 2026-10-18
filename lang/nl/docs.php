@@ -109,6 +109,7 @@ return [
                     'flag' => 'Zonder toestemming',
                     'providers' => 'Aanbieders: :providers',
                     'links' => 'Betrokken verkorte links: :count',
+                    'required' => 'Deze vermelding kan niet worden uitgeschakeld: de doorgifte vindt bij elke klik plaats en moet in de tekst staan.',
                 ],
                 'outbound' => [
                     'title' => 'Uitgaande links en downloads',

@@ -82,6 +82,47 @@ class NoticeComposerTest extends TestCase
         );
     }
 
+    public function test_a_project_without_pixels_denies_any_advertising_transfer(): void
+    {
+        $project = Project::factory()->create();
+        $domain = Domain::factory()->create(['project_id' => $project->id]);
+        Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+
+        $composer = new NoticeComposer;
+        $sections = $composer->compose(ProcessingSnapshot::for($project), $this->noticeOptions());
+
+        $processors = $this->section($sections, trans('privacy_notice.processors.heading', [], 'de'));
+        $this->assertNotNull($processors, 'The processor section is missing.');
+
+        $this->assertContains(
+            trans('privacy_notice.processors.no_advertising_transfer', [], 'de'),
+            $processors->paragraphs,
+            'A project that really transfers nothing to advertising providers must say so.',
+        );
+    }
+
+    public function test_a_project_with_pixels_never_denies_the_advertising_transfer(): void
+    {
+        $project = $this->projectWithEverything();
+
+        $composer = new NoticeComposer;
+
+        // Both the notice that names the pixels and the one whose pixel row
+        // was switched off: neither may claim the transfer does not happen.
+        foreach ([[], [NoticeOptions::ACTIVITY_PIXELS]] as $disabled) {
+            $sections = $composer->compose(
+                ProcessingSnapshot::for($project),
+                $this->noticeOptions(['disabledActivities' => $disabled]),
+            );
+
+            $this->assertStringNotContainsString(
+                trans('privacy_notice.processors.no_advertising_transfer', [], 'de'),
+                $composer->toPlainText($sections),
+                $disabled === [] ? 'pixels listed' : 'pixel row switched off',
+            );
+        }
+    }
+
     public function test_a_project_with_no_sites_omits_the_analytics_section(): void
     {
         $project = Project::factory()->create();
@@ -389,6 +430,14 @@ class NoticeComposerTest extends TestCase
         $this->assertSectionAbsent($composer, $sections, trans('privacy_notice.pixels.heading', [], 'de'));
         $this->assertStringNotContainsString(
             trans('privacy_notice.pixels.transmission', [], 'de'),
+            $composer->toPlainText($sections),
+        );
+
+        // Omitting the pixels is the operator's call; denying them is not.
+        // The transfer still happens on every click, so the notice may not
+        // assert the opposite of what the redirect interstitial does.
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.processors.no_advertising_transfer', [], 'de'),
             $composer->toPlainText($sections),
         );
 
