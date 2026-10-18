@@ -62,7 +62,7 @@ return [
         'own_company' => 'Die zur Messung eingesetzte Software betreiben wir selbst. Eine Auswertung der Messdaten durch einen externen Dienstleister findet nicht statt.',
         'hosting' => 'Die Server, auf denen die Messdaten gespeichert werden, betreibt :provider. Standort der Server: :location.',
         'transfer_pixels' => 'Darüber hinaus werden beim Aufruf von Kurzlinks Daten an die unter „Retargeting-Pixel“ genannten Anbieter übermittelt, überwiegend in die Vereinigten Staaten von Amerika.',
-        'no_advertising_transfer' => 'Die Messdaten verbleiben auf dieser Infrastruktur. Eine Übermittlung an Dritte zu Werbe- oder Marketingzwecken findet nicht statt.',
+        'no_advertising_transfer' => 'Eine Übermittlung der Messdaten an Dritte zu Werbe- oder Marketingzwecken findet nicht statt.',
     ],
 
     'clicks' => [
@@ -129,6 +129,7 @@ return [
         'activities_sites' => 'die statistische Auswertung der Websitenutzung',
         'legitimate_interest' => 'Rechtsgrundlage für :activities ist Art. 6 Abs. 1 lit. f DSGVO.',
         'legitimate_interest_detail' => 'Unser berechtigtes Interesse besteht darin, die Reichweite und die Nutzung unseres Angebots nachvollziehen und es auf dieser Grundlage verbessern zu können.',
+        'clicks_legitimate_interest' => 'Rechtsgrundlage für die Erfassung von Klicks auf Kurzlinks ist Art. 6 Abs. 1 lit. f DSGVO. Die Zählung erfolgt serverseitig bei jedem Aufruf eines Kurzlinks; unser berechtigtes Interesse besteht darin, die Reichweite der von uns verbreiteten Links nachvollziehen zu können.',
         'consent' => 'Rechtsgrundlage für :activities ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Soweit dabei Informationen auf Ihrem Endgerät gespeichert oder ausgelesen werden, beruht dies zusätzlich auf § 25 Abs. 1 TDDDG.',
         'consent_withdrawal' => 'Sie können eine erteilte Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt davon unberührt.',
     ],
@@ -145,6 +146,7 @@ return [
         'heading' => 'Ihre Rechte',
         'list_legitimate_interest' => 'Sie haben das Recht, Auskunft über die zu Ihnen gespeicherten personenbezogenen Daten zu verlangen (Art. 15 DSGVO) sowie deren Berichtigung (Art. 16 DSGVO), deren Löschung (Art. 17 DSGVO) oder die Einschränkung der Verarbeitung (Art. 18 DSGVO) zu verlangen. Außerdem können Sie der Verarbeitung aus Gründen, die sich aus Ihrer besonderen Situation ergeben, widersprechen (Art. 21 DSGVO). Wenden Sie sich hierzu an den oben genannten Verantwortlichen.',
         'list_consent' => 'Sie haben das Recht, Auskunft über die zu Ihnen gespeicherten personenbezogenen Daten zu verlangen (Art. 15 DSGVO) sowie deren Berichtigung (Art. 16 DSGVO), deren Löschung (Art. 17 DSGVO) oder die Einschränkung der Verarbeitung (Art. 18 DSGVO) zu verlangen; ferner haben Sie das Recht auf Herausgabe dieser Daten in einem übertragbaren Format (Art. 20 DSGVO). Eine erteilte Einwilligung können Sie jederzeit widerrufen (Art. 7 Abs. 3 DSGVO). Wenden Sie sich hierzu an den oben genannten Verantwortlichen.',
+        'objection_clicks' => 'Der Erfassung von Klicks auf Kurzlinks, die auf Art. 6 Abs. 1 lit. f DSGVO beruht, können Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, widersprechen (Art. 21 DSGVO).',
         'cookie_identifier' => 'Soweit Sie über das Cookie „mx_vid“ wiedererkannt werden, ist der in diesem Cookie gespeicherte Wert das einzige Merkmal, über das sich die zu Ihnen gespeicherten Daten auffinden lassen. Sie finden ihn in den Cookie-Einstellungen Ihres Browsers unter dem Namen „mx_vid“. Teilen Sie uns diesen Wert zusammen mit der betroffenen Website mit, wenn Sie Auskunft oder Löschung verlangen.',
         'anonymous' => 'Ein Merkmal, das Sie uns vorlegen könnten, gibt es nicht bei :scope. Nach Ablauf des Tagesschlüssels von 48 Stunden sind die dabei gespeicherten Daten anonym und lassen sich keiner Person mehr zuordnen. Die Rechte auf Auskunft (Art. 15 DSGVO) und auf Löschung (Art. 17 DSGVO) finden auf diese Daten keine Anwendung, weil wir Sie darin nicht identifizieren können und nicht verpflichtet sind, allein zu diesem Zweck zusätzliche Informationen zu erheben (Art. 11 DSGVO).',
         'anonymous_scope_both' => 'der Erfassung von Klicks auf Kurzlinks und bei der Websitemessung, soweit diese ohne Cookie erfolgt',
