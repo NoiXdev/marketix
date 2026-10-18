@@ -62,5 +62,105 @@ return [
             'dpa' => 'Einen Auftragsverarbeitungsvertrag (AVV) mit dem Betreiber Ihrer :app-Instanz abschließen, sofern erforderlich.',
             'rights' => 'Betroffenenanfragen bearbeiten. Da Besucher nur über einen täglich wechselnden, nicht zuordenbaren Hash identifiziert werden, lassen sich die meisten gespeicherten Daten keiner Einzelperson zuordnen.',
         ],
+
+        'generator' => [
+            'heading' => 'Datenschutzhinweis-Generator',
+            'intro' => 'Erzeugt einen Hinweistext aus dem, was dieses Projekt tatsächlich verarbeitet. Nichts davon wird gespeichert – der Text wird bei jeder Änderung neu zusammengestellt.',
+
+            'role' => [
+                'label' => 'Wer ist der Verantwortliche?',
+                'own_company' => [
+                    'title' => 'Eigenes Unternehmen',
+                    'text' => 'Sie messen für Ihr eigenes Unternehmen. Es gibt keinen separaten Auftraggeber.',
+                ],
+                'client' => [
+                    'title' => 'Kundenprojekt',
+                    'text' => 'Sie messen im Auftrag eines Kunden. Der Kunde ist verantwortlich, Ihre Agentur ist Auftragsverarbeiterin.',
+                ],
+            ],
+
+            'controller' => [
+                'heading' => 'Verantwortlicher',
+                'description' => 'Wird im Hinweistext namentlich genannt.',
+                'name' => 'Name',
+                'address' => 'Anschrift',
+                'name_placeholder' => 'Musterfirma GmbH',
+                'address_placeholder' => 'Musterstraße 1, 10115 Berlin',
+                'locked' => 'Diese Angaben stammen aus den Projekt- und Betreibereinstellungen und können nur von der Instanz-Administration geändert werden.',
+            ],
+
+            'processors' => [
+                'heading' => 'Auftragsverarbeiter',
+                'description' => 'Aus den Betreibereinstellungen übernommen – hier nur zur Ansicht, damit Sie sehen, was im Hinweistext steht.',
+                'agency' => 'Agentur',
+                'hosting' => 'Hosting-Anbieter',
+                'location' => 'Serverstandort',
+                'empty' => 'Nicht hinterlegt',
+            ],
+
+            'activities' => [
+                'heading' => 'Was aktiv ist',
+                'description' => 'Aus der Projektkonfiguration vorbelegt. Schalten Sie ab, was der Hinweistext nicht erwähnen soll.',
+                'inactive' => 'In diesem Projekt nicht erkannt.',
+                'link_clicks' => [
+                    'title' => 'Klickstatistiken für Kurzlinks',
+                    'text' => 'Serverseitig bei jedem Klick erfasst. Kurzlinks in diesem Projekt: :count',
+                ],
+                'site_analytics' => [
+                    'title' => 'Website-Analyse',
+                    'text' => 'Seitenaufrufe und Besuche auf den getrackten Websites.',
+                ],
+                'pixels' => [
+                    'title' => 'Retargeting-Pixel',
+                    'text' => 'Die Weiterleitungsseite lädt das Skript des Anbieters, bevor sie weiterleitet. Eine Einwilligungsabfrage gibt es dafür im Produkt nicht.',
+                    'flag' => 'Ohne Einwilligung',
+                    'providers' => 'Anbieter: :providers',
+                    'links' => 'Betroffene Kurzlinks: :count',
+                ],
+                'outbound' => [
+                    'title' => 'Externe Links und Downloads',
+                    'text' => 'Klicks auf externe Links und Datei-Downloads auf getrackten Websites.',
+                ],
+                'site_search' => [
+                    'title' => 'Website-Suche',
+                    'text' => 'Suchbegriffe, die in die Suche einer getrackten Website eingegeben werden.',
+                ],
+                'custom_events' => [
+                    'title' => 'Eigene Events',
+                    'text' => 'Events, die Ihr eigener Code an den Tracker sendet.',
+                ],
+            ],
+
+            'legal_basis' => [
+                'label' => 'Rechtsgrundlage',
+                'legitimate_interest' => [
+                    'title' => 'Berechtigtes Interesse',
+                    'text' => 'Art. 6 Abs. 1 lit. f DSGVO – Reichweitenmessung ohne Einwilligung.',
+                ],
+                'consent' => [
+                    'title' => 'Einwilligung',
+                    'text' => 'Art. 6 Abs. 1 lit. a DSGVO – die Messung läuft erst nach einer Einwilligung.',
+                ],
+            ],
+
+            'language' => [
+                'label' => 'Sprache des Hinweistextes',
+                'hint' => 'Ändert nur die Sprache des erzeugten Textes, nicht die der Oberfläche.',
+            ],
+
+            'warnings' => [
+                'heading' => 'Vor der Veröffentlichung prüfen',
+            ],
+
+            'preview' => [
+                'heading' => 'Vorschau',
+                'loading' => 'Wird erzeugt …',
+                'error' => 'Der Hinweistext konnte nicht erzeugt werden. Bitte versuchen Sie es erneut.',
+                'copy_text' => 'Als Text kopieren',
+                'copy_html' => 'Als HTML kopieren',
+                'copied' => 'Kopiert',
+                'placeholders' => 'Noch zu ersetzen: :list',
+            ],
+        ],
     ],
 ];

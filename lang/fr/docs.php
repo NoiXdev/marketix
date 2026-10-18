@@ -62,5 +62,105 @@ return [
             'dpa' => 'Conclure un accord de traitement des données (DPA / AVV) avec l’exploitant de votre instance :app, lorsque cela est requis.',
             'rights' => 'Traiter les demandes des personnes concernées. Les visiteurs n’étant identifiés que par un hachage quotidien non rattachable, la plupart des données stockées ne peuvent pas être reliées à une personne.',
         ],
+
+        'generator' => [
+            'heading' => 'Générateur de mentions de confidentialité',
+            'intro' => 'Génère un texte à partir de ce que ce projet traite réellement. Rien n’est enregistré : le texte est recomposé à chaque modification.',
+
+            'role' => [
+                'label' => 'Qui est le responsable du traitement ?',
+                'own_company' => [
+                    'title' => 'Notre propre entreprise',
+                    'text' => 'Vous mesurez pour votre propre entreprise. Il n’y a pas de client distinct.',
+                ],
+                'client' => [
+                    'title' => 'Projet client',
+                    'text' => 'Vous mesurez pour le compte d’un client. Le client est responsable du traitement et votre agence est sous-traitante.',
+                ],
+            ],
+
+            'controller' => [
+                'heading' => 'Responsable du traitement',
+                'description' => 'Nommé dans le texte généré.',
+                'name' => 'Nom',
+                'address' => 'Adresse',
+                'name_placeholder' => 'Exemple SARL',
+                'address_placeholder' => 'Rue de l’Exemple 1, 75001 Paris',
+                'locked' => 'Ces informations proviennent des réglages du projet et de l’exploitant ; seule l’administration de l’instance peut les modifier.',
+            ],
+
+            'processors' => [
+                'heading' => 'Sous-traitants',
+                'description' => 'Reprises des réglages de l’exploitant — affichées ici pour que vous voyiez ce que dira le texte.',
+                'agency' => 'Agence',
+                'hosting' => 'Hébergeur',
+                'location' => 'Localisation des serveurs',
+                'empty' => 'Non renseigné',
+            ],
+
+            'activities' => [
+                'heading' => 'Ce qui est actif',
+                'description' => 'Prérempli à partir de la configuration du projet. Désactivez ce que le texte ne doit pas mentionner.',
+                'inactive' => 'Non détecté dans ce projet.',
+                'link_clicks' => [
+                    'title' => 'Statistiques de clics des liens courts',
+                    'text' => 'Enregistrées côté serveur à chaque clic. Liens courts dans ce projet : :count',
+                ],
+                'site_analytics' => [
+                    'title' => 'Analyse des sites',
+                    'text' => 'Pages vues et visites sur les sites suivis.',
+                ],
+                'pixels' => [
+                    'title' => 'Pixels de reciblage',
+                    'text' => 'La page de redirection charge le script du fournisseur avant de rediriger. Le produit ne prévoit aucun recueil de consentement pour cela.',
+                    'flag' => 'Sans consentement',
+                    'providers' => 'Fournisseurs : :providers',
+                    'links' => 'Liens courts concernés : :count',
+                ],
+                'outbound' => [
+                    'title' => 'Liens sortants et téléchargements',
+                    'text' => 'Clics sur les liens externes et téléchargements de fichiers sur les sites suivis.',
+                ],
+                'site_search' => [
+                    'title' => 'Recherche interne',
+                    'text' => 'Termes saisis dans la recherche interne d’un site suivi.',
+                ],
+                'custom_events' => [
+                    'title' => 'Événements personnalisés',
+                    'text' => 'Événements que votre propre code envoie au traceur.',
+                ],
+            ],
+
+            'legal_basis' => [
+                'label' => 'Base légale',
+                'legitimate_interest' => [
+                    'title' => 'Intérêt légitime',
+                    'text' => 'Art. 6, §1, f) RGPD — mesure d’audience sans consentement.',
+                ],
+                'consent' => [
+                    'title' => 'Consentement',
+                    'text' => 'Art. 6, §1, a) RGPD — la mesure ne démarre qu’après le consentement.',
+                ],
+            ],
+
+            'language' => [
+                'label' => 'Langue du texte généré',
+                'hint' => 'Ne change que la langue du texte généré, pas celle de l’interface.',
+            ],
+
+            'warnings' => [
+                'heading' => 'À vérifier avant publication',
+            ],
+
+            'preview' => [
+                'heading' => 'Aperçu',
+                'loading' => 'Génération…',
+                'error' => 'Le texte n’a pas pu être généré. Veuillez réessayer.',
+                'copy_text' => 'Copier en texte',
+                'copy_html' => 'Copier en HTML',
+                'copied' => 'Copié',
+                'placeholders' => 'Encore à remplacer : :list',
+            ],
+        ],
     ],
 ];

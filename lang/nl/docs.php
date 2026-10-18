@@ -62,5 +62,105 @@ return [
             'dpa' => 'Een verwerkersovereenkomst (DPA / AVV) te sluiten met de beheerder van uw :app-instantie, waar vereist.',
             'rights' => 'Verzoeken van betrokkenen af te handelen. Omdat bezoekers alleen via een dagelijks wisselende, niet-koppelbare hash worden geïdentificeerd, kunnen de meeste opgeslagen gegevens niet tot een persoon worden herleid.',
         ],
+
+        'generator' => [
+            'heading' => 'Privacyverklaring-generator',
+            'intro' => 'Stelt een tekst samen op basis van wat dit project daadwerkelijk verwerkt. Er wordt niets opgeslagen — de tekst wordt bij elke wijziging opnieuw samengesteld.',
+
+            'role' => [
+                'label' => 'Wie is de verwerkingsverantwoordelijke?',
+                'own_company' => [
+                    'title' => 'Ons eigen bedrijf',
+                    'text' => 'U meet voor uw eigen bedrijf. Er is geen aparte opdrachtgever.',
+                ],
+                'client' => [
+                    'title' => 'Klantproject',
+                    'text' => 'U meet in opdracht van een klant. De klant is verwerkingsverantwoordelijke, uw bureau is verwerker.',
+                ],
+            ],
+
+            'controller' => [
+                'heading' => 'Verwerkingsverantwoordelijke',
+                'description' => 'Wordt met naam in de tekst genoemd.',
+                'name' => 'Naam',
+                'address' => 'Adres',
+                'name_placeholder' => 'Voorbeeld B.V.',
+                'address_placeholder' => 'Voorbeeldstraat 1, 1015 Amsterdam',
+                'locked' => 'Deze gegevens komen uit de project- en beheerdersinstellingen en kunnen alleen door een instantiebeheerder worden gewijzigd.',
+            ],
+
+            'processors' => [
+                'heading' => 'Verwerkers',
+                'description' => 'Overgenomen uit de beheerdersinstellingen — hier alleen ter inzage, zodat u ziet wat er in de tekst komt te staan.',
+                'agency' => 'Bureau',
+                'hosting' => 'Hostingprovider',
+                'location' => 'Serverlocatie',
+                'empty' => 'Niet ingevuld',
+            ],
+
+            'activities' => [
+                'heading' => 'Wat actief is',
+                'description' => 'Vooraf ingevuld op basis van de projectconfiguratie. Zet uit wat de tekst niet mag noemen.',
+                'inactive' => 'Niet aangetroffen in dit project.',
+                'link_clicks' => [
+                    'title' => 'Klikstatistieken van verkorte links',
+                    'text' => 'Bij elke klik aan de serverzijde vastgelegd. Verkorte links in dit project: :count',
+                ],
+                'site_analytics' => [
+                    'title' => 'Website-analyse',
+                    'text' => 'Paginaweergaven en bezoeken op de gevolgde websites.',
+                ],
+                'pixels' => [
+                    'title' => 'Retargeting-pixels',
+                    'text' => 'De doorstuurpagina laadt het script van de aanbieder voordat er wordt doorgestuurd. Het product kent hiervoor geen toestemmingsvraag.',
+                    'flag' => 'Zonder toestemming',
+                    'providers' => 'Aanbieders: :providers',
+                    'links' => 'Betrokken verkorte links: :count',
+                ],
+                'outbound' => [
+                    'title' => 'Uitgaande links en downloads',
+                    'text' => 'Klikken op externe links en bestandsdownloads op gevolgde websites.',
+                ],
+                'site_search' => [
+                    'title' => 'Zoeken op de website',
+                    'text' => 'Zoektermen die in de zoekfunctie van een gevolgde website worden ingevoerd.',
+                ],
+                'custom_events' => [
+                    'title' => 'Eigen events',
+                    'text' => 'Events die uw eigen code naar de tracker stuurt.',
+                ],
+            ],
+
+            'legal_basis' => [
+                'label' => 'Rechtsgrondslag',
+                'legitimate_interest' => [
+                    'title' => 'Gerechtvaardigd belang',
+                    'text' => 'Art. 6 lid 1 sub f AVG — bereikmeting zonder toestemming.',
+                ],
+                'consent' => [
+                    'title' => 'Toestemming',
+                    'text' => 'Art. 6 lid 1 sub a AVG — de meting start pas na toestemming.',
+                ],
+            ],
+
+            'language' => [
+                'label' => 'Taal van de tekst',
+                'hint' => 'Verandert alleen de taal van de gegenereerde tekst, niet die van de interface.',
+            ],
+
+            'warnings' => [
+                'heading' => 'Controleer vóór publicatie',
+            ],
+
+            'preview' => [
+                'heading' => 'Voorbeeld',
+                'loading' => 'Bezig met genereren…',
+                'error' => 'De tekst kon niet worden gegenereerd. Probeer het opnieuw.',
+                'copy_text' => 'Kopiëren als tekst',
+                'copy_html' => 'Kopiëren als HTML',
+                'copied' => 'Gekopieerd',
+                'placeholders' => 'Nog te vervangen: :list',
+            ],
+        ],
     ],
 ];

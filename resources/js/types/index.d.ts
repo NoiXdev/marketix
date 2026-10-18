@@ -145,3 +145,70 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   translations: Record<string, unknown>;
   navCounts?: Record<string, number>;
 };
+
+// ── Privacy notice generator ───────────────────────────────────────────
+
+export type ControllerRole = 'own_company' | 'client';
+
+export type LegalBasis = 'legitimate_interest' | 'consent';
+
+/** Mirrors App\Support\Privacy\NoticeOptions::ACTIVITIES. */
+export type NoticeActivity = 'link_clicks' | 'site_analytics' | 'pixels' | 'outbound_links' | 'file_downloads' | 'site_search' | 'custom_events';
+
+export interface SnapshotSite {
+  domain: string;
+  tracking_mode: string;
+  consent_mode: string;
+  respects_dnt: boolean;
+  tracks_outbound_links: boolean;
+  tracks_file_downloads: boolean;
+  tracks_site_search: boolean;
+  retention_days: number;
+}
+
+/** App\Support\Privacy\ProcessingSnapshot::toArray(). */
+export interface ProcessingSnapshot {
+  sites: SnapshotSite[];
+  link_count: number;
+  pixel_providers: string[];
+  pixel_link_count: number;
+  click_retention_days: number;
+  geolocation_available: boolean;
+  uses_cookies: boolean;
+  has_consentless_cookies: boolean;
+}
+
+/** Party details the admin settings and the project supply. */
+export interface NoticeParties {
+  agency_name: string | null;
+  agency_address: string | null;
+  hosting_provider: string | null;
+  hosting_location: string | null;
+  client_name: string | null;
+  client_address: string | null;
+}
+
+export interface NoticeDefaults {
+  role: ControllerRole;
+  locale: string;
+  legalBasis: LegalBasis;
+}
+
+export interface NoticeSection {
+  heading: string;
+  paragraphs: string[];
+}
+
+export interface NoticeWarning {
+  key: string;
+  message: string;
+}
+
+/** The JSON body of app.project.docs.privacy.notice. */
+export interface GeneratedNotice {
+  sections: NoticeSection[];
+  text: string;
+  html: string;
+  placeholders: string[];
+  warnings: NoticeWarning[];
+}
