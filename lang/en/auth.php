@@ -14,6 +14,9 @@ return [
         'submit' => 'Sign in',
         'passkey' => 'Sign in with a passkey',
     ],
+    'login_link' => [
+        'invalid' => 'This login link is invalid or has expired.',
+    ],
     'forgot' => [
         'head' => 'Forgot Password',
         'title' => 'Reset your password',

@@ -14,6 +14,9 @@ return [
         'submit' => 'Inloggen',
         'passkey' => 'Inloggen met een passkey',
     ],
+    'login_link' => [
+        'invalid' => 'Deze inloglink is ongeldig of verlopen.',
+    ],
     'forgot' => [
         'head' => 'Wachtwoord vergeten',
         'title' => 'Wachtwoord opnieuw instellen',

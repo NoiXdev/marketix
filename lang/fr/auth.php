@@ -14,6 +14,9 @@ return [
         'submit' => 'Se connecter',
         'passkey' => 'Se connecter avec une passkey',
     ],
+    'login_link' => [
+        'invalid' => 'Ce lien de connexion est invalide ou a expiré.',
+    ],
     'forgot' => [
         'head' => 'Mot de passe oublié',
         'title' => 'Réinitialiser votre mot de passe',

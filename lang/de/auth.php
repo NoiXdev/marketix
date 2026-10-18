@@ -14,6 +14,9 @@ return [
         'submit' => 'Anmelden',
         'passkey' => 'Mit einem Passkey anmelden',
     ],
+    'login_link' => [
+        'invalid' => 'Dieser Anmeldelink ist ungültig oder abgelaufen.',
+    ],
     'forgot' => [
         'head' => 'Passwort vergessen',
         'title' => 'Passwort zurücksetzen',
