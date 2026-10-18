@@ -164,4 +164,25 @@ return [
         'complaint' => 'Los daarvan hebt u het recht om een klacht in te dienen bij een toezichthoudende autoriteit voor gegevensbescherming (artikel 77 AVG). Bevoegd is met name de toezichthoudende autoriteit van uw gewone verblijfplaats, van uw werkplek of van de plaats van de vermeende inbreuk.',
     ],
 
+    // Alleen zichtbaar in de Marketix-interface, voor de beheerder — nooit
+    // gepubliceerd. De tekst hierboven is bewust neutraal; dit blok mag
+    // ronduit benoemen wat er mis is en wat dat raakt, vandaar het
+    // duidelijk directere register, dat nooit in de gepubliceerde tekst
+    // mag worden overgenomen.
+    'warnings' => [
+        'pixels_without_consent' => 'Retargeting-pixels zijn actief. Ze laden bij elke klik op de betreffende korte link, zonder dat ergens in het product toestemming wordt gevraagd. Dat is in strijd met § 25, lid 1, TDDDG, dat toestemming vereist voordat informatie op een eindapparaat wordt benaderd.',
+        'cookie_without_consent' => 'De volgende websites plaatsen het cookie “mx_vid”, met een levensduur van 365 dagen, al bij het allereerste verzoek, voordat er toestemming is verkregen: :domains. Dit geldt ongeacht welke rechtsgrondslag voor deze tekst is gekozen — een gerechtvaardigd belang maakt een cookie die vóór elke toestemming wordt geplaatst niet rechtmatig.',
+        'missing_party_details' => 'De volgende verplichte velden ontbreken en verschijnen als plaatshouders in de gepubliceerde tekst: :fields.',
+        'consent_claimed_for_link_clicks' => 'Voor deze tekst is “toestemming” als rechtsgrondslag gekozen, maar het project telt klikken op korte links serverzijdig bij elk verzoek, zonder dat daarvoor toestemming kan worden verkregen. De gepubliceerde tekst noemt voor het registreren van klikken daarom in plaats daarvan een gerechtvaardigd belang — dat wijkt af van de gekozen grondslag.',
+
+        'fields' => [
+            'controller_name' => 'Naam van de verwerkingsverantwoordelijke',
+            'controller_address' => 'Adres van de verwerkingsverantwoordelijke',
+            'agency_name' => 'Naam van de verwerker',
+            'agency_address' => 'Adres van de verwerker',
+            'hosting_provider' => 'Hostingprovider',
+            'hosting_location' => 'Locatie van de servers',
+        ],
+    ],
+
 ];

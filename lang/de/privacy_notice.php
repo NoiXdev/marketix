@@ -155,4 +155,24 @@ return [
         'complaint' => 'Unabhängig davon steht Ihnen das Recht zu, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO). Zuständig ist insbesondere die Aufsichtsbehörde Ihres gewöhnlichen Aufenthaltsorts, Ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes.',
     ],
 
+    // Shown only in the Marketix UI, to the operator — never published. The
+    // notice above is deliberately neutral; this block is allowed to say
+    // plainly what is wrong and what it affects, so it is written in a
+    // noticeably blunter register and must never be copied into the notice.
+    'warnings' => [
+        'pixels_without_consent' => 'Retargeting-Pixel sind aktiv. Sie laden bei jedem Klick auf den betroffenen Kurzlink, ohne dass irgendwo im Produkt eine Einwilligung eingeholt wird. Das verstößt gegen § 25 Abs. 1 TDDDG, der vor dem Zugriff auf Endgeräteinformationen eine Einwilligung verlangt.',
+        'cookie_without_consent' => 'Folgende Websites setzen das Cookie „mx_vid“ mit einer Laufzeit von 365 Tagen bereits beim ersten Aufruf, ohne dass zuvor eine Einwilligung vorliegt: :domains. Das gilt unabhängig davon, welche Rechtsgrundlage für diesen Hinweis gewählt wurde — ein berechtigtes Interesse macht ein Cookie, das vor jeder Einwilligung gesetzt wird, nicht zulässig.',
+        'missing_party_details' => 'Folgende Pflichtangaben fehlen und erscheinen im veröffentlichten Hinweis als Platzhalter: :fields.',
+        'consent_claimed_for_link_clicks' => 'Für diesen Hinweis wurde „Einwilligung“ als Rechtsgrundlage gewählt, das Projekt zählt aber Klicks auf Kurzlinks serverseitig bei jedem Aufruf, ohne dass dafür eine Einwilligung eingeholt werden kann. Der veröffentlichte Hinweis nennt für die Klickerfassung deshalb stattdessen berechtigtes Interesse — das weicht von der getroffenen Auswahl ab.',
+
+        'fields' => [
+            'controller_name' => 'Name des Verantwortlichen',
+            'controller_address' => 'Anschrift des Verantwortlichen',
+            'agency_name' => 'Name des Auftragsverarbeiters',
+            'agency_address' => 'Anschrift des Auftragsverarbeiters',
+            'hosting_provider' => 'Name des Hosting-Anbieters',
+            'hosting_location' => 'Standort der Server',
+        ],
+    ],
+
 ];

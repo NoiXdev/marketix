@@ -160,4 +160,24 @@ return [
         'complaint' => 'Irrespective of this, you have the right to lodge a complaint with a data protection supervisory authority (Art. 77 GDPR). The authority competent in particular is that of your habitual residence, of your place of work or of the place of the alleged infringement.',
     ],
 
+    // Shown only in the Marketix UI, to the operator — never published. The
+    // notice above is deliberately neutral; this block is allowed to say
+    // plainly what is wrong and what it affects, so it is written in a
+    // noticeably blunter register and must never be copied into the notice.
+    'warnings' => [
+        'pixels_without_consent' => 'Retargeting pixels are active. They load on every click on the affected short link, with no consent obtained anywhere in the product. That violates § 25(1) TDDDG, which requires consent before accessing information on an end device.',
+        'cookie_without_consent' => 'The following websites set the “mx_vid” cookie, with a 365-day lifetime, on the very first request, before any consent is obtained: :domains. This applies regardless of which legal basis was chosen for this notice — a legitimate interest does not make a cookie set before any consent lawful.',
+        'missing_party_details' => 'The following mandatory fields are missing and appear as placeholders in the published notice: :fields.',
+        'consent_claimed_for_link_clicks' => '“Consent” was chosen as the legal basis for this notice, but the project counts clicks on short links server-side on every request, with no way to obtain consent before doing so. The published notice therefore names legitimate interest for click recording instead — which diverges from the basis that was chosen.',
+
+        'fields' => [
+            'controller_name' => 'Controller name',
+            'controller_address' => 'Controller address',
+            'agency_name' => 'Processor name',
+            'agency_address' => 'Processor address',
+            'hosting_provider' => 'Hosting provider',
+            'hosting_location' => 'Server location',
+        ],
+    ],
+
 ];

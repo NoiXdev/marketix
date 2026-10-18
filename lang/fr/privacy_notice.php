@@ -165,4 +165,25 @@ return [
         'complaint' => 'Indépendamment de cela, vous avez le droit d’introduire une réclamation auprès d’une autorité de contrôle en matière de protection des données (article 77 du RGPD). Est notamment compétente l’autorité de contrôle de votre lieu de résidence habituelle, de votre lieu de travail ou du lieu où la violation présumée a été commise.',
     ],
 
+    // Affiché uniquement dans l’interface Marketix, à l’opérateur — jamais
+    // publié. Le texte ci-dessus est volontairement neutre ; ce bloc peut
+    // dire clairement ce qui ne va pas et ce que cela concerne, d’où un
+    // registre nettement plus direct, qu’il ne faut jamais recopier dans
+    // le texte publié.
+    'warnings' => [
+        'pixels_without_consent' => 'Des pixels de reciblage sont actifs. Ils se chargent à chaque clic sur le lien court concerné, sans qu’aucun consentement ne soit recueilli nulle part dans le produit. Cela enfreint le § 25, paragraphe 1, du TDDDG, qui exige un consentement avant tout accès à des informations stockées sur un terminal.',
+        'cookie_without_consent' => 'Les sites web suivants déposent le cookie « mx_vid », d’une durée de vie de 365 jours, dès la toute première requête, avant tout recueil de consentement : :domains. Cela vaut indépendamment de la base légale choisie pour ce texte — un intérêt légitime ne rend pas licite un cookie déposé avant tout consentement.',
+        'missing_party_details' => 'Les champs obligatoires suivants sont manquants et apparaissent comme des espaces réservés dans le texte publié : :fields.',
+        'consent_claimed_for_link_clicks' => '« Consentement » a été choisi comme base légale pour ce texte, mais le projet comptabilise les clics sur les liens courts côté serveur à chaque requête, sans aucun moyen de recueillir un consentement avant de le faire. Le texte publié mentionne donc l’intérêt légitime pour l’enregistrement des clics — ce qui diverge de la base choisie.',
+
+        'fields' => [
+            'controller_name' => 'Nom du responsable du traitement',
+            'controller_address' => 'Adresse du responsable du traitement',
+            'agency_name' => 'Nom du sous-traitant',
+            'agency_address' => 'Adresse du sous-traitant',
+            'hosting_provider' => 'Hébergeur',
+            'hosting_location' => 'Localisation des serveurs',
+        ],
+    ],
+
 ];
