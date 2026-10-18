@@ -47,7 +47,7 @@ class PrivacyNoticeEndpointTest extends TestCase
     {
         [$user, $project] = $this->memberWithProjectAndLink();
 
-        session(['locale' => 'de']);
+        $user->update(['locale' => 'de']);
 
         $response = $this->actingAs($user)->getJson(route('app.project.docs.privacy.notice', [
             'project' => $project->id,
@@ -118,6 +118,40 @@ class PrivacyNoticeEndpointTest extends TestCase
 
         $response->assertOk();
         $this->assertStringNotContainsString('Erfassung von Klicks auf Kurzlinks', $response->json('text'));
+    }
+
+    /**
+     * Warnings are Marketix UI text shown beside the generator form and are
+     * never published, so they follow the interface language even when the
+     * notice itself is composed in another one.
+     */
+    public function test_warnings_stay_in_the_ui_language_when_the_notice_is_generated_in_another(): void
+    {
+        [$user, $project] = $this->memberWithProjectAndLink();
+
+        // SetLocaleMiddleware reads the user's own locale, so this is what
+        // actually puts the interface into German.
+        $user->update(['locale' => 'de']);
+
+        $response = $this->actingAs($user)->getJson(route('app.project.docs.privacy.notice', [
+            'project' => $project->id,
+            'role' => ControllerRole::OwnCompany->value,
+            'legal_basis' => LegalBasis::LegitimateInterest->value,
+            'locale' => 'fr',
+        ]));
+
+        $response->assertOk();
+
+        // The notice is French: no party details were supplied, so the
+        // placeholders are French too.
+        $this->assertStringContainsString('Responsable du traitement', $response->json('text'));
+
+        $warnings = collect($response->json('warnings'))->keyBy('key');
+        $this->assertTrue($warnings->has('missing_party_details'));
+
+        $message = $warnings['missing_party_details']['message'];
+        $this->assertStringContainsString('Folgende Pflichtangaben fehlen', $message);
+        $this->assertStringNotContainsString('Les champs obligatoires suivants', $message);
     }
 
     /** @return array{0: User, 1: Project} */

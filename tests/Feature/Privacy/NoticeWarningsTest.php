@@ -120,12 +120,12 @@ class NoticeWarningsTest extends TestCase
         $warning = $this->assertWarningPresent($warnings, 'missing_party_details');
 
         foreach ([
-            trans('privacy_notice.warnings.fields.controller_name', [], 'de'),
-            trans('privacy_notice.warnings.fields.controller_address', [], 'de'),
-            trans('privacy_notice.warnings.fields.agency_name', [], 'de'),
-            trans('privacy_notice.warnings.fields.agency_address', [], 'de'),
-            trans('privacy_notice.warnings.fields.hosting_provider', [], 'de'),
-            trans('privacy_notice.warnings.fields.hosting_location', [], 'de'),
+            trans('privacy_notice.warnings.fields.controller_name'),
+            trans('privacy_notice.warnings.fields.controller_address'),
+            trans('privacy_notice.warnings.fields.agency_name'),
+            trans('privacy_notice.warnings.fields.agency_address'),
+            trans('privacy_notice.warnings.fields.hosting_provider'),
+            trans('privacy_notice.warnings.fields.hosting_location'),
         ] as $label) {
             $this->assertStringContainsString($label, $warning['message']);
         }
