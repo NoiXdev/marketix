@@ -24,6 +24,7 @@ use App\Http\Controllers\FunnelController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\LoginLinkController;
 use App\Http\Controllers\MoveToProjectController;
 use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
@@ -88,6 +89,12 @@ Route::group(['domain' => config('app.domain')], function () {
             ->middleware('throttle:5,1')
             ->name('app.auth.reset');
     });
+
+    // Support login links (artisan marketix:login-link). Deliberately outside
+    // the guest group so it can also swap an already signed-in session.
+    Route::get('/auth/login-link/{token}', LoginLinkController::class)
+        ->middleware('throttle:10,1')
+        ->name('app.auth.login-link');
 
     // Auth-only routes
     Route::middleware('auth')->group(function () {
