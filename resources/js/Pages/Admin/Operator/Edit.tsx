@@ -38,12 +38,7 @@ export default function AdminOperatorEdit(props: Props) {
               <Input id="agency_name" value={data.agency_name} onChange={(e) => setData('agency_name', e.target.value)} />
             </Field>
 
-            <Field
-              label={t('admin.operator.fields.agency_address')}
-              hint={t('admin.operator.fields.agency_address_hint')}
-              htmlFor="agency_address"
-              error={errors.agency_address}
-            >
+            <Field label={t('admin.operator.fields.agency_address')} hint={t('admin.operator.fields.agency_address_hint')} htmlFor="agency_address" error={errors.agency_address}>
               <Input id="agency_address" value={data.agency_address} onChange={(e) => setData('agency_address', e.target.value)} />
             </Field>
           </FormSection>

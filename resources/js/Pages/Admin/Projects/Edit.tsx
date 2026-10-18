@@ -94,11 +94,7 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
             <Field label={t('admin.projects.fields.client_name')} error={details.errors.client_name}>
               <Input value={details.data.client_name} onChange={(e) => details.setData('client_name', e.target.value)} />
             </Field>
-            <Field
-              label={t('admin.projects.fields.client_address')}
-              hint={t('admin.projects.fields.client_address_hint')}
-              error={details.errors.client_address}
-            >
+            <Field label={t('admin.projects.fields.client_address')} hint={t('admin.projects.fields.client_address_hint')} error={details.errors.client_address}>
               <Input value={details.data.client_address} onChange={(e) => details.setData('client_address', e.target.value)} />
             </Field>
           </FormSection>
