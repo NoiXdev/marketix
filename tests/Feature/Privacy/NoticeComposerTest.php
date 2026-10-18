@@ -237,6 +237,122 @@ class NoticeComposerTest extends TestCase
         $this->assertStringContainsString('mx_vid', $body);
     }
 
+    public function test_consent_is_never_asserted_for_link_click_recording(): void
+    {
+        $project = Project::factory()->create();
+        $domain = Domain::factory()->create(['project_id' => $project->id]);
+        Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+        Site::factory()->forProject($project)->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $sections = (new NoticeComposer)->compose(
+            ProcessingSnapshot::for($project),
+            $this->noticeOptions(['legalBasis' => LegalBasis::Consent]),
+        );
+
+        $basis = $this->section($sections, trans('privacy_notice.legal_basis.heading', [], 'de'));
+        $this->assertNotNull($basis);
+
+        $body = implode("\n", $basis->paragraphs);
+        $clicks = trans('privacy_notice.legal_basis.activities_clicks', [], 'de');
+        $sites = trans('privacy_notice.legal_basis.activities_sites', [], 'de');
+
+        // Clicks are counted server-side on every request with no consent
+        // path anywhere in the product, so they run on legitimate interest.
+        $this->assertStringContainsString(
+            trans('privacy_notice.legal_basis.clicks_legitimate_interest', [], 'de'),
+            $body,
+        );
+        $this->assertStringContainsString('Art. 6 Abs. 1 lit. f DSGVO', $body);
+
+        // The consent sentence covers site analytics and nothing else.
+        $this->assertStringContainsString(
+            trans('privacy_notice.legal_basis.consent', ['activities' => $sites], 'de'),
+            $body,
+        );
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.legal_basis.consent', ['activities' => $clicks], 'de'),
+            $body,
+        );
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.legal_basis.activities_both', [], 'de'),
+            $body,
+        );
+
+        // Clicks running on legitimate interest carry the Art. 21 objection
+        // right, which the consent variant of the rights list omits.
+        $rights = implode("\n", $this->section($sections, trans('privacy_notice.rights.heading', [], 'de'))->paragraphs);
+        $this->assertStringContainsString('Art. 21', $rights);
+    }
+
+    public function test_a_links_only_project_on_consent_claims_no_consent_at_all(): void
+    {
+        $project = Project::factory()->create();
+        $domain = Domain::factory()->create(['project_id' => $project->id]);
+        Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+
+        $sections = (new NoticeComposer)->compose(
+            ProcessingSnapshot::for($project),
+            $this->noticeOptions(['legalBasis' => LegalBasis::Consent]),
+        );
+
+        $body = implode("\n", $this->section($sections, trans('privacy_notice.legal_basis.heading', [], 'de'))->paragraphs);
+
+        $this->assertStringContainsString('Art. 6 Abs. 1 lit. f DSGVO', $body);
+        $this->assertStringNotContainsString('Art. 6 Abs. 1 lit. a DSGVO', $body);
+        $this->assertStringNotContainsString('Einwilligung', $body);
+    }
+
+    public function test_switched_off_activities_are_omitted(): void
+    {
+        $project = Project::factory()->create();
+        $domain = Domain::factory()->create(['project_id' => $project->id]);
+        $url = Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+
+        Site::factory()->forProject($project)->create([
+            'domain' => 'shop.example.com',
+            'tracking_mode' => TrackingMode::Cookieless,
+            'track_outbound_links' => true,
+            'site_search_params' => 'q',
+        ]);
+
+        Pixel::factory()->create(['project_id' => $project->id, 'provider' => PixelProvider::Facebook])
+            ->urls()->attach($url);
+
+        $composer = new NoticeComposer;
+        $sections = $composer->compose(
+            ProcessingSnapshot::for($project),
+            $this->noticeOptions([
+                'disabledActivities' => [
+                    NoticeOptions::ACTIVITY_PIXELS,
+                    NoticeOptions::ACTIVITY_SITE_SEARCH,
+                ],
+            ]),
+        );
+
+        $this->assertSectionAbsent($composer, $sections, trans('privacy_notice.pixels.heading', [], 'de'));
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.pixels.transmission', [], 'de'),
+            $composer->toPlainText($sections),
+        );
+
+        $analytics = $this->section($sections, trans('privacy_notice.analytics.heading', [], 'de'));
+        $this->assertNotNull($analytics, 'Switching off site search must not take the analytics section with it.');
+
+        $body = implode("\n", $analytics->paragraphs);
+
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.analytics.site_search', ['domains' => 'shop.example.com'], 'de'),
+            $body,
+        );
+
+        // What was left switched on is still there.
+        $this->assertStringContainsString(trans('privacy_notice.analytics.page_view', [], 'de'), $body);
+        $this->assertStringContainsString(
+            trans('privacy_notice.analytics.outbound', ['domains' => 'shop.example.com'], 'de'),
+            $body,
+        );
+    }
+
     public function test_html_output_escapes_party_details(): void
     {
         $project = $this->projectWithEverything();

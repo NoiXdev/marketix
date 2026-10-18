@@ -270,19 +270,43 @@ final class NoticeComposer
             return null;
         }
 
-        $activities = $this->t('legal_basis.'.$this->scopeKey('activities'));
-
         $paragraphs = $this->options->legalBasis === LegalBasis::Consent
-            ? [
-                $this->t('legal_basis.consent', ['activities' => $activities]),
-                $this->t('legal_basis.consent_withdrawal'),
-            ]
+            ? $this->consentParagraphs()
             : [
-                $this->t('legal_basis.legitimate_interest', ['activities' => $activities]),
+                $this->t('legal_basis.legitimate_interest', [
+                    'activities' => $this->t('legal_basis.'.$this->scopeKey('activities')),
+                ]),
                 $this->t('legal_basis.legitimate_interest_detail'),
             ];
 
         return new NoticeSection($this->t('legal_basis.heading'), $paragraphs);
+    }
+
+    /**
+     * Consent can only ever cover site analytics. Link clicks are counted
+     * server-side on every request and the product has no consent path for
+     * them at all, so asserting consent there would publish a false
+     * statement; they are stated under legitimate interest instead, which
+     * is the only basis the always-on counting can run on.
+     *
+     * @return list<string>
+     */
+    private function consentParagraphs(): array
+    {
+        $paragraphs = [];
+
+        if ($this->tracksClicks()) {
+            $paragraphs[] = $this->t('legal_basis.clicks_legitimate_interest');
+        }
+
+        if ($this->tracksSites()) {
+            $paragraphs[] = $this->t('legal_basis.consent', [
+                'activities' => $this->t('legal_basis.activities_sites'),
+            ]);
+            $paragraphs[] = $this->t('legal_basis.consent_withdrawal');
+        }
+
+        return $paragraphs;
     }
 
     private function retentionSection(): ?NoticeSection
@@ -331,6 +355,14 @@ final class NoticeComposer
                 ? $this->t('rights.list_consent')
                 : $this->t('rights.list_legitimate_interest'),
         ];
+
+        // The consent list leaves out Art. 21, which does not apply to
+        // consent-based processing. Link clicks run on legitimate interest
+        // even when the notice's chosen basis is consent, so the objection
+        // right still has to be stated for them.
+        if ($this->options->legalBasis === LegalBasis::Consent && $this->tracksClicks()) {
+            $paragraphs[] = $this->t('rights.objection_clicks');
+        }
 
         if ($this->tracksSites() && $this->snapshot->usesCookies()) {
             $paragraphs[] = $this->t('rights.cookie_identifier');
