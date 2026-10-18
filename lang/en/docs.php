@@ -45,18 +45,10 @@ return [
             'aggregates' => 'Aggregated counts and charts may be kept longer; they contain no personal identifiers.',
         ],
 
-        'notice' => [
-            'heading' => 'Privacy notice for your website',
-            'intro' => 'If you use :app to track links or pages, tell your visitors. You can adapt the text below for your own privacy policy:',
-            'snippet' => 'This website uses :app to measure the reach of its links and pages. When you open a tracked link or page, technical data (a hashed IP address, approximate location, browser, operating system and referring website) is processed to generate anonymous statistics. Cookies are only used if you consent to cookie-based measurement, and the data is not used to identify you personally.',
-            'copy' => 'Copy notice',
-            'copied' => 'Copied',
-        ],
-
         'responsibilities' => [
             'heading' => 'Your responsibilities as controller',
             'intro' => 'When you use :app, you are the data controller for your visitors’ data. In particular you should:',
-            'policy' => 'Publish a privacy policy that discloses this analytics processing (you can use the notice above).',
+            'policy' => 'Publish a privacy policy that discloses this analytics processing (the generator below produces the text for it).',
             'basis' => 'Make sure you have a valid legal basis — a legitimate-interest assessment or consent — for your region.',
             'consent' => 'Choose a tracking mode and consent setting that match your legal basis — enable the Do-Not-Track option and cookie consent where your region requires them.',
             'dpa' => 'Have a data processing agreement (DPA / AVV) in place with whoever operates your :app instance, where required.',
@@ -66,6 +58,7 @@ return [
         'generator' => [
             'heading' => 'Privacy notice generator',
             'intro' => 'Builds a notice out of what this project actually processes. Nothing is stored — the text is composed again on every change.',
+            'pointer' => 'The text for your own privacy policy is produced by the generator further down this page, tailored to what this project actually processes.',
 
             'role' => [
                 'label' => 'Who is the controller?',

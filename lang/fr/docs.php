@@ -45,18 +45,10 @@ return [
             'aggregates' => 'Les compteurs et graphiques agrégés peuvent être conservés plus longtemps ; ils ne contiennent aucun identifiant personnel.',
         ],
 
-        'notice' => [
-            'heading' => 'Mention de confidentialité pour votre site',
-            'intro' => 'Si vous utilisez :app pour suivre des liens ou des pages, informez vos visiteurs. Vous pouvez adapter le texte ci-dessous pour votre propre politique de confidentialité :',
-            'snippet' => 'Ce site utilise :app pour mesurer l’audience de ses liens et de ses pages. Lorsque vous ouvrez un lien ou une page suivis, des données techniques (une adresse IP hachée, la localisation approximative, le navigateur, le système d’exploitation et le site référent) sont traitées pour produire des statistiques anonymes. Des cookies ne sont utilisés que si vous consentez à une mesure basée sur les cookies, et les données ne servent pas à vous identifier personnellement.',
-            'copy' => 'Copier la mention',
-            'copied' => 'Copié',
-        ],
-
         'responsibilities' => [
             'heading' => 'Vos responsabilités en tant que responsable du traitement',
             'intro' => 'Lorsque vous utilisez :app, vous êtes le responsable du traitement des données de vos visiteurs. En particulier, vous devez :',
-            'policy' => 'Publier une politique de confidentialité qui révèle ce traitement analytique (vous pouvez utiliser la mention ci-dessus).',
+            'policy' => 'Publier une politique de confidentialité qui révèle ce traitement analytique (le générateur ci-dessous en produit le texte).',
             'basis' => 'Vous assurer de disposer d’une base légale valide — une évaluation de l’intérêt légitime ou un consentement — pour votre région.',
             'consent' => 'Choisir un mode de suivi et un réglage de consentement adaptés à votre base légale — activez l’option Do-Not-Track et le consentement aux cookies lorsque votre région l’exige.',
             'dpa' => 'Conclure un accord de traitement des données (DPA / AVV) avec l’exploitant de votre instance :app, lorsque cela est requis.',
@@ -66,6 +58,7 @@ return [
         'generator' => [
             'heading' => 'Générateur de mentions de confidentialité',
             'intro' => 'Génère un texte à partir de ce que ce projet traite réellement. Rien n’est enregistré : le texte est recomposé à chaque modification.',
+            'pointer' => 'Le texte destiné à votre propre politique de confidentialité est produit par le générateur plus bas sur cette page, adapté à ce que ce projet traite réellement.',
 
             'role' => [
                 'label' => 'Qui est le responsable du traitement ?',

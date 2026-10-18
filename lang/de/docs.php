@@ -45,18 +45,10 @@ return [
             'aggregates' => 'Aggregierte Zählwerte und Diagramme können länger aufbewahrt werden; sie enthalten keine personenbezogenen Kennungen.',
         ],
 
-        'notice' => [
-            'heading' => 'Datenschutzhinweis für Ihre Website',
-            'intro' => 'Wenn Sie :app zum Tracken von Links oder Seiten nutzen, informieren Sie Ihre Besucher. Sie können den folgenden Text für Ihre eigene Datenschutzerklärung anpassen:',
-            'snippet' => 'Diese Website nutzt :app zur Messung der Reichweite ihrer Links und Seiten. Wenn Sie einen getrackten Link oder eine getrackte Seite öffnen, werden technische Daten (eine gehashte IP-Adresse, der ungefähre Standort, Browser, Betriebssystem und die verweisende Website) verarbeitet, um anonyme Statistiken zu erstellen. Cookies werden nur verwendet, wenn Sie einer cookiebasierten Messung zustimmen, und die Daten werden nicht dazu verwendet, Sie persönlich zu identifizieren.',
-            'copy' => 'Hinweis kopieren',
-            'copied' => 'Kopiert',
-        ],
-
         'responsibilities' => [
             'heading' => 'Ihre Pflichten als Verantwortlicher',
             'intro' => 'Wenn Sie :app einsetzen, sind Sie der Verantwortliche für die Daten Ihrer Besucher. Insbesondere sollten Sie:',
-            'policy' => 'Eine Datenschutzerklärung veröffentlichen, die diese Analyse-Verarbeitung offenlegt (Sie können den obigen Hinweis verwenden).',
+            'policy' => 'Eine Datenschutzerklärung veröffentlichen, die diese Analyse-Verarbeitung offenlegt (den Text dafür erzeugt der Generator weiter unten).',
             'basis' => 'Sicherstellen, dass Sie eine gültige Rechtsgrundlage haben – eine Abwägung des berechtigten Interesses oder eine Einwilligung – passend zu Ihrer Region.',
             'consent' => 'Einen Tracking-Modus und eine Einwilligungseinstellung wählen, die zu Ihrer Rechtsgrundlage passen – aktivieren Sie die Do-Not-Track-Option und die Cookie-Einwilligung, wo Ihre Region dies verlangt.',
             'dpa' => 'Einen Auftragsverarbeitungsvertrag (AVV) mit dem Betreiber Ihrer :app-Instanz abschließen, sofern erforderlich.',
@@ -66,6 +58,7 @@ return [
         'generator' => [
             'heading' => 'Datenschutzhinweis-Generator',
             'intro' => 'Erzeugt einen Hinweistext aus dem, was dieses Projekt tatsächlich verarbeitet. Nichts davon wird gespeichert – der Text wird bei jeder Änderung neu zusammengestellt.',
+            'pointer' => 'Den Text für Ihre eigene Datenschutzerklärung erzeugt der Generator weiter unten auf dieser Seite – zugeschnitten auf das, was dieses Projekt tatsächlich verarbeitet.',
 
             'role' => [
                 'label' => 'Wer ist der Verantwortliche?',

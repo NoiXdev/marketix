@@ -45,18 +45,10 @@ return [
             'aggregates' => 'Geaggregeerde tellingen en grafieken kunnen langer worden bewaard; ze bevatten geen persoonlijke identificatoren.',
         ],
 
-        'notice' => [
-            'heading' => 'Privacyverklaring voor uw website',
-            'intro' => 'Als u :app gebruikt om links of pagina’s te volgen, informeer dan uw bezoekers. U kunt de onderstaande tekst aanpassen voor uw eigen privacyverklaring:',
-            'snippet' => 'Deze website gebruikt :app om het bereik van haar links en pagina’s te meten. Wanneer u een gevolgde link of pagina opent, worden technische gegevens (een gehasht IP-adres, de globale locatie, browser, besturingssysteem en de verwijzende website) verwerkt om anonieme statistieken te maken. Cookies worden alleen gebruikt als u instemt met cookiegebaseerde meting, en de gegevens worden niet gebruikt om u persoonlijk te identificeren.',
-            'copy' => 'Verklaring kopiëren',
-            'copied' => 'Gekopieerd',
-        ],
-
         'responsibilities' => [
             'heading' => 'Uw verantwoordelijkheden als verwerkingsverantwoordelijke',
             'intro' => 'Wanneer u :app gebruikt, bent u de verwerkingsverantwoordelijke voor de gegevens van uw bezoekers. In het bijzonder dient u:',
-            'policy' => 'Een privacyverklaring te publiceren die deze analyseverwerking vermeldt (u kunt de bovenstaande verklaring gebruiken).',
+            'policy' => 'Een privacyverklaring te publiceren die deze analyseverwerking vermeldt (de generator hieronder maakt daarvoor de tekst).',
             'basis' => 'Ervoor te zorgen dat u een geldige rechtsgrond hebt — een afweging van gerechtvaardigd belang of toestemming — voor uw regio.',
             'consent' => 'Een trackingmodus en toestemmingsinstelling te kiezen die bij uw rechtsgrond passen — schakel de Do-Not-Track-optie en cookietoestemming in waar uw regio dit vereist.',
             'dpa' => 'Een verwerkersovereenkomst (DPA / AVV) te sluiten met de beheerder van uw :app-instantie, waar vereist.',
@@ -66,6 +58,7 @@ return [
         'generator' => [
             'heading' => 'Privacyverklaring-generator',
             'intro' => 'Stelt een tekst samen op basis van wat dit project daadwerkelijk verwerkt. Er wordt niets opgeslagen — de tekst wordt bij elke wijziging opnieuw samengesteld.',
+            'pointer' => 'De tekst voor uw eigen privacyverklaring maakt de generator verderop op deze pagina, toegesneden op wat dit project daadwerkelijk verwerkt.',
 
             'role' => [
                 'label' => 'Wie is de verwerkingsverantwoordelijke?',

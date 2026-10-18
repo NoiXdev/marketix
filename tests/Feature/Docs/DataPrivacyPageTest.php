@@ -136,6 +136,19 @@ class DataPrivacyPageTest extends TestCase
         }
     }
 
+    public function test_the_static_notice_snippet_is_gone_from_every_locale(): void
+    {
+        // It claimed cookies were only set after consent, left the
+        // retargeting pixels out and called the result anonymous. The
+        // generator replaces it; a second copyable text would contradict it.
+        foreach (['de', 'en', 'fr', 'nl'] as $locale) {
+            $docs = require base_path("lang/{$locale}/docs.php");
+
+            $this->assertArrayNotHasKey('notice', $docs['privacy'], "lang/{$locale}/docs.php still carries the static notice snippet.");
+            $this->assertArrayHasKey('pointer', $docs['privacy']['generator'], "lang/{$locale}/docs.php has no pointer to the generator.");
+        }
+    }
+
     public function test_the_page_no_longer_claims_there_are_no_third_party_cookies(): void
     {
         $de = require base_path('lang/de/docs.php');
