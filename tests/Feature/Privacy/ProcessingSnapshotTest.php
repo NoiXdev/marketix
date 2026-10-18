@@ -146,7 +146,7 @@ class ProcessingSnapshotTest extends TestCase
         {
             public function __construct() {}
 
-            public function hasDatabase(): bool
+            public function isAvailable(): bool
             {
                 return true;
             }

@@ -61,7 +61,7 @@ final class ProcessingSnapshot
             linkCount: $project->urls()->count(),
             pixelProviders: $pixelProviders,
             pixelLinkCount: $project->urls()->whereHas('pixels')->count(),
-            geolocationAvailable: app(GeoIpService::class)->hasDatabase(),
+            geolocationAvailable: app(GeoIpService::class)->isAvailable(),
         );
     }
 
