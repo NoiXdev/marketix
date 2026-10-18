@@ -350,8 +350,15 @@ final class NoticeComposer
 
     private function rightsSection(): NoticeSection
     {
+        // Consent governs the rights list only when consent governs
+        // something in this notice. Site analytics is the only activity it
+        // can cover; a links-only project on Consent obtains no consent at
+        // all, so offering an Art. 7(3) withdrawal and Art. 20 portability
+        // there would promise rights that have nothing to attach to.
+        $consentGoverns = $this->options->legalBasis === LegalBasis::Consent && $this->tracksSites();
+
         $paragraphs = [
-            $this->options->legalBasis === LegalBasis::Consent
+            $consentGoverns
                 ? $this->t('rights.list_consent')
                 : $this->t('rights.list_legitimate_interest'),
         ];
@@ -359,8 +366,10 @@ final class NoticeComposer
         // The consent list leaves out Art. 21, which does not apply to
         // consent-based processing. Link clicks run on legitimate interest
         // even when the notice's chosen basis is consent, so the objection
-        // right still has to be stated for them.
-        if ($this->options->legalBasis === LegalBasis::Consent && $this->tracksClicks()) {
+        // right still has to be stated for them. The legitimate-interest
+        // list already carries Art. 21, so this only applies alongside the
+        // consent list.
+        if ($consentGoverns && $this->tracksClicks()) {
             $paragraphs[] = $this->t('rights.objection_clicks');
         }
 

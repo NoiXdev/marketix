@@ -300,6 +300,63 @@ class NoticeComposerTest extends TestCase
         $this->assertStringContainsString('Art. 6 Abs. 1 lit. f DSGVO', $body);
         $this->assertStringNotContainsString('Art. 6 Abs. 1 lit. a DSGVO', $body);
         $this->assertStringNotContainsString('Einwilligung', $body);
+
+        // No consent is obtained anywhere in this notice, so the rights
+        // section must not offer a withdrawal of one, nor portability,
+        // which only attaches to consent-based processing.
+        $rights = implode("\n", $this->section($sections, trans('privacy_notice.rights.heading', [], 'de'))->paragraphs);
+
+        $this->assertStringNotContainsString('Art. 7 Abs. 3', $rights);
+        $this->assertStringNotContainsString('Art. 20', $rights);
+        $this->assertSame(1, substr_count($rights, 'Art. 21'), 'The objection right must be stated exactly once.');
+    }
+
+    public function test_the_rights_list_follows_whether_consent_governs_anything(): void
+    {
+        // [legal basis, has links, has sites] => [consent list?, Art. 21 occurrences]
+        $combinations = [
+            'consent with sites and links' => [LegalBasis::Consent, true, true, true, 1],
+            'consent with sites only' => [LegalBasis::Consent, false, true, true, 0],
+            'consent with links only' => [LegalBasis::Consent, true, false, false, 1],
+            'legitimate interest' => [LegalBasis::LegitimateInterest, true, true, false, 1],
+        ];
+
+        foreach ($combinations as $label => [$basis, $hasLinks, $hasSites, $consentList, $objections]) {
+            $project = Project::factory()->create();
+
+            if ($hasLinks) {
+                $domain = Domain::factory()->create(['project_id' => $project->id]);
+                Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+            }
+
+            if ($hasSites) {
+                Site::factory()->forProject($project)->create(['tracking_mode' => TrackingMode::Cookieless]);
+            }
+
+            $sections = (new NoticeComposer)->compose(
+                ProcessingSnapshot::for($project),
+                $this->noticeOptions(['legalBasis' => $basis]),
+            );
+
+            $rights = implode("\n", $this->section($sections, trans('privacy_notice.rights.heading', [], 'de'))->paragraphs);
+
+            $expected = $consentList ? 'rights.list_consent' : 'rights.list_legitimate_interest';
+            $unexpected = $consentList ? 'rights.list_legitimate_interest' : 'rights.list_consent';
+
+            $this->assertStringContainsString(trans('privacy_notice.'.$expected, [], 'de'), $rights, $label);
+            $this->assertStringNotContainsString(trans('privacy_notice.'.$unexpected, [], 'de'), $rights, $label);
+
+            // Art. 7(3) withdrawal and Art. 20 portability presuppose
+            // consent-based processing and may only appear with that list.
+            $this->assertSame($consentList, str_contains($rights, 'Art. 7 Abs. 3'), $label);
+            $this->assertSame($consentList, str_contains($rights, 'Art. 20'), $label);
+
+            // Stated exactly once, whether it comes from the
+            // legitimate-interest list or from the separate clicks paragraph.
+            $this->assertSame($objections, substr_count($rights, 'Art. 21'), $label);
+
+            $this->assertStringContainsString('Art. 77', $rights, $label);
+        }
     }
 
     public function test_switched_off_activities_are_omitted(): void
