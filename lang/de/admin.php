@@ -7,6 +7,7 @@ return [
         'projects' => 'Projekte',
         'mailer' => 'Mailer',
         'branding' => 'Branding',
+        'operator' => 'Betreiber',
         'storage' => 'Speicher',
         'activity' => 'Aktivität',
         'horizon' => 'Horizon',
@@ -130,6 +131,20 @@ return [
             'favicon_hint' => '.ico, .png, .jpg.',
         ],
         'remove_current' => 'Aktuelles entfernen',
+    ],
+    'operator' => [
+        'title' => 'Betreiber-Einstellungen',
+        'sections' => [
+            'agency' => 'Agentur',
+            'hosting' => 'Hosting',
+        ],
+        'fields' => [
+            'agency_name' => 'Name der Agentur',
+            'agency_address' => 'Anschrift der Agentur',
+            'agency_address_hint' => 'Vollständige Postanschrift.',
+            'hosting_provider' => 'Hosting-Anbieter',
+            'hosting_location' => 'Standort der Server',
+        ],
     ],
     'mailer' => [
         'title' => 'Mailer-Einstellungen',

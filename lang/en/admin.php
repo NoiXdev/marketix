@@ -7,6 +7,7 @@ return [
         'projects' => 'Projects',
         'mailer' => 'Mailer',
         'branding' => 'Branding',
+        'operator' => 'Operator',
         'storage' => 'Storage',
         'activity' => 'Activity',
         'horizon' => 'Horizon',
@@ -130,6 +131,20 @@ return [
             'favicon_hint' => '.ico, .png, .jpg.',
         ],
         'remove_current' => 'Remove current',
+    ],
+    'operator' => [
+        'title' => 'Operator settings',
+        'sections' => [
+            'agency' => 'Agency',
+            'hosting' => 'Hosting',
+        ],
+        'fields' => [
+            'agency_name' => 'Agency name',
+            'agency_address' => 'Agency address',
+            'agency_address_hint' => 'Full postal address.',
+            'hosting_provider' => 'Hosting provider',
+            'hosting_location' => 'Server location',
+        ],
     ],
     'mailer' => [
         'title' => 'Mailer settings',

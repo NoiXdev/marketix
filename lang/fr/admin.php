@@ -7,6 +7,7 @@ return [
         'projects' => 'Projets',
         'mailer' => 'Messagerie',
         'branding' => 'Image de marque',
+        'operator' => 'Exploitant',
         'storage' => 'Stockage',
         'activity' => 'Activité',
         'horizon' => 'Horizon',
@@ -130,6 +131,20 @@ return [
             'favicon_hint' => '.ico, .png, .jpg.',
         ],
         'remove_current' => 'Retirer le fichier actuel',
+    ],
+    'operator' => [
+        'title' => "Paramètres de l'exploitant",
+        'sections' => [
+            'agency' => 'Agence',
+            'hosting' => 'Hébergement',
+        ],
+        'fields' => [
+            'agency_name' => "Nom de l'agence",
+            'agency_address' => "Adresse de l'agence",
+            'agency_address_hint' => 'Adresse postale complète.',
+            'hosting_provider' => 'Hébergeur',
+            'hosting_location' => 'Emplacement des serveurs',
+        ],
     ],
     'mailer' => [
         'title' => 'Paramètres de messagerie',

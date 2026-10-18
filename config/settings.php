@@ -2,6 +2,7 @@
 
 use App\Settings\BrandingSettings;
 use App\Settings\MailSettings;
+use App\Settings\OperatorSettings;
 use App\Settings\StorageSettings;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
@@ -20,6 +21,7 @@ return [
         MailSettings::class,
         BrandingSettings::class,
         StorageSettings::class,
+        OperatorSettings::class,
     ],
 
     /*

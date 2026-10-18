@@ -50,6 +50,7 @@ return [
         'project_updated' => 'Projekt aktualisiert.',
         'project_deleted' => 'Projekt gelöscht.',
         'branding_saved' => 'Branding gespeichert.',
+        'operator_saved' => 'Betreiber-Einstellungen gespeichert.',
         'storage_saved' => 'Speicher-Einstellungen gespeichert.',
         'storage_test_failed' => 'Speichertest fehlgeschlagen: :error',
         'storage_ok' => 'Verbindung zum Speicher funktioniert.',

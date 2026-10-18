@@ -50,6 +50,7 @@ return [
         'project_updated' => 'Project updated.',
         'project_deleted' => 'Project deleted.',
         'branding_saved' => 'Branding saved.',
+        'operator_saved' => 'Operator settings saved.',
         'storage_saved' => 'Storage settings saved.',
         'storage_test_failed' => 'Storage test failed: :error',
         'storage_ok' => 'Storage connection OK.',

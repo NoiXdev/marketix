@@ -1,6 +1,6 @@
 import { useTranslation } from '@/lib/i18n';
 import { Link, usePage } from '@inertiajs/react';
-import { Activity, ArrowLeft, FolderKanban, HardDrive, Mail, Palette, ScrollText, Users } from 'lucide-react';
+import { Activity, ArrowLeft, Building2, FolderKanban, HardDrive, Mail, Palette, ScrollText, Users } from 'lucide-react';
 import Brand from './Brand';
 import SidebarShell, { MobileNavProps } from './SidebarShell';
 
@@ -20,6 +20,7 @@ const groups: NavGroup[] = [
     items: [
       { key: 'mailer', icon: Mail, routeName: 'app.admin.mailer.edit' },
       { key: 'branding', icon: Palette, routeName: 'app.admin.branding.edit' },
+      { key: 'operator', icon: Building2, routeName: 'app.admin.operator.edit' },
       { key: 'storage', icon: HardDrive, routeName: 'app.admin.storage.edit' },
     ],
   },

@@ -7,6 +7,7 @@ return [
         'projects' => 'Projecten',
         'mailer' => 'Mailer',
         'branding' => 'Branding',
+        'operator' => 'Exploitant',
         'storage' => 'Opslag',
         'activity' => 'Activiteit',
         'horizon' => 'Horizon',
@@ -130,6 +131,20 @@ return [
             'favicon_hint' => '.ico, .png, .jpg.',
         ],
         'remove_current' => 'Huidige verwijderen',
+    ],
+    'operator' => [
+        'title' => 'Exploitant-instellingen',
+        'sections' => [
+            'agency' => 'Bureau',
+            'hosting' => 'Hosting',
+        ],
+        'fields' => [
+            'agency_name' => 'Naam van het bureau',
+            'agency_address' => 'Adres van het bureau',
+            'agency_address_hint' => 'Volledig postadres.',
+            'hosting_provider' => 'Hostingprovider',
+            'hosting_location' => 'Locatie van de servers',
+        ],
     ],
     'mailer' => [
         'title' => 'Mailerinstellingen',
