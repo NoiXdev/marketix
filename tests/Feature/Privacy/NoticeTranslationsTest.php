@@ -40,7 +40,11 @@ class NoticeTranslationsTest extends TestCase
      * Keys the composer never renders on its own, or whose literal text is
      * too short to be searched for in the composed notice. Each one is
      * asserted explicitly in test_a_notice_can_be_composed_in_each_locale
-     * instead, so nothing here goes unchecked.
+     * instead, so nothing here goes unchecked — with one exception: the
+     * `warnings.*` keys are never part of a composed notice at all, by
+     * design (NoticeComposer never reads them; NoticeWarnings does). Their
+     * key-set and `:token` parity is still enforced by the two tests above
+     * this one, and their content is exercised by NoticeWarningsTest.
      *
      * @var list<string>
      */
@@ -53,6 +57,16 @@ class NoticeTranslationsTest extends TestCase
         'duration.days',
         'controller.party',
         'retention.site',
+        'warnings.pixels_without_consent',
+        'warnings.cookie_without_consent',
+        'warnings.missing_party_details',
+        'warnings.consent_claimed_for_link_clicks',
+        'warnings.fields.controller_name',
+        'warnings.fields.controller_address',
+        'warnings.fields.agency_name',
+        'warnings.fields.agency_address',
+        'warnings.fields.hosting_provider',
+        'warnings.fields.hosting_location',
     ];
 
     public function test_every_locale_defines_the_same_notice_keys(): void
