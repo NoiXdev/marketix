@@ -90,6 +90,36 @@ class PrivacyNoticeEndpointTest extends TestCase
             ->assertJsonValidationErrors('locale');
     }
 
+    /**
+     * The generator's buildNoticeQuery() emits the array parameter with the
+     * [] suffix PHP needs, so the exact query string it produces is pinned
+     * here rather than an array Laravel would re-encode for us.
+     */
+    public function test_the_query_string_the_generator_builds_switches_activities_off(): void
+    {
+        [$user, $project] = $this->memberWithProjectAndLink();
+
+        $url = route('app.project.docs.privacy.notice', ['project' => $project->id])
+            .'?role=own_company&legal_basis=legitimate_interest&locale=de'
+            .'&controller_name=Acme+GmbH&controller_address=Hauptstr.+1'
+            .'&disabled_activities%5B%5D=link_clicks&disabled_activities%5B%5D=pixels';
+
+        $control = $this->actingAs($user)->getJson(route('app.project.docs.privacy.notice', [
+            'project' => $project->id,
+            'role' => ControllerRole::OwnCompany->value,
+            'legal_basis' => LegalBasis::LegitimateInterest->value,
+            'locale' => 'de',
+        ]));
+
+        $control->assertOk();
+        $this->assertStringContainsString('Erfassung von Klicks auf Kurzlinks', $control->json('text'));
+
+        $response = $this->actingAs($user)->getJson($url);
+
+        $response->assertOk();
+        $this->assertStringNotContainsString('Erfassung von Klicks auf Kurzlinks', $response->json('text'));
+    }
+
     /** @return array{0: User, 1: Project} */
     private function memberWithProjectAndLink(): array
     {

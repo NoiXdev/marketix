@@ -62,5 +62,105 @@ return [
             'dpa' => 'Have a data processing agreement (DPA / AVV) in place with whoever operates your :app instance, where required.',
             'rights' => 'Handle data-subject requests. Because visitors are only identified by a daily-rotating, unlinkable hash, most stored data cannot be tied back to an individual.',
         ],
+
+        'generator' => [
+            'heading' => 'Privacy notice generator',
+            'intro' => 'Builds a notice out of what this project actually processes. Nothing is stored — the text is composed again on every change.',
+
+            'role' => [
+                'label' => 'Who is the controller?',
+                'own_company' => [
+                    'title' => 'Our own company',
+                    'text' => 'You measure for your own company. There is no separate client.',
+                ],
+                'client' => [
+                    'title' => 'Client project',
+                    'text' => 'You measure on a client’s behalf. The client is the controller and your agency is a processor.',
+                ],
+            ],
+
+            'controller' => [
+                'heading' => 'Controller',
+                'description' => 'Named in the notice itself.',
+                'name' => 'Name',
+                'address' => 'Address',
+                'name_placeholder' => 'Example Ltd',
+                'address_placeholder' => 'Example Street 1, 10115 Berlin',
+                'locked' => 'These details come from the project and operator settings and can only be changed by an instance administrator.',
+            ],
+
+            'processors' => [
+                'heading' => 'Processors',
+                'description' => 'Taken from the operator settings — shown here so you can see what the notice will say.',
+                'agency' => 'Agency',
+                'hosting' => 'Hosting provider',
+                'location' => 'Server location',
+                'empty' => 'Not set',
+            ],
+
+            'activities' => [
+                'heading' => 'What is active',
+                'description' => 'Pre-filled from this project’s configuration. Switch off anything the notice should not mention.',
+                'inactive' => 'Not detected in this project.',
+                'link_clicks' => [
+                    'title' => 'Short-link click statistics',
+                    'text' => 'Recorded server-side on every click. Short links in this project: :count',
+                ],
+                'site_analytics' => [
+                    'title' => 'Site analytics',
+                    'text' => 'Page views and visits on the tracked sites.',
+                ],
+                'pixels' => [
+                    'title' => 'Retargeting pixels',
+                    'text' => 'The redirect page loads the provider’s script before forwarding. The product has no consent gate for this.',
+                    'flag' => 'Without consent',
+                    'providers' => 'Providers: :providers',
+                    'links' => 'Short links affected: :count',
+                ],
+                'outbound' => [
+                    'title' => 'Outbound links and downloads',
+                    'text' => 'Clicks on external links and file downloads on tracked sites.',
+                ],
+                'site_search' => [
+                    'title' => 'Site search',
+                    'text' => 'Search terms entered into a tracked site’s search.',
+                ],
+                'custom_events' => [
+                    'title' => 'Custom events',
+                    'text' => 'Events your own code sends to the tracker.',
+                ],
+            ],
+
+            'legal_basis' => [
+                'label' => 'Legal basis',
+                'legitimate_interest' => [
+                    'title' => 'Legitimate interest',
+                    'text' => 'Art. 6(1)(f) GDPR — audience measurement without consent.',
+                ],
+                'consent' => [
+                    'title' => 'Consent',
+                    'text' => 'Art. 6(1)(a) GDPR — measurement only runs once consent has been given.',
+                ],
+            ],
+
+            'language' => [
+                'label' => 'Notice language',
+                'hint' => 'Changes the language of the generated text only, not of the interface.',
+            ],
+
+            'warnings' => [
+                'heading' => 'Check before publishing',
+            ],
+
+            'preview' => [
+                'heading' => 'Preview',
+                'loading' => 'Generating…',
+                'error' => 'The notice could not be generated. Please try again.',
+                'copy_text' => 'Copy as text',
+                'copy_html' => 'Copy as HTML',
+                'copied' => 'Copied',
+                'placeholders' => 'Still to be replaced: :list',
+            ],
+        ],
     ],
 ];
