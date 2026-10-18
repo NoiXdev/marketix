@@ -109,6 +109,7 @@ return [
                     'flag' => 'Ohne Einwilligung',
                     'providers' => 'Anbieter: :providers',
                     'links' => 'Betroffene Kurzlinks: :count',
+                    'required' => 'Diese Angabe lässt sich nicht abwählen: Die Übermittlung findet bei jedem Klick statt und muss im Hinweistext stehen.',
                 ],
                 'outbound' => [
                     'title' => 'Externe Links und Downloads',

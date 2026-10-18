@@ -109,6 +109,7 @@ return [
                     'flag' => 'Without consent',
                     'providers' => 'Providers: :providers',
                     'links' => 'Short links affected: :count',
+                    'required' => 'This disclosure cannot be switched off: the transfer happens on every click and has to appear in the notice.',
                 ],
                 'outbound' => [
                     'title' => 'Outbound links and downloads',

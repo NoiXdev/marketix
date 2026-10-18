@@ -130,9 +130,14 @@ final class NoticeComposer
             'location' => $this->party($this->options->hostingLocation, 'hosting_location'),
         ]);
 
+        // Naming the pixels follows the operator's toggle, but denying them
+        // follows reality. Switching the pixel row off may drop the pixel
+        // paragraph — an omission — yet never turn the notice into a claim
+        // that no advertising transfer happens, which on a project with live
+        // pixels is the opposite of what the redirect interstitial does.
         if ($this->usesPixels()) {
             $paragraphs[] = $this->t('processors.transfer_pixels');
-        } elseif ($this->measures()) {
+        } elseif ($this->measures() && $this->snapshot->pixelProviders() === []) {
             $paragraphs[] = $this->t('processors.no_advertising_transfer');
         }
 

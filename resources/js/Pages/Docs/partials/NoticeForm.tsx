@@ -5,6 +5,7 @@ import ChoiceCards from '@/Pages/Sites/partials/ChoiceCards';
 import ToggleRow from '@/Pages/Sites/partials/ToggleRow';
 import type { ControllerRole, LegalBasis, NoticeActivity, ProcessingSnapshot } from '@/types';
 import { Lock, TriangleAlert } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 // Brand names, so they are not translated. Mirrors App\Enums\PixelProvider.
 const PIXEL_PROVIDER_LABELS: Record<string, string> = {
@@ -143,14 +144,22 @@ export default function NoticeForm({ state, snapshot, canEditClient, locales, on
           </div>
 
           {/* Pixels fire before the redirect with no consent gate anywhere in
-              the product, so the row is flagged rather than listed plainly. */}
+              the product, so the row is flagged rather than listed plainly.
+              Where they really are in use the row is locked on: a transfer
+              that happens may not be switched out of the published text. */}
           <div
             className={`rounded-[var(--radius-sm)] border p-3 ${
               hasPixels ? 'bg-warning-soft/50 border-[color:color-mix(in_srgb,var(--warning-foreground)_35%,transparent)]' : 'border-line'
             }`}
           >
-            <label className="flex cursor-pointer items-start gap-3">
-              <Checkbox className="mt-0.5 shrink-0" checked={state.activities.pixels} onChange={(event) => setActivities(['pixels'], event.target.checked)} />
+            <PixelRowShell locked={hasPixels}>
+              <Checkbox
+                className="mt-0.5 shrink-0"
+                checked={hasPixels || state.activities.pixels}
+                disabled={hasPixels}
+                readOnly={hasPixels}
+                onChange={hasPixels ? undefined : (event) => setActivities(['pixels'], event.target.checked)}
+              />
               <span className="min-w-0">
                 <span className="text-foreground flex flex-wrap items-center gap-2 text-sm font-medium">
                   {t(tkey('activities.pixels.title'))}
@@ -166,10 +175,14 @@ export default function NoticeForm({ state, snapshot, canEditClient, locales, on
                   <>
                     <span className="text-muted mt-1 block text-xs">{t(tkey('activities.pixels.providers'), { providers })}</span>
                     <span className="text-muted block text-xs">{t(tkey('activities.pixels.links'), { count: snapshot.pixel_link_count })}</span>
+                    <span className="text-muted mt-1.5 flex items-start gap-1.5 text-xs">
+                      <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                      <span>{t(tkey('activities.pixels.required'))}</span>
+                    </span>
                   </>
                 )}
               </span>
-            </label>
+            </PixelRowShell>
           </div>
 
           <ToggleRow
@@ -221,6 +234,14 @@ export default function NoticeForm({ state, snapshot, canEditClient, locales, on
       </FormSection>
     </div>
   );
+}
+
+/**
+ * The pixel row's wrapper. A locked row carries no label, because there is
+ * nothing to click: the disclosure is mandatory while pixels are attached.
+ */
+function PixelRowShell({ locked, children }: { locked: boolean; children: ReactNode }) {
+  return locked ? <div className="flex items-start gap-3">{children}</div> : <label className="flex cursor-pointer items-start gap-3">{children}</label>;
 }
 
 /** One read-only party line in the processor summary. */
