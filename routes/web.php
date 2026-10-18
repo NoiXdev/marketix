@@ -30,6 +30,7 @@ use App\Http\Controllers\MoveToProjectController;
 use App\Http\Controllers\PasskeyManagementController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PixelController;
+use App\Http\Controllers\PrivacyNoticeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectChooserController;
 use App\Http\Controllers\QrCodeController;
@@ -128,6 +129,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::delete('/dashboards/{dashboard}', [DashboardManageController::class, 'destroy'])->name('app.project.dashboards.destroy');
             Route::get('/widgets/data', [WidgetDataController::class, 'show'])->middleware('throttle:120,1')->name('app.project.widgets.data');
             Route::get('/docs/data-privacy', [DocsController::class, 'dataPrivacy'])->name('app.project.docs.privacy');
+            Route::get('/docs/data-privacy/notice', PrivacyNoticeController::class)->name('app.project.docs.privacy.notice');
             Route::get('/activity', [ActivityController::class, 'index'])->name('app.project.activity.index');
             Route::get('/statistics', [StatisticsController::class, 'show'])->name('app.project.statistics');
             Route::get('/reports/download', [ReportController::class, 'downloadProject'])->name('app.project.reports.download');
