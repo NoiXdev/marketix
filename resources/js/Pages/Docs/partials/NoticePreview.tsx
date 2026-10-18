@@ -19,7 +19,7 @@ export default function NoticePreview({ notice, loading, failed }: NoticePreview
   const tkey = (suffix: string) => `docs.privacy.generator.${suffix}`;
 
   function copy(target: CopyTarget) {
-    if (!notice) {
+    if (!notice || failed) {
       return;
     }
 
@@ -31,7 +31,10 @@ export default function NoticePreview({ notice, loading, failed }: NoticePreview
 
   return (
     <div className="space-y-4">
-      {notice && notice.warnings.length > 0 && (
+      {/* A failed request leaves the previous notice in state so the
+          preview does not flash empty; nothing derived from it may be shown
+          next to the error, and nothing stale may be copied. */}
+      {notice && !failed && notice.warnings.length > 0 && (
         <div className="bg-warning-soft/60 rounded-[var(--radius)] border border-[color:color-mix(in_srgb,var(--warning-foreground)_35%,transparent)] p-4">
           <h2 className="text-warning-foreground flex items-center gap-2 text-sm font-semibold">
             <TriangleAlert className="h-4 w-4 shrink-0" />
@@ -55,18 +58,18 @@ export default function NoticePreview({ notice, loading, failed }: NoticePreview
             {loading && <Loader2 className="text-subtle h-3.5 w-3.5 animate-spin" aria-hidden />}
           </h2>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" disabled={!notice} onClick={() => copy('text')}>
+            <Button variant="secondary" size="sm" disabled={!notice || failed} onClick={() => copy('text')}>
               {copied === 'text' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               {copied === 'text' ? t(tkey('preview.copied')) : t(tkey('preview.copy_text'))}
             </Button>
-            <Button variant="secondary" size="sm" disabled={!notice} onClick={() => copy('html')}>
+            <Button variant="secondary" size="sm" disabled={!notice || failed} onClick={() => copy('html')}>
               {copied === 'html' ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               {copied === 'html' ? t(tkey('preview.copied')) : t(tkey('preview.copy_html'))}
             </Button>
           </div>
         </div>
 
-        {notice && notice.placeholders.length > 0 && (
+        {notice && !failed && notice.placeholders.length > 0 && (
           <p className="border-line bg-elevated text-muted border-b px-5 py-2 text-xs">{t(tkey('preview.placeholders'), { list: notice.placeholders.join(', ') })}</p>
         )}
 
