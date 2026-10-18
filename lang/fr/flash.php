@@ -50,6 +50,7 @@ return [
         'project_updated' => 'Projet mis à jour.',
         'project_deleted' => 'Projet supprimé.',
         'branding_saved' => 'Personnalisation enregistrée.',
+        'operator_saved' => "Paramètres de l'exploitant enregistrés.",
         'storage_saved' => 'Paramètres de stockage enregistrés.',
         'storage_test_failed' => 'Échec du test de stockage : :error',
         'storage_ok' => 'Connexion au stockage réussie.',

@@ -50,6 +50,7 @@ return [
         'project_updated' => 'Project bijgewerkt.',
         'project_deleted' => 'Project verwijderd.',
         'branding_saved' => 'Huisstijl opgeslagen.',
+        'operator_saved' => 'Exploitant-instellingen opgeslagen.',
         'storage_saved' => 'Opslaginstellingen opgeslagen.',
         'storage_test_failed' => 'Opslagtest mislukt: :error',
         'storage_ok' => 'Verbinding met opslag werkt.',

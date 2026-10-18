@@ -4,6 +4,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Admin\ActivityController as AdminActivityController;
 use App\Http\Controllers\Admin\BrandingController;
 use App\Http\Controllers\Admin\MailerController;
+use App\Http\Controllers\Admin\OperatorController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectMemberController;
 use App\Http\Controllers\Admin\StorageController;
@@ -263,6 +264,9 @@ Route::group(['domain' => config('app.domain')], function () {
 
         Route::get('/branding', [BrandingController::class, 'edit'])->name('app.admin.branding.edit');
         Route::post('/branding', [BrandingController::class, 'update'])->name('app.admin.branding.update');
+
+        Route::get('/operator', [OperatorController::class, 'edit'])->name('app.admin.operator.edit');
+        Route::put('/operator', [OperatorController::class, 'update'])->name('app.admin.operator.update');
 
         Route::get('/storage', [StorageController::class, 'edit'])->name('app.admin.storage.edit');
         Route::put('/storage', [StorageController::class, 'update'])->name('app.admin.storage.update');
