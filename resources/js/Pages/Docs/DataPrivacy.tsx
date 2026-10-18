@@ -3,8 +3,8 @@ import AppLayout from '@/Layouts/AppLayout';
 import { useTranslation } from '@/lib/i18n';
 import NoticeGenerator from '@/Pages/Docs/partials/NoticeGenerator';
 import type { NoticeDefaults, NoticeParties, ProcessingSnapshot } from '@/types';
-import { Check, Cookie, Copy, Database, FileText, Info, Scale, ShieldOff, UserCheck } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { Cookie, Database, FileText, Info, Scale, ShieldOff, UserCheck } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface Props {
   appName: string;
@@ -43,16 +43,6 @@ function Bullets({ items }: { items: string[] }) {
 
 export default function DataPrivacy({ appName, statsMonths, analyticsMonths, snapshot, parties, canEditClient, defaults }: Props) {
   const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-
-  const snippet = t('docs.privacy.notice.snippet', { app: appName });
-
-  function copySnippet() {
-    navigator.clipboard.writeText(snippet).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
 
   return (
     <AppLayout title={t('docs.privacy.title')}>
@@ -111,23 +101,14 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths, sna
               />
             </Section>
 
-            <Section icon={FileText} title={t('docs.privacy.notice.heading')}>
-              <p>{t('docs.privacy.notice.intro', { app: appName })}</p>
-              <div className="border-line bg-elevated text-foreground relative rounded-[var(--radius-sm)] border p-4 pr-12 text-[13px] leading-relaxed">
-                {snippet}
-                <button
-                  type="button"
-                  onClick={copySnippet}
-                  title={copied ? t('docs.privacy.notice.copied') : t('docs.privacy.notice.copy')}
-                  aria-label={copied ? t('docs.privacy.notice.copied') : t('docs.privacy.notice.copy')}
-                  className={`absolute top-2 right-2 rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
-                    copied ? 'text-success-foreground' : 'text-subtle hover:bg-surface hover:text-foreground'
-                  }`}
-                >
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </button>
-              </div>
-            </Section>
+            {/* The notice text itself is no longer boilerplate on this page.
+                A single sentence cannot describe every project's processing,
+                so the generator below composes it from this project's real
+                configuration instead. */}
+            <div className="border-line bg-elevated text-muted flex items-start gap-2 rounded-[var(--radius)] border px-4 py-3 text-xs">
+              <FileText className="text-subtle mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{t('docs.privacy.generator.pointer')}</span>
+            </div>
 
             <Section icon={UserCheck} title={t('docs.privacy.responsibilities.heading')}>
               <p>{t('docs.privacy.responsibilities.intro', { app: appName })}</p>
