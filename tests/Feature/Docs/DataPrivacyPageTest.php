@@ -53,4 +53,34 @@ class DataPrivacyPageTest extends TestCase
             ->get(route('app.project.docs.privacy', ['project' => $otherProject->id]))
             ->assertForbidden();
     }
+
+    public function test_all_locales_define_the_same_privacy_doc_keys(): void
+    {
+        $flatten = function (array $a, string $prefix = '') use (&$flatten): array {
+            $out = [];
+            foreach ($a as $k => $v) {
+                $key = $prefix === '' ? (string) $k : $prefix.'.'.$k;
+                $out = array_merge($out, is_array($v) ? $flatten($v, $key) : [$key]);
+            }
+
+            return $out;
+        };
+
+        $reference = $flatten(require base_path('lang/de/docs.php'));
+        sort($reference);
+
+        foreach (['en', 'fr', 'nl'] as $locale) {
+            $keys = $flatten(require base_path("lang/{$locale}/docs.php"));
+            sort($keys);
+            $this->assertSame($reference, $keys, "lang/{$locale}/docs.php key set differs from German");
+        }
+    }
+
+    public function test_the_page_no_longer_claims_there_are_no_third_party_cookies(): void
+    {
+        $de = require base_path('lang/de/docs.php');
+
+        $this->assertStringNotContainsString('Keine Third-Party-Cookies', $de['privacy']['nocollect']['cookies']);
+        $this->assertArrayHasKey('hybrid', $de['privacy']['modes']);
+    }
 }

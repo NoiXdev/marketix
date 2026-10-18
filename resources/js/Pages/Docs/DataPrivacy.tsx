@@ -70,6 +70,7 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
                 t('docs.privacy.collect.referrer'),
                 t('docs.privacy.collect.utm'),
                 t('docs.privacy.collect.timestamp'),
+                t('docs.privacy.collect.title_hostname'),
                 t('docs.privacy.collect.engagement'),
                 t('docs.privacy.collect.search'),
               ]}
@@ -78,7 +79,13 @@ export default function DataPrivacy({ appName, statsMonths, analyticsMonths }: P
 
           <Section icon={Cookie} title={t('docs.privacy.modes.heading')}>
             <Bullets
-              items={[t('docs.privacy.modes.cookieless'), t('docs.privacy.modes.cookie'), t('docs.privacy.modes.dnt'), t('docs.privacy.modes.links_note', { app: appName })]}
+              items={[
+                t('docs.privacy.modes.cookieless'),
+                t('docs.privacy.modes.hybrid'),
+                t('docs.privacy.modes.cookie'),
+                t('docs.privacy.modes.dnt'),
+                t('docs.privacy.modes.links_note', { app: appName }),
+              ]}
             />
           </Section>
 
