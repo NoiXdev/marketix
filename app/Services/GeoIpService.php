@@ -60,4 +60,13 @@ class GeoIpService
     {
         return $this->reader !== null;
     }
+
+    /**
+     * Whether the GeoLite2 database file is present and loaded, i.e. whether
+     * any geolocation happens at all.
+     */
+    public function hasDatabase(): bool
+    {
+        return $this->isAvailable();
+    }
 }
