@@ -18,6 +18,8 @@ class ProjectRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'client_name' => ['nullable', 'string', 'max:255'],
+            'client_address' => ['nullable', 'string', 'max:500'],
             'locked' => ['boolean'],
         ];
     }

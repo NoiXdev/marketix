@@ -48,7 +48,13 @@ class ProjectController extends Controller
         $memberIds = $model->users()->pluck('users.id');
 
         return inertia('Admin/Projects/Edit', [
-            'project' => ['id' => $model->id, 'name' => $model->name, 'locked' => $model->locked],
+            'project' => [
+                'id' => $model->id,
+                'name' => $model->name,
+                'locked' => $model->locked,
+                'client_name' => $model->client_name,
+                'client_address' => $model->client_address,
+            ],
             'members' => $model->users()->get()->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,

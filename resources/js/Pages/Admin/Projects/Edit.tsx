@@ -10,6 +10,8 @@ interface EditProject {
   id: string;
   name: string;
   locked: boolean;
+  client_name: string | null;
+  client_address: string | null;
 }
 
 interface AssignableUser {
@@ -20,7 +22,12 @@ interface AssignableUser {
 
 export default function AdminProjectsEdit({ project, members, assignableUsers }: { project: EditProject; members: ProjectMember[]; assignableUsers: AssignableUser[] }) {
   const { t } = useTranslation();
-  const details = useForm({ name: project.name, locked: project.locked });
+  const details = useForm({
+    name: project.name,
+    locked: project.locked,
+    client_name: project.client_name ?? '',
+    client_address: project.client_address ?? '',
+  });
   const assign = useForm({ user_id: '', role: 'member' });
 
   function saveDetails(e: React.FormEvent) {
@@ -81,6 +88,19 @@ export default function AdminProjectsEdit({ project, members, assignableUsers }:
                 {t('common.actions.cancel')}
               </Link>
             </div>
+          </FormSection>
+
+          <FormSection title={t('admin.projects.sections.client')}>
+            <Field label={t('admin.projects.fields.client_name')} error={details.errors.client_name}>
+              <Input value={details.data.client_name} onChange={(e) => details.setData('client_name', e.target.value)} />
+            </Field>
+            <Field
+              label={t('admin.projects.fields.client_address')}
+              hint={t('admin.projects.fields.client_address_hint')}
+              error={details.errors.client_address}
+            >
+              <Input value={details.data.client_address} onChange={(e) => details.setData('client_address', e.target.value)} />
+            </Field>
           </FormSection>
         </form>
 
