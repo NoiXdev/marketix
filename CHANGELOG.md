@@ -1,4 +1,38 @@
-## [2.6.0](https://github.com/NoiXdev/marketix/compare/v2.5.2...v) (2026-10-12)
+## [2.7.0](https://github.com/NoiXdev/marketix/compare/v2.6.0...v) (2026-10-19)
+
+
+### Features
+
+* **admin:** record the client a project is run for ([9ad71f7](https://github.com/NoiXdev/marketix/commit/9ad71f71b8f504df750815ff631cfef4f2cdd2ad))
+* **admin:** store agency and hosting provider details ([ec35d82](https://github.com/NoiXdev/marketix/commit/ec35d82664fa5fa85cc9fdc6a77620ca3d1457de))
+* **analytics:** add commands to export and delete a visitor's data ([e9a8e8f](https://github.com/NoiXdev/marketix/commit/e9a8e8f7924181fc72e5a34db9f340763c7d81d5))
+* **analytics:** add hybrid tracking mode with cookie after consent ([e557d85](https://github.com/NoiXdev/marketix/commit/e557d85540d6b2b85c6ea3f8476064d3fc85abdf))
+* **analytics:** carry over only the campaign source when a visitor consents ([6e54f66](https://github.com/NoiXdev/marketix/commit/6e54f6663e69105470a45406c23007ad7ba33e71))
+* **analytics:** scope the anonymous visitor hash to each site and project ([6e0be30](https://github.com/NoiXdev/marketix/commit/6e0be30f52b6693e9bb3b9b5fbc6868d11980c88))
+* **auth:** add support login links via artisan command ([fb191b8](https://github.com/NoiXdev/marketix/commit/fb191b824362c4f4ffb05ee5c63545b29a89c601))
+* **privacy:** add the notice generator to the data privacy page ([751e9da](https://github.com/NoiXdev/marketix/commit/751e9da508901a765ce557472bb809efd0e616a4))
+* **privacy:** compose a GDPR notice from a project's configuration ([02dca9a](https://github.com/NoiXdev/marketix/commit/02dca9a4e17ecf1533f032f47326239a5686a535))
+* **privacy:** describe what a project actually processes ([c12864e](https://github.com/NoiXdev/marketix/commit/c12864ef0bdf48dcbb7cca631638588506c6f1e5))
+* **privacy:** replace the static notice snippet with a pointer to the generator ([f4f9514](https://github.com/NoiXdev/marketix/commit/f4f9514e8209a65319644a6a55ce5f7fe443e576))
+* **privacy:** serve the generated notice from a project endpoint ([5fa413e](https://github.com/NoiXdev/marketix/commit/5fa413ebe8783a9b847028c6b857e10232c84c77))
+* **privacy:** translate the notice into English, French and Dutch ([a9c5294](https://github.com/NoiXdev/marketix/commit/a9c5294e4de5daf0b59a40c1eef6956895cc9328))
+* **privacy:** warn about consentless pixels and cookies ([5ae64cd](https://github.com/NoiXdev/marketix/commit/5ae64cd925654ed6c6b4e9bc96c6a334c2dd55ac))
+* **sites:** show tracking mode cards side by side when they fit ([e5e8ca1](https://github.com/NoiXdev/marketix/commit/e5e8ca1c06642470c44694bcd4cc71fff11ad7a9))
+
+
+### Bug Fixes
+
+* **docs:** correct false privacy claims about cookies and referrers ([4790082](https://github.com/NoiXdev/marketix/commit/47900822112a1acbb49792e809bac431bbba15d1))
+* overflow in body ([89984e5](https://github.com/NoiXdev/marketix/commit/89984e52880f7aa9a32f1ff324f1681a23d99d72))
+* **privacy:** drop GeoIpService.hasDatabase, reuse isAvailable ([c2ecdc2](https://github.com/NoiXdev/marketix/commit/c2ecdc26b8fa795271c7afbeac99cbce2775d091))
+* **privacy:** keep the generator warnings in the interface language ([f098038](https://github.com/NoiXdev/marketix/commit/f09803894beb73a2c0b1131306e1385e8e9f595f))
+* **privacy:** never assert consent for server-side click recording ([2218d21](https://github.com/NoiXdev/marketix/commit/2218d21c81a4163c1f3308828c612ee508ea107b))
+* **privacy:** never let the notice deny a transfer that really happens ([86d404d](https://github.com/NoiXdev/marketix/commit/86d404df75aaff3938b9ef4d9e2881e6c369d727))
+* **privacy:** pick the rights list by what consent actually governs ([18be5c9](https://github.com/NoiXdev/marketix/commit/18be5c9baa58a51c3d7f80fd4062484c964877da))
+* **privacy:** restore the comma in the English anonymous-scope clause ([8cbd4bb](https://github.com/NoiXdev/marketix/commit/8cbd4bbadf7ac23e3f40bc6718e326d22b895513))
+* **privacy:** stop offering a stale notice next to the generator error ([dfb2809](https://github.com/NoiXdev/marketix/commit/dfb2809dd260e54e06cd589e5d31e4233fe15e16))
+
+## [2.6.0](https://github.com/NoiXdev/marketix/compare/v2.5.2...v2.6.0) (2026-10-12)
 
 
 ### Features
