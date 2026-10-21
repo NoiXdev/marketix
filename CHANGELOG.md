@@ -1,4 +1,11 @@
-## [2.7.0](https://github.com/NoiXdev/marketix/compare/v2.6.0...v) (2026-10-19)
+## [2.7.1](https://github.com/NoiXdev/marketix/compare/v2.7.0...v) (2026-10-21)
+
+
+### Bug Fixes
+
+* **docker:** refuse to build an image with PHP below 8.4.27 ([3f28a4b](https://github.com/NoiXdev/marketix/commit/3f28a4b645dd477b4c6b6611c463112b4c15e590))
+
+## [2.7.0](https://github.com/NoiXdev/marketix/compare/v2.6.0...v2.7.0) (2026-10-19)
 
 
 ### Features
