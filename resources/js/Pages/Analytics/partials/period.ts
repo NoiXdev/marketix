@@ -12,6 +12,9 @@ export type Period = {
   compare: Comparison;
   compare_from: string | null;
   compare_to: string | null;
+  compare_complete: boolean;
+  tracking_since: string | null;
+  current_bucket: string | null;
 };
 
 export const RANGE_PRESETS = ['today', 'yesterday', '7d', '30d', '90d', 'month', 'last_month', 'year', '12m'];
@@ -58,6 +61,10 @@ export function formatAxisLabel(key: string, interval: Interval, multiDay: boole
     default:
       return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
   }
+}
+
+export function formatDate(iso: string, locale: string): string {
+  return parseDate(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export function formatRange(from: string, to: string, locale: string): string {

@@ -207,34 +207,27 @@ return [
             'label' => 'Analytics sections',
             'overview' => [
                 'label' => 'Overview',
-                'description' => 'The most important numbers of your website at a glance.',
             ],
             'acquisition' => [
                 'label' => 'Acquisition',
-                'description' => 'Where your visitors come from: channels, referring websites and campaigns.',
                 'more' => 'All sources',
             ],
             'behavior' => [
                 'label' => 'Behavior',
-                'description' => 'What visitors do on your website: pages, interactions, events and active times.',
                 'more' => 'All pages',
             ],
             'audience' => [
                 'label' => 'Audience',
-                'description' => 'Who your visitors are: countries, languages, devices and browsers.',
                 'more' => 'More about your audience',
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'How many visits reach your goals – and where visitors drop off on the way.',
             ],
             'realtime' => [
                 'label' => 'Realtime',
-                'description' => 'What is happening on your website right now – in the last 30 minutes.',
             ],
             'revenue' => [
                 'label' => 'Revenue',
-                'description' => 'How much revenue your website generates – and which channels, campaigns and pages contribute.',
             ],
         ],
 
@@ -260,6 +253,7 @@ return [
             'feed' => 'Latest activity',
             'event' => 'Event “:name”',
             'nobody' => 'Nobody right now',
+            'no_views' => 'No page views in the last 30 minutes',
             'empty_title' => 'No visitors right now',
             'empty_text' => 'As soon as someone visits your website, it shows up here within a few seconds.',
         ],
@@ -273,6 +267,8 @@ return [
                 'average_order_value' => 'Avg. order value',
                 'purchase_rate' => 'Purchase rate',
                 'revenue_per_visitor' => 'Revenue per visitor',
+                'orders_hint' => 'Number of purchases – one session can contain several',
+                'purchase_rate_hint' => 'Sessions with a purchase ÷ all sessions',
             ],
             'by_channel' => 'Revenue by channel',
             'by_campaign' => 'Revenue by campaign',
@@ -295,6 +291,8 @@ return [
             'previous' => 'Comparison',
             'select_metric' => 'Select at least one metric.',
             'scale_hint' => 'Page views and unique visitors share one scale; each line is scaled to its peak in this period. Exact values in the tooltip or the table.',
+            'partial' => 'in progress',
+            'partial_hint' => 'Shown lighter: this period is still in progress and incomplete.',
         ],
 
         'range' => [
@@ -319,6 +317,7 @@ return [
             'year' => 'vs. previous year',
             'none' => 'No comparison',
             'vs_year' => 'vs. previous year',
+            'incomplete' => 'Incomplete comparison: data is only available from :date, so changes against the comparison period are hidden.',
         ],
 
         'interval' => [
@@ -343,6 +342,29 @@ return [
             'engagement_hint' => 'Sessions over 10 s, with 2+ pages or a conversion',
             'avg_duration' => 'Avg. duration',
             'from_campaigns' => 'From campaigns',
+        ],
+
+        'units' => [
+            'page_views' => 'Page views',
+            'sessions' => 'Sessions',
+            'visitors' => 'Visitors',
+            'visitors_count' => ':count visitors',
+            'events' => 'Events',
+            'clicks' => 'Clicks',
+            'downloads' => 'Downloads',
+            'searches' => 'Searches',
+            'conversions' => 'Conversions',
+            'revenue' => 'Revenue',
+        ],
+
+        'list' => [
+            'show_all' => 'Show all',
+            'search' => 'Search …',
+            'loading' => 'Loading …',
+            'error' => 'The list could not be loaded.',
+            'no_match' => 'No matches',
+            'capped' => 'Showing the :count most frequent entries.',
+            'close' => 'Close',
         ],
 
         'channel_table' => [
@@ -444,9 +466,7 @@ return [
 
         'campaigns' => [
             'title' => 'Campaigns',
-            'hint' => 'Session counts, unique visitors in parentheses. First-touch attribution.',
-            'sources' => 'Top sources',
-            'mediums' => 'Top mediums',
+            'hint' => 'First-touch attribution: each session counts towards the campaign it started from.',
             'campaigns' => 'Top campaigns',
             'source_medium' => 'Source / medium',
             'terms' => 'Terms',
@@ -457,6 +477,7 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'No events yet',
+            'open' => 'Show details',
         ],
 
         'funnels' => [
@@ -465,6 +486,7 @@ return [
             'edit' => 'Edit funnel',
             'summary' => ':entered sessions started · :completed completed',
             'conversion_rate' => 'Completion rate',
+            'hint' => 'Completed counts only sessions that went through every step in this order, so it is usually lower than the conversions of a matching goal.',
             'continued' => ':rate continued',
             'dropped' => ':count dropped off',
             'empty_title' => 'No funnels yet',
@@ -478,6 +500,8 @@ return [
             'create_one' => 'Create one',
             'value' => 'Value :value (:unit per conversion)',
             'stats' => ':conversions conversions · :visitors visitors ·',
+            'hint' => 'A conversion is a session in which the goal was reached at least once. The rate is relative to all sessions; the breakdown shows the channel of the first touch.',
+            'by_channel' => 'By channel',
         ],
     ],
 

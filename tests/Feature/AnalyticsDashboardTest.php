@@ -85,10 +85,12 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('tab', 'acquisition')
                 ->has('channels', 2)
                 ->has('topReferrers')
-                ->has('utmSources', 1)
-                ->has('utmMediums')
+                ->missing('utmSources')
+                ->missing('utmMediums')
                 ->has('utmCampaigns')
-                ->has('utmSourceMediums')
+                ->has('utmSourceMediums', 1)
+                ->where('utmSourceMediums.0.source', 'google')
+                ->where('utmSourceMediums.0.medium', 'cpc')
                 ->has('utmTerms')
                 ->has('utmContents')
                 ->missing('summary')
@@ -155,7 +157,9 @@ class AnalyticsDashboardTest extends TestCase
                 ->has('goals', 1)
                 ->where('goals.0.conversions', 1)
                 ->where('goals.0.name', 'Signup')
-                ->has('goals.0.byCampaign')
+                ->has('goals.0.byChannel', 1)
+                ->where('goals.0.byChannel.0.channel', 'campaign')
+                ->where('goals.0.byChannel.0.conversions', 1)
                 ->missing('summary')
             );
     }
@@ -244,6 +248,91 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('summary.sessions', 1)
                 ->where('summary.campaign_share', fn ($share) => (float) $share === 100.0)
             );
+    }
+
+    public function test_rolling_ranges_compare_with_the_same_weekdays_and_calendar_ranges_do_not(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 22)->setTime(12, 0));
+
+        $this->dashboard('?range=30d')
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('period.from', '2026-09-23')
+                ->where('period.compare_from', '2026-08-19')
+                ->where('period.compare_to', '2026-09-17')
+            );
+
+        $this->dashboard('?range=month')
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('period.compare_from', '2026-09-09')
+                ->where('period.compare_to', '2026-09-30')
+            );
+    }
+
+    public function test_comparison_is_flagged_incomplete_when_tracking_started_later(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 22)->setTime(12, 0));
+        Visit::factory()->forSite($this->site)->create(['started_at' => now()->setDate(2026, 9, 1)]);
+
+        $this->dashboard('?range=30d')
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('period.compare_complete', false)
+                ->where('period.tracking_since', '2026-09-01')
+            );
+
+        Visit::factory()->forSite($this->site)->create(['started_at' => now()->setDate(2026, 8, 1)]);
+
+        $this->dashboard('?range=30d')
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('period.compare_complete', true));
+    }
+
+    public function test_running_period_names_its_unfinished_bucket(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 22)->setTime(14, 30));
+
+        $this->dashboard('?range=today')
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('period.current_bucket', '2026-10-22 14:00'));
+        $this->dashboard('?range=30d')
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('period.current_bucket', '2026-10-22'));
+        $this->dashboard('?range=yesterday')
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('period.current_bucket', null));
+    }
+
+    public function test_revenue_tab_includes_the_comparison_series(): void
+    {
+        $visit = Visit::factory()->forSite($this->site)->create();
+        Event::factory()->forVisit($visit)->create(['name' => 'purchase', 'props' => ['value' => 20, 'currency' => 'CHF']]);
+
+        $this->dashboard('?tab=revenue&range=7d')
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->has('revenue.timeseries', 7)
+                ->has('revenue.previousTimeseries', 7)
+            );
+    }
+
+    public function test_breakdown_endpoint_returns_the_full_list(): void
+    {
+        foreach (['/a', '/b', '/c'] as $path) {
+            $visit = Visit::factory()->forSite($this->site)->create();
+            PageView::factory()->forVisit($visit)->create(['path' => $path]);
+        }
+
+        $this->actingAs($this->user)
+            ->getJson(route('app.project.analytics.breakdown', ['project' => $this->project->id, 'site' => $this->site->id, 'dimension' => 'pages']))
+            ->assertOk()
+            ->assertJsonCount(3, 'rows')
+            ->assertJsonPath('limit', 1000);
+    }
+
+    public function test_breakdown_endpoint_rejects_unknown_dimensions_and_foreign_sites(): void
+    {
+        $url = route('app.project.analytics.breakdown', ['project' => $this->project->id, 'site' => $this->site->id, 'dimension' => 'pages']);
+
+        $this->actingAs($this->user)->getJson(str_replace('/pages', '/secret', $url))->assertNotFound();
+
+        $foreign = Site::factory()->create();
+        $this->actingAs($this->user)
+            ->getJson(route('app.project.analytics.breakdown', ['project' => $this->project->id, 'site' => $foreign->id, 'dimension' => 'pages']))
+            ->assertNotFound();
     }
 
     public function test_foreign_project_site_is_not_found(): void

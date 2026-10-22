@@ -2,7 +2,7 @@ import { Checkbox } from '@/Components/ui';
 import { formatAxisLabel, formatBucket as formatBucketLabel, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { scrubHandlers } from '@/lib/chartScrub';
-import { formatDuration, percentChange } from '@/lib/format';
+import { formatDuration, formatPercent, percentChange, pointChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
@@ -26,6 +26,7 @@ type Metric = {
   label: string;
   format: (value: number) => string;
   lowerIsBetter?: boolean;
+  points?: boolean;
 };
 
 type PlotPoint = { x: number; y: number };
@@ -110,6 +111,7 @@ export default function VisitorsChart({
   comparisonRange = null,
   interval,
   intervals,
+  currentBucket = null,
   onIntervalChange,
 }: {
   title: string;
@@ -118,6 +120,7 @@ export default function VisitorsChart({
   comparisonRange?: string | null;
   interval: Interval;
   intervals: Interval[];
+  currentBucket?: string | null;
   onIntervalChange: (interval: Interval) => void;
 }) {
   const { t, locale } = useTranslation();
@@ -132,15 +135,24 @@ export default function VisitorsChart({
 
   const multiDay = spansSeveralDays(data.map((d) => d.date));
   const count = (n: number) => n.toLocaleString(locale);
-  const percent = (n: number) => `${n.toLocaleString(locale)} %`;
+  const percent = (n: number) => formatPercent(n, locale);
+  const partialIndex = currentBucket === null ? -1 : data.findIndex((d) => d.date === currentBucket);
 
   const metrics: Metric[] = [
     { key: 'views', kind: 'bar', color: 'var(--chart-views)', label: t('analytics.dashboard.kpi.page_views'), format: count },
     { key: 'visitors', kind: 'bar', color: 'var(--chart-visitors)', label: t('analytics.dashboard.kpi.unique_visitors'), format: count },
-    { key: 'engagement_rate', kind: 'line', color: 'var(--chart-engagement)', label: t('analytics.dashboard.kpi.engagement_rate'), format: percent },
-    { key: 'bounce_rate', kind: 'line', color: 'var(--chart-bounce)', label: t('analytics.dashboard.kpi.bounce_rate'), format: percent, lowerIsBetter: true },
+    { key: 'engagement_rate', kind: 'line', color: 'var(--chart-engagement)', label: t('analytics.dashboard.kpi.engagement_rate'), format: percent, points: true },
+    {
+      key: 'bounce_rate',
+      kind: 'line',
+      color: 'var(--chart-bounce)',
+      label: t('analytics.dashboard.kpi.bounce_rate'),
+      format: percent,
+      lowerIsBetter: true,
+      points: true,
+    },
     { key: 'avg_duration', kind: 'line', color: 'var(--chart-duration)', label: t('analytics.dashboard.kpi.avg_duration'), format: formatDuration },
-    { key: 'campaign_share', kind: 'line', color: 'var(--chart-campaign)', label: t('analytics.dashboard.kpi.from_campaigns'), format: percent },
+    { key: 'campaign_share', kind: 'line', color: 'var(--chart-campaign)', label: t('analytics.dashboard.kpi.from_campaigns'), format: percent, points: true },
   ];
 
   const active = metrics.filter((m) => selection.includes(m.key));
@@ -231,7 +243,8 @@ export default function VisitorsChart({
   const point = hovered !== null ? data[hovered] : null;
   const previousPoint = hovered !== null ? (comparison?.[hovered] ?? null) : null;
   const sameHeadings = point && previousPoint && formatBucket(point.date) === formatBucket(previousPoint.date);
-  const currentHeading = point ? (sameHeadings ? t('analytics.dashboard.chart.current') : formatBucket(point.date)) : '';
+  const partialNote = hovered !== null && hovered === partialIndex ? ` (${t('analytics.dashboard.chart.partial')})` : '';
+  const currentHeading = point ? (sameHeadings ? t('analytics.dashboard.chart.current') : formatBucket(point.date)) + partialNote : '';
   const previousHeading = previousPoint ? (sameHeadings ? t('analytics.dashboard.chart.previous') : formatBucket(previousPoint.date)) : '';
 
   return (
@@ -350,7 +363,7 @@ export default function VisitorsChart({
                       {bars.map((m) => (
                         <div
                           key={m.key}
-                          className={`${barWidth >= 6 ? 'rounded-t-[4px]' : 'rounded-t-[2px]'} transition-[height] duration-300`}
+                          className={`${barWidth >= 6 ? 'rounded-t-[4px]' : 'rounded-t-[2px]'} transition-[height] duration-300 ${i === partialIndex ? 'opacity-40' : ''}`}
                           style={{ width: barWidth, height: barHeight(p[m.key], barMax), background: m.color }}
                         />
                       ))}
@@ -413,7 +426,8 @@ export default function VisitorsChart({
                       {active.map((m) => {
                         const value = point[m.key];
                         const before = previousPoint[m.key];
-                        const change = value !== null && before !== null ? percentChange(value, before) : null;
+                        const change = value !== null && before !== null ? (m.points ? pointChange(value, before) : percentChange(value, before)) : null;
+                        const unit = m.points ? t('common.dashboard.points') : '%';
                         const good = change !== null && (m.lowerIsBetter ? change < 0 : change > 0);
                         return (
                           <tr key={m.key}>
@@ -428,7 +442,7 @@ export default function VisitorsChart({
                             <td
                               className={`pl-3 text-right font-bold whitespace-nowrap tabular-nums sm:pl-4 ${change === null || change === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
                             >
-                              {change === null ? '—' : change === 0 ? '± 0 %' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toLocaleString(locale)} %`}
+                              {change === null ? '—' : change === 0 ? `± 0 ${unit}` : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toLocaleString(locale)} ${unit}`}
                             </td>
                           </tr>
                         );
@@ -437,7 +451,10 @@ export default function VisitorsChart({
                   </table>
                 ) : (
                   <>
-                    <p className="text-muted mb-1.5 font-semibold whitespace-nowrap">{formatBucket(point.date)}</p>
+                    <p className="text-muted mb-1.5 font-semibold whitespace-nowrap">
+                      {formatBucket(point.date)}
+                      {partialNote}
+                    </p>
                     {active.map((m) => {
                       const value = point[m.key];
                       return (
@@ -456,9 +473,13 @@ export default function VisitorsChart({
 
           <ChartDateAxis dates={data.map((d) => d.date)} gapClass="gap-px" format={formatAxis} />
 
-          {(lines.length > 0 || comparison) && (
+          {(lines.length > 0 || comparison || partialIndex >= 0) && (
             <p className="text-subtle mt-3 text-xs">
-              {[comparison && active.length > 0 ? t('analytics.dashboard.chart.comparison_hint') : null, lines.length > 0 ? t('analytics.dashboard.chart.scale_hint') : null]
+              {[
+                comparison && active.length > 0 ? t('analytics.dashboard.chart.comparison_hint') : null,
+                lines.length > 0 ? t('analytics.dashboard.chart.scale_hint') : null,
+                partialIndex >= 0 && bars.length > 0 ? t('analytics.dashboard.chart.partial_hint') : null,
+              ]
                 .filter(Boolean)
                 .join(' ')}
             </p>

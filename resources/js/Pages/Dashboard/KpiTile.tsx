@@ -13,6 +13,7 @@ export default function KpiTile({
   icon: Icon,
   compact = true,
   lowerIsBetter = false,
+  deltaInPoints = false,
   className = '',
 }: {
   label: string;
@@ -23,12 +24,20 @@ export default function KpiTile({
   icon: LucideIcon;
   compact?: boolean;
   lowerIsBetter?: boolean;
+  deltaInPoints?: boolean;
   className?: string;
 }) {
   const { t, locale } = useTranslation();
   const showDelta = deltaPct !== undefined;
   const up = (deltaPct ?? 0) >= 0;
   const good = lowerIsBetter ? !up : up;
+  const unit = deltaInPoints ? t('common.dashboard.points') : '%';
+  const deltaText =
+    deltaPct === null
+      ? '—'
+      : deltaPct === 0
+        ? `± 0 ${unit}`
+        : `${up ? '▲' : '▼'} ${Math.abs(deltaPct ?? 0).toLocaleString(locale, deltaInPoints ? { minimumFractionDigits: 1, maximumFractionDigits: 1 } : undefined)} ${unit}`;
   const display = typeof value === 'number' ? (compact ? formatCompactNumber(value) : value.toLocaleString(locale)) : value;
   // The value scales with the tile width; long values such as currency amounts need more room before growing
   const size = String(display).length > 8 ? 'text-xl @min-[10.5rem]:text-[22px] @min-[13rem]:text-[27px]' : 'text-[22px] @min-[7rem]:text-[27px]';
@@ -51,7 +60,7 @@ export default function KpiTile({
         <p
           className={`mt-0.5 flex flex-wrap items-center gap-x-1 text-xs font-bold ${deltaPct === null || deltaPct === 0 ? 'text-muted' : good ? 'text-success-foreground' : 'text-danger-foreground'}`}
         >
-          <span className="whitespace-nowrap">{deltaPct === null ? '—' : deltaPct === 0 ? '± 0 %' : `${up ? '▲' : '▼'} ${Math.abs(deltaPct).toLocaleString(locale)} %`}</span>
+          <span className="whitespace-nowrap">{deltaText}</span>
           <span className="text-muted font-medium whitespace-nowrap">{deltaLabel ?? t('common.dashboard.vs_previous')}</span>
         </p>
       )}

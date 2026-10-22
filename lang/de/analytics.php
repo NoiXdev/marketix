@@ -207,34 +207,27 @@ return [
             'label' => 'Analytics-Bereiche',
             'overview' => [
                 'label' => 'Übersicht',
-                'description' => 'Die wichtigsten Kennzahlen Ihrer Website auf einen Blick.',
             ],
             'acquisition' => [
                 'label' => 'Akquisition',
-                'description' => 'Woher Ihre Besucher kommen: Kanäle, verweisende Websites und Kampagnen.',
                 'more' => 'Alle Quellen',
             ],
             'behavior' => [
                 'label' => 'Verhalten',
-                'description' => 'Was Besucher auf Ihrer Website tun: Seiten, Interaktionen, Events und aktive Zeiten.',
                 'more' => 'Alle Seiten',
             ],
             'audience' => [
                 'label' => 'Zielgruppe',
-                'description' => 'Wer Ihre Besucher sind: Länder, Sprachen, Geräte und Browser.',
                 'more' => 'Mehr zur Zielgruppe',
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'Wie viele Besuche Ihre Ziele erreichen – und wo Besucher auf dem Weg dorthin abspringen.',
             ],
             'realtime' => [
                 'label' => 'Echtzeit',
-                'description' => 'Was gerade auf Ihrer Website passiert – in den letzten 30 Minuten.',
             ],
             'revenue' => [
                 'label' => 'Umsatz',
-                'description' => 'Wie viel Umsatz Ihre Website erzielt – und welche Kanäle, Kampagnen und Seiten dazu beitragen.',
             ],
         ],
 
@@ -260,6 +253,7 @@ return [
             'feed' => 'Letzte Aktivität',
             'event' => 'Event „:name“',
             'nobody' => 'Gerade niemand',
+            'no_views' => 'Keine Seitenaufrufe in den letzten 30 Minuten',
             'empty_title' => 'Gerade keine Besucher',
             'empty_text' => 'Sobald jemand Ihre Website besucht, erscheint das hier innerhalb weniger Sekunden.',
         ],
@@ -273,6 +267,8 @@ return [
                 'average_order_value' => 'Ø Bestellwert',
                 'purchase_rate' => 'Kaufrate',
                 'revenue_per_visitor' => 'Umsatz pro Besucher',
+                'orders_hint' => 'Anzahl der Käufe – eine Sitzung kann mehrere enthalten',
+                'purchase_rate_hint' => 'Sitzungen mit Kauf ÷ alle Sitzungen',
             ],
             'by_channel' => 'Umsatz nach Kanal',
             'by_campaign' => 'Umsatz nach Kampagne',
@@ -295,6 +291,8 @@ return [
             'current' => 'Aktuell',
             'previous' => 'Vergleich',
             'scale_hint' => 'Seitenaufrufe und eindeutige Besucher teilen sich eine Skala, jede Linie ist auf ihren Höchstwert im Zeitraum skaliert. Genaue Werte im Tooltip oder in der Tabelle.',
+            'partial' => 'läuft noch',
+            'partial_hint' => 'Heller dargestellt: Dieser Zeitraum läuft noch und ist unvollständig.',
         ],
 
         'range' => [
@@ -319,6 +317,7 @@ return [
             'year' => 'vs. Vorjahr',
             'none' => 'Kein Vergleich',
             'vs_year' => 'vs. Vorjahr',
+            'incomplete' => 'Vergleich unvollständig: Daten liegen erst ab dem :date vor. Veränderungen gegenüber dem Vergleichszeitraum werden deshalb ausgeblendet.',
         ],
 
         'interval' => [
@@ -343,6 +342,29 @@ return [
             'engagement_hint' => 'Sitzungen über 10 s, mit 2+ Seiten oder einer Conversion',
             'avg_duration' => 'Ø Verweildauer',
             'from_campaigns' => 'Aus Kampagnen',
+        ],
+
+        'units' => [
+            'page_views' => 'Seitenaufrufe',
+            'sessions' => 'Sitzungen',
+            'visitors' => 'Besucher',
+            'visitors_count' => ':count Besucher',
+            'events' => 'Ereignisse',
+            'clicks' => 'Klicks',
+            'downloads' => 'Downloads',
+            'searches' => 'Suchen',
+            'conversions' => 'Conversions',
+            'revenue' => 'Umsatz',
+        ],
+
+        'list' => [
+            'show_all' => 'Alle anzeigen',
+            'search' => 'Suchen …',
+            'loading' => 'Wird geladen …',
+            'error' => 'Die Liste konnte nicht geladen werden.',
+            'no_match' => 'Keine Treffer',
+            'capped' => 'Angezeigt werden die :count häufigsten Einträge.',
+            'close' => 'Schließen',
         ],
 
         'channel_table' => [
@@ -444,9 +466,7 @@ return [
 
         'campaigns' => [
             'title' => 'Kampagnen',
-            'hint' => 'Sitzungszahlen, eindeutige Besucher in Klammern. First-Touch-Attribution.',
-            'sources' => 'Top-Quellen',
-            'mediums' => 'Top-Medien',
+            'hint' => 'First-Touch-Attribution: Jede Sitzung zählt für die Kampagne, über die sie begonnen hat.',
             'campaigns' => 'Top-Kampagnen',
             'source_medium' => 'Quelle / Medium',
             'terms' => 'Begriffe',
@@ -457,6 +477,7 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'Noch keine Events',
+            'open' => 'Details anzeigen',
         ],
 
         'funnels' => [
@@ -465,6 +486,7 @@ return [
             'edit' => 'Funnel bearbeiten',
             'summary' => ':entered Sitzungen gestartet · :completed abgeschlossen',
             'conversion_rate' => 'Abschlussrate',
+            'hint' => 'Abgeschlossen zählt nur Sitzungen, die alle Schritte in dieser Reihenfolge durchlaufen haben. Deshalb liegt die Zahl meist unter den Conversions eines passenden Ziels.',
             'continued' => ':rate gingen weiter',
             'dropped' => ':count abgesprungen',
             'empty_title' => 'Noch keine Funnels',
@@ -477,7 +499,9 @@ return [
             'empty' => 'Keine Ziele definiert.',
             'create_one' => 'Erstellen Sie eines',
             'value' => 'Wert :value (:unit pro Conversion)',
-            'stats' => ':conversions Conversions · :visitors Visitors ·',
+            'stats' => ':conversions Conversions · :visitors Besucher ·',
+            'hint' => 'Eine Conversion ist eine Sitzung, in der das Ziel mindestens einmal erreicht wurde. Die Rate bezieht sich auf alle Sitzungen, die Aufschlüsselung auf den Kanal des ersten Kontakts.',
+            'by_channel' => 'Nach Kanal',
         ],
     ],
 

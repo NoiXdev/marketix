@@ -5,10 +5,11 @@ import { countryName, languageName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 import { AnalyticsProvider, useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import AnalyticsTabs from '@/Pages/Analytics/partials/AnalyticsTabs';
+import CompareSelect from '@/Pages/Analytics/partials/CompareSelect';
 import DateRangePicker from '@/Pages/Analytics/partials/DateRangePicker';
 import FilterBar, { ActiveFilter } from '@/Pages/Analytics/partials/FilterBar';
 import LiveVisitors from '@/Pages/Analytics/partials/LiveVisitors';
-import { COMPARISONS, Comparison, Period } from '@/Pages/Analytics/partials/period';
+import { formatDate, Period } from '@/Pages/Analytics/partials/period';
 import TrackingSetup from '@/Pages/Analytics/partials/TrackingSetup';
 import AcquisitionTab, { AcquisitionData } from '@/Pages/Analytics/tabs/AcquisitionTab';
 import AudienceTab, { AudienceData } from '@/Pages/Analytics/tabs/AudienceTab';
@@ -20,7 +21,7 @@ import RevenueTab, { RevenueData } from '@/Pages/Analytics/tabs/RevenueTab';
 import { FilterKey, Filters, SiteInfo, TabKey } from '@/Pages/Analytics/types';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Clock } from 'lucide-react';
+import { Clock, Info } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 type TabData = OverviewData & RealtimeData & AcquisitionData & BehaviorData & AudienceData & ConversionsData & RevenueData;
@@ -75,21 +76,24 @@ function Header({ liveVisitors }: { liveVisitors: number }) {
       ) : (
         <div className="flex flex-wrap items-center gap-2">
           <DateRangePicker period={period} onSelect={(range, custom) => go({ range, ...custom })} />
-          <select
-            aria-label={t('analytics.dashboard.compare.label')}
-            value={period.compare}
-            onChange={(e) => go({ compare: e.target.value as Comparison })}
-            className="border-line bg-surface text-foreground hover:bg-elevated rounded-lg border py-1.5 pr-8 pl-3 text-sm font-semibold shadow-[var(--shadow-sm)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none"
-          >
-            {COMPARISONS.map((option) => (
-              <option key={option} value={option}>
-                {t(`analytics.dashboard.compare.${option}`)}
-              </option>
-            ))}
-          </select>
+          <CompareSelect value={period.compare} onChange={(compare) => go({ compare })} />
         </div>
       )}
     </div>
+  );
+}
+
+function IncompleteComparison() {
+  const { t, locale } = useTranslation();
+  const { period } = useAnalytics();
+
+  if (period.compare === 'none' || period.compare_complete || !period.tracking_since) return null;
+
+  return (
+    <p className="border-line bg-elevated text-muted mb-4 flex items-start gap-2 rounded-lg border px-3 py-2 text-xs">
+      <Info className="text-subtle mt-px h-3.5 w-3.5 shrink-0" />
+      {t('analytics.dashboard.compare.incomplete', { date: formatDate(period.tracking_since, locale) })}
+    </p>
   );
 }
 
@@ -157,6 +161,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, filterLabel
             <>
               <AnalyticsTabs />
               {tab !== 'realtime' && <ActiveFilters labels={filterLabels} />}
+              {tab !== 'realtime' && <IncompleteComparison />}
               <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
                 <ActiveTab tab={tab} data={data} />
               </div>

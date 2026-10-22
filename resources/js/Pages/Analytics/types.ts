@@ -91,5 +91,5 @@ export type GoalCard = {
   rate: number;
   value: number | null;
   currency: string | null;
-  byCampaign: { value: string; conversions: number }[];
+  byChannel: { channel: string; conversions: number }[];
 };

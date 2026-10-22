@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { axisLabelStep, formatAxisDate } from './chartAxis';
+import { axisLabelStep, formatAxisDate, niceTicks } from './chartAxis';
+
+describe('niceTicks', () => {
+  it('splits the range into round steps that reach the maximum', () => {
+    expect(niceTicks(100)).toEqual([0, 25, 50, 75, 100]);
+    expect(niceTicks(97)).toEqual([0, 25, 50, 75, 100]);
+    expect(niceTicks(4200)).toEqual([0, 2000, 4000, 6000]);
+  });
+
+  it('returns a single zero tick without data', () => {
+    expect(niceTicks(0)).toEqual([0]);
+  });
+});
 
 describe('axisLabelStep', () => {
   it('labels every bar when the range is small', () => {

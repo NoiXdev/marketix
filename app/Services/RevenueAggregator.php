@@ -88,7 +88,7 @@ class RevenueAggregator
             'revenue' => $revenue,
             'orders' => $orders,
             'average_order_value' => $orders > 0 ? round($revenue / $orders, 2) : 0.0,
-            'purchase_rate' => $totals['sessions'] > 0 ? round((int) $row->sessions / $totals['sessions'] * 100, 2) : 0.0,
+            'purchase_rate' => $totals['sessions'] > 0 ? round((int) $row->sessions / $totals['sessions'] * 100, 1) : 0.0,
             'revenue_per_visitor' => $totals['visitors'] > 0 ? round($revenue / $totals['visitors'], 2) : 0.0,
         ];
     }

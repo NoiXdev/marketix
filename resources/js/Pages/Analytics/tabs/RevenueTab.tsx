@@ -1,10 +1,12 @@
 import { CountryFlag } from '@/Components/icons/CountryFlag';
 import { countryName } from '@/lib/displayNames';
-import { formatMoney, percentChange } from '@/lib/format';
+import { formatMoney, formatPercent, percentChange, pointChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
+import CardColumns from '@/Pages/Analytics/partials/CardColumns';
+import { formatRange } from '@/Pages/Analytics/partials/period';
 import RevenueChart, { RevenuePoint } from '@/Pages/Analytics/partials/RevenueChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import { RankRow } from '@/Pages/Dashboard/RankedList';
@@ -27,6 +29,7 @@ export type RevenueData = {
     summary: RevenueSummary;
     previousSummary: RevenueSummary | null;
     timeseries: RevenuePoint[];
+    previousTimeseries: RevenuePoint[] | null;
     channels: RevenueRow[];
     campaigns: RevenueRow[];
     landingPages: RevenueRow[];
@@ -38,14 +41,18 @@ const SNIPPET = "marketix('event', 'purchase', { value: 49.90, currency: 'CHF' }
 
 export default function RevenueTab({ revenue }: RevenueData) {
   const { t, locale } = useTranslation();
-  const { period, go } = useAnalytics();
+  const { period, comparable, go } = useAnalytics();
   const { channelLabel } = useRowBuilders();
   const { currency, summary, previousSummary } = revenue;
 
   const money = (value: number) => formatMoney(value, currency, locale);
-  const delta = (key: keyof RevenueSummary) => (previousSummary ? percentChange(summary[key], previousSummary[key]) : undefined);
+  const delta = (key: keyof RevenueSummary) => {
+    if (!previousSummary || !comparable) return undefined;
+    return key === 'purchase_rate' ? pointChange(summary[key], previousSummary[key]) : percentChange(summary[key], previousSummary[key]);
+  };
   const deltaLabel = t(period.compare === 'year' ? 'analytics.dashboard.compare.vs_year' : 'common.dashboard.vs_previous');
   const noData = t('analytics.dashboard.no_data');
+  const unit = t('analytics.dashboard.units.revenue');
   const otherCurrencies = revenue.currencies.slice(1);
 
   function revenueRows(items: RevenueRow[], extra: (row: RevenueRow) => Partial<RankRow> = () => ({})): RankRow[] {
@@ -75,7 +82,15 @@ export default function RevenueTab({ revenue }: RevenueData) {
           deltaLabel={deltaLabel}
           icon={Banknote}
         />
-        <KpiTile compact={false} label={t('analytics.dashboard.revenue.kpi.orders')} value={summary.orders} deltaPct={delta('orders')} deltaLabel={deltaLabel} icon={ReceiptText} />
+        <KpiTile
+          compact={false}
+          label={t('analytics.dashboard.revenue.kpi.orders')}
+          value={summary.orders}
+          deltaPct={delta('orders')}
+          deltaLabel={deltaLabel}
+          subtitle={t('analytics.dashboard.revenue.kpi.orders_hint')}
+          icon={ReceiptText}
+        />
         <KpiTile
           compact={false}
           label={t('analytics.dashboard.revenue.kpi.average_order_value')}
@@ -87,9 +102,11 @@ export default function RevenueTab({ revenue }: RevenueData) {
         <KpiTile
           compact={false}
           label={t('analytics.dashboard.revenue.kpi.purchase_rate')}
-          value={`${summary.purchase_rate.toLocaleString(locale)} %`}
+          value={formatPercent(summary.purchase_rate, locale)}
           deltaPct={delta('purchase_rate')}
           deltaLabel={deltaLabel}
+          deltaInPoints
+          subtitle={t('analytics.dashboard.revenue.kpi.purchase_rate_hint')}
           icon={Percent}
         />
         <KpiTile
@@ -111,36 +128,54 @@ export default function RevenueTab({ revenue }: RevenueData) {
         </p>
       )}
 
-      <RevenueChart data={revenue.timeseries} currency={currency} interval={period.interval} intervals={period.intervals} onIntervalChange={(interval) => go({ interval })} />
+      <RevenueChart
+        data={revenue.timeseries}
+        previous={revenue.previousTimeseries}
+        comparisonRange={period.compare_from && period.compare_to ? formatRange(period.compare_from, period.compare_to, locale) : null}
+        currency={currency}
+        interval={period.interval}
+        intervals={period.intervals}
+        currentBucket={period.current_bucket}
+        onIntervalChange={(interval) => go({ interval })}
+      />
 
-      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
-        <BreakdownCard
-          title={t('analytics.dashboard.revenue.by_channel')}
-          emptyLabel={noData}
-          tabs={[{ key: 'channels', label: '', rows: revenueRows(revenue.channels, (row) => ({ label: channelLabel(row.value) })) }]}
-        />
-        <BreakdownCard
-          title={t('analytics.dashboard.revenue.by_campaign')}
-          emptyLabel={t('analytics.dashboard.campaigns.no_data')}
-          tabs={[{ key: 'campaigns', label: '', rows: revenueRows(revenue.campaigns) }]}
-        />
-        <BreakdownCard
-          title={t('analytics.dashboard.revenue.by_landing_page')}
-          emptyLabel={noData}
-          tabs={[{ key: 'landing', label: '', rows: revenueRows(revenue.landingPages) }]}
-        />
-        <BreakdownCard
-          title={t('analytics.dashboard.revenue.by_country')}
-          emptyLabel={noData}
-          tabs={[
-            {
-              key: 'countries',
-              label: '',
-              rows: revenueRows(revenue.countries, (row) => ({ label: countryName(row.value, locale, row.value), prefix: <CountryFlag code={row.value} /> })),
-            },
-          ]}
-        />
-      </div>
+      <CardColumns
+        left={
+          <>
+            <BreakdownCard
+              title={t('analytics.dashboard.revenue.by_channel')}
+              emptyLabel={noData}
+              tabs={[{ key: 'channels', label: '', unit, rows: revenueRows(revenue.channels, (row) => ({ label: channelLabel(row.value) })) }]}
+            />
+            <BreakdownCard
+              title={t('analytics.dashboard.revenue.by_landing_page')}
+              emptyLabel={noData}
+              tabs={[{ key: 'landing', label: '', unit, rows: revenueRows(revenue.landingPages) }]}
+            />
+          </>
+        }
+        right={
+          <>
+            <BreakdownCard
+              title={t('analytics.dashboard.revenue.by_campaign')}
+              emptyLabel={t('analytics.dashboard.campaigns.no_data')}
+              tabs={[{ key: 'campaigns', label: '', unit, rows: revenueRows(revenue.campaigns) }]}
+            />
+            <BreakdownCard
+              title={t('analytics.dashboard.revenue.by_country')}
+              emptyLabel={noData}
+              tabs={[
+                {
+                  key: 'countries',
+                  label: '',
+                  unit,
+                  rows: revenueRows(revenue.countries, (row) => ({ label: countryName(row.value, locale, row.value), prefix: <CountryFlag code={row.value} /> })),
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
       <p className="text-subtle mt-4 text-xs">{t('analytics.dashboard.revenue.hint')}</p>
     </>

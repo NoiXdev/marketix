@@ -61,6 +61,7 @@ return [
     'dashboard' => [
         'overview' => 'Overzicht',
         'vs_previous' => 't.o.v. vorige periode',
+        'points' => 'pp',
         'new_in_period' => ':n nieuw',
         'clicks' => 'Klikken',
         'unique_visitors' => 'Unieke bezoekers',

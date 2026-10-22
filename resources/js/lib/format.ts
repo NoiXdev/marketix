@@ -19,17 +19,40 @@ export function formatDuration(seconds: number): string {
 }
 
 export function formatMoney(value: number, currency: string, locale: string): string {
+  const digits = Math.abs(value) >= 1000 ? 0 : 2;
+  const options = { minimumFractionDigits: digits, maximumFractionDigits: digits };
   if (/^[A-Z]{3}$/.test(currency)) {
     try {
-      return new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 2 }).format(value);
+      return new Intl.NumberFormat(locale, { style: 'currency', currency, ...options }).format(value);
     } catch {
-      return `${value.toLocaleString(locale, { maximumFractionDigits: 2 })} ${currency}`;
+      return `${value.toLocaleString(locale, options)} ${currency}`;
     }
   }
-  return value.toLocaleString(locale, { maximumFractionDigits: 2 });
+  return value.toLocaleString(locale, options);
+}
+
+export function formatAxisMoney(value: number, currency: string, locale: string): string {
+  const options: Intl.NumberFormatOptions =
+    Math.abs(value) >= 1_000_000 ? { notation: 'compact', maximumFractionDigits: 1 } : { minimumFractionDigits: 0, maximumFractionDigits: Math.abs(value) >= 10 ? 0 : 2 };
+  if (/^[A-Z]{3}$/.test(currency)) {
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency, ...options }).format(value);
+    } catch {
+      return value.toLocaleString(locale, options);
+    }
+  }
+  return value.toLocaleString(locale, options);
+}
+
+export function formatPercent(value: number, locale: string): string {
+  return `${value.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %`;
 }
 
 export function percentChange(current: number, previous: number): number | null {
   if (previous === 0) return null;
   return Math.round(((current - previous) / previous) * 1000) / 10;
+}
+
+export function pointChange(current: number, previous: number): number {
+  return Math.round((current - previous) * 10) / 10;
 }

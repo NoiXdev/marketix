@@ -117,14 +117,16 @@ class GoalAggregator
     }
 
     /** @return Collection<int, \stdClass> */
-    public function conversionsByCampaign(Goal $goal, AnalyticsQuery|int $range, int $limit = 5): Collection
+    public function conversionsByChannel(Goal $goal, AnalyticsQuery|int $range): Collection
     {
         $visitIds = $this->matchBase($goal, AnalyticsQuery::from($range))->select('visit_id')->distinct();
+        [$sql, $bindings] = $this->analytics->channelExpression($goal->site_id);
 
         return DB::table('visits')
             ->whereIn('id', $visitIds)
-            ->whereNotNull('utm_source')->where('utm_source', '!=', '')
-            ->select('utm_source as value', DB::raw('COUNT(*) as conversions'))
-            ->groupBy('utm_source')->orderByDesc('conversions')->limit($limit)->get();
+            ->selectRaw("{$sql} as channel", $bindings)
+            ->selectRaw('COUNT(*) as conversions')
+            ->groupBy('channel')->orderByDesc('conversions')->get()
+            ->each(fn ($row) => $row->conversions = (int) $row->conversions);
     }
 }
