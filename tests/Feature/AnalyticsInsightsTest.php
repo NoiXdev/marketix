@@ -192,6 +192,31 @@ class AnalyticsInsightsTest extends TestCase
         $this->assertSame(['news.example.org'], $referrers);
     }
 
+    public function test_top_referrers_merge_known_sources_and_filter_by_them(): void
+    {
+        $site = Site::factory()->create(['domain' => 'shop.test']);
+        $this->visit($site, ['referer_domain' => 'www.google.ch']);
+        $this->visit($site, ['referer_domain' => 'www.google.com']);
+        $this->visit($site, ['referer_domain' => 'l.facebook.com']);
+        $this->visit($site, ['referer_domain' => 'www.news.example.org']);
+
+        $referrers = $this->agg->topReferrers($site->id, 30)->pluck('count', 'referer_domain')->map(fn ($c) => (int) $c)->sortKeys()->all();
+
+        $this->assertSame(['facebook.com' => 1, 'google.com' => 2, 'news.example.org' => 1], $referrers);
+        $this->assertSame(2, $this->agg->summary($site->id, AnalyticsQuery::lastDays(30, ['referer_domain' => 'google.com']))['sessions']);
+    }
+
+    public function test_previous_period_can_line_up_weekdays(): void
+    {
+        $query = AnalyticsQuery::lastDays(30);
+        $previous = $query->previousMatchingWeekdays();
+
+        $this->assertSame($query->from->dayOfWeek, $previous->from->dayOfWeek);
+        $this->assertSame(30, $previous->days());
+        $this->assertTrue($previous->to->lt($query->from));
+        $this->assertSame('2026-10-06', AnalyticsQuery::lastDays(1)->previousMatchingWeekdays()->from->toDateString());
+    }
+
     public function test_entry_and_exit_pages(): void
     {
         $site = Site::factory()->create();

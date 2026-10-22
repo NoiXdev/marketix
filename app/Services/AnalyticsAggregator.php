@@ -92,6 +92,9 @@ class AnalyticsAggregator
             if ($key === 'channel') {
                 [$sql, $bindings] = $this->channelExpression($siteId);
                 $builder->whereRaw("({$sql}) = ?", [...$bindings, $value]);
+            } elseif ($key === 'referer_domain') {
+                [$sql, $bindings] = ChannelClassifier::refererExpression();
+                $builder->whereRaw("({$sql}) = ?", [...$bindings, strtolower($value)]);
             } elseif ($key === 'visitor_type') {
                 if (in_array($value, AnalyticsQuery::VISITOR_TYPES, true)) {
                     $builder->where('is_returning', $value === 'returning');
@@ -485,9 +488,16 @@ class AnalyticsAggregator
                 ->where('referer_domain', 'not like', '%.'.$self);
         }
 
+        [$sql, $bindings] = ChannelClassifier::refererExpression();
+
         return $builder
-            ->select('referer_domain', DB::raw('COUNT(*) as count'))
-            ->groupBy('referer_domain')->orderByDesc('count')->limit($limit)->get();
+            ->selectRaw("{$sql} as source", $bindings)
+            ->selectRaw('COUNT(*) as count')
+            ->groupBy('source')->orderByDesc('count')->limit($limit)->get()
+            ->each(function ($row) {
+                $row->referer_domain = $row->source;
+                unset($row->source);
+            });
     }
 
     /** @return Collection<int, \stdClass> */
@@ -615,6 +625,8 @@ class AnalyticsAggregator
             ->whereNotNull('utm_source')->where('utm_source', '!=', '')
             ->select(
                 DB::raw("{$value} as value"),
+                'utm_source as source',
+                'utm_medium as medium',
                 DB::raw('COUNT(*) as sessions'),
                 DB::raw('COUNT(DISTINCT visitor_hash) as visitors'),
             )

@@ -1,4 +1,4 @@
-import { formatDuration } from '@/lib/format';
+import { formatDuration, formatPercent } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import { ChannelRow } from '@/Pages/Analytics/types';
@@ -10,7 +10,7 @@ export default function ChannelTable({ title, channels, emptyLabel }: { title: s
 
   const total = channels.reduce((sum, row) => sum + Number(row.count), 0);
   const max = Math.max(1, ...channels.map((row) => Number(row.count)));
-  const percent = (value: number) => `${value.toLocaleString(locale, { maximumFractionDigits: 1 })} %`;
+  const percent = (value: number) => formatPercent(value, locale);
 
   return (
     <section className="border-line bg-surface flex flex-col rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">

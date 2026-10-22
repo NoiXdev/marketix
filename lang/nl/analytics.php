@@ -207,34 +207,27 @@ return [
             'label' => 'Analytics-onderdelen',
             'overview' => [
                 'label' => 'Overzicht',
-                'description' => 'De belangrijkste cijfers van uw website in één oogopslag.',
             ],
             'acquisition' => [
                 'label' => 'Acquisitie',
-                'description' => 'Waar uw bezoekers vandaan komen: kanalen, verwijzende websites en campagnes.',
                 'more' => 'Alle bronnen',
             ],
             'behavior' => [
                 'label' => 'Gedrag',
-                'description' => 'Wat bezoekers op uw website doen: pagina’s, interacties, events en actieve tijden.',
                 'more' => 'Alle pagina’s',
             ],
             'audience' => [
                 'label' => 'Doelgroep',
-                'description' => 'Wie uw bezoekers zijn: landen, talen, apparaten en browsers.',
                 'more' => 'Meer over uw doelgroep',
             ],
             'conversions' => [
                 'label' => 'Conversies',
-                'description' => 'Hoeveel bezoeken uw doelen bereiken – en waar bezoekers onderweg afhaken.',
             ],
             'realtime' => [
                 'label' => 'Realtime',
-                'description' => 'Wat er nu op uw website gebeurt – in de laatste 30 minuten.',
             ],
             'revenue' => [
                 'label' => 'Omzet',
-                'description' => 'Hoeveel omzet uw website oplevert – en welke kanalen, campagnes en pagina’s daaraan bijdragen.',
             ],
         ],
 
@@ -260,6 +253,7 @@ return [
             'feed' => 'Recente activiteit',
             'event' => 'Event „:name”',
             'nobody' => 'Nu niemand',
+            'no_views' => 'Geen paginaweergaven in de afgelopen 30 minuten',
             'empty_title' => 'Nu geen bezoekers',
             'empty_text' => 'Zodra iemand uw website bezoekt, verschijnt dat hier binnen enkele seconden.',
         ],
@@ -273,6 +267,8 @@ return [
                 'average_order_value' => 'Gem. bestelwaarde',
                 'purchase_rate' => 'Aankooppercentage',
                 'revenue_per_visitor' => 'Omzet per bezoeker',
+                'orders_hint' => 'Aantal aankopen – één sessie kan er meerdere bevatten',
+                'purchase_rate_hint' => 'Sessies met aankoop ÷ alle sessies',
             ],
             'by_channel' => 'Omzet per kanaal',
             'by_campaign' => 'Omzet per campagne',
@@ -295,6 +291,8 @@ return [
             'previous' => 'Vergelijking',
             'select_metric' => 'Selecteer minstens één metriek.',
             'scale_hint' => 'Paginaweergaven en unieke bezoekers delen één schaal; elke lijn is geschaald naar zijn piek in deze periode. Exacte waarden in de tooltip of de tabel.',
+            'partial' => 'nog bezig',
+            'partial_hint' => 'Lichter weergegeven: deze periode loopt nog en is onvolledig.',
         ],
 
         'range' => [
@@ -319,6 +317,7 @@ return [
             'year' => 't.o.v. vorig jaar',
             'none' => 'Geen vergelijking',
             'vs_year' => 't.o.v. vorig jaar',
+            'incomplete' => 'Onvolledige vergelijking: gegevens zijn pas beschikbaar vanaf :date, daarom worden wijzigingen ten opzichte van de vergelijkingsperiode verborgen.',
         ],
 
         'interval' => [
@@ -343,6 +342,29 @@ return [
             'engagement_hint' => 'Sessies langer dan 10 s, met 2+ pagina’s of een conversie',
             'avg_duration' => 'Gem. duur',
             'from_campaigns' => 'Uit campagnes',
+        ],
+
+        'units' => [
+            'page_views' => 'Paginaweergaven',
+            'sessions' => 'Sessies',
+            'visitors' => 'Bezoekers',
+            'visitors_count' => ':count bezoekers',
+            'events' => 'Events',
+            'clicks' => 'Klikken',
+            'downloads' => 'Downloads',
+            'searches' => 'Zoekopdrachten',
+            'conversions' => 'Conversies',
+            'revenue' => 'Omzet',
+        ],
+
+        'list' => [
+            'show_all' => 'Alles tonen',
+            'search' => 'Zoeken …',
+            'loading' => 'Laden …',
+            'error' => 'De lijst kon niet worden geladen.',
+            'no_match' => 'Geen resultaten',
+            'capped' => 'De :count meest voorkomende items worden getoond.',
+            'close' => 'Sluiten',
         ],
 
         'channel_table' => [
@@ -444,9 +466,7 @@ return [
 
         'campaigns' => [
             'title' => 'Campagnes',
-            'hint' => 'Sessieaantallen, unieke bezoekers tussen haakjes. First-touch-attributie.',
-            'sources' => 'Topbronnen',
-            'mediums' => 'Topmedia',
+            'hint' => 'First-touch-attributie: elke sessie telt voor de campagne waarmee ze begon.',
             'campaigns' => 'Topcampagnes',
             'source_medium' => 'Bron / medium',
             'terms' => 'Zoektermen',
@@ -457,6 +477,7 @@ return [
         'events' => [
             'title' => 'Events',
             'empty' => 'Nog geen events',
+            'open' => 'Details bekijken',
         ],
 
         'funnels' => [
@@ -465,6 +486,7 @@ return [
             'edit' => 'Trechter bewerken',
             'summary' => ':entered sessies gestart · :completed voltooid',
             'conversion_rate' => 'Voltooiingspercentage',
+            'hint' => 'Voltooid telt alleen sessies die alle stappen in deze volgorde doorliepen; daarom ligt het aantal meestal lager dan de conversies van een overeenkomend doel.',
             'continued' => ':rate ging verder',
             'dropped' => ':count haakte af',
             'empty_title' => 'Nog geen trechters',
@@ -478,6 +500,8 @@ return [
             'create_one' => 'Maak er een aan',
             'value' => 'Waarde :value (:unit per conversie)',
             'stats' => ':conversions conversies · :visitors bezoekers ·',
+            'hint' => 'Een conversie is een sessie waarin het doel minstens één keer is bereikt. Het percentage is relatief ten opzichte van alle sessies; de uitsplitsing toont het kanaal van het eerste contact.',
+            'by_channel' => 'Per kanaal',
         ],
     ],
 

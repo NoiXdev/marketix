@@ -9,7 +9,7 @@
  */
 export function axisLabelStep(count: number, maxLabels = 16): number {
   if (count <= maxLabels) return 1;
-  return Math.ceil(count / maxLabels);
+  return Math.ceil(count / Math.max(1, maxLabels));
 }
 
 /**
@@ -21,4 +21,17 @@ export function formatAxisDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   if (!y || !m || !d) return iso;
   return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+export function niceTicks(max: number, target = 4): number[] {
+  if (!(max > 0)) return [0];
+  const rough = max / target;
+  const magnitude = 10 ** Math.floor(Math.log10(rough));
+  const step = ([1, 2, 2.5, 5, 10].find((f) => f * magnitude >= rough) ?? 10) * magnitude;
+  const ticks: number[] = [];
+  for (let value = 0; value < max + step; value += step) {
+    ticks.push(Math.round(value * 1e6) / 1e6);
+    if (value >= max) break;
+  }
+  return ticks;
 }

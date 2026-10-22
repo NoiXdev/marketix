@@ -5,10 +5,11 @@ import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import ActivityHeatmap from '@/Pages/Analytics/partials/ActivityHeatmap';
 import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
-import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
-import { EventRow, Interactions, Rank } from '@/Pages/Analytics/types';
-import { Link } from '@inertiajs/react';
-import { FileDown, FileX, Search } from 'lucide-react';
+import BreakdownCard, { breakdownTab } from '@/Pages/Analytics/partials/BreakdownCard';
+import CardColumns from '@/Pages/Analytics/partials/CardColumns';
+import { EventRow, Interactions, Rank, ValueRow } from '@/Pages/Analytics/types';
+import { router } from '@inertiajs/react';
+import { FileDown, FileX, Search, Zap } from 'lucide-react';
 
 export type BehaviorData = {
   topPaths: (Rank & { title: string | null; avg_engaged: number | null; avg_scroll: number | null })[];
@@ -21,120 +22,164 @@ export type BehaviorData = {
 };
 
 export default function BehaviorTab({ topPaths, entryPages, exitPages, hostnames, interactions, topEvents, hourlyActivity }: BehaviorData) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { projectId, site, period } = useAnalytics();
   const { rows, valueRows, titled, engagementSub } = useRowBuilders();
   const noData = t('analytics.dashboard.no_data');
+  const unit = (key: string) => t(`analytics.dashboard.units.${key}`);
+  const visitorsNote = (r: { visitors: number }) => ({ note: t('analytics.dashboard.units.visitors_count', { count: Number(r.visitors).toLocaleString(locale) }) });
+
+  const eventRows = (items: EventRow[]) =>
+    items.map((e, i) => ({
+      key: `${e.name}-${i}`,
+      label: e.name,
+      value: Number(e.count),
+      prefix: <Zap className="text-subtle mx-auto h-4 w-4" />,
+      ...visitorsNote(e),
+      onClick: () => router.visit(route('app.project.analytics.events.show', { project: projectId, site: site.id, name: e.name })),
+      title: t('analytics.dashboard.events.open'),
+    }));
 
   return (
     <>
-      <div className="mb-6 grid grid-cols-1 gap-3.5 md:grid-cols-2">
-        <BreakdownCard
-          title={t('analytics.dashboard.breakdown.pages')}
-          emptyLabel={noData}
-          tabs={[
-            {
-              key: 'top',
-              label: t('analytics.dashboard.breakdown.top_pages'),
-              rows: rows(topPaths, 'path', 'path', (r) => ({ ...titled(r.path, r.title), note: engagementSub(r.avg_engaged, r.avg_scroll) })),
-            },
-            {
-              key: 'entry',
-              label: t('analytics.dashboard.breakdown.entry_pages'),
-              rows: rows(entryPages, 'entry_path', 'entry_path', (r) => ({
-                ...titled(r.entry_path, r.title),
-                note: t('analytics.dashboard.breakdown.bounce_sub', { rate: r.bounce_rate }),
-              })),
-            },
-            { key: 'exit', label: t('analytics.dashboard.breakdown.exit_pages'), rows: rows(exitPages, 'exit_path', 'exit_path', (r) => titled(r.exit_path, r.title)) },
-            // Only worth a tab when the snippet runs on more than one host (subdomains, staging, …)
-            ...(hostnames.length > 1 ? [{ key: 'hostnames', label: t('analytics.dashboard.breakdown.hostnames'), rows: rows(hostnames, 'hostname', 'hostname') }] : []),
-          ]}
-        />
-
-        <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">
-          <div className="border-line border-b px-4 py-3">
-            <h2 className="text-foreground text-sm font-semibold">{t('analytics.dashboard.events.title')}</h2>
-          </div>
-          {topEvents.length === 0 ? (
-            <p className="text-subtle px-4 py-6 text-center text-sm">{t('analytics.dashboard.events.empty')}</p>
-          ) : (
-            <ul className="p-1.5">
-              {topEvents.map((e, i) => (
-                <li key={i} className="hover:bg-elevated flex items-center justify-between gap-3 rounded-lg px-2.5 py-2">
-                  <Link
-                    href={route('app.project.analytics.events.show', { project: projectId, site: site.id, name: e.name })}
-                    className="text-accent-soft-foreground truncate font-mono text-[13.5px] font-semibold hover:underline"
-                  >
-                    {e.name}
-                  </Link>
-                  <span className="text-foreground text-sm font-bold whitespace-nowrap tabular-nums">
-                    {e.count.toLocaleString()}
-                    <span className="text-subtle ml-1 text-xs font-normal">({e.visitors.toLocaleString()})</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <BreakdownCard
-          title={t('analytics.dashboard.interactions.title')}
-          emptyLabel={noData}
-          tabs={[
-            {
-              key: 'outbound',
-              label: t('analytics.dashboard.interactions.outbound'),
-              rows: valueRows(interactions.outbound, (r) => ({ prefix: <Favicon domain={r.value.split('/')[0]} /> })),
-            },
-            {
-              key: 'downloads',
-              label: t('analytics.dashboard.interactions.downloads'),
-              rows: valueRows(interactions.downloads, (r) => ({
-                label: r.value.split('/').pop() || r.value,
-                sub: r.value,
-                prefix: <FileDown className="text-subtle mx-auto h-4 w-4" />,
-              })),
-            },
-          ]}
-        />
-        <BreakdownCard
-          title={t('analytics.dashboard.interactions.search_title')}
-          emptyLabel={noData}
-          tabs={[
-            {
-              key: 'searches',
-              label: t('analytics.dashboard.interactions.searches'),
-              rows: valueRows(interactions.searches, () => ({ prefix: <Search className="text-subtle mx-auto h-4 w-4" /> })),
-              empty: site.search_enabled ? undefined : (
-                <AnalyticsEmptyState
-                  icon={Search}
-                  title={t('analytics.dashboard.interactions.search_disabled_title')}
-                  text={t('analytics.dashboard.interactions.search_disabled_text')}
-                  action={
-                    <LinkButton variant="secondary" size="sm" href={route('app.project.sites.edit', { project: projectId, site: site.id })}>
-                      {t('analytics.dashboard.interactions.open_settings')}
-                    </LinkButton>
-                  }
-                />
-              ),
-            },
-            {
-              key: 'not_found',
-              label: t('analytics.dashboard.interactions.not_found'),
-              rows: valueRows(interactions.notFound, () => ({ prefix: <FileX className="text-subtle mx-auto h-4 w-4" /> })),
-              empty: (
-                <AnalyticsEmptyState
-                  icon={FileX}
-                  title={t('analytics.dashboard.interactions.not_found_empty_title')}
-                  text={t('analytics.dashboard.interactions.not_found_empty_text')}
-                  code="marketix('404');"
-                />
-              ),
-            },
-          ]}
-        />
-      </div>
+      <CardColumns
+        className="mb-6"
+        left={
+          <>
+            <BreakdownCard
+              title={t('analytics.dashboard.breakdown.pages')}
+              emptyLabel={noData}
+              tabs={[
+                breakdownTab({
+                  key: 'top',
+                  label: t('analytics.dashboard.breakdown.top_pages'),
+                  unit: unit('page_views'),
+                  dimension: 'pages',
+                  items: topPaths,
+                  toRows: (items) => rows(items, 'path', 'path', (r) => ({ ...titled(r.path, r.title), note: engagementSub(r.avg_engaged, r.avg_scroll) })),
+                }),
+                breakdownTab({
+                  key: 'entry',
+                  label: t('analytics.dashboard.breakdown.entry_pages'),
+                  unit: unit('sessions'),
+                  dimension: 'entry_pages',
+                  items: entryPages,
+                  toRows: (items) =>
+                    rows(items, 'entry_path', 'entry_path', (r) => ({
+                      ...titled(r.entry_path, r.title),
+                      note: t('analytics.dashboard.breakdown.bounce_sub', {
+                        rate: Number(r.bounce_rate).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+                      }),
+                    })),
+                }),
+                breakdownTab({
+                  key: 'exit',
+                  label: t('analytics.dashboard.breakdown.exit_pages'),
+                  unit: unit('sessions'),
+                  dimension: 'exit_pages',
+                  items: exitPages,
+                  toRows: (items) => rows(items, 'exit_path', 'exit_path', (r) => titled(r.exit_path, r.title)),
+                }),
+                // Only worth a tab when the snippet runs on more than one host (subdomains, staging, …)
+                ...(hostnames.length > 1
+                  ? [
+                      breakdownTab({
+                        key: 'hostnames',
+                        label: t('analytics.dashboard.breakdown.hostnames'),
+                        unit: unit('page_views'),
+                        dimension: 'hostnames',
+                        items: hostnames,
+                        toRows: (items) => rows(items, 'hostname', 'hostname'),
+                      }),
+                    ]
+                  : []),
+              ]}
+            />
+            <BreakdownCard
+              title={t('analytics.dashboard.interactions.title')}
+              emptyLabel={noData}
+              tabs={[
+                breakdownTab({
+                  key: 'outbound',
+                  label: t('analytics.dashboard.interactions.outbound'),
+                  unit: unit('clicks'),
+                  dimension: 'outbound',
+                  items: interactions.outbound,
+                  toRows: (items: ValueRow[]) => valueRows(items, (r) => ({ prefix: <Favicon domain={r.value.split('/')[0]} /> })),
+                }),
+                breakdownTab({
+                  key: 'downloads',
+                  label: t('analytics.dashboard.interactions.downloads'),
+                  unit: unit('downloads'),
+                  dimension: 'downloads',
+                  items: interactions.downloads,
+                  toRows: (items: ValueRow[]) =>
+                    valueRows(items, (r) => ({
+                      label: r.value.split('/').pop() || r.value,
+                      sub: r.value,
+                      prefix: <FileDown className="text-subtle mx-auto h-4 w-4" />,
+                    })),
+                }),
+              ]}
+            />
+          </>
+        }
+        right={
+          <>
+            <BreakdownCard
+              title={t('analytics.dashboard.events.title')}
+              emptyLabel={t('analytics.dashboard.events.empty')}
+              tabs={[breakdownTab({ key: 'events', label: '', unit: unit('events'), dimension: 'events', items: topEvents, toRows: eventRows })]}
+            />
+            <BreakdownCard
+              title={t('analytics.dashboard.interactions.search_title')}
+              emptyLabel={noData}
+              tabs={[
+                {
+                  ...breakdownTab({
+                    key: 'searches',
+                    label: t('analytics.dashboard.interactions.searches'),
+                    unit: unit('searches'),
+                    dimension: 'searches',
+                    items: interactions.searches,
+                    toRows: (items: ValueRow[]) => valueRows(items, () => ({ prefix: <Search className="text-subtle mx-auto h-4 w-4" /> })),
+                  }),
+                  empty: site.search_enabled ? undefined : (
+                    <AnalyticsEmptyState
+                      icon={Search}
+                      title={t('analytics.dashboard.interactions.search_disabled_title')}
+                      text={t('analytics.dashboard.interactions.search_disabled_text')}
+                      action={
+                        <LinkButton variant="secondary" size="sm" href={route('app.project.sites.edit', { project: projectId, site: site.id })}>
+                          {t('analytics.dashboard.interactions.open_settings')}
+                        </LinkButton>
+                      }
+                    />
+                  ),
+                },
+                {
+                  ...breakdownTab({
+                    key: 'not_found',
+                    label: t('analytics.dashboard.interactions.not_found'),
+                    unit: unit('page_views'),
+                    dimension: 'not_found',
+                    items: interactions.notFound,
+                    toRows: (items: ValueRow[]) => valueRows(items, () => ({ prefix: <FileX className="text-subtle mx-auto h-4 w-4" /> })),
+                  }),
+                  empty: (
+                    <AnalyticsEmptyState
+                      icon={FileX}
+                      title={t('analytics.dashboard.interactions.not_found_empty_title')}
+                      text={t('analytics.dashboard.interactions.not_found_empty_text')}
+                      code="marketix('404');"
+                    />
+                  ),
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
       {period.days >= 7 && <ActivityHeatmap buckets={hourlyActivity} timezone={site.timezone} />}
     </>

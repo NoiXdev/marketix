@@ -58,7 +58,6 @@ export default function AnalyticsTabs() {
           })}
         </ul>
       </nav>
-      <p className="text-muted mt-3 text-sm">{t(`analytics.dashboard.tabs.${active}.description`)}</p>
     </div>
   );
 }

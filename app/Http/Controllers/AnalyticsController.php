@@ -14,11 +14,19 @@ use App\Support\Analytics\PeriodResolver;
 use App\Support\Analytics\ResolvedPeriod;
 use App\Support\Geo\PlaceNames;
 use Carbon\CarbonImmutable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
     public const TABS = ['overview', 'realtime', 'acquisition', 'behavior', 'audience', 'conversions', 'revenue'];
+
+    public const BREAKDOWNS = [
+        'pages', 'entry_pages', 'exit_pages', 'hostnames', 'referrers', 'countries', 'regions', 'cities', 'languages', 'browsers', 'os',
+        'events', 'outbound', 'downloads', 'searches', 'not_found', 'campaigns', 'source_medium', 'terms', 'contents',
+    ];
+
+    public const BREAKDOWN_LIMIT = 1000;
 
     public function __construct(
         private AnalyticsAggregator $agg,
@@ -34,16 +42,12 @@ class AnalyticsController extends Controller
         $project = $request->get('project');
         $model = $project->sites()->findOrFail($site);
 
-        $hasData = $model->hasTrackedVisits();
+        $trackingSince = $model->firstTrackedAt();
+        $hasData = $trackingSince !== null;
         $tab = $request->input('tab');
         $tab = $hasData && in_array($tab, self::TABS, true) ? $tab : 'overview';
 
-        $filters = $request->input('filters');
-        $period = PeriodResolver::resolve(
-            $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
-            is_array($filters) ? $filters : [],
-            CarbonImmutable::now($model->timezone),
-        );
+        $period = $this->period($request, $model);
 
         return inertia('Analytics/Index', [
             'site' => [
@@ -57,7 +61,7 @@ class AnalyticsController extends Controller
                 'timezone' => $model->timezone,
             ],
             'tab' => $tab,
-            'period' => $period->toArray(),
+            'period' => $period->toArray($trackingSince),
             'filters' => (object) $period->query->filters,
             'filterLabels' => (object) collect([PlaceNames::REGION, PlaceNames::CITY])
                 ->filter(fn (string $key) => $period->query->filter($key) !== null)
@@ -66,6 +70,50 @@ class AnalyticsController extends Controller
             'liveVisitors' => fn () => $this->agg->liveVisitors($model->id),
             ...$this->tabProps($tab, $model, $period),
         ]);
+    }
+
+    public function breakdown(Request $request, string $site, string $dimension): JsonResponse
+    {
+        $model = $request->get('project')->sites()->findOrFail($site);
+        $query = $this->period($request, $model)->query;
+        $id = $model->id;
+        $limit = self::BREAKDOWN_LIMIT;
+
+        $rows = match ($dimension) {
+            'pages' => $this->agg->topPaths($id, $query, $limit),
+            'entry_pages' => $this->agg->entryPages($id, $query, $limit),
+            'exit_pages' => $this->agg->exitPages($id, $query, $limit),
+            'hostnames' => $this->agg->hostnames($id, $query, $limit),
+            'referrers' => $this->agg->topReferrers($id, $query, $limit),
+            'countries' => $this->agg->countriesWithCode($id, $query, $limit),
+            'regions' => $this->places->localize($this->agg->locations($id, 'region', $query, $limit), PlaceNames::REGION, 'region'),
+            'cities' => $this->places->localize($this->agg->locations($id, 'city', $query, $limit), PlaceNames::CITY, 'city'),
+            'languages' => $this->agg->breakdown($id, 'language', $query, $limit),
+            'browsers' => $this->agg->breakdown($id, 'browser', $query, $limit),
+            'os' => $this->agg->breakdown($id, 'os', $query, $limit),
+            'events' => $this->goals->topEvents($id, $query, $limit),
+            'outbound' => $this->goals->eventBreakdown($id, $query, 'outbound_click', 'url', $limit),
+            'downloads' => $this->goals->eventBreakdown($id, $query, 'file_download', 'url', $limit),
+            'searches' => $this->goals->eventBreakdown($id, $query, 'site_search', 'term', $limit),
+            'not_found' => $this->goals->eventBreakdown($id, $query, 'not_found', null, $limit),
+            'campaigns' => $this->agg->utmBreakdown($id, 'utm_campaign', $query, $limit),
+            'source_medium' => $this->agg->utmSourceMedium($id, $query, $limit),
+            'terms' => $this->agg->utmBreakdown($id, 'utm_term', $query, $limit),
+            'contents' => $this->agg->utmBreakdown($id, 'utm_content', $query, $limit),
+        };
+
+        return response()->json(['rows' => $rows->values(), 'limit' => $limit]);
+    }
+
+    private function period(Request $request, Site $site): ResolvedPeriod
+    {
+        $filters = $request->input('filters');
+
+        return PeriodResolver::resolve(
+            $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
+            is_array($filters) ? $filters : [],
+            CarbonImmutable::now($site->timezone),
+        );
     }
 
     /** @return array<string, \Closure> */
@@ -108,8 +156,6 @@ class AnalyticsController extends Controller
         return [
             'channels' => fn () => $this->agg->channels($id, $query),
             'topReferrers' => fn () => $this->agg->topReferrers($id, $query),
-            'utmSources' => fn () => $this->agg->utmBreakdown($id, 'utm_source', $query),
-            'utmMediums' => fn () => $this->agg->utmBreakdown($id, 'utm_medium', $query),
             'utmCampaigns' => fn () => $this->agg->utmBreakdown($id, 'utm_campaign', $query),
             'utmSourceMediums' => fn () => $this->agg->utmSourceMedium($id, $query),
             'utmTerms' => fn () => $this->agg->utmBreakdown($id, 'utm_term', $query),
@@ -173,6 +219,7 @@ class AnalyticsController extends Controller
                     'summary' => $this->revenueReports->summary($id, $query, $currency),
                     'previousSummary' => $comparison === null ? null : $this->revenueReports->summary($id, $comparison, $currency),
                     'timeseries' => $this->revenueReports->timeseries($id, $query, $currency),
+                    'previousTimeseries' => $comparison === null ? null : $this->revenueReports->timeseries($id, $comparison, $currency),
                     'channels' => $this->revenueReports->breakdown($id, $query, $currency, 'channel'),
                     'campaigns' => $this->revenueReports->breakdown($id, $query, $currency, 'utm_campaign'),
                     'landingPages' => $this->revenueReports->breakdown($id, $query, $currency, 'entry_path'),
@@ -196,7 +243,7 @@ class AnalyticsController extends Controller
                 'conditions' => $g->conditions ?? [],
                 'unit_value' => $g->value,
             ], $this->goals->conversions($g, $query), [
-                'byCampaign' => $this->goals->conversionsByCampaign($g, $query),
+                'byChannel' => $this->goals->conversionsByChannel($g, $query),
             ])),
             'funnels' => fn () => $site->funnels()->oldest()->get()->map(fn (Funnel $funnel) => [
                 'id' => $funnel->id,

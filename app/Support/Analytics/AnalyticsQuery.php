@@ -90,9 +90,32 @@ final class AnalyticsQuery
         return new self($this->from->subDays($days), $this->to->subDays($days), $this->filters, $this->interval);
     }
 
+    public function previousMatchingWeekdays(): self
+    {
+        $days = $this->days();
+        $shift = $days < 7 ? $days : (int) ceil($days / 7) * 7;
+
+        return new self($this->from->subDays($shift), $this->to->subDays($shift), $this->filters, $this->interval);
+    }
+
     public function previousYear(): self
     {
         return new self($this->from->subYearNoOverflow(), $this->to->subYearNoOverflow(), $this->filters, $this->interval);
+    }
+
+    public function endsBeforeDayEnd(): bool
+    {
+        return $this->to->lt($this->to->endOfDay());
+    }
+
+    public function bucketKey(CarbonImmutable $moment): string
+    {
+        return match ($this->interval) {
+            'hour' => $moment->format('Y-m-d H:00'),
+            'week' => $moment->startOfWeek(CarbonImmutable::MONDAY)->format('Y-m-d'),
+            'month' => $moment->format('Y-m-01'),
+            default => $moment->format('Y-m-d'),
+        };
     }
 
     public function daily(): self

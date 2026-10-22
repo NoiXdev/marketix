@@ -22,9 +22,12 @@ type AnalyticsContextValue = {
   tab: TabKey;
   period: Period;
   filters: Filters;
+  comparable: boolean;
   go: (next: Navigation) => void;
   href: (next: Navigation) => string;
+  breakdownUrl: (dimension: string) => string;
   addFilter: (key: FilterKey, value: string) => void;
+  addFilters: (next: Filters) => void;
 };
 
 const AnalyticsContext = createContext<AnalyticsContextValue | null>(null);
@@ -82,9 +85,12 @@ export function AnalyticsProvider({
     tab,
     period,
     filters,
+    comparable: period.compare !== 'none' && period.compare_complete,
     go,
     href,
+    breakdownUrl: (dimension) => route('app.project.analytics.breakdown', { project: projectId, site: site.id, dimension, ...params({}) }),
     addFilter: (key, filterValue) => go({ filters: { ...filters, [key]: filterValue } }),
+    addFilters: (next) => go({ filters: { ...filters, ...next } }),
   };
 
   return <AnalyticsContext.Provider value={value}>{children}</AnalyticsContext.Provider>;

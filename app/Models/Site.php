@@ -6,6 +6,7 @@ use App\Enums\ConsentMode;
 use App\Enums\TrackingMode;
 use App\Models\Concerns\SetsActivityProject;
 use App\Support\Analytics\ChannelClassifier;
+use Carbon\CarbonImmutable;
 use Database\Factories\SiteFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -165,5 +166,12 @@ class Site extends Model
     public function hasTrackedVisits(): bool
     {
         return $this->visits()->where('is_bot', false)->exists();
+    }
+
+    public function firstTrackedAt(): ?CarbonImmutable
+    {
+        $first = $this->visits()->where('is_bot', false)->min('started_at');
+
+        return $first === null ? null : CarbonImmutable::parse($first, config('app.timezone'));
     }
 }

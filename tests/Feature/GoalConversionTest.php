@@ -115,17 +115,21 @@ class GoalConversionTest extends TestCase
         $this->assertSame(1, $this->agg->conversions($goal, 30)['conversions']);
     }
 
-    public function test_conversions_by_campaign_groups_first_touch_source(): void
+    public function test_conversions_by_channel_include_traffic_without_campaigns(): void
     {
         $site = Site::factory()->create();
-        $g = Visit::factory()->forSite($site)->create(['utm_source' => 'google']);
-        $n = Visit::factory()->forSite($site)->create(['utm_source' => 'newsletter']);
-        Event::factory()->forVisit($g)->create(['name' => 'signup']);
-        Event::factory()->forVisit($n)->create(['name' => 'signup']);
+        $paid = Visit::factory()->forSite($site)->create(['utm_source' => 'google', 'utm_medium' => 'cpc']);
+        $mail = Visit::factory()->forSite($site)->create(['utm_source' => 'newsletter']);
+        $direct = Visit::factory()->forSite($site)->create(['referer_domain' => null]);
+        $direct2 = Visit::factory()->forSite($site)->create(['referer_domain' => null]);
+        foreach ([$paid, $mail, $direct, $direct2] as $visit) {
+            Event::factory()->forVisit($visit)->create(['name' => 'signup']);
+        }
 
         $goal = Goal::factory()->forSite($site)->create(['type' => GoalType::Event, 'match_value' => 'signup']);
-        $rows = $this->agg->conversionsByCampaign($goal, 30);
-        $this->assertSame(2, $rows->count());
+        $rows = $this->agg->conversionsByChannel($goal, 30)->pluck('conversions', 'channel')->sortKeys()->all();
+
+        $this->assertSame(['direct' => 2, 'email' => 1, 'paid' => 1], $rows);
     }
 
     public function test_rate_is_zero_when_no_sessions(): void

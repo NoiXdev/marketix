@@ -1,3 +1,4 @@
+import { formatPercent } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import { FunnelReport } from '@/Pages/Analytics/types';
@@ -8,7 +9,7 @@ export default function FunnelCard({ funnel }: { funnel: FunnelReport }) {
   const { t, locale } = useTranslation();
   const { projectId, site } = useAnalytics();
   const number = (n: number) => n.toLocaleString(locale);
-  const percent = (n: number) => `${n.toLocaleString(locale)} %`;
+  const percent = (n: number) => formatPercent(n, locale);
 
   return (
     <section className="border-line bg-surface rounded-[var(--radius)] border shadow-[var(--shadow-sm)]">

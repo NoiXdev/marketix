@@ -76,6 +76,29 @@ final class ChannelClassifier
         return [$sql, $bindings];
     }
 
+    /** @return array{0: string, 1: list<string>} */
+    public static function refererExpression(): array
+    {
+        $referer = "LOWER(COALESCE(referer_domain, ''))";
+        $bindings = [];
+        $cases = [];
+
+        foreach ([...self::SEARCH_HOSTS, ...self::SOCIAL_HOSTS] as $host) {
+            if (str_ends_with($host, '.*')) {
+                $base = substr($host, 0, -1);
+                $cases[] = "WHEN {$referer} LIKE ? OR {$referer} LIKE ? THEN ?";
+                array_push($bindings, $base.'%', '%.'.$base.'%', $base.'com');
+            } else {
+                $cases[] = "WHEN {$referer} = ? OR {$referer} LIKE ? THEN ?";
+                array_push($bindings, $host, '%.'.$host, $host);
+            }
+        }
+
+        $sql = 'CASE '.implode(' ', $cases)." WHEN {$referer} LIKE 'www.%' THEN SUBSTR({$referer}, 5) ELSE {$referer} END";
+
+        return [$sql, $bindings];
+    }
+
     public static function normalizeDomain(?string $domain): ?string
     {
         if ($domain === null || trim($domain) === '') {

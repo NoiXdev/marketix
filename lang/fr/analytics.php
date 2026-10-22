@@ -207,34 +207,27 @@ return [
             'label' => 'Sections d’analyse',
             'overview' => [
                 'label' => 'Vue d’ensemble',
-                'description' => 'Les chiffres clés de votre site en un coup d’œil.',
             ],
             'acquisition' => [
                 'label' => 'Acquisition',
-                'description' => 'D’où viennent vos visiteurs : canaux, sites référents et campagnes.',
                 'more' => 'Toutes les sources',
             ],
             'behavior' => [
                 'label' => 'Comportement',
-                'description' => 'Ce que les visiteurs font sur votre site : pages, interactions, événements et heures d’activité.',
                 'more' => 'Toutes les pages',
             ],
             'audience' => [
                 'label' => 'Audience',
-                'description' => 'Qui sont vos visiteurs : pays, langues, appareils et navigateurs.',
                 'more' => 'En savoir plus sur l’audience',
             ],
             'conversions' => [
                 'label' => 'Conversions',
-                'description' => 'Combien de visites atteignent vos objectifs – et où les visiteurs abandonnent en chemin.',
             ],
             'realtime' => [
                 'label' => 'Temps réel',
-                'description' => 'Ce qui se passe sur votre site en ce moment – au cours des 30 dernières minutes.',
             ],
             'revenue' => [
                 'label' => 'Chiffre d’affaires',
-                'description' => 'Le chiffre d’affaires généré par votre site – et les canaux, campagnes et pages qui y contribuent.',
             ],
         ],
 
@@ -260,6 +253,7 @@ return [
             'feed' => 'Activité récente',
             'event' => 'Événement « :name »',
             'nobody' => 'Personne en ce moment',
+            'no_views' => 'Aucune page vue au cours des 30 dernières minutes',
             'empty_title' => 'Aucun visiteur en ce moment',
             'empty_text' => 'Dès que quelqu’un visite votre site, cela apparaît ici en quelques secondes.',
         ],
@@ -273,6 +267,8 @@ return [
                 'average_order_value' => 'Panier moyen',
                 'purchase_rate' => 'Taux d’achat',
                 'revenue_per_visitor' => 'CA par visiteur',
+                'orders_hint' => 'Nombre d’achats – une session peut en contenir plusieurs',
+                'purchase_rate_hint' => 'Sessions avec achat ÷ toutes les sessions',
             ],
             'by_channel' => 'CA par canal',
             'by_campaign' => 'CA par campagne',
@@ -295,6 +291,8 @@ return [
             'previous' => 'Comparaison',
             'select_metric' => 'Sélectionnez au moins une métrique.',
             'scale_hint' => 'Pages vues et visiteurs uniques partagent une échelle ; chaque ligne est mise à l’échelle de son maximum sur la période. Valeurs exactes dans l’infobulle ou le tableau.',
+            'partial' => 'en cours',
+            'partial_hint' => 'En plus clair : cette période est encore en cours et incomplète.',
         ],
 
         'range' => [
@@ -319,6 +317,7 @@ return [
             'year' => 'vs année précédente',
             'none' => 'Aucune comparaison',
             'vs_year' => 'vs année précédente',
+            'incomplete' => 'Comparaison incomplète : les données ne sont disponibles qu’à partir du :date, les variations par rapport à la période de comparaison sont donc masquées.',
         ],
 
         'interval' => [
@@ -343,6 +342,29 @@ return [
             'engagement_hint' => 'Sessions de plus de 10 s, avec 2+ pages ou une conversion',
             'avg_duration' => 'Durée moy.',
             'from_campaigns' => 'Depuis les campagnes',
+        ],
+
+        'units' => [
+            'page_views' => 'Pages vues',
+            'sessions' => 'Sessions',
+            'visitors' => 'Visiteurs',
+            'visitors_count' => ':count visiteurs',
+            'events' => 'Événements',
+            'clicks' => 'Clics',
+            'downloads' => 'Téléchargements',
+            'searches' => 'Recherches',
+            'conversions' => 'Conversions',
+            'revenue' => 'CA',
+        ],
+
+        'list' => [
+            'show_all' => 'Tout afficher',
+            'search' => 'Rechercher …',
+            'loading' => 'Chargement …',
+            'error' => 'La liste n’a pas pu être chargée.',
+            'no_match' => 'Aucun résultat',
+            'capped' => 'Affichage des :count entrées les plus fréquentes.',
+            'close' => 'Fermer',
         ],
 
         'channel_table' => [
@@ -444,9 +466,7 @@ return [
 
         'campaigns' => [
             'title' => 'Campagnes',
-            'hint' => 'Nombre de sessions, visiteurs uniques entre parenthèses. Attribution au premier contact.',
-            'sources' => 'Meilleures sources',
-            'mediums' => 'Meilleurs supports',
+            'hint' => 'Attribution au premier contact : chaque session est attribuée à la campagne par laquelle elle a commencé.',
             'campaigns' => 'Meilleures campagnes',
             'source_medium' => 'Source / support',
             'terms' => 'Termes',
@@ -457,6 +477,7 @@ return [
         'events' => [
             'title' => 'Événements',
             'empty' => 'Aucun événement pour le moment',
+            'open' => 'Voir le détail',
         ],
 
         'funnels' => [
@@ -465,6 +486,7 @@ return [
             'edit' => 'Modifier l’entonnoir',
             'summary' => ':entered sessions commencées · :completed terminées',
             'conversion_rate' => 'Taux de complétion',
+            'hint' => 'Seules les sessions ayant franchi toutes les étapes dans cet ordre comptent comme terminées ; le nombre est donc souvent inférieur aux conversions d’un objectif correspondant.',
             'continued' => ':rate ont continué',
             'dropped' => ':count ont abandonné',
             'empty_title' => 'Aucun entonnoir',
@@ -478,6 +500,8 @@ return [
             'create_one' => 'En créer un',
             'value' => 'Valeur :value (:unit par conversion)',
             'stats' => ':conversions conversions · :visitors visiteurs ·',
+            'hint' => 'Une conversion est une session au cours de laquelle l’objectif a été atteint au moins une fois. Le taux se rapporte à toutes les sessions ; la répartition indique le canal du premier contact.',
+            'by_channel' => 'Par canal',
         ],
     ],
 

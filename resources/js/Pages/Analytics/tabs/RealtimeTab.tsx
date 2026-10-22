@@ -95,10 +95,13 @@ export default function RealtimeTab({ realtime }: RealtimeData) {
           <p className="text-muted text-xs">{readout}</p>
         </div>
         <div
-          className="border-line flex h-32 touch-pan-y items-end gap-[2px] border-b sm:gap-[3px]"
+          className="border-line relative flex h-32 touch-pan-y items-end gap-[2px] border-b sm:gap-[3px]"
           onMouseLeave={() => setHovered(null)}
           {...scrubHandlers((slot) => setHovered(Number(slot)))}
         >
+          {realtime.page_views === 0 && (
+            <p className="text-subtle pointer-events-none absolute inset-0 grid place-items-center text-sm">{t('analytics.dashboard.realtime.no_views')}</p>
+          )}
           {realtime.minutes.map((minute, i) => (
             <div
               key={minute.minutes_ago}
