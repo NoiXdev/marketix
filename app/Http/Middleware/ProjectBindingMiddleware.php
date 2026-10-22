@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\ProjectRole;
 use App\Models\Project;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,7 +26,11 @@ class ProjectBindingMiddleware
 
         Inertia::share('project', $project);
         Inertia::share('projects', auth()->user()->accessibleProjects()->get(['projects.id', 'projects.name'])
-            ->map(fn ($p) => ['id' => $p->id, 'name' => $p->name]));
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'is_admin' => auth()->user()->super_admin || $p->pivot?->role === ProjectRole::Admin,
+            ]));
         Inertia::share('currentProjectRole', auth()->user()->roleInProject($project)?->value);
 
         URL::defaults(['project' => $request->route('project')]);

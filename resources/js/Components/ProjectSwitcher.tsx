@@ -8,7 +8,9 @@ function initial(name?: string): string {
   return (name ?? '?').trim().charAt(0).toUpperCase() || '?';
 }
 
-export default function ProjectSwitcher({ collapsed = false }: { collapsed?: boolean }) {
+type Module = { routeName: string; adminOnly?: boolean };
+
+export default function ProjectSwitcher({ collapsed = false, activeModule }: { collapsed?: boolean; activeModule?: Module }) {
   const { projects, project } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -31,7 +33,8 @@ export default function ProjectSwitcher({ collapsed = false }: { collapsed?: boo
 
   function switchTo(p: Project) {
     setOpen(false);
-    router.visit(route('app.project.dashboard', { project: p.id }));
+    const routeName = activeModule && (!activeModule.adminOnly || p.is_admin) ? activeModule.routeName : 'app.project.dashboard';
+    router.visit(route(routeName, { project: p.id }));
   }
 
   return (
