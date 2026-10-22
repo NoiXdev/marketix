@@ -9,6 +9,7 @@ export interface Project {
   id: string;
   name: string;
   locked: boolean;
+  is_admin?: boolean;
 }
 
 export interface DomainCheckDetails {

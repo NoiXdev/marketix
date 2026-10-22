@@ -6,7 +6,7 @@ import { BarChart3, FileBarChart, Globe, History, LayoutDashboard, LineChart, Li
 import Brand from './Brand';
 import SidebarShell, { MobileNavProps } from './SidebarShell';
 
-type NavItem = { key: string; icon: typeof LinkIcon; routeName: string; countKey?: string; activeRoutes?: string[] };
+type NavItem = { key: string; icon: typeof LinkIcon; routeName: string; countKey?: string; activeRoutes?: string[]; adminOnly?: boolean };
 type NavGroup = { labelKey: string; items: NavItem[] };
 
 const groups: NavGroup[] = [
@@ -31,7 +31,13 @@ const groups: NavGroup[] = [
       { key: 'reports', icon: FileBarChart, routeName: 'app.project.reports.index' },
     ],
   },
-  { labelKey: 'management', items: [{ key: 'activity', icon: History, routeName: 'app.project.activity.index' }] },
+  {
+    labelKey: 'management',
+    items: [
+      { key: 'activity', icon: History, routeName: 'app.project.activity.index' },
+      { key: 'team', icon: Users, routeName: 'app.project.team.index', adminOnly: true },
+    ],
+  },
   { labelKey: 'docs_help', items: [{ key: 'data_privacy', icon: ShieldCheck, routeName: 'app.project.docs.privacy' }] },
 ];
 
@@ -44,9 +50,8 @@ export default function Sidebar(mobileNav: MobileNavProps) {
   const isProjectAdmin = auth.user.super_admin || currentProjectRole === 'admin';
   const { t } = useTranslation();
 
-  const renderGroups: NavGroup[] = isProjectAdmin
-    ? groups.map((g) => (g.labelKey === 'management' ? { ...g, items: [...g.items, { key: 'team', icon: Users, routeName: 'app.project.team.index' }] } : g))
-    : groups;
+  const renderGroups: NavGroup[] = groups.map((g) => ({ ...g, items: g.items.filter((item) => !item.adminOnly || isProjectAdmin) }));
+  const activeItem = renderGroups.flatMap((g) => g.items).find(isNavItemActive);
 
   return (
     <SidebarShell brand={<Brand />} {...mobileNav}>
@@ -54,7 +59,7 @@ export default function Sidebar(mobileNav: MobileNavProps) {
         <>
           {/* Project switcher */}
           <div className="border-line border-b p-2">
-            <ProjectSwitcher collapsed={collapsed} />
+            <ProjectSwitcher collapsed={collapsed} activeModule={activeItem} />
           </div>
 
           {/* Navigation */}
