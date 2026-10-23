@@ -94,7 +94,8 @@ trait InteractsWithSiteAnalytics
             'to' => $schema->string()->description('End date (YYYY-MM-DD) when range is "custom".'),
             'compare' => $schema->string()
                 ->enum(PeriodResolver::COMPARISONS)
-                ->description('Comparison period: the previous period of equal length (default), the same period last year, or none.'),
+                ->description('Comparison period: the preceding period of equal length (default; rolling ranges such as 7d, 30d, 90d and custom '
+                    .'are shifted by whole weeks so weekdays line up), the same period last year, or none.'),
             'filters' => $schema->object($filters)
                 ->description('Optional exact-match filters that narrow every number, e.g. {"country_code": "CH", "channel": "organic_search"}. '
                     .'channel is one of direct, organic_search, paid, social, email, referral, campaign; visitor_type is new or returning.'),
