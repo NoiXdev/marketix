@@ -1,4 +1,18 @@
-## [2.8.0](https://github.com/NoiXdev/marketix/compare/v2.7.1...v) (2026-10-23)
+## [2.9.0](https://github.com/NoiXdev/marketix/compare/v2.8.0...v) (2026-10-23)
+
+
+### Features
+
+* add analytics annotations with custom comparison periods ([6522bf5](https://github.com/NoiXdev/marketix/commit/6522bf5948ba0d0ccc3f1b841559ef9de700424f))
+* show colored browser and os icons ([e2f9016](https://github.com/NoiXdev/marketix/commit/e2f9016064561e5d1b8afeca7c2c862b931d7b77))
+* show flags next to visitor languages ([434edc2](https://github.com/NoiXdev/marketix/commit/434edc288717df1793a70ee4ea5b2f91e5e51950))
+
+
+### Bug Fixes
+
+* keep full language codes from accept-language headers ([a33b318](https://github.com/NoiXdev/marketix/commit/a33b318a176cffc4374b67d9afda1e60a67df67b))
+
+## [2.8.0](https://github.com/NoiXdev/marketix/compare/v2.7.1...v2.8.0) (2026-10-23)
 
 
 ### Features
