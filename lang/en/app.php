@@ -18,4 +18,7 @@ return [
     'funnel_created' => 'Funnel created.',
     'funnel_updated' => 'Funnel updated.',
     'funnel_deleted' => 'Funnel deleted.',
+    'annotation_created' => 'Annotation added.',
+    'annotation_updated' => 'Annotation updated.',
+    'annotation_deleted' => 'Annotation deleted.',
 ];

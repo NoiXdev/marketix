@@ -101,6 +101,57 @@ class PeriodResolverTest extends TestCase
         $this->assertSame('previous', PeriodResolver::resolve(['compare' => 'bogus'], [], $this->now)->compare);
     }
 
+    public function test_custom_comparison_uses_the_given_dates(): void
+    {
+        $period = PeriodResolver::resolve(
+            ['range' => 'custom', 'from' => '2026-10-01', 'to' => '2026-10-07', 'compare' => 'custom', 'compare_from' => '2026-09-01', 'compare_to' => '2026-09-14'],
+            [],
+            $this->now,
+        );
+
+        $this->assertSame('custom', $period->compare);
+        $this->assertSame('2026-09-01 00:00:00', $period->comparison()->from->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-09-14 23:59:59', $period->comparison()->to->format('Y-m-d H:i:s'));
+        $this->assertSame($period->query->interval, $period->comparison()->interval);
+        $this->assertSame(14, $period->toArray()['compare_days']);
+    }
+
+    public function test_custom_comparison_without_a_start_spans_the_period_right_before_compare_to(): void
+    {
+        $period = PeriodResolver::resolve(
+            ['range' => 'custom', 'from' => '2026-09-20', 'to' => '2026-10-07', 'compare' => 'custom', 'compare_to' => '2026-09-19'],
+            [],
+            $this->now,
+        );
+
+        $this->assertSame(18, $period->query->days());
+        $this->assertSame('2026-09-02', $period->comparison()->from->toDateString());
+        $this->assertSame('2026-09-19', $period->comparison()->to->toDateString());
+        $this->assertSame(18, $period->comparison()->days());
+    }
+
+    public function test_invalid_custom_comparisons_fall_back_to_the_previous_period(): void
+    {
+        foreach ([[], ['compare_to' => 'soon'], ['compare_from' => '2026-02-30', 'compare_to' => '2026-03-01'], ['compare_from' => '2027-01-01', 'compare_to' => '2027-01-05']] as $input) {
+            $period = PeriodResolver::resolve(['range' => '7d', 'compare' => 'custom'] + $input, [], $this->now);
+            $this->assertSame('previous', $period->compare, json_encode($input));
+            $this->assertSame('2026-09-24', $period->comparison()->from->toDateString());
+        }
+    }
+
+    public function test_comparison_series_is_cut_to_the_period_length(): void
+    {
+        $period = PeriodResolver::resolve(
+            ['range' => 'custom', 'from' => '2026-10-01', 'to' => '2026-10-07', 'compare' => 'custom', 'compare_from' => '2026-08-01', 'compare_to' => '2026-09-30'],
+            [],
+            $this->now,
+        );
+
+        $this->assertSame(61, $period->comparison()->days());
+        $this->assertSame('2026-08-01', $period->comparisonSeries()->from->toDateString());
+        $this->assertSame('2026-08-07', $period->comparisonSeries()->to->toDateString());
+    }
+
     public function test_filters_are_sanitized_into_the_query(): void
     {
         $period = PeriodResolver::resolve([], ['path' => '/a', 'evil' => 'x'], $this->now);

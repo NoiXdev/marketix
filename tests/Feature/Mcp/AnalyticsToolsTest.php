@@ -6,6 +6,7 @@ use App\Mcp\Servers\MarketixServer;
 use App\Mcp\Tools\GetSiteBreakdownTool;
 use App\Mcp\Tools\GetSiteStatsTool;
 use App\Mcp\Tools\ListSitesTool;
+use App\Models\Annotation;
 use App\Models\PageView;
 use App\Models\Project;
 use App\Models\Site;
@@ -104,6 +105,28 @@ class AnalyticsToolsTest extends TestCase
             ->assertSee('"compare_complete": false')
             ->assertSee('"change_percent": null')
             ->assertSee('"change_points": null');
+    }
+
+    public function test_site_stats_list_annotations_and_compare_before_one(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 22)->setTime(12, 0));
+        $mine = $this->makeSite('Mine');
+        Annotation::factory()->forSite($mine['site'])->create(['date' => '2026-10-10', 'title' => 'Hybrid tracking']);
+
+        MarketixServer::actingAs($mine['user'])
+            ->tool(GetSiteStatsTool::class, [
+                'site' => $mine['site']->id,
+                'range' => 'custom',
+                'from' => '2026-10-10',
+                'to' => '2026-10-22',
+                'compare' => 'custom',
+                'compare_to' => '2026-10-09',
+            ])
+            ->assertOk()
+            ->assertSee('"title": "Hybrid tracking"')
+            ->assertSee('"compare": "custom"')
+            ->assertSee('"compare_from": "2026-09-27"')
+            ->assertSee('"compare_to": "2026-10-09"');
     }
 
     public function test_site_stats_apply_filters(): void

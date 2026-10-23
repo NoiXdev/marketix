@@ -105,6 +105,11 @@ class Site extends Model
         return $this->hasMany(Funnel::class);
     }
 
+    public function annotations(): HasMany
+    {
+        return $this->hasMany(Annotation::class);
+    }
+
     public function favoritedBy(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'site_favorites');

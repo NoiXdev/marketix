@@ -6,7 +6,7 @@ import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext
 import AnalyticsEmptyState from '@/Pages/Analytics/partials/AnalyticsEmptyState';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import CardColumns from '@/Pages/Analytics/partials/CardColumns';
-import { formatRange } from '@/Pages/Analytics/partials/period';
+import { deltaLabelKey, formatRange } from '@/Pages/Analytics/partials/period';
 import RevenueChart, { RevenuePoint } from '@/Pages/Analytics/partials/RevenueChart';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
 import { RankRow } from '@/Pages/Dashboard/RankedList';
@@ -50,7 +50,7 @@ export default function RevenueTab({ revenue }: RevenueData) {
     if (!previousSummary || !comparable) return undefined;
     return key === 'purchase_rate' ? pointChange(summary[key], previousSummary[key]) : percentChange(summary[key], previousSummary[key]);
   };
-  const deltaLabel = t(period.compare === 'year' ? 'analytics.dashboard.compare.vs_year' : 'common.dashboard.vs_previous');
+  const deltaLabel = t(deltaLabelKey(period.compare));
   const noData = t('analytics.dashboard.no_data');
   const unit = t('analytics.dashboard.units.revenue');
   const otherCurrencies = revenue.currencies.slice(1);

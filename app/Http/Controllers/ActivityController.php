@@ -27,7 +27,7 @@ class ActivityController extends Controller
         return inertia('Activity/Index', [
             'activities' => $activities,
             'logName' => $logName,
-            'logNames' => ['url', 'domain', 'qrcode', 'pixel', 'site', 'goal', 'funnel', 'project', 'membership', 'invitation'],
+            'logNames' => ['url', 'domain', 'qrcode', 'pixel', 'site', 'goal', 'funnel', 'annotation', 'project', 'membership', 'invitation'],
         ]);
     }
 }

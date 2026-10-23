@@ -9,7 +9,7 @@ final class PeriodResolver
 {
     public const RANGES = ['today', 'yesterday', '7d', '30d', '90d', 'month', 'last_month', 'year', '12m', 'custom'];
 
-    public const COMPARISONS = ['previous', 'year', 'none'];
+    public const COMPARISONS = ['previous', 'year', 'custom', 'none'];
 
     public const DEFAULT_RANGE = '30d';
 
@@ -39,12 +39,23 @@ final class PeriodResolver
 
         $compare = in_array($input['compare'] ?? null, self::COMPARISONS, true) ? $input['compare'] : 'previous';
         $interval = is_string($input['interval'] ?? null) ? $input['interval'] : null;
+        $query = AnalyticsQuery::between($bounds[0], $bounds[1], $filters, $interval);
 
-        return new ResolvedPeriod(
-            AnalyticsQuery::between($bounds[0], $bounds[1], $filters, $interval),
-            $range,
-            $compare,
-        );
+        $custom = $compare === 'custom'
+            ? self::customComparison($input['compare_from'] ?? null, $input['compare_to'] ?? null, $query, $now)
+            : null;
+
+        return new ResolvedPeriod($query, $range, $compare === 'custom' && $custom === null ? 'previous' : $compare, $custom);
+    }
+
+    private static function customComparison(mixed $from, mixed $to, AnalyticsQuery $query, CarbonImmutable $now): ?AnalyticsQuery
+    {
+        $end = self::date($to, $now);
+        $start = $from === null || $from === '' ? $end?->subDays($query->days() - 1) : self::date($from, $now);
+
+        $bounds = $start === null || $end === null ? null : self::clamp($start, $end, $now);
+
+        return $bounds === null ? null : new AnalyticsQuery($bounds[0], $bounds[1], $query->filters, $query->interval);
     }
 
     /** @return array{0: CarbonImmutable, 1: CarbonImmutable} */
@@ -66,21 +77,30 @@ final class PeriodResolver
     /** @return array{0: CarbonImmutable, 1: CarbonImmutable}|null */
     private static function custom(mixed $from, mixed $to, CarbonImmutable $now): ?array
     {
-        if (! is_string($from) || ! is_string($to)) {
+        $start = self::date($from, $now);
+        $end = self::date($to, $now);
+
+        return $start === null || $end === null ? null : self::clamp($start, $end, $now);
+    }
+
+    private static function date(mixed $value, CarbonImmutable $now): ?CarbonImmutable
+    {
+        if (! is_string($value)) {
             return null;
         }
 
         try {
-            $start = CarbonImmutable::createFromFormat('!Y-m-d', $from, $now->getTimezone());
-            $end = CarbonImmutable::createFromFormat('!Y-m-d', $to, $now->getTimezone());
+            $date = CarbonImmutable::createFromFormat('!Y-m-d', $value, $now->getTimezone());
         } catch (Throwable) {
             return null;
         }
 
-        if ($start === false || $end === false || $start->format('Y-m-d') !== $from || $end->format('Y-m-d') !== $to) {
-            return null;
-        }
+        return $date === false || $date->format('Y-m-d') !== $value ? null : $date;
+    }
 
+    /** @return array{0: CarbonImmutable, 1: CarbonImmutable}|null */
+    private static function clamp(CarbonImmutable $start, CarbonImmutable $end, CarbonImmutable $now): ?array
+    {
         if ($start->gt($end)) {
             [$start, $end] = [$end, $start];
         }

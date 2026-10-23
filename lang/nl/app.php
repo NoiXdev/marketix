@@ -18,4 +18,7 @@ return [
     'funnel_created' => 'Trechter aangemaakt.',
     'funnel_updated' => 'Trechter bijgewerkt.',
     'funnel_deleted' => 'Trechter verwijderd.',
+    'annotation_created' => 'Annotatie toegevoegd.',
+    'annotation_updated' => 'Annotatie bijgewerkt.',
+    'annotation_deleted' => 'Annotatie verwijderd.',
 ];

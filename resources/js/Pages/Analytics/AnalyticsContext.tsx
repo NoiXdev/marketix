@@ -1,10 +1,10 @@
 import { formatDuration } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
 import { Comparison, Interval, Period } from '@/Pages/Analytics/partials/period';
-import { FilterKey, Filters, Rank, SiteInfo, TabKey, ValueRow } from '@/Pages/Analytics/types';
+import { Annotation, AnnotationTarget, FilterKey, Filters, Rank, SiteInfo, TabKey, ValueRow } from '@/Pages/Analytics/types';
 import { RankRow } from '@/Pages/Dashboard/RankedList';
 import { router } from '@inertiajs/react';
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 export type Navigation = {
   tab?: TabKey;
@@ -12,6 +12,8 @@ export type Navigation = {
   from?: string;
   to?: string;
   compare?: Comparison;
+  compare_from?: string | null;
+  compare_to?: string | null;
   interval?: Interval;
   filters?: Filters;
 };
@@ -22,6 +24,9 @@ type AnalyticsContextValue = {
   tab: TabKey;
   period: Period;
   filters: Filters;
+  annotations: Annotation[];
+  annotationTarget: AnnotationTarget | null;
+  manageAnnotations: (target: AnnotationTarget | null) => void;
   comparable: boolean;
   go: (next: Navigation) => void;
   href: (next: Navigation) => string;
@@ -38,6 +43,7 @@ export function AnalyticsProvider({
   tab,
   period,
   filters,
+  annotations,
   children,
 }: {
   projectId: string;
@@ -45,8 +51,11 @@ export function AnalyticsProvider({
   tab: TabKey;
   period: Period;
   filters: Filters;
+  annotations: Annotation[];
   children: ReactNode;
 }) {
+  const [annotationTarget, setAnnotationTarget] = useState<AnnotationTarget | null>(null);
+
   function params(next: Navigation): Record<string, string | Filters> {
     const range = next.range ?? period.range;
     const rangeChanged = next.range !== undefined && (next.range !== period.range || range === 'custom');
@@ -62,6 +71,12 @@ export function AnalyticsProvider({
       result.to = next.to ?? period.to;
     }
     if (compare !== 'previous') result.compare = compare;
+    if (compare === 'custom') {
+      const compareFrom = next.compare_from !== undefined ? next.compare_from : period.compare_from;
+      const compareTo = next.compare_to !== undefined ? next.compare_to : period.compare_to;
+      if (compareFrom) result.compare_from = compareFrom;
+      if (compareTo) result.compare_to = compareTo;
+    }
     if (interval) result.interval = interval;
     if (Object.keys(nextFilters).length > 0) result.filters = nextFilters;
 
@@ -85,6 +100,9 @@ export function AnalyticsProvider({
     tab,
     period,
     filters,
+    annotations,
+    annotationTarget,
+    manageAnnotations: setAnnotationTarget,
     comparable: period.compare !== 'none' && period.compare_complete,
     go,
     href,

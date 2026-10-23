@@ -3,6 +3,7 @@ import { niceTicks } from '@/lib/chartAxis';
 import { scrubHandlers } from '@/lib/chartScrub';
 import { formatAxisMoney, formatMoney, percentChange } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n';
+import { AnnotationLines, AnnotationRail, AnnotationsButton, AnnotationTooltipNote, useAnnotationGroups } from '@/Pages/Analytics/partials/ChartAnnotations';
 import { formatAxisLabel, formatBucket, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { KeyboardEvent, useLayoutEffect, useRef, useState } from 'react';
@@ -53,6 +54,10 @@ export default function RevenueChart({
   const yFor = (value: number) => PLOT_TOP + (max > 0 ? 1 - value / max : 1) * innerHeight;
   const xFor = (i: number) => i * (slotWidth + SLOT_GAP) + slotWidth / 2;
   const partialIndex = currentBucket === null ? -1 : data.findIndex((d) => d.date === currentBucket);
+  const annotationGroups = useAnnotationGroups(
+    data.map((d) => d.date),
+    interval,
+  );
   const point = hovered !== null ? data[hovered] : null;
   const previousPoint = hovered !== null ? (comparison?.[hovered] ?? null) : null;
   const money = (value: number) => formatMoney(value, currency, locale);
@@ -91,23 +96,26 @@ export default function RevenueChart({
     <section className="border-line bg-surface mb-6 rounded-[var(--radius)] border p-4 shadow-[var(--shadow-sm)] sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-foreground text-sm font-semibold">{t('analytics.dashboard.revenue.chart_title')}</h2>
-        {intervals.length > 1 && (
-          <div role="group" aria-label={t('analytics.dashboard.interval.label')} className="border-line inline-flex overflow-hidden rounded-lg border">
-            {intervals.map((option) => (
-              <button
-                key={option}
-                type="button"
-                aria-pressed={option === interval}
-                onClick={() => option !== interval && onIntervalChange(option)}
-                className={`border-line border-r px-2.5 py-1 text-xs font-semibold last:border-r-0 focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
-                  option === interval ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
-                }`}
-              >
-                {t(`analytics.dashboard.interval.${option}`)}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {intervals.length > 1 && (
+            <div role="group" aria-label={t('analytics.dashboard.interval.label')} className="border-line inline-flex overflow-hidden rounded-lg border">
+              {intervals.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={option === interval}
+                  onClick={() => option !== interval && onIntervalChange(option)}
+                  className={`border-line border-r px-2.5 py-1 text-xs font-semibold last:border-r-0 focus-visible:ring-2 focus-visible:ring-[color:var(--accent-ring)] focus-visible:outline-none ${
+                    option === interval ? 'bg-accent-soft text-accent-soft-foreground' : 'bg-surface text-muted hover:bg-elevated'
+                  }`}
+                >
+                  {t(`analytics.dashboard.interval.${option}`)}
+                </button>
+              ))}
+            </div>
+          )}
+          <AnnotationsButton />
+        </div>
       </div>
 
       {previous && previous.length > 0 && (
@@ -126,6 +134,10 @@ export default function RevenueChart({
           </label>
         </div>
       )}
+
+      <div className="pl-[4.5rem]">
+        <AnnotationRail groups={annotationGroups} x={xFor} width={size.width} />
+      </div>
 
       <div className="flex gap-2">
         <div aria-hidden className="relative h-44 w-16 shrink-0">
@@ -167,6 +179,8 @@ export default function RevenueChart({
                 </div>
               ))}
 
+              {size.width > 0 && <AnnotationLines groups={annotationGroups} x={xFor} />}
+
               {comparison && size.width > 0 && (
                 <svg aria-hidden className="pointer-events-none absolute inset-0 overflow-visible" width={size.width} height={size.height}>
                   <polyline
@@ -207,6 +221,7 @@ export default function RevenueChart({
                     )}
                   </p>
                 )}
+                <AnnotationTooltipNote items={hovered === null ? undefined : annotationGroups.get(hovered)} />
               </div>
             )}
           </div>

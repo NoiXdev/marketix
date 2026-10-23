@@ -103,6 +103,13 @@ final class AnalyticsQuery
         return new self($this->from->subYearNoOverflow(), $this->to->subYearNoOverflow(), $this->filters, $this->interval);
     }
 
+    public function limitedTo(int $days): self
+    {
+        $to = $this->from->startOfDay()->addDays($days - 1)->endOfDay()->min($this->to);
+
+        return new self($this->from, $to, $this->filters, $this->interval);
+    }
+
     public function endsBeforeDayEnd(): bool
     {
         return $this->to->lt($this->to->endOfDay());

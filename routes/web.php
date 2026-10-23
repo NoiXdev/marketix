@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserProjectController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AnalyticsIngestionController;
+use App\Http\Controllers\AnnotationController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -222,6 +223,9 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::put('/analytics/{site}/funnels/{funnel}', [FunnelController::class, 'update'])->name('app.project.analytics.funnels.update');
             Route::delete('/analytics/{site}/funnels/{funnel}', [FunnelController::class, 'destroy'])->name('app.project.analytics.funnels.destroy');
             Route::get('/analytics/{site}/events', [EventAnalyticsController::class, 'show'])->name('app.project.analytics.events.show');
+            Route::post('/analytics/{site}/annotations', [AnnotationController::class, 'store'])->name('app.project.analytics.annotations.store');
+            Route::put('/analytics/{site}/annotations/{annotation}', [AnnotationController::class, 'update'])->name('app.project.analytics.annotations.update');
+            Route::delete('/analytics/{site}/annotations/{annotation}', [AnnotationController::class, 'destroy'])->name('app.project.analytics.annotations.destroy');
 
             // Team (project admins only)
             Route::middleware('project_admin')->group(function () {

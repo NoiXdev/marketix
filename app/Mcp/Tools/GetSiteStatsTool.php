@@ -3,6 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Mcp\Concerns\InteractsWithSiteAnalytics;
+use App\Models\Annotation;
 use App\Models\Goal;
 use App\Services\AnalyticsAggregator;
 use App\Services\GoalAggregator;
@@ -18,7 +19,8 @@ use Laravel\Mcp\Server\Tool;
     .'average duration and campaign share with their change against a comparison period (change_percent for counts and '
     .'durations, change_points in percentage points for rates; both null when tracking started after the comparison period '
     .'began, see period.compare_complete), plus top pages, channels, referrers, campaigns, countries, devices, '
-    .'new vs. returning visitors, goal conversions and revenue.')]
+    .'new vs. returning visitors, goal conversions and revenue. annotations lists every dated note on the site (e.g. a '
+    .'relaunch or tracking change); use their dates as from/to or compare_to to measure before and after them.')]
 class GetSiteStatsTool extends Tool
 {
     use InteractsWithSiteAnalytics;
@@ -87,6 +89,11 @@ class GetSiteStatsTool extends Tool
                 'currency' => $currency,
                 ...$this->revenue->summary($site->id, $query, $currency),
             ],
+            'annotations' => $site->annotations()->orderBy('date')->oldest()->get()->map(fn (Annotation $annotation): array => [
+                'date' => $annotation->date->toDateString(),
+                'title' => $annotation->title,
+                'description' => $annotation->description,
+            ])->all(),
         ]);
     }
 

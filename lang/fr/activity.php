@@ -40,6 +40,7 @@ return [
         'Site' => 'un site',
         'Goal' => 'un objectif',
         'Funnel' => 'un entonnoir',
+        'Annotation' => 'une annotation',
         'Project' => 'un projet',
     ],
     'log_names' => [
@@ -50,6 +51,7 @@ return [
         'site' => 'Sites',
         'goal' => 'Objectifs',
         'funnel' => 'Entonnoirs',
+        'annotation' => 'Annotations',
         'project' => 'Projet',
         'membership' => 'Membres',
         'invitation' => 'Invitations',
