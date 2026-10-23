@@ -1,4 +1,21 @@
-## [2.7.1](https://github.com/NoiXdev/marketix/compare/v2.7.0...v) (2026-10-21)
+## [2.8.0](https://github.com/NoiXdev/marketix/compare/v2.7.1...v) (2026-10-23)
+
+
+### Features
+
+* improve analytics clarity, comparisons and breakdowns ([89cd2ad](https://github.com/NoiXdev/marketix/commit/89cd2ad4dc0d5667592a9d25c50e8a3c79060a3f))
+* keep current module when switching projects ([72689e6](https://github.com/NoiXdev/marketix/commit/72689e6c12b2a5ca89f53361828b9eff46ddab51))
+* track clicks on phone and email links ([aacbdeb](https://github.com/NoiXdev/marketix/commit/aacbdebbc2ab4887eb807228f931e09531e2aaa4))
+
+
+### Bug Fixes
+
+* align mcp analytics comparisons with the dashboard ([de157f2](https://github.com/NoiXdev/marketix/commit/de157f28c6b76cdd0da1684a7e15c625e3a65a79))
+* keep contact link tracking off for existing sites ([47e4f56](https://github.com/NoiXdev/marketix/commit/47e4f56d90a013f813a181aa6fd02bc58768af82))
+* match referrer filters against merged referrer domains ([f2c7dff](https://github.com/NoiXdev/marketix/commit/f2c7dffc965fb6bdf0d944f8be2776a7059596c3))
+* rate limit the analytics breakdown endpoint ([e4367e6](https://github.com/NoiXdev/marketix/commit/e4367e6305a68f3a5ab1785d57a1926d8d66cb15))
+
+## [2.7.1](https://github.com/NoiXdev/marketix/compare/v2.7.0...v2.7.1) (2026-10-21)
 
 
 ### Bug Fixes
