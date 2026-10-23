@@ -23,6 +23,7 @@ export default function SitesCreate({ trackingModes, consentModes, timezones }: 
     respect_dnt: false,
     track_outbound_links: true,
     track_file_downloads: true,
+    track_contact_links: true,
     site_search_params: '',
     retention_days: '',
   });

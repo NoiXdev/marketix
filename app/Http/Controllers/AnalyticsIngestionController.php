@@ -29,6 +29,7 @@ class AnalyticsIngestionController extends Controller
             'respect_dnt' => (bool) $site->respect_dnt,
             'outbound_links' => (bool) $site->track_outbound_links,
             'file_downloads' => (bool) $site->track_file_downloads,
+            'contact_links' => (bool) $site->track_contact_links,
             'search_params' => $site->searchParams(),
         ])->header('Cache-Control', 'public, max-age=300');
     }

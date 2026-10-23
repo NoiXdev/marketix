@@ -25,6 +25,8 @@ class AnalyticsAggregator
 
     public const ENGAGED_MIN_PAGE_VIEWS = 2;
 
+    public const CONTACT_EVENTS = ['phone_click', 'email_click'];
+
     private const PAGE_VIEW_FILTERS = ['hostname', 'path', 'language', 'country_code', 'region', 'city', 'browser', 'os', 'device'];
 
     private const VISIT_FILTERS = ['entry_path', 'exit_path', 'referer_domain', 'country_code', 'browser', 'os', 'device', 'utm_source', 'utm_medium', 'utm_campaign'];
@@ -169,7 +171,7 @@ class AnalyticsAggregator
                 ->pluck('match_value')
                 ->all();
 
-            $this->keyEvents[$siteId] = array_values(array_unique([RevenueAggregator::EVENT, ...$goalEvents]));
+            $this->keyEvents[$siteId] = array_values(array_unique([RevenueAggregator::EVENT, ...self::CONTACT_EVENTS, ...$goalEvents]));
         }
 
         return $this->keyEvents[$siteId];

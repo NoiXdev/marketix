@@ -48,7 +48,7 @@ export default function NoticeForm({ state, snapshot, canEditClient, locales, on
 
   const sites = snapshot.sites;
   const hasPixels = snapshot.pixel_providers.length > 0;
-  const tracksOutbound = sites.some((site) => site.tracks_outbound_links || site.tracks_file_downloads);
+  const tracksOutbound = sites.some((site) => site.tracks_outbound_links || site.tracks_file_downloads || site.tracks_contact_links);
   const tracksSearch = sites.some((site) => site.tracks_site_search);
 
   // A row describes what the project does; when it does not do it, say so
@@ -186,8 +186,8 @@ export default function NoticeForm({ state, snapshot, canEditClient, locales, on
           </div>
 
           <ToggleRow
-            checked={state.activities.outbound_links || state.activities.file_downloads}
-            onChange={(checked) => setActivities(['outbound_links', 'file_downloads'], checked)}
+            checked={state.activities.outbound_links || state.activities.file_downloads || state.activities.contact_links}
+            onChange={(checked) => setActivities(['outbound_links', 'file_downloads', 'contact_links'], checked)}
             title={t(tkey('activities.outbound.title'))}
             text={detail(tracksOutbound, 'activities.outbound.text')}
           />

@@ -58,7 +58,7 @@ export type ValueRow = { value: string; count: number; visitors: number };
 
 export type VisitorTypeRow = { type: 'new' | 'returning'; visitors: number; sessions: number; engagement_rate: number | null };
 
-export type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
+export type Interactions = { outbound: ValueRow[]; downloads: ValueRow[]; phone: ValueRow[]; email: ValueRow[]; searches: ValueRow[]; notFound: ValueRow[] };
 
 export type FunnelStepReport = {
   label: string | null;

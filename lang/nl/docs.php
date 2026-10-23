@@ -16,7 +16,7 @@ return [
             'utm' => 'Campagneparameters (UTM-tags) die in de link aanwezig zijn.',
             'timestamp' => 'De datum en tijd van de klik of paginaweergave.',
             'title_hostname' => 'De paginatitel en hostname van de gevolgde pagina.',
-            'engagement' => 'Interacties op gemeten pagina’s: actieve tijd op de pagina, scrolldiepte en klikken op uitgaande links en bestandsdownloads (alleen het doeladres, zonder queryparameters).',
+            'engagement' => 'Interacties op gemeten pagina’s: actieve tijd op de pagina, scrolldiepte, klikken op uitgaande links en bestandsdownloads (alleen het doeladres, zonder queryparameters) en klikken op telefoon- of e-maillinks (alleen het nummer of adres).',
             'search' => 'Zoektermen van de websitezoekfunctie – alleen als u dit per website uitdrukkelijk inschakelt.',
         ],
 
@@ -112,8 +112,8 @@ return [
                     'required' => 'Deze vermelding kan niet worden uitgeschakeld: de doorgifte vindt bij elke klik plaats en moet in de tekst staan.',
                 ],
                 'outbound' => [
-                    'title' => 'Uitgaande links en downloads',
-                    'text' => 'Klikken op externe links en bestandsdownloads op gevolgde websites.',
+                    'title' => 'Uitgaande links, downloads en contactlinks',
+                    'text' => 'Klikken op externe links, bestandsdownloads en telefoon- en e-maillinks op gevolgde websites.',
                 ],
                 'site_search' => [
                     'title' => 'Zoeken op de website',

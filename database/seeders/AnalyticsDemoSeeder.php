@@ -116,6 +116,10 @@ class AnalyticsDemoSeeder extends Seeder
 
     private const OUTBOUND_URLS = ['www.instagram.com/demoshop', 'www.youtube.com/@demoshop', 'www.kaffee-magazin.ch/test', 'github.com/demoshop'];
 
+    private const PHONE_NUMBERS = ['+41445550100', '+41445550111'];
+
+    private const EMAIL_ADDRESSES = ['info@demo-shop.ch', 'service@demo-shop.ch'];
+
     private const PRODUCTS = [
         ['Kaffeemaschine Pro', 899], ['Milchschäumer', 89], ['Espresso Bohnen 1 kg', 39], ['Entkalker-Set', 19], ['Tamper Edelstahl', 49],
     ];
@@ -497,6 +501,12 @@ class AnalyticsDemoSeeder extends Seeder
             (str_starts_with($path, '/blog/') || $path === '/ueber-uns') && mt_rand(1, 100) <= 6 => [['outbound_click', ['url' => $this->pick(self::OUTBOUND_URLS)]]],
             default => [],
         };
+
+        if (($path === '/kontakt' && mt_rand(1, 100) <= 20) || mt_rand(1, 1000) <= 6) {
+            $events[] = mt_rand(1, 100) <= 60
+                ? ['phone_click', ['number' => $this->pick(self::PHONE_NUMBERS)]]
+                : ['email_click', ['email' => $this->pick(self::EMAIL_ADDRESSES)]];
+        }
 
         if ($path === '/warenkorb' && mt_rand(1, 100) <= 38) {
             $events[] = ['purchase', ['value' => mt_rand(39, 950), 'currency' => 'CHF']];

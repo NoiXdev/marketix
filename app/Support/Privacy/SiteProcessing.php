@@ -18,6 +18,7 @@ final class SiteProcessing
         public readonly bool $respectsDnt,
         public readonly bool $tracksOutboundLinks,
         public readonly bool $tracksFileDownloads,
+        public readonly bool $tracksContactLinks,
         public readonly bool $tracksSiteSearch,
         public readonly int $retentionDays,
     ) {}

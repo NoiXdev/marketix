@@ -20,6 +20,7 @@ export type SiteFormData = {
   respect_dnt: boolean;
   track_outbound_links: boolean;
   track_file_downloads: boolean;
+  track_contact_links: boolean;
   site_search_params: string;
   retention_days: string | number;
 };

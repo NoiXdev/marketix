@@ -18,6 +18,7 @@ function state(overrides: Partial<GeneratorState> = {}): GeneratorState {
       pixels: true,
       outbound_links: true,
       file_downloads: true,
+      contact_links: true,
       site_search: true,
       custom_events: true,
     },
@@ -69,6 +70,7 @@ describe('buildNoticeQuery', () => {
           pixels: false,
           outbound_links: true,
           file_downloads: false,
+          contact_links: false,
           site_search: true,
           custom_events: false,
         },
@@ -77,7 +79,7 @@ describe('buildNoticeQuery', () => {
 
     // The endpoint validates an array, so the key carries the [] suffix PHP
     // needs; the order follows NoticeOptions::ACTIVITIES.
-    expect(query['disabled_activities[]']).toEqual(['site_analytics', 'pixels', 'file_downloads', 'custom_events']);
+    expect(query['disabled_activities[]']).toEqual(['site_analytics', 'pixels', 'file_downloads', 'contact_links', 'custom_events']);
     expect(buildNoticeQuery(state())).not.toHaveProperty('disabled_activities[]');
   });
 });

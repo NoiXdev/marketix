@@ -16,7 +16,7 @@ return [
             'utm' => 'Kampagnenparameter (UTM-Tags), die im Link enthalten sind.',
             'timestamp' => 'Datum und Uhrzeit des Klicks bzw. Seitenaufrufs.',
             'title_hostname' => 'Seitentitel und Hostname der getrackten Seite.',
-            'engagement' => 'Interaktionen auf getrackten Seiten: aktive Verweildauer, Scrolltiefe sowie Klicks auf externe Links und Datei-Downloads (nur die Zieladresse ohne Query-Parameter).',
+            'engagement' => 'Interaktionen auf getrackten Seiten: aktive Verweildauer, Scrolltiefe sowie Klicks auf externe Links und Datei-Downloads (nur die Zieladresse ohne Query-Parameter) und auf Telefon- oder E-Mail-Links (nur die Nummer bzw. Adresse).',
             'search' => 'Suchbegriffe der Website-Suche – nur wenn Sie dies pro Website ausdrücklich aktivieren.',
         ],
 
@@ -112,8 +112,8 @@ return [
                     'required' => 'Diese Angabe lässt sich nicht abwählen: Die Übermittlung findet bei jedem Klick statt und muss im Hinweistext stehen.',
                 ],
                 'outbound' => [
-                    'title' => 'Externe Links und Downloads',
-                    'text' => 'Klicks auf externe Links und Datei-Downloads auf getrackten Websites.',
+                    'title' => 'Externe Links, Downloads und Kontakt-Links',
+                    'text' => 'Klicks auf externe Links, Datei-Downloads sowie Telefon- und E-Mail-Links auf getrackten Websites.',
                 ],
                 'site_search' => [
                     'title' => 'Website-Suche',

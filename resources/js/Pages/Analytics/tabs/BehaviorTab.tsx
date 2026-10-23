@@ -9,7 +9,7 @@ import BreakdownCard, { breakdownTab } from '@/Pages/Analytics/partials/Breakdow
 import CardColumns from '@/Pages/Analytics/partials/CardColumns';
 import { EventRow, Interactions, Rank, ValueRow } from '@/Pages/Analytics/types';
 import { router } from '@inertiajs/react';
-import { FileDown, FileX, Search, Zap } from 'lucide-react';
+import { FileDown, FileX, Mail, Phone, Search, Zap } from 'lucide-react';
 
 export type BehaviorData = {
   topPaths: (Rank & { title: string | null; avg_engaged: number | null; avg_scroll: number | null })[];
@@ -119,6 +119,22 @@ export default function BehaviorTab({ topPaths, entryPages, exitPages, hostnames
                       sub: r.value,
                       prefix: <FileDown className="text-subtle mx-auto h-4 w-4" />,
                     })),
+                }),
+                breakdownTab({
+                  key: 'phone',
+                  label: t('analytics.dashboard.interactions.phone'),
+                  unit: unit('clicks'),
+                  dimension: 'phone',
+                  items: interactions.phone,
+                  toRows: (items: ValueRow[]) => valueRows(items, () => ({ prefix: <Phone className="text-subtle mx-auto h-4 w-4" /> })),
+                }),
+                breakdownTab({
+                  key: 'email',
+                  label: t('analytics.dashboard.interactions.email'),
+                  unit: unit('clicks'),
+                  dimension: 'email',
+                  items: interactions.email,
+                  toRows: (items: ValueRow[]) => valueRows(items, () => ({ prefix: <Mail className="text-subtle mx-auto h-4 w-4" /> })),
                 }),
               ]}
             />

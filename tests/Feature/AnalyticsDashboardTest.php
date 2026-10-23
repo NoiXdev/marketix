@@ -115,6 +115,8 @@ class AnalyticsDashboardTest extends TestCase
                 ->where('topEvents.0.name', 'signup')
                 ->has('interactions.outbound')
                 ->has('interactions.downloads')
+                ->has('interactions.phone')
+                ->has('interactions.email')
                 ->has('interactions.searches')
                 ->has('interactions.notFound')
                 ->has('hourlyActivity', 1)

@@ -213,6 +213,7 @@ class SiteCrudTest extends TestCase
                 'consent_mode' => 'immediate',
                 'track_outbound_links' => false,
                 'track_file_downloads' => true,
+                'track_contact_links' => false,
                 'site_search_params' => ' q , search,, q ',
             ])
             ->assertRedirect();
@@ -220,6 +221,7 @@ class SiteCrudTest extends TestCase
         $site->refresh();
         $this->assertFalse($site->track_outbound_links);
         $this->assertTrue($site->track_file_downloads);
+        $this->assertFalse($site->track_contact_links);
         $this->assertSame('q,search', $site->site_search_params);
         $this->assertSame(['q', 'search'], $site->searchParams());
     }

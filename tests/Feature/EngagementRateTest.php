@@ -81,6 +81,21 @@ class EngagementRateTest extends TestCase
         $this->assertNull($series['2026-10-06']['engagement_rate']);
     }
 
+    public function test_a_click_on_a_phone_or_email_link_engages_the_session(): void
+    {
+        $site = Site::factory()->create();
+        $start = CarbonImmutable::now()->subDays(2);
+
+        foreach (['phone_click', 'email_click', null] as $event) {
+            $visit = Visit::factory()->forSite($site)->create(['started_at' => $start, 'last_activity_at' => $start, 'pageview_count' => 1]);
+            if ($event !== null) {
+                Event::factory()->forVisit($visit)->create(['name' => $event, 'created_at' => $start]);
+            }
+        }
+
+        $this->assertSame(66.7, $this->agg->summary($site->id, 30)['engagement_rate']);
+    }
+
     public function test_summary_without_sessions_is_zero(): void
     {
         $empty = Site::factory()->create();

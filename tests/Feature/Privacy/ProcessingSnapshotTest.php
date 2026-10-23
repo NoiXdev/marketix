@@ -30,6 +30,7 @@ class ProcessingSnapshotTest extends TestCase
             'respect_dnt' => true,
             'track_outbound_links' => true,
             'track_file_downloads' => false,
+            'track_contact_links' => false,
             'site_search_params' => 'q, search',
             'retention_days' => 60,
         ]);
@@ -45,6 +46,7 @@ class ProcessingSnapshotTest extends TestCase
         $this->assertTrue($reported->respectsDnt);
         $this->assertTrue($reported->tracksOutboundLinks);
         $this->assertFalse($reported->tracksFileDownloads);
+        $this->assertFalse($reported->tracksContactLinks);
         $this->assertTrue($reported->tracksSiteSearch);
         $this->assertSame(60, $reported->retentionDays);
     }
@@ -181,6 +183,7 @@ class ProcessingSnapshotTest extends TestCase
                     'respects_dnt' => false,
                     'tracks_outbound_links' => true,
                     'tracks_file_downloads' => true,
+                    'tracks_contact_links' => true,
                     'tracks_site_search' => false,
                     'retention_days' => config('analytics.retention_months') * 30,
                 ],

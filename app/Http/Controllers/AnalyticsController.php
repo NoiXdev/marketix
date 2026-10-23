@@ -23,7 +23,7 @@ class AnalyticsController extends Controller
 
     public const BREAKDOWNS = [
         'pages', 'entry_pages', 'exit_pages', 'hostnames', 'referrers', 'countries', 'regions', 'cities', 'languages', 'browsers', 'os',
-        'events', 'outbound', 'downloads', 'searches', 'not_found', 'campaigns', 'source_medium', 'terms', 'contents',
+        'events', 'outbound', 'downloads', 'phone', 'email', 'searches', 'not_found', 'campaigns', 'source_medium', 'terms', 'contents',
     ];
 
     public const BREAKDOWN_LIMIT = 1000;
@@ -94,6 +94,8 @@ class AnalyticsController extends Controller
             'events' => $this->goals->topEvents($id, $query, $limit),
             'outbound' => $this->goals->eventBreakdown($id, $query, 'outbound_click', 'url', $limit),
             'downloads' => $this->goals->eventBreakdown($id, $query, 'file_download', 'url', $limit),
+            'phone' => $this->goals->eventBreakdown($id, $query, 'phone_click', 'number', $limit),
+            'email' => $this->goals->eventBreakdown($id, $query, 'email_click', 'email', $limit),
             'searches' => $this->goals->eventBreakdown($id, $query, 'site_search', 'term', $limit),
             'not_found' => $this->goals->eventBreakdown($id, $query, 'not_found', null, $limit),
             'campaigns' => $this->agg->utmBreakdown($id, 'utm_campaign', $query, $limit),
@@ -177,6 +179,8 @@ class AnalyticsController extends Controller
             'interactions' => fn () => [
                 'outbound' => $this->goals->eventBreakdown($id, $query, 'outbound_click', 'url'),
                 'downloads' => $this->goals->eventBreakdown($id, $query, 'file_download', 'url'),
+                'phone' => $this->goals->eventBreakdown($id, $query, 'phone_click', 'number'),
+                'email' => $this->goals->eventBreakdown($id, $query, 'email_click', 'email'),
                 'searches' => $this->goals->eventBreakdown($id, $query, 'site_search', 'term'),
                 'notFound' => $this->goals->eventBreakdown($id, $query, 'not_found'),
             ],

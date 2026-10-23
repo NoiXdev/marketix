@@ -7,10 +7,11 @@ const source = readFileSync(new URL('../../analytics/mx.js', import.meta.url), '
 type Hit = Record<string, unknown>;
 
 // Runs the snippet against a minimal browser: cookies, window events and the hits it sends
-async function loadTracker(trackingMode: string, consent: boolean) {
+async function loadTracker(trackingMode: string, consent: boolean, settings: Record<string, unknown> = {}) {
   const hits: Hit[] = [];
   const cookies = new Map<string, string>();
   const listeners = new Map<string, Array<() => void>>();
+  const documentListeners = new Map<string, Array<(event: unknown) => void>>();
 
   const document = {
     currentScript: { src: 'https://marketix.test/mx.js', getAttribute: (name: string) => (name === 'data-site' ? 'site-1' : null) },
@@ -32,10 +33,18 @@ async function loadTracker(trackingMode: string, consent: boolean) {
     visibilityState: 'visible',
     documentElement: { scrollHeight: 1000, clientHeight: 1000, scrollTop: 0 },
     body: { scrollHeight: 1000 },
-    addEventListener: () => {},
+    addEventListener: (type: string, listener: (event: unknown) => void) => documentListeners.set(type, [...(documentListeners.get(type) ?? []), listener]),
   };
 
-  const config = { tracking_mode: trackingMode, consent_mode: 'immediate', consent_signal: 'UC_UI', outbound_links: false, file_downloads: false };
+  const config = {
+    tracking_mode: trackingMode,
+    consent_mode: 'immediate',
+    consent_signal: 'UC_UI',
+    outbound_links: false,
+    file_downloads: false,
+    contact_links: true,
+    ...settings,
+  };
 
   const window: Record<string, unknown> = {
     document,
@@ -70,8 +79,50 @@ async function loadTracker(trackingMode: string, consent: boolean) {
       (listeners.get('marketix:consent') ?? []).forEach((listener) => listener());
     },
     event: (name: string) => (window.marketix as (command: string, name: string) => void)('event', name),
+    click(href: string) {
+      const link = { href, getAttribute: () => href, hasAttribute: () => false };
+      const event = { type: 'click', button: 0, target: { closest: () => link } };
+      (documentListeners.get('click') ?? []).forEach((listener) => listener(event));
+    },
+    events: () => hits.filter((hit) => hit.type === 'event').map(({ name, props }) => ({ name, props })),
   };
 }
+
+describe('contact links', () => {
+  it('tracks phone and email links with normalised values', async () => {
+    const tracker = await loadTracker('cookieless', false);
+
+    tracker.click('tel:+41%20(0)44%20123%2045%2067');
+    tracker.click('callto:0049 30 1234567');
+    tracker.click('mailto:Info@Example.com,sales@example.com?subject=Offer&body=Call%20me');
+
+    expect(tracker.events()).toEqual([
+      { name: 'phone_click', props: { number: '+41441234567' } },
+      { name: 'phone_click', props: { number: '+49301234567' } },
+      { name: 'email_click', props: { email: 'info@example.com' } },
+    ]);
+  });
+
+  it('counts a repeated click on the same link once', async () => {
+    const tracker = await loadTracker('cookieless', false);
+
+    tracker.click('tel:+41441234567');
+    tracker.click('tel:+41 44 123 45 67');
+
+    expect(tracker.events()).toHaveLength(1);
+  });
+
+  it('ignores links without a usable address and sites that switched it off', async () => {
+    const tracker = await loadTracker('cookieless', false);
+    tracker.click('mailto:');
+    tracker.click('tel:12');
+    expect(tracker.events()).toEqual([]);
+
+    const disabled = await loadTracker('cookieless', false, { contact_links: false });
+    disabled.click('tel:+41441234567');
+    expect(disabled.events()).toEqual([]);
+  });
+});
 
 describe('hybrid tracking mode', () => {
   it('counts visitors anonymously until they consent', async () => {

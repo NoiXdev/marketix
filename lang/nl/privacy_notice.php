@@ -96,6 +96,7 @@ return [
         'visit' => 'Per samenhangend bezoek worden daarnaast de instappagina, de uitstappagina, de aanduiding of het om een terugkerend bezoek gaat en de campagnebron van het eerste contact opgeslagen.',
         'outbound' => 'Op de volgende websites worden klikken op links die naar andere websites leiden, samen met het betreffende doeladres als gebeurtenis opgeslagen: :domains.',
         'downloads' => 'Op de volgende websites worden klikken op downloadbare bestanden samen met het adres van het bestand als gebeurtenis opgeslagen: :domains.',
+        'contact_links' => 'Op de volgende websites worden klikken op telefoon- en e-maillinks, samen met het aangeklikte telefoonnummer of e-mailadres, als gebeurtenis opgeslagen: :domains.',
         'site_search' => 'Op de volgende websites worden termen die via de zoekfunctie worden ingevoerd, als gebeurtenis opgeslagen: :domains. Daarbij worden ze omgezet naar kleine letters en na 100 tekens afgekapt.',
         'custom_events' => 'Daarnaast kunnen verdere gebeurtenissen worden vastgelegd. Zo’n gebeurtenis bestaat uit een naam en kan aanvullende gegevens van maximaal 1 kilobyte bevatten; welke gegevens dat zijn, bepaalt degene die de meetcode in de website heeft opgenomen.',
     ],

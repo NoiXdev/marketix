@@ -28,6 +28,7 @@ class SiteRequest extends FormRequest
             'respect_dnt' => ['boolean'],
             'track_outbound_links' => ['boolean'],
             'track_file_downloads' => ['boolean'],
+            'track_contact_links' => ['boolean'],
             'site_search_params' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9_\-\[\]]+(,[A-Za-z0-9_\-\[\]]+)*$/'],
             'retention_days' => ['nullable', 'integer', 'min:1', 'max:3650'],
         ];

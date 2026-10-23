@@ -92,6 +92,7 @@ return [
         'visit' => 'For each coherent visit, the entry page, the exit page, whether it is a returning visit, and the campaign source of the first contact are stored in addition.',
         'outbound' => 'On the following websites, clicks on links leading to other websites are stored as an event together with the respective target address: :domains.',
         'downloads' => 'On the following websites, clicks on downloadable files are stored as an event together with the address of the file: :domains.',
+        'contact_links' => 'On the following websites, clicks on phone and email links are stored as an event together with the telephone number or email address clicked: :domains.',
         'site_search' => 'On the following websites, terms entered through the search function are stored as an event: :domains. They are converted to lower case and truncated after 100 characters.',
         'custom_events' => 'Further events may be recorded in addition. Such an event consists of a name and may contain additional information of up to 1 kilobyte; what that information is, is determined by whoever embedded the measurement code in the website.',
     ],

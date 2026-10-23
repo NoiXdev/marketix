@@ -97,6 +97,7 @@ return [
         'visit' => 'Pour chaque visite continue sont en outre conservées la page d’entrée, la page de sortie, l’indication s’il s’agit d’une visite récurrente et la source de campagne du premier contact.',
         'outbound' => 'Sur les sites web suivants, les clics sur des liens menant vers d’autres sites web sont enregistrés comme événement, avec l’adresse de destination correspondante : :domains.',
         'downloads' => 'Sur les sites web suivants, les clics sur des fichiers téléchargeables sont enregistrés comme événement, avec l’adresse du fichier : :domains.',
+        'contact_links' => 'Sur les sites web suivants, les clics sur des liens de téléphone et d’e-mail sont enregistrés comme événement, avec le numéro de téléphone ou l’adresse e-mail cliqués : :domains.',
         'site_search' => 'Sur les sites web suivants, les termes saisis au moyen de la fonction de recherche sont enregistrés comme événement : :domains. Ils sont alors convertis en minuscules et tronqués au-delà de 100 caractères.',
         'custom_events' => 'D’autres événements peuvent par ailleurs être collectés. Un tel événement se compose d’un nom et peut contenir des informations supplémentaires d’une taille maximale de 1 kilooctet ; la nature de ces informations est déterminée par l’entité qui a intégré le code de mesure dans le site web.',
     ],

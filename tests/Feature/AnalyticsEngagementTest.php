@@ -28,6 +28,7 @@ class AnalyticsEngagementTest extends TestCase
         $site = Site::factory()->create([
             'track_outbound_links' => false,
             'track_file_downloads' => true,
+            'track_contact_links' => false,
             'site_search_params' => 'q,search',
         ]);
 
@@ -36,6 +37,7 @@ class AnalyticsEngagementTest extends TestCase
             ->assertJson([
                 'outbound_links' => false,
                 'file_downloads' => true,
+                'contact_links' => false,
                 'search_params' => ['q', 'search'],
             ]);
     }
