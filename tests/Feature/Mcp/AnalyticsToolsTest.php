@@ -76,6 +76,36 @@ class AnalyticsToolsTest extends TestCase
             ->assertSee('"range": "7d"');
     }
 
+    public function test_site_stats_report_rate_changes_in_points_and_count_changes_in_percent(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 22)->setTime(12, 0));
+        $mine = $this->makeSite('Mine');
+        Visit::factory()->forSite($mine['site'])->create(['started_at' => now()->subDays(100), 'last_activity_at' => now()->subDays(100)]);
+        Visit::factory()->forSite($mine['site'])->create(['started_at' => now()->subDays(10), 'last_activity_at' => now()->subDays(10), 'pageview_count' => 1]);
+        Visit::factory()->forSite($mine['site'])->create(['started_at' => now()->subDay(), 'last_activity_at' => now()->subDay(), 'pageview_count' => 1]);
+        Visit::factory()->forSite($mine['site'])->create(['started_at' => now()->subDay(), 'last_activity_at' => now()->subDay(), 'pageview_count' => 3]);
+
+        MarketixServer::actingAs($mine['user'])
+            ->tool(GetSiteStatsTool::class, ['site' => $mine['site']->id, 'range' => '7d'])
+            ->assertOk()
+            ->assertSee('"compare_complete": true')
+            ->assertSee('"sessions": 100')
+            ->assertSee('"bounce_rate": -50');
+    }
+
+    public function test_site_stats_leave_out_changes_when_the_comparison_predates_tracking(): void
+    {
+        $mine = $this->makeSite('Mine');
+        $this->track($mine['site'], ['visitor_hash' => 'a'], [['path' => '/']]);
+
+        MarketixServer::actingAs($mine['user'])
+            ->tool(GetSiteStatsTool::class, ['site' => $mine['site']->id, 'range' => '30d'])
+            ->assertOk()
+            ->assertSee('"compare_complete": false')
+            ->assertSee('"change_percent": null')
+            ->assertSee('"change_points": null');
+    }
+
     public function test_site_stats_apply_filters(): void
     {
         $mine = $this->makeSite('Mine');

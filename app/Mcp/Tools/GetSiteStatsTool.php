@@ -15,13 +15,17 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 
 #[Description('Get a web analytics report for a website: page views, visitors, sessions, bounce and engagement rate, '
-    .'average duration and campaign share with their relative change against a comparison period, plus top pages, channels, '
-    .'referrers, campaigns, countries, devices, new vs. returning visitors, goal conversions and revenue.')]
+    .'average duration and campaign share with their change against a comparison period (change_percent for counts and '
+    .'durations, change_points in percentage points for rates; both null when tracking started after the comparison period '
+    .'began, see period.compare_complete), plus top pages, channels, referrers, campaigns, countries, devices, '
+    .'new vs. returning visitors, goal conversions and revenue.')]
 class GetSiteStatsTool extends Tool
 {
     use InteractsWithSiteAnalytics;
 
     private const LIMIT = 10;
+
+    private const RATES = ['bounce_rate', 'engagement_rate', 'campaign_share'];
 
     public function __construct(
         private AnalyticsAggregator $analytics,
@@ -49,16 +53,21 @@ class GetSiteStatsTool extends Tool
         $summary = $this->analytics->summary($site->id, $query);
         $previous = $comparison === null ? null : $this->analytics->summary($site->id, $comparison);
         $currency = $this->revenue->currencies($site->id, $query)[0]['currency'] ?? null;
+        $trackingSince = $site->firstTrackedAt();
+        $comparable = $previous !== null && $period->comparisonComplete($trackingSince);
 
         return $this->json([
             'site' => ['id' => $site->id, 'name' => $site->name, 'domain' => $site->domain],
-            'period' => $period->toArray(),
+            'period' => $period->toArray($trackingSince),
             'filters' => (object) $query->filters,
             'summary' => $summary,
             'previous_summary' => $previous,
-            'change_percent' => $previous === null ? null : collect($summary)->map(
+            'change_percent' => $comparable ? collect($summary)->except(self::RATES)->map(
                 fn ($current, string $key) => $previous[$key] == 0 ? null : round(($current - $previous[$key]) / $previous[$key] * 100, 1),
-            )->all(),
+            )->all() : null,
+            'change_points' => $comparable ? collect($summary)->only(self::RATES)->map(
+                fn ($current, string $key) => round($current - $previous[$key], 1),
+            )->all() : null,
             'top_pages' => $this->rows($this->analytics->topPaths($site->id, $query, self::LIMIT)),
             'channels' => $this->rows($this->analytics->channels($site->id, $query)),
             'top_referrers' => $this->rows($this->analytics->topReferrers($site->id, $query, self::LIMIT)),
