@@ -1,4 +1,5 @@
 import { CountryFlag } from '@/Components/icons/CountryFlag';
+import { LanguageFlag } from '@/Components/icons/LanguageFlag';
 import { PlatformIcon } from '@/Components/icons/PlatformIcon';
 import WorldMap, { CountryDatum } from '@/Components/WorldMap';
 import { countryName, languageName } from '@/lib/displayNames';
@@ -79,7 +80,12 @@ export default function AudienceTab({ clicksByCountry, countries, regions, citie
                 unit: visitors,
                 dimension: 'languages',
                 items: languages,
-                toRows: (items) => rows(items, 'language', 'language', (r) => ({ label: languageName(String(r.language), locale), sub: String(r.language) })),
+                toRows: (items) =>
+                  rows(items, 'language', 'language', (r) => ({
+                    label: languageName(String(r.language), locale),
+                    sub: String(r.language),
+                    prefix: <LanguageFlag code={String(r.language)} />,
+                  })),
               }),
             ]}
           />
