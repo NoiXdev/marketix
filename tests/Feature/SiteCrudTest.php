@@ -200,6 +200,18 @@ class SiteCrudTest extends TestCase
         $this->assertDatabaseHas('sites', ['id' => $site->id, 'tracking_mode' => 'cookie', 'consent_signal' => 'UC_UI']);
     }
 
+    public function test_contact_link_tracking_stays_off_for_sites_that_existed_before_it(): void
+    {
+        $existing = Site::factory()->create();
+
+        $migration = require database_path('migrations/2026_10_23_000000_add_track_contact_links_to_sites_table.php');
+        $migration->down();
+        $migration->up();
+
+        $this->assertFalse($existing->fresh()->track_contact_links);
+        $this->assertTrue(Site::factory()->create()->fresh()->track_contact_links);
+    }
+
     public function test_update_saves_enhanced_measurement_settings(): void
     {
         [$user, $project] = $this->userWithProject();

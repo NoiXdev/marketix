@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,6 +12,8 @@ return new class extends Migration
         Schema::table('sites', function (Blueprint $table) {
             $table->boolean('track_contact_links')->default(true)->after('track_file_downloads');
         });
+
+        DB::table('sites')->update(['track_contact_links' => false]);
     }
 
     public function down(): void
