@@ -206,6 +206,21 @@ class AnalyticsInsightsTest extends TestCase
         $this->assertSame(2, $this->agg->summary($site->id, AnalyticsQuery::lastDays(30, ['referer_domain' => 'google.com']))['sessions']);
     }
 
+    public function test_referrer_filters_from_before_the_merge_still_match(): void
+    {
+        $site = Site::factory()->create(['domain' => 'shop.test']);
+        $this->visit($site, ['referer_domain' => 'www.google.ch']);
+        $this->visit($site, ['referer_domain' => 'www.google.com']);
+        $this->visit($site, ['referer_domain' => 'www.news.example.org']);
+
+        $sessions = fn (string $referer) => $this->agg->summary($site->id, AnalyticsQuery::lastDays(30, ['referer_domain' => $referer]))['sessions'];
+
+        $this->assertSame(2, $sessions('www.google.com'));
+        $this->assertSame(2, $sessions('WWW.Google.CH'));
+        $this->assertSame(1, $sessions('www.news.example.org'));
+        $this->assertSame(1, $sessions('news.example.org'));
+    }
+
     public function test_previous_period_can_line_up_weekdays(): void
     {
         $query = AnalyticsQuery::lastDays(30);

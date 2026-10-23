@@ -96,7 +96,7 @@ class AnalyticsAggregator
                 $builder->whereRaw("({$sql}) = ?", [...$bindings, $value]);
             } elseif ($key === 'referer_domain') {
                 [$sql, $bindings] = ChannelClassifier::refererExpression();
-                $builder->whereRaw("({$sql}) = ?", [...$bindings, strtolower($value)]);
+                $builder->whereRaw("({$sql}) = ?", [...$bindings, ChannelClassifier::normalizeReferer($value)]);
             } elseif ($key === 'visitor_type') {
                 if (in_array($value, AnalyticsQuery::VISITOR_TYPES, true)) {
                     $builder->where('is_returning', $value === 'returning');

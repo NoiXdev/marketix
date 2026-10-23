@@ -99,6 +99,24 @@ final class ChannelClassifier
         return [$sql, $bindings];
     }
 
+    public static function normalizeReferer(string $domain): string
+    {
+        $host = strtolower(trim($domain));
+
+        foreach ([...self::SEARCH_HOSTS, ...self::SOCIAL_HOSTS] as $known) {
+            if (str_ends_with($known, '.*')) {
+                $base = substr($known, 0, -1);
+                if (str_starts_with($host, $base) || str_contains($host, '.'.$base)) {
+                    return $base.'com';
+                }
+            } elseif ($host === $known || str_ends_with($host, '.'.$known)) {
+                return $known;
+            }
+        }
+
+        return str_starts_with($host, 'www.') ? substr($host, 4) : $host;
+    }
+
     public static function normalizeDomain(?string $domain): ?string
     {
         if ($domain === null || trim($domain) === '') {
