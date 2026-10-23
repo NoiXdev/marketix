@@ -1,4 +1,5 @@
 import { CountryFlag } from '@/Components/icons/CountryFlag';
+import { LanguageFlag } from '@/Components/icons/LanguageFlag';
 import { BackLink, Flash } from '@/Components/ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { countryName, languageName } from '@/lib/displayNames';
@@ -135,7 +136,12 @@ function ActiveFilters({ labels }: { labels: Partial<Record<FilterKey, string>> 
           </span>
         );
       case 'language':
-        return languageName(value, locale);
+        return (
+          <span className="inline-flex items-center gap-1.5">
+            <LanguageFlag code={value} />
+            {languageName(value, locale)}
+          </span>
+        );
       case 'region':
       case 'city':
         return labels[key] ?? value;
