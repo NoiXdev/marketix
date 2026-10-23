@@ -8,6 +8,7 @@ use App\Jobs\RecordEventJob;
 use App\Jobs\RecordPageViewJob;
 use App\Models\Site;
 use App\Services\GeoIpService;
+use App\Support\AcceptLanguage;
 use App\Support\VisitorHash;
 use App\Support\VisitResolver;
 use Illuminate\Http\JsonResponse;
@@ -181,7 +182,7 @@ class AnalyticsIngestionController extends Controller
             $userAgent,
             $path,
             $data['referrer'] ?? null,
-            substr($request->header('Accept-Language', ''), 0, 2) ?: null,
+            AcceptLanguage::primary($request->header('Accept-Language')),
             $this->geoIp->lookup($ip),
             $utm,
             $this->hostname($data['hostname'] ?? null),

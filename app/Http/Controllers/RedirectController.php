@@ -8,6 +8,7 @@ use App\Models\Domain;
 use App\Models\QrCode;
 use App\Models\Url;
 use App\Services\GeoIpService;
+use App\Support\AcceptLanguage;
 use App\Support\UserAgent;
 use App\Support\UtmTagger;
 use App\Support\VisitorHash;
@@ -160,7 +161,7 @@ class RedirectController extends Controller
 
         // 3 — Language
         if (! empty($url->targeting_language)) {
-            $lang = substr($request->header('Accept-Language', ''), 0, 2);
+            $lang = AcceptLanguage::primary($request->header('Accept-Language'));
 
             foreach ($url->targeting_language as $rule) {
                 if (! empty($rule['url']) && ($rule['language'] ?? '') === $lang) {
@@ -246,7 +247,7 @@ class RedirectController extends Controller
             VisitorHash::for($request->ip(), $userAgent, $url->project_id),
             $userAgent,
             $request->header('Referer') ?: null,
-            substr($request->header('Accept-Language', ''), 0, 2) ?: null,
+            AcceptLanguage::primary($request->header('Accept-Language')),
             $geo,
         );
     }
