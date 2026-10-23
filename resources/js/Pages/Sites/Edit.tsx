@@ -43,6 +43,7 @@ export default function SitesEdit({
     respect_dnt: site.respect_dnt ?? false,
     track_outbound_links: site.track_outbound_links ?? true,
     track_file_downloads: site.track_file_downloads ?? true,
+    track_contact_links: site.track_contact_links ?? true,
     site_search_params: site.site_search_params ?? '',
     retention_days: site.retention_days ?? '',
   });

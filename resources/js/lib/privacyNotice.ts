@@ -1,7 +1,7 @@
 import type { ControllerRole, LegalBasis, NoticeActivity, NoticeDefaults, NoticeParties, ProcessingSnapshot, SnapshotSite } from '@/types';
 
 /** Mirrors App\Support\Privacy\NoticeOptions::ACTIVITIES, in the same order. */
-export const NOTICE_ACTIVITIES: NoticeActivity[] = ['link_clicks', 'site_analytics', 'pixels', 'outbound_links', 'file_downloads', 'site_search', 'custom_events'];
+export const NOTICE_ACTIVITIES: NoticeActivity[] = ['link_clicks', 'site_analytics', 'pixels', 'outbound_links', 'file_downloads', 'contact_links', 'site_search', 'custom_events'];
 
 /**
  * The generator form's answers. Nothing here is persisted — the notice is
@@ -101,6 +101,7 @@ export function activitiesFrom(snapshot: ProcessingSnapshot): Record<NoticeActiv
     pixels: snapshot.pixel_providers.length > 0,
     outbound_links: anySite((site) => site.tracks_outbound_links),
     file_downloads: anySite((site) => site.tracks_file_downloads),
+    contact_links: anySite((site) => site.tracks_contact_links),
     site_search: anySite((site) => site.tracks_site_search),
     custom_events: sites.length > 0,
   };

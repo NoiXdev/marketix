@@ -55,6 +55,7 @@ export interface Site {
   respect_dnt?: boolean;
   track_outbound_links?: boolean;
   track_file_downloads?: boolean;
+  track_contact_links?: boolean;
   site_search_params?: string | null;
   retention_days?: number | null;
   created_at?: string;
@@ -153,7 +154,7 @@ export type ControllerRole = 'own_company' | 'client';
 export type LegalBasis = 'legitimate_interest' | 'consent';
 
 /** Mirrors App\Support\Privacy\NoticeOptions::ACTIVITIES. */
-export type NoticeActivity = 'link_clicks' | 'site_analytics' | 'pixels' | 'outbound_links' | 'file_downloads' | 'site_search' | 'custom_events';
+export type NoticeActivity = 'link_clicks' | 'site_analytics' | 'pixels' | 'outbound_links' | 'file_downloads' | 'contact_links' | 'site_search' | 'custom_events';
 
 export interface SnapshotSite {
   domain: string;
@@ -162,6 +163,7 @@ export interface SnapshotSite {
   respects_dnt: boolean;
   tracks_outbound_links: boolean;
   tracks_file_downloads: boolean;
+  tracks_contact_links: boolean;
   tracks_site_search: boolean;
   retention_days: number;
 }

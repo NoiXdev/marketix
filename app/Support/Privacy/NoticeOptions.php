@@ -23,6 +23,8 @@ final class NoticeOptions
 
     public const ACTIVITY_FILE_DOWNLOADS = 'file_downloads';
 
+    public const ACTIVITY_CONTACT_LINKS = 'contact_links';
+
     public const ACTIVITY_SITE_SEARCH = 'site_search';
 
     public const ACTIVITY_CUSTOM_EVENTS = 'custom_events';
@@ -39,6 +41,7 @@ final class NoticeOptions
         self::ACTIVITY_PIXELS,
         self::ACTIVITY_OUTBOUND_LINKS,
         self::ACTIVITY_FILE_DOWNLOADS,
+        self::ACTIVITY_CONTACT_LINKS,
         self::ACTIVITY_SITE_SEARCH,
         self::ACTIVITY_CUSTOM_EVENTS,
     ];

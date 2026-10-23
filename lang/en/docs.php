@@ -16,7 +16,7 @@ return [
             'utm' => 'Campaign parameters (UTM tags) that are present on the link.',
             'timestamp' => 'The date and time of the click or page view.',
             'title_hostname' => 'The page title and hostname of the tracked page.',
-            'engagement' => 'Interactions on tracked pages: active time on page, scroll depth, and clicks on outbound links and file downloads (target address only, without query parameters).',
+            'engagement' => 'Interactions on tracked pages: active time on page, scroll depth, clicks on outbound links and file downloads (target address only, without query parameters), and clicks on phone or email links (number or address only).',
             'search' => 'Site search terms – only if you explicitly enable this per site.',
         ],
 
@@ -112,8 +112,8 @@ return [
                     'required' => 'This disclosure cannot be switched off: the transfer happens on every click and has to appear in the notice.',
                 ],
                 'outbound' => [
-                    'title' => 'Outbound links and downloads',
-                    'text' => 'Clicks on external links and file downloads on tracked sites.',
+                    'title' => 'Outbound links, downloads and contact links',
+                    'text' => 'Clicks on external links, file downloads, and phone and email links on tracked sites.',
                 ],
                 'site_search' => [
                     'title' => 'Site search',

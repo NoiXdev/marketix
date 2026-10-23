@@ -400,6 +400,24 @@ class NoticeComposerTest extends TestCase
         }
     }
 
+    public function test_contact_link_tracking_names_only_the_sites_that_do_it(): void
+    {
+        $project = Project::factory()->create();
+        Site::factory()->forProject($project)->create(['domain' => 'shop.example.com', 'tracking_mode' => TrackingMode::Cookieless, 'track_contact_links' => true]);
+        Site::factory()->forProject($project)->create(['domain' => 'blog.example.com', 'tracking_mode' => TrackingMode::Cookieless, 'track_contact_links' => false]);
+
+        $composer = new NoticeComposer;
+        $body = implode("\n", $this->section($composer->compose(ProcessingSnapshot::for($project), $this->noticeOptions()), trans('privacy_notice.analytics.heading', [], 'de'))->paragraphs);
+
+        $this->assertStringContainsString(trans('privacy_notice.analytics.contact_links', ['domains' => 'shop.example.com'], 'de'), $body);
+
+        $sections = $composer->compose(ProcessingSnapshot::for($project), $this->noticeOptions(['disabledActivities' => [NoticeOptions::ACTIVITY_CONTACT_LINKS]]));
+        $this->assertStringNotContainsString(
+            trans('privacy_notice.analytics.contact_links', ['domains' => 'shop.example.com'], 'de'),
+            $composer->toPlainText($sections),
+        );
+    }
+
     public function test_switched_off_activities_are_omitted(): void
     {
         $project = Project::factory()->create();

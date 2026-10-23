@@ -87,6 +87,7 @@ return [
         'visit' => 'Je zusammenhängendem Besuch werden zusätzlich die Einstiegsseite, die Ausstiegsseite, die Angabe, ob es sich um einen wiederkehrenden Besuch handelt, und die Kampagnenquelle des ersten Kontakts gespeichert.',
         'outbound' => 'Auf den folgenden Websites werden Klicks auf Links, die auf andere Websites führen, zusammen mit der jeweiligen Zieladresse als Ereignis gespeichert: :domains.',
         'downloads' => 'Auf den folgenden Websites werden Klicks auf herunterladbare Dateien zusammen mit der Adresse der Datei als Ereignis gespeichert: :domains.',
+        'contact_links' => 'Auf den folgenden Websites werden Klicks auf Telefon- und E-Mail-Links zusammen mit der angeklickten Telefonnummer bzw. E-Mail-Adresse als Ereignis gespeichert: :domains.',
         'site_search' => 'Auf den folgenden Websites werden Begriffe, die über die Suchfunktion eingegeben werden, als Ereignis gespeichert: :domains. Sie werden dabei in Kleinbuchstaben umgewandelt und nach 100 Zeichen abgeschnitten.',
         'custom_events' => 'Darüber hinaus können weitere Ereignisse erfasst werden. Ein solches Ereignis besteht aus einem Namen und kann zusätzliche Angaben von bis zu 1 Kilobyte enthalten; welche Angaben das sind, legt die Stelle fest, die den Messcode in die Website eingebunden hat.',
     ],

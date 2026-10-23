@@ -176,6 +176,7 @@ final class NoticeComposer
         $optional = [
             NoticeOptions::ACTIVITY_OUTBOUND_LINKS => ['analytics.outbound', fn (SiteProcessing $site) => $site->tracksOutboundLinks],
             NoticeOptions::ACTIVITY_FILE_DOWNLOADS => ['analytics.downloads', fn (SiteProcessing $site) => $site->tracksFileDownloads],
+            NoticeOptions::ACTIVITY_CONTACT_LINKS => ['analytics.contact_links', fn (SiteProcessing $site) => $site->tracksContactLinks],
             NoticeOptions::ACTIVITY_SITE_SEARCH => ['analytics.site_search', fn (SiteProcessing $site) => $site->tracksSiteSearch],
         ];
 

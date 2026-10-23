@@ -16,7 +16,7 @@ return [
             'utm' => 'Paramètres de campagne (balises UTM) présents sur le lien.',
             'timestamp' => 'La date et l’heure du clic ou de la vue de page.',
             'title_hostname' => 'Le titre de la page et le nom d’hôte de la page suivie.',
-            'engagement' => 'Interactions sur les pages suivies : temps actif sur la page, profondeur de défilement ainsi que clics sur les liens sortants et téléchargements de fichiers (adresse cible uniquement, sans paramètres de requête).',
+            'engagement' => 'Interactions sur les pages suivies : temps actif sur la page, profondeur de défilement, clics sur les liens sortants et téléchargements de fichiers (adresse cible uniquement, sans paramètres de requête) ainsi que clics sur les liens de téléphone ou d’e-mail (numéro ou adresse uniquement).',
             'search' => 'Termes de recherche du site – uniquement si vous l’activez explicitement pour un site.',
         ],
 
@@ -112,8 +112,8 @@ return [
                     'required' => 'Cette mention ne peut pas être désactivée : la transmission a lieu à chaque clic et doit figurer dans le texte.',
                 ],
                 'outbound' => [
-                    'title' => 'Liens sortants et téléchargements',
-                    'text' => 'Clics sur les liens externes et téléchargements de fichiers sur les sites suivis.',
+                    'title' => 'Liens sortants, téléchargements et liens de contact',
+                    'text' => 'Clics sur les liens externes, téléchargements de fichiers et liens de téléphone et d’e-mail sur les sites suivis.',
                 ],
                 'site_search' => [
                     'title' => 'Recherche interne',

@@ -43,6 +43,7 @@ class Site extends Model
         'respect_dnt',
         'track_outbound_links',
         'track_file_downloads',
+        'track_contact_links',
         'site_search_params',
         'retention_days',
     ];
@@ -69,7 +70,7 @@ class Site extends Model
     {
         return LogOptions::defaults()
             ->useLogName('site')
-            ->logOnly(['name', 'domain', 'additional_hostnames', 'timezone', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'site_search_params', 'retention_days'])
+            ->logOnly(['name', 'domain', 'additional_hostnames', 'timezone', 'tracking_mode', 'consent_mode', 'consent_signal', 'respect_dnt', 'track_outbound_links', 'track_file_downloads', 'track_contact_links', 'site_search_params', 'retention_days'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
@@ -117,6 +118,7 @@ class Site extends Model
             'respect_dnt' => 'boolean',
             'track_outbound_links' => 'boolean',
             'track_file_downloads' => 'boolean',
+            'track_contact_links' => 'boolean',
             'retention_days' => 'integer',
         ];
     }

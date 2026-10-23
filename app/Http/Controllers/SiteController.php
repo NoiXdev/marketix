@@ -75,6 +75,7 @@ class SiteController extends Controller
                 'respect_dnt' => (bool) $model->respect_dnt,
                 'track_outbound_links' => (bool) $model->track_outbound_links,
                 'track_file_downloads' => (bool) $model->track_file_downloads,
+                'track_contact_links' => (bool) $model->track_contact_links,
                 'site_search_params' => $model->site_search_params,
                 'retention_days' => $model->retention_days,
             ],

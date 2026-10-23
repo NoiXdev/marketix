@@ -40,6 +40,7 @@ final class ProcessingSnapshot
                 respectsDnt: $site->respect_dnt,
                 tracksOutboundLinks: $site->track_outbound_links,
                 tracksFileDownloads: $site->track_file_downloads,
+                tracksContactLinks: $site->track_contact_links,
                 tracksSiteSearch: $site->searchParams() !== [],
                 retentionDays: $site->retention_days ?? ((int) config('analytics.retention_months') * 30),
             ))
@@ -135,6 +136,7 @@ final class ProcessingSnapshot
                 'respects_dnt' => $site->respectsDnt,
                 'tracks_outbound_links' => $site->tracksOutboundLinks,
                 'tracks_file_downloads' => $site->tracksFileDownloads,
+                'tracks_contact_links' => $site->tracksContactLinks,
                 'tracks_site_search' => $site->tracksSiteSearch,
                 'retention_days' => $site->retentionDays,
             ], $this->sites),

@@ -17,6 +17,8 @@
 
   var VID_COOKIE = 'mx_vid';
   var DOWNLOAD_EXTENSIONS = /\.(pdf|xlsx?|docx?|pptx?|csv|txt|rtf|odt|ods|odp|zip|rar|7z|gz|tar|dmg|exe|msi|pkg|apk|mp3|wav|mp4|mov|avi|mkv|epub|key|numbers|pages)$/i;
+  var CONTACT_LINK = /^\s*(tel|callto|mailto):(.*)$/i;
+  var REPEATED_CLICK_MS = 1500;
 
   function getCookie(name) {
     var m = document.cookie.match('(?:^|;)\\s*' + name + '=([^;]*)');
@@ -341,12 +343,60 @@
     }
   }
 
+  function phoneNumber(value) {
+    var number = value
+      .split(/[;,?#]/)[0]
+      .replace(/\(0\)/g, '')
+      .replace(/[^\d+]/g, '');
+    if (number.indexOf('00') === 0) number = '+' + number.slice(2);
+    number = number.charAt(0) + number.slice(1).replace(/\+/g, '');
+    return number.replace(/\D/g, '').length >= 3 ? number.slice(0, 32) : null;
+  }
+
+  function emailAddress(value) {
+    var address = value.split('?')[0].split(',')[0].trim().toLowerCase();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address) ? address.slice(0, 254) : null;
+  }
+
+  function contactEvent(href) {
+    var match = CONTACT_LINK.exec(href);
+    if (!match) return null;
+    var value;
+    try {
+      value = decodeURIComponent(match[2]);
+    } catch (e) {
+      value = match[2];
+    }
+    if (match[1].toLowerCase() === 'mailto') {
+      var email = emailAddress(value);
+      return email ? { name: 'email_click', props: { email: email }, key: email } : null;
+    }
+    var number = phoneNumber(value);
+    return number ? { name: 'phone_click', props: { number: number }, key: number } : null;
+  }
+
+  var lastContact = null;
+
+  function trackContact(contact) {
+    var now = Date.now();
+    if (lastContact && lastContact.key === contact.key && now - lastContact.at < REPEATED_CLICK_MS) return;
+    lastContact = { key: contact.key, at: now };
+    sendEvent(contact.name, contact.props);
+  }
+
   function onLinkClick(event) {
-    if (!siteConfig || (!siteConfig.outbound_links && !siteConfig.file_downloads)) return;
+    if (!siteConfig || (!siteConfig.outbound_links && !siteConfig.file_downloads && !siteConfig.contact_links)) return;
     if (event.type === 'auxclick' && event.button !== 1) return;
 
-    var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    var source = (event.composedPath && event.composedPath()[0]) || event.target;
+    var link = source && source.closest ? source.closest('a[href]') : null;
     if (!link) return;
+
+    var contact = siteConfig.contact_links ? contactEvent(link.getAttribute('href') || '') : null;
+    if (contact) {
+      trackContact(contact);
+      return;
+    }
 
     var url;
     try {

@@ -6,6 +6,7 @@ import ToggleRow from '@/Pages/Sites/partials/ToggleRow';
 export type EnhancedMeasurement = {
   track_outbound_links: boolean;
   track_file_downloads: boolean;
+  track_contact_links: boolean;
   site_search_params: string;
 };
 
@@ -34,6 +35,12 @@ export default function EnhancedMeasurementSection({
           onChange={(checked) => onChange({ track_file_downloads: checked })}
           title={t('analytics.sites.measurement.file_downloads')}
           text={t('analytics.sites.measurement.file_downloads_hint')}
+        />
+        <ToggleRow
+          checked={values.track_contact_links}
+          onChange={(checked) => onChange({ track_contact_links: checked })}
+          title={t('analytics.sites.measurement.contact_links')}
+          text={t('analytics.sites.measurement.contact_links_hint')}
         />
       </div>
 
