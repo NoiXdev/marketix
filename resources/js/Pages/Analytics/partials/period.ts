@@ -1,6 +1,6 @@
 export type Interval = 'hour' | 'day' | 'week' | 'month';
 
-export type Comparison = 'previous' | 'year' | 'none';
+export type Comparison = 'previous' | 'year' | 'custom' | 'none';
 
 export type Period = {
   range: string;
@@ -12,6 +12,7 @@ export type Period = {
   compare: Comparison;
   compare_from: string | null;
   compare_to: string | null;
+  compare_days: number | null;
   compare_complete: boolean;
   tracking_since: string | null;
   current_bucket: string | null;
@@ -19,7 +20,18 @@ export type Period = {
 
 export const RANGE_PRESETS = ['today', 'yesterday', '7d', '30d', '90d', 'month', 'last_month', 'year', '12m'];
 
-export const COMPARISONS: Comparison[] = ['previous', 'year', 'none'];
+export const COMPARISON_PRESETS: Comparison[] = ['previous', 'year', 'none'];
+
+export function deltaLabelKey(compare: Comparison): string {
+  switch (compare) {
+    case 'year':
+      return 'analytics.dashboard.compare.vs_year';
+    case 'custom':
+      return 'analytics.dashboard.compare.vs_custom';
+    default:
+      return 'common.dashboard.vs_previous';
+  }
+}
 
 export function parseDate(iso: string): Date {
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
@@ -28,6 +40,32 @@ export function parseDate(iso: string): Date {
 
 export function toIsoDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+export function shiftDate(iso: string, days: number): string {
+  const date = parseDate(iso);
+  date.setDate(date.getDate() + days);
+  return toIsoDate(date);
+}
+
+export function laterDate(a: string, b: string): string {
+  return a > b ? a : b;
+}
+
+export function bucketOf(iso: string, interval: Interval): string {
+  switch (interval) {
+    case 'hour':
+      return `${iso} 00:00`;
+    case 'week': {
+      const date = parseDate(iso);
+      date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+      return toIsoDate(date);
+    }
+    case 'month':
+      return `${iso.slice(0, 7)}-01`;
+    default:
+      return iso;
+  }
 }
 
 export function spansSeveralDays(keys: string[]): boolean {

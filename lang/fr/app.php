@@ -18,4 +18,7 @@ return [
     'funnel_created' => 'Entonnoir créé.',
     'funnel_updated' => 'Entonnoir mis à jour.',
     'funnel_deleted' => 'Entonnoir supprimé.',
+    'annotation_created' => 'Annotation ajoutée.',
+    'annotation_updated' => 'Annotation mise à jour.',
+    'annotation_deleted' => 'Annotation supprimée.',
 ];

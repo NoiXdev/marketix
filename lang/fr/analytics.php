@@ -297,6 +297,29 @@ return [
             'partial_hint' => 'En plus clair : cette période est encore en cours et incomplète.',
         ],
 
+        'annotations' => [
+            'button' => 'Annotations',
+            'title' => 'Annotations',
+            'intro' => 'Marquez des dates comme un changement de suivi ou une refonte. Les annotations apparaissent dans les graphiques et peuvent servir de début ou de fin de période.',
+            'empty' => 'Aucune annotation pour le moment.',
+            'create' => 'Nouvelle annotation',
+            'create_title' => 'Ajouter une annotation',
+            'edit_title' => 'Modifier l’annotation',
+            'date' => 'Date',
+            'name' => 'Titre',
+            'name_placeholder' => 'p. ex. Passage du suivi cookie au mode hybride',
+            'description' => 'Description (facultatif)',
+            'description_placeholder' => 'Qu’est-ce qui a changé, et pourquoi ?',
+            'by' => 'par :name',
+            'show' => 'Annotation : :title',
+            'more' => '+:count autres',
+            'since' => 'Analyser à partir d’ici',
+            'before_after' => 'Comparer avant et après',
+            'before_after_hint' => 'De cette date à aujourd’hui, comparé au même nombre de jours juste avant.',
+            'delete_confirm' => 'Vraiment supprimer ?',
+            'future' => 'À venir',
+        ],
+
         'range' => [
             'today' => "Aujourd'hui",
             'yesterday' => 'Hier',
@@ -311,6 +334,9 @@ return [
             'from' => 'Du',
             'to' => 'Au',
             'apply' => 'Appliquer la période',
+            'from_annotation' => 'Depuis l’annotation…',
+            'to_annotation' => 'Jusqu’à l’annotation…',
+            'annotation_hint' => 'Le jour d’une annotation fait partie de la période qui suit.',
         ],
 
         'compare' => [
@@ -320,6 +346,11 @@ return [
             'none' => 'Aucune comparaison',
             'vs_year' => 'vs année précédente',
             'incomplete' => 'Comparaison incomplète : les données ne sont disponibles qu’à partir du :date, les variations par rapport à la période de comparaison sont donc masquées.',
+            'custom' => 'Personnalisée',
+            'vs_custom' => 'vs. période de comparaison',
+            'apply' => 'Appliquer la comparaison',
+            'match_length' => 'Même durée que la période',
+            'uneven' => 'La comparaison et la période n’ont pas la même durée (:compare contre :days jours). Les totaux comme les pages vues ne sont donc que partiellement comparables, contrairement aux taux.',
         ],
 
         'interval' => [

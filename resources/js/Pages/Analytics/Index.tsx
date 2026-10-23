@@ -5,6 +5,7 @@ import { countryName, languageName } from '@/lib/displayNames';
 import { useTranslation } from '@/lib/i18n';
 import { AnalyticsProvider, useAnalytics } from '@/Pages/Analytics/AnalyticsContext';
 import AnalyticsTabs from '@/Pages/Analytics/partials/AnalyticsTabs';
+import AnnotationManager from '@/Pages/Analytics/partials/AnnotationManager';
 import CompareSelect from '@/Pages/Analytics/partials/CompareSelect';
 import DateRangePicker from '@/Pages/Analytics/partials/DateRangePicker';
 import FilterBar, { ActiveFilter } from '@/Pages/Analytics/partials/FilterBar';
@@ -18,7 +19,7 @@ import ConversionsTab, { ConversionsData } from '@/Pages/Analytics/tabs/Conversi
 import OverviewTab, { OverviewData } from '@/Pages/Analytics/tabs/OverviewTab';
 import RealtimeTab, { RealtimeData } from '@/Pages/Analytics/tabs/RealtimeTab';
 import RevenueTab, { RevenueData } from '@/Pages/Analytics/tabs/RevenueTab';
-import { FilterKey, Filters, SiteInfo, TabKey } from '@/Pages/Analytics/types';
+import { Annotation, FilterKey, Filters, SiteInfo, TabKey } from '@/Pages/Analytics/types';
 import { PageProps } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { Clock, Info } from 'lucide-react';
@@ -32,6 +33,7 @@ type AnalyticsPageProps = {
   period: Period;
   filters: Filters;
   filterLabels: Partial<Record<FilterKey, string>>;
+  annotations: Annotation[];
   liveVisitors: number;
 } & Partial<TabData>;
 
@@ -56,7 +58,7 @@ function ActiveTab({ tab, data }: { tab: TabKey; data: Partial<TabData> }) {
 
 function Header({ liveVisitors }: { liveVisitors: number }) {
   const { t } = useTranslation();
-  const { projectId, site, tab, period, go } = useAnalytics();
+  const { projectId, site, tab, period, annotations, go } = useAnalytics();
 
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -75,8 +77,8 @@ function Header({ liveVisitors }: { liveVisitors: number }) {
         </span>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
-          <DateRangePicker period={period} onSelect={(range, custom) => go({ range, ...custom })} />
-          <CompareSelect value={period.compare} onChange={(compare) => go({ compare })} />
+          <DateRangePicker period={period} annotations={annotations} onSelect={(range, custom) => go({ range, ...custom })} />
+          <CompareSelect period={period} annotations={annotations} onChange={(compare, custom) => go({ compare, ...custom })} />
         </div>
       )}
     </div>
@@ -95,6 +97,26 @@ function IncompleteComparison() {
       {t('analytics.dashboard.compare.incomplete', { date: formatDate(period.tracking_since, locale) })}
     </p>
   );
+}
+
+function UnevenComparison() {
+  const { t } = useTranslation();
+  const { period } = useAnalytics();
+
+  if (period.compare !== 'custom' || period.compare_days === null || period.compare_days === period.days) return null;
+
+  return (
+    <p className="border-line bg-elevated text-muted mb-4 flex items-start gap-2 rounded-lg border px-3 py-2 text-xs">
+      <Info className="text-subtle mt-px h-3.5 w-3.5 shrink-0" />
+      {t('analytics.dashboard.compare.uneven', { compare: period.compare_days, days: period.days })}
+    </p>
+  );
+}
+
+function AnnotationDialog() {
+  const { annotationTarget, manageAnnotations } = useAnalytics();
+
+  return annotationTarget && <AnnotationManager target={annotationTarget} onClose={() => manageAnnotations(null)} />;
 }
 
 function ActiveFilters({ labels }: { labels: Partial<Record<FilterKey, string>> }) {
@@ -135,7 +157,7 @@ function ActiveFilters({ labels }: { labels: Partial<Record<FilterKey, string>> 
   );
 }
 
-export default function AnalyticsIndex({ site, tab, period, filters, filterLabels, liveVisitors, ...data }: AnalyticsPageProps) {
+export default function AnalyticsIndex({ site, tab, period, filters, filterLabels, annotations, liveVisitors, ...data }: AnalyticsPageProps) {
   const { project } = usePage<PageProps>().props;
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -153,7 +175,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, filterLabel
 
   return (
     <AppLayout title={t('analytics.dashboard.title', { name: site.name })}>
-      <AnalyticsProvider projectId={project!.id} site={site} tab={tab} period={period} filters={filters}>
+      <AnalyticsProvider projectId={project!.id} site={site} tab={tab} period={period} filters={filters} annotations={annotations}>
         <div className="px-4 py-6 sm:px-8 sm:py-8">
           <Header liveVisitors={liveVisitors} />
           <Flash />
@@ -162,6 +184,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, filterLabel
               <AnalyticsTabs />
               {tab !== 'realtime' && <ActiveFilters labels={filterLabels} />}
               {tab !== 'realtime' && <IncompleteComparison />}
+              {tab !== 'realtime' && <UnevenComparison />}
               <div className={`transition-opacity duration-200 ${loading ? 'opacity-60' : ''}`}>
                 <ActiveTab tab={tab} data={data} />
               </div>
@@ -179,6 +202,7 @@ export default function AnalyticsIndex({ site, tab, period, filters, filterLabel
             </>
           )}
         </div>
+        <AnnotationDialog />
       </AnalyticsProvider>
     </AppLayout>
   );

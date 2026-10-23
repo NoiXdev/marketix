@@ -1,4 +1,5 @@
 import { Checkbox } from '@/Components/ui';
+import { AnnotationLabels, AnnotationLines, AnnotationRail, AnnotationsButton, AnnotationTooltipNote, useAnnotationGroups } from '@/Pages/Analytics/partials/ChartAnnotations';
 import { formatAxisLabel, formatBucket as formatBucketLabel, Interval, spansSeveralDays } from '@/Pages/Analytics/partials/period';
 import ChartDateAxis from '@/Pages/Dashboard/ChartDateAxis';
 import { scrubHandlers } from '@/lib/chartScrub';
@@ -137,6 +138,10 @@ export default function VisitorsChart({
   const count = (n: number) => n.toLocaleString(locale);
   const percent = (n: number) => formatPercent(n, locale);
   const partialIndex = currentBucket === null ? -1 : data.findIndex((d) => d.date === currentBucket);
+  const annotationGroups = useAnnotationGroups(
+    data.map((d) => d.date),
+    interval,
+  );
 
   const metrics: Metric[] = [
     { key: 'views', kind: 'bar', color: 'var(--chart-views)', label: t('analytics.dashboard.kpi.page_views'), format: count },
@@ -269,6 +274,7 @@ export default function VisitorsChart({
               ))}
             </div>
           )}
+          <AnnotationsButton />
           <button
             type="button"
             onClick={() => setShowTable((v) => !v)}
@@ -325,9 +331,12 @@ export default function VisitorsChart({
               </tr>
             </thead>
             <tbody>
-              {[...data].reverse().map((p) => (
+              {[...data].reverse().map((p, i) => (
                 <tr key={p.date} className="border-line border-t">
-                  <td className="text-muted px-3 py-1.5 whitespace-nowrap">{formatBucket(p.date)}</td>
+                  <td className="text-muted px-3 py-1.5 whitespace-nowrap">
+                    {formatBucket(p.date)}
+                    <AnnotationLabels items={annotationGroups.get(data.length - 1 - i)} />
+                  </td>
                   {metrics.map((m) => {
                     const value = p[m.key];
                     return (
@@ -343,6 +352,7 @@ export default function VisitorsChart({
         </div>
       ) : (
         <>
+          <AnnotationRail groups={annotationGroups} x={slotCenter} width={size.width} />
           <div className="relative" onMouseLeave={() => setHovered(null)}>
             <div
               ref={plotRef}
@@ -371,6 +381,8 @@ export default function VisitorsChart({
                   )}
                 </div>
               ))}
+
+              {size.width > 0 && <AnnotationLines groups={annotationGroups} x={slotCenter} />}
 
               {(lines.length > 0 || comparisonPaths.length > 0) && size.width > 0 && (
                 <svg
@@ -467,6 +479,7 @@ export default function VisitorsChart({
                     })}
                   </>
                 )}
+                <AnnotationTooltipNote items={hovered === null ? undefined : annotationGroups.get(hovered)} />
               </div>
             )}
           </div>

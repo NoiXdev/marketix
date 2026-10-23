@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/i18n';
 import { useAnalytics, useRowBuilders } from '@/Pages/Analytics/AnalyticsContext';
 import BreakdownCard from '@/Pages/Analytics/partials/BreakdownCard';
 import CardColumns from '@/Pages/Analytics/partials/CardColumns';
-import { formatRange } from '@/Pages/Analytics/partials/period';
+import { deltaLabelKey, formatRange } from '@/Pages/Analytics/partials/period';
 import VisitorsChart, { SeriesPoint } from '@/Pages/Analytics/partials/VisitorsChart';
 import { Rank, Summary } from '@/Pages/Analytics/types';
 import KpiTile from '@/Pages/Dashboard/KpiTile';
@@ -36,7 +36,7 @@ export default function OverviewTab({ summary, previousSummary, timeseries, prev
     if (!previousSummary || !comparable) return undefined;
     return RATES.includes(key) ? pointChange(summary[key], previousSummary[key]) : percentChange(summary[key], previousSummary[key]);
   };
-  const deltaLabel = t(period.compare === 'year' ? 'analytics.dashboard.compare.vs_year' : 'common.dashboard.vs_previous');
+  const deltaLabel = t(deltaLabelKey(period.compare));
   const more = (tab: 'acquisition' | 'behavior' | 'audience') => ({ href: href({ tab }), label: t(`analytics.dashboard.tabs.${tab}.more`) });
 
   return (

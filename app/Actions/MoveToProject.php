@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\Annotation;
 use App\Models\Domain;
 use App\Models\Event;
 use App\Models\Funnel;
@@ -68,7 +69,7 @@ class MoveToProject
         DB::transaction(function () use ($site, $source, $target, $causer) {
             $site->update(['project_id' => $target->id]);
 
-            foreach ([Goal::withTrashed(), Funnel::withTrashed(), Visit::query(), PageView::query(), Event::query()] as $query) {
+            foreach ([Goal::withTrashed(), Funnel::withTrashed(), Annotation::withTrashed(), Visit::query(), PageView::query(), Event::query()] as $query) {
                 $query->where('site_id', $site->id)->toBase()->update(['project_id' => $target->id]);
             }
 

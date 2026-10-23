@@ -1,15 +1,26 @@
 import { Button, Input } from '@/Components/ui';
-import { formatRange, Period, RANGE_PRESETS, toIsoDate } from '@/Pages/Analytics/partials/period';
+import AnnotationSelect from '@/Pages/Analytics/partials/AnnotationSelect';
+import { formatRange, Period, RANGE_PRESETS, shiftDate, toIsoDate } from '@/Pages/Analytics/partials/period';
+import { Annotation } from '@/Pages/Analytics/types';
 import { useTranslation } from '@/lib/i18n';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { CalendarDays, Check, ChevronDown } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 
-export default function DateRangePicker({ period, onSelect }: { period: Period; onSelect: (range: string, custom?: { from: string; to: string }) => void }) {
+export default function DateRangePicker({
+  period,
+  annotations,
+  onSelect,
+}: {
+  period: Period;
+  annotations: Annotation[];
+  onSelect: (range: string, custom?: { from: string; to: string }) => void;
+}) {
   const { t, locale } = useTranslation();
   const [from, setFrom] = useState(period.from);
   const [to, setTo] = useState(period.to);
   const today = toIsoDate(new Date());
+  const past = annotations.filter((a) => a.date <= today);
 
   function applyCustom(e: FormEvent, close: () => void) {
     e.preventDefault();
@@ -33,7 +44,10 @@ export default function DateRangePicker({ period, onSelect }: { period: Period; 
         <ChevronDown className="text-subtle h-4 w-4" />
       </PopoverButton>
 
-      <PopoverPanel anchor="bottom end" className="border-line bg-surface z-30 w-72 rounded-lg border py-1 shadow-[var(--shadow)] [--anchor-gap:6px] focus:outline-none">
+      <PopoverPanel
+        anchor="bottom end"
+        className={`border-line bg-surface z-30 rounded-lg border py-1 shadow-[var(--shadow)] [--anchor-gap:6px] focus:outline-none ${past.length > 0 ? 'w-80' : 'w-72'}`}
+      >
         {({ close }) => (
           <>
             {RANGE_PRESETS.map((key) => (
@@ -65,7 +79,24 @@ export default function DateRangePicker({ period, onSelect }: { period: Period; 
                   <span>{t('analytics.dashboard.range.to')}</span>
                   <Input type="date" value={to} min={from} max={today} onChange={(e) => setTo(e.target.value)} className="px-2 py-1.5 text-xs" />
                 </label>
+                {past.length > 0 && (
+                  <>
+                    <AnnotationSelect
+                      label={t('analytics.dashboard.range.from_annotation')}
+                      annotations={past}
+                      selected={past.find((a) => a.date === from)}
+                      onSelect={(annotation) => setFrom(annotation.date)}
+                    />
+                    <AnnotationSelect
+                      label={t('analytics.dashboard.range.to_annotation')}
+                      annotations={past.filter((a) => !from || a.date > from)}
+                      selected={past.find((a) => shiftDate(a.date, -1) === to)}
+                      onSelect={(annotation) => setTo(shiftDate(annotation.date, -1))}
+                    />
+                  </>
+                )}
               </div>
+              {past.length > 0 && <p className="text-subtle mt-2 text-[11px] leading-snug">{t('analytics.dashboard.range.annotation_hint')}</p>}
               <Button type="submit" size="sm" className="mt-3 w-full" disabled={!from || !to}>
                 {t('analytics.dashboard.range.apply')}
               </Button>

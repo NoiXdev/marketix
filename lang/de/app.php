@@ -18,4 +18,7 @@ return [
     'funnel_created' => 'Funnel erstellt.',
     'funnel_updated' => 'Funnel aktualisiert.',
     'funnel_deleted' => 'Funnel gelöscht.',
+    'annotation_created' => 'Anmerkung hinzugefügt.',
+    'annotation_updated' => 'Anmerkung aktualisiert.',
+    'annotation_deleted' => 'Anmerkung gelöscht.',
 ];

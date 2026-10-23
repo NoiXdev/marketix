@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Annotation;
 use App\Models\Funnel;
 use App\Models\Goal;
 use App\Models\Site;
@@ -67,6 +68,8 @@ class AnalyticsController extends Controller
                 ->filter(fn (string $key) => $period->query->filter($key) !== null)
                 ->mapWithKeys(fn (string $key) => [$key => $this->places->nameFor($key, $period->query->filter($key))])
                 ->all(),
+            'annotations' => fn () => $model->annotations()->with('user:id,name')->orderBy('date')->oldest()->get()
+                ->map(fn (Annotation $annotation) => $annotation->toAnalyticsArray()),
             'liveVisitors' => fn () => $this->agg->liveVisitors($model->id),
             ...$this->tabProps($tab, $model, $period),
         ]);
@@ -112,7 +115,7 @@ class AnalyticsController extends Controller
         $filters = $request->input('filters');
 
         return PeriodResolver::resolve(
-            $request->only(['range', 'from', 'to', 'days', 'interval', 'compare']),
+            $request->only(['range', 'from', 'to', 'days', 'interval', 'compare', 'compare_from', 'compare_to']),
             is_array($filters) ? $filters : [],
             CarbonImmutable::now($site->timezone),
         );
@@ -137,12 +140,13 @@ class AnalyticsController extends Controller
     {
         $query = $period->query;
         $comparison = $period->comparison();
+        $comparisonSeries = $period->comparisonSeries();
 
         return [
             'summary' => fn () => $this->agg->summary($id, $query),
             'previousSummary' => fn () => $comparison === null ? null : $this->agg->summary($id, $comparison),
             'timeseries' => fn () => $this->agg->timeseries($id, $query),
-            'previousTimeseries' => fn () => $comparison === null ? null : $this->agg->timeseries($id, $comparison),
+            'previousTimeseries' => fn () => $comparisonSeries === null ? null : $this->agg->timeseries($id, $comparisonSeries),
             'topPaths' => fn () => $this->agg->topPaths($id, $query, 6),
             'channels' => fn () => $this->agg->channels($id, $query)->take(6)->values(),
             'countries' => fn () => $this->agg->countriesWithCode($id, $query, 6),
@@ -216,6 +220,7 @@ class AnalyticsController extends Controller
                 $currencies = $this->revenueReports->currencies($id, $query);
                 $currency = $currencies[0]['currency'] ?? '';
                 $comparison = $period->comparison();
+                $comparisonSeries = $period->comparisonSeries();
 
                 return [
                     'currency' => $currency,
@@ -223,7 +228,7 @@ class AnalyticsController extends Controller
                     'summary' => $this->revenueReports->summary($id, $query, $currency),
                     'previousSummary' => $comparison === null ? null : $this->revenueReports->summary($id, $comparison, $currency),
                     'timeseries' => $this->revenueReports->timeseries($id, $query, $currency),
-                    'previousTimeseries' => $comparison === null ? null : $this->revenueReports->timeseries($id, $comparison, $currency),
+                    'previousTimeseries' => $comparisonSeries === null ? null : $this->revenueReports->timeseries($id, $comparisonSeries, $currency),
                     'channels' => $this->revenueReports->breakdown($id, $query, $currency, 'channel'),
                     'campaigns' => $this->revenueReports->breakdown($id, $query, $currency, 'utm_campaign'),
                     'landingPages' => $this->revenueReports->breakdown($id, $query, $currency, 'entry_path'),

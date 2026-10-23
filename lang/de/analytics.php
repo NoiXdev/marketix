@@ -297,6 +297,29 @@ return [
             'partial_hint' => 'Heller dargestellt: Dieser Zeitraum läuft noch und ist unvollständig.',
         ],
 
+        'annotations' => [
+            'button' => 'Anmerkungen',
+            'title' => 'Anmerkungen',
+            'intro' => 'Markieren Sie Daten wie eine Tracking-Umstellung oder einen Relaunch. Anmerkungen erscheinen in den Diagrammen und lassen sich als Beginn oder Ende eines Zeitraums verwenden.',
+            'empty' => 'Noch keine Anmerkungen.',
+            'create' => 'Neue Anmerkung',
+            'create_title' => 'Anmerkung hinzufügen',
+            'edit_title' => 'Anmerkung bearbeiten',
+            'date' => 'Datum',
+            'name' => 'Titel',
+            'name_placeholder' => 'z. B. Umstellung Tracking Cookie → Hybrid',
+            'description' => 'Beschreibung (optional)',
+            'description_placeholder' => 'Was wurde geändert und warum?',
+            'by' => 'von :name',
+            'show' => 'Anmerkung: :title',
+            'more' => '+:count weitere',
+            'since' => 'Ab hier auswerten',
+            'before_after' => 'Vorher/nachher vergleichen',
+            'before_after_hint' => 'Ab diesem Datum bis heute, verglichen mit gleich vielen Tagen direkt davor.',
+            'delete_confirm' => 'Wirklich löschen?',
+            'future' => 'Geplant',
+        ],
+
         'range' => [
             'today' => 'Heute',
             'yesterday' => 'Gestern',
@@ -311,6 +334,9 @@ return [
             'from' => 'Von',
             'to' => 'Bis',
             'apply' => 'Zeitraum anwenden',
+            'from_annotation' => 'Ab Anmerkung …',
+            'to_annotation' => 'Bis Anmerkung …',
+            'annotation_hint' => 'Der Tag einer Anmerkung zählt zum Zeitraum danach.',
         ],
 
         'compare' => [
@@ -320,6 +346,11 @@ return [
             'none' => 'Kein Vergleich',
             'vs_year' => 'vs. Vorjahr',
             'incomplete' => 'Vergleich unvollständig: Daten liegen erst ab dem :date vor. Veränderungen gegenüber dem Vergleichszeitraum werden deshalb ausgeblendet.',
+            'custom' => 'Benutzerdefiniert',
+            'vs_custom' => 'vs. Vergleichszeitraum',
+            'apply' => 'Vergleich anwenden',
+            'match_length' => 'Gleich lang wie der Zeitraum',
+            'uneven' => 'Vergleichszeitraum und Zeitraum sind unterschiedlich lang (:compare vs. :days Tage). Summen wie Seitenaufrufe sind daher nur bedingt vergleichbar, Raten schon.',
         ],
 
         'interval' => [

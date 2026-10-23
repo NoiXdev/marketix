@@ -36,6 +36,16 @@ export type SiteInfo = {
   timezone: string;
 };
 
+export type Annotation = {
+  id: string;
+  date: string;
+  title: string;
+  description: string | null;
+  author: string | null;
+};
+
+export type AnnotationTarget = 'list' | 'new' | Annotation;
+
 export type Summary = {
   page_views: number;
   visitors: number;

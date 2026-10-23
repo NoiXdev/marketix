@@ -55,6 +55,8 @@ trait InteractsWithSiteAnalytics
                 'from' => $request->get('from'),
                 'to' => $request->get('to'),
                 'compare' => $request->get('compare'),
+                'compare_from' => $request->get('compare_from'),
+                'compare_to' => $request->get('compare_to'),
             ], fn ($value) => $value !== null),
             is_array($filters) ? $filters : [],
             CarbonImmutable::now($site->timezone),
@@ -70,6 +72,8 @@ trait InteractsWithSiteAnalytics
             'from' => ['nullable', 'required_if:range,custom', 'date_format:Y-m-d'],
             'to' => ['nullable', 'required_if:range,custom', 'date_format:Y-m-d'],
             'compare' => ['nullable', 'string', 'in:'.implode(',', PeriodResolver::COMPARISONS)],
+            'compare_from' => ['nullable', 'date_format:Y-m-d'],
+            'compare_to' => ['nullable', 'required_if:compare,custom', 'date_format:Y-m-d'],
             'filters' => ['nullable', 'array'],
         ];
     }
@@ -95,7 +99,10 @@ trait InteractsWithSiteAnalytics
             'compare' => $schema->string()
                 ->enum(PeriodResolver::COMPARISONS)
                 ->description('Comparison period: the preceding period of equal length (default; rolling ranges such as 7d, 30d, 90d and custom '
-                    .'are shifted by whole weeks so weekdays line up), the same period last year, or none.'),
+                    .'are shifted by whole weeks so weekdays line up), the same period last year, a custom period, or none.'),
+            'compare_from' => $schema->string()
+                ->description('Start date (YYYY-MM-DD) when compare is "custom". Leave it out to compare with as many days as the period, ending on compare_to.'),
+            'compare_to' => $schema->string()->description('End date (YYYY-MM-DD) when compare is "custom", e.g. the day before an annotation to compare before and after it.'),
             'filters' => $schema->object($filters)
                 ->description('Optional exact-match filters that narrow every number, e.g. {"country_code": "CH", "channel": "organic_search"}. '
                     .'channel is one of direct, organic_search, paid, social, email, referral, campaign; visitor_type is new or returning.'),

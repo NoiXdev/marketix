@@ -12,15 +12,22 @@ final class ResolvedPeriod
         public readonly AnalyticsQuery $query,
         public readonly string $range,
         public readonly string $compare,
+        private readonly ?AnalyticsQuery $customComparison = null,
     ) {}
 
     public function comparison(): ?AnalyticsQuery
     {
         return match ($this->compare) {
             'year' => $this->query->previousYear(),
+            'custom' => $this->customComparison,
             'none' => null,
             default => in_array($this->range, self::CALENDAR_RANGES, true) ? $this->query->previous() : $this->query->previousMatchingWeekdays(),
         };
+    }
+
+    public function comparisonSeries(): ?AnalyticsQuery
+    {
+        return $this->comparison()?->limitedTo($this->query->days());
     }
 
     public function comparisonComplete(?CarbonImmutable $trackingSince): bool
@@ -48,6 +55,7 @@ final class ResolvedPeriod
             'compare' => $this->compare,
             'compare_from' => $comparison?->from->toDateString(),
             'compare_to' => $comparison?->to->toDateString(),
+            'compare_days' => $comparison?->days(),
             'compare_complete' => $this->comparisonComplete($trackingSince),
             'tracking_since' => $trackingSince?->setTimezone($this->query->timezone())->toDateString(),
             'current_bucket' => $this->query->endsBeforeDayEnd() ? $this->query->bucketKey($this->query->to) : null,

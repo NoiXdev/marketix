@@ -297,6 +297,29 @@ return [
             'partial_hint' => 'Lichter weergegeven: deze periode loopt nog en is onvolledig.',
         ],
 
+        'annotations' => [
+            'button' => 'Annotaties',
+            'title' => 'Annotaties',
+            'intro' => 'Markeer datums zoals een trackingwijziging of een relaunch. Annotaties verschijnen in de grafieken en kunnen als begin of einde van een periode dienen.',
+            'empty' => 'Nog geen annotaties.',
+            'create' => 'Nieuwe annotatie',
+            'create_title' => 'Annotatie toevoegen',
+            'edit_title' => 'Annotatie bewerken',
+            'date' => 'Datum',
+            'name' => 'Titel',
+            'name_placeholder' => 'bijv. Tracking omgezet van cookie naar hybride',
+            'description' => 'Beschrijving (optioneel)',
+            'description_placeholder' => 'Wat is er veranderd, en waarom?',
+            'by' => 'door :name',
+            'show' => 'Annotatie: :title',
+            'more' => '+:count meer',
+            'since' => 'Vanaf hier analyseren',
+            'before_after' => 'Voor en na vergelijken',
+            'before_after_hint' => 'Van deze datum tot vandaag, vergeleken met evenveel dagen direct ervoor.',
+            'delete_confirm' => 'Echt verwijderen?',
+            'future' => 'Gepland',
+        ],
+
         'range' => [
             'today' => 'Vandaag',
             'yesterday' => 'Gisteren',
@@ -311,6 +334,9 @@ return [
             'from' => 'Van',
             'to' => 'Tot',
             'apply' => 'Periode toepassen',
+            'from_annotation' => 'Vanaf annotatie…',
+            'to_annotation' => 'Tot annotatie…',
+            'annotation_hint' => 'De dag van een annotatie hoort bij de periode erna.',
         ],
 
         'compare' => [
@@ -320,6 +346,11 @@ return [
             'none' => 'Geen vergelijking',
             'vs_year' => 't.o.v. vorig jaar',
             'incomplete' => 'Onvolledige vergelijking: gegevens zijn pas beschikbaar vanaf :date, daarom worden wijzigingen ten opzichte van de vergelijkingsperiode verborgen.',
+            'custom' => 'Aangepast',
+            'vs_custom' => 'vs. vergelijkingsperiode',
+            'apply' => 'Vergelijking toepassen',
+            'match_length' => 'Even lang als de periode',
+            'uneven' => 'Vergelijkingsperiode en periode verschillen in lengte (:compare vs. :days dagen). Totalen zoals paginaweergaven zijn daardoor maar beperkt vergelijkbaar, percentages wel.',
         ],
 
         'interval' => [

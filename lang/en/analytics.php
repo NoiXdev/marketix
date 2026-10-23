@@ -297,6 +297,29 @@ return [
             'partial_hint' => 'Shown lighter: this period is still in progress and incomplete.',
         ],
 
+        'annotations' => [
+            'button' => 'Annotations',
+            'title' => 'Annotations',
+            'intro' => 'Mark dates such as a tracking change or a relaunch. Annotations appear in the charts and can be used as the start or end of a period.',
+            'empty' => 'No annotations yet.',
+            'create' => 'New annotation',
+            'create_title' => 'Add annotation',
+            'edit_title' => 'Edit annotation',
+            'date' => 'Date',
+            'name' => 'Title',
+            'name_placeholder' => 'e.g. Tracking switched from cookie to hybrid',
+            'description' => 'Description (optional)',
+            'description_placeholder' => 'What changed, and why?',
+            'by' => 'by :name',
+            'show' => 'Annotation: :title',
+            'more' => '+:count more',
+            'since' => 'Analyse from here',
+            'before_after' => 'Compare before and after',
+            'before_after_hint' => 'From this date until today, compared with the same number of days right before it.',
+            'delete_confirm' => 'Really delete?',
+            'future' => 'Upcoming',
+        ],
+
         'range' => [
             'today' => 'Today',
             'yesterday' => 'Yesterday',
@@ -311,6 +334,9 @@ return [
             'from' => 'From',
             'to' => 'To',
             'apply' => 'Apply range',
+            'from_annotation' => 'From annotation…',
+            'to_annotation' => 'Until annotation…',
+            'annotation_hint' => 'The day of an annotation belongs to the period after it.',
         ],
 
         'compare' => [
@@ -320,6 +346,11 @@ return [
             'none' => 'No comparison',
             'vs_year' => 'vs. previous year',
             'incomplete' => 'Incomplete comparison: data is only available from :date, so changes against the comparison period are hidden.',
+            'custom' => 'Custom',
+            'vs_custom' => 'vs. comparison',
+            'apply' => 'Apply comparison',
+            'match_length' => 'Same length as the period',
+            'uneven' => 'Comparison and period differ in length (:compare vs. :days days). Totals such as page views are therefore only partly comparable; rates are not affected.',
         ],
 
         'interval' => [
