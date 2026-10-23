@@ -208,6 +208,7 @@ Route::group(['domain' => config('app.domain')], function () {
             Route::get('/analytics/{site}', [AnalyticsController::class, 'show'])->name('app.project.analytics.show');
             Route::get('/analytics/{site}/breakdown/{dimension}', [AnalyticsController::class, 'breakdown'])
                 ->whereIn('dimension', AnalyticsController::BREAKDOWNS)
+                ->middleware('throttle:60,1')
                 ->name('app.project.analytics.breakdown');
             Route::get('/analytics/{site}/goals', [GoalController::class, 'index'])->name('app.project.analytics.goals.index');
             Route::get('/analytics/{site}/goals/create', [GoalController::class, 'create'])->name('app.project.analytics.goals.create');

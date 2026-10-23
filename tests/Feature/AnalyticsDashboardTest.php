@@ -325,6 +325,17 @@ class AnalyticsDashboardTest extends TestCase
             ->assertJsonPath('limit', 1000);
     }
 
+    public function test_breakdown_endpoint_is_rate_limited(): void
+    {
+        $url = route('app.project.analytics.breakdown', ['project' => $this->project->id, 'site' => $this->site->id, 'dimension' => 'pages']);
+
+        for ($i = 0; $i < 60; $i++) {
+            $this->actingAs($this->user)->getJson($url)->assertOk();
+        }
+
+        $this->actingAs($this->user)->getJson($url)->assertTooManyRequests();
+    }
+
     public function test_breakdown_endpoint_rejects_unknown_dimensions_and_foreign_sites(): void
     {
         $url = route('app.project.analytics.breakdown', ['project' => $this->project->id, 'site' => $this->site->id, 'dimension' => 'pages']);
