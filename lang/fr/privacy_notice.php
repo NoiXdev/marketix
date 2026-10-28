@@ -110,6 +110,7 @@ return [
         'scope_clicks' => 'L’identifiant de périmètre correspond au projet concerné. Une même personne obtient ainsi des empreintes différentes selon les projets et ne peut donc pas être reconnue d’un projet à l’autre.',
         'scope_sites' => 'L’identifiant de périmètre correspond au site web concerné. Une même personne obtient ainsi des empreintes différentes selon les sites web et ne peut donc pas être reconnue d’un site web à l’autre.',
         'geolocation' => 'L’attribution du pays, de la région et de la ville s’effectue au moyen d’une base de données installée localement sur le serveur (MaxMind GeoLite2-City). Votre adresse IP n’est transmise à personne à cette fin et ne quitte pas le serveur.',
+        'data_center' => 'Pour l’analyse statistique des sites web, une base de données installée localement sur le serveur (MaxMind GeoLite2-ASN) permet en outre de déterminer à quel opérateur de réseau appartient votre adresse IP. Si l’ouverture provient du réseau d’un centre de données ou d’un hébergeur, elle est signalée comme provenant d’un programme automatisé. L’opérateur de réseau lui-même n’est pas conservé ; à cette fin non plus, votre adresse IP n’est transmise à personne et elle ne quitte pas le serveur.',
     ],
 
     'cookies' => [

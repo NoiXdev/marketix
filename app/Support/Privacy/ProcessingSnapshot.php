@@ -27,6 +27,7 @@ final class ProcessingSnapshot
         private readonly array $pixelProviders,
         private readonly int $pixelLinkCount,
         private readonly bool $geolocationAvailable,
+        private readonly bool $dataCenterDetectionAvailable,
     ) {}
 
     public static function for(Project $project): self
@@ -63,6 +64,7 @@ final class ProcessingSnapshot
             pixelProviders: $pixelProviders,
             pixelLinkCount: $project->urls()->whereHas('pixels')->count(),
             geolocationAvailable: app(GeoIpService::class)->isAvailable(),
+            dataCenterDetectionAvailable: app(GeoIpService::class)->detectsDataCenters(),
         );
     }
 
@@ -96,6 +98,11 @@ final class ProcessingSnapshot
     public function geolocationAvailable(): bool
     {
         return $this->geolocationAvailable;
+    }
+
+    public function dataCenterDetectionAvailable(): bool
+    {
+        return $this->dataCenterDetectionAvailable;
     }
 
     /** True when any site is in cookie or hybrid tracking mode. */
@@ -145,6 +152,7 @@ final class ProcessingSnapshot
             'pixel_link_count' => $this->pixelLinkCount,
             'click_retention_days' => $this->clickRetentionDays(),
             'geolocation_available' => $this->geolocationAvailable,
+            'data_center_detection_available' => $this->dataCenterDetectionAvailable,
             'uses_cookies' => $this->usesCookies(),
             'has_consentless_cookies' => $this->hasConsentlessCookies(),
         ];

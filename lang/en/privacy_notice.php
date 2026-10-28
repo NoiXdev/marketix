@@ -105,6 +105,7 @@ return [
         'scope_clicks' => 'The scope identifier is the respective project. The same person therefore receives different hash values in different projects and cannot be recognised across projects.',
         'scope_sites' => 'The scope identifier is the respective website. The same person therefore receives different hash values on different websites and cannot be recognised across websites.',
         'geolocation' => 'Country, region and city are determined by means of a database installed locally on the server (MaxMind GeoLite2-City). Your IP address is not transmitted to anyone for this purpose and does not leave the server.',
+        'data_center' => 'For the statistical analysis of the websites, a database installed locally on the server (MaxMind GeoLite2-ASN) is also used to determine which network operator your IP address belongs to. If the request comes from the network of a data centre or hosting provider, it is marked as originating from an automated program. The network operator itself is not stored; for this purpose, too, your IP address is not transmitted to anyone and does not leave the server.',
     ],
 
     'cookies' => [

@@ -191,6 +191,33 @@ class NoticeComposerTest extends TestCase
         $this->assertStringContainsString(trans('privacy_notice.ip.heading', [], 'de'), $withoutGeo);
     }
 
+    public function test_the_data_center_passage_is_omitted_when_the_asn_database_is_absent(): void
+    {
+        $project = Project::factory()->create();
+        Site::factory()->forProject($project)->create();
+
+        $passage = trans('privacy_notice.ip.data_center', [], 'de');
+
+        $this->assertStringContainsString($passage, $this->composeWithDataCenterDetection($project, true));
+
+        $without = $this->composeWithDataCenterDetection($project, false);
+        $this->assertStringNotContainsString($passage, $without);
+        $this->assertStringNotContainsString('GeoLite2-ASN', $without);
+    }
+
+    public function test_the_data_center_passage_is_omitted_when_only_link_clicks_are_measured(): void
+    {
+        $project = Project::factory()->create();
+        $domain = Domain::factory()->create(['project_id' => $project->id]);
+        Url::factory()->create(['project_id' => $project->id, 'domain_id' => $domain->id]);
+
+        $text = $this->composeWithDataCenterDetection($project, true);
+
+        // The IP section is there for the clicks, the website-only passage is not.
+        $this->assertStringContainsString(trans('privacy_notice.ip.heading', [], 'de'), $text);
+        $this->assertStringNotContainsString(trans('privacy_notice.ip.data_center', [], 'de'), $text);
+    }
+
     public function test_a_missing_controller_name_becomes_a_visible_placeholder(): void
     {
         $project = $this->projectWithEverything();
@@ -567,6 +594,25 @@ class NoticeComposerTest extends TestCase
         }
 
         return null;
+    }
+
+    private function composeWithDataCenterDetection(Project $project, bool $available): string
+    {
+        $this->app->instance(GeoIpService::class, new class($available) extends GeoIpService
+        {
+            public function __construct(private bool $available) {}
+
+            public function detectsDataCenters(): bool
+            {
+                return $this->available;
+            }
+        });
+
+        $composer = new NoticeComposer;
+
+        return $composer->toPlainText(
+            $composer->compose(ProcessingSnapshot::for($project), $this->noticeOptions()),
+        );
     }
 
     private function composeWithGeolocation(Project $project, bool $available): string

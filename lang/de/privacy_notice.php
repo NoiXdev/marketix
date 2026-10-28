@@ -100,6 +100,7 @@ return [
         'scope_clicks' => 'Die Bereichskennung ist das jeweilige Projekt. Dieselbe Person erhält dadurch in verschiedenen Projekten unterschiedliche Prüfwerte und ist darüber nicht projektübergreifend wiedererkennbar.',
         'scope_sites' => 'Die Bereichskennung ist die jeweilige Website. Dieselbe Person erhält dadurch auf verschiedenen Websites unterschiedliche Prüfwerte und ist darüber nicht websiteübergreifend wiedererkennbar.',
         'geolocation' => 'Die Zuordnung von Land, Region und Stadt erfolgt über eine lokal auf dem Server installierte Datenbank (MaxMind GeoLite2-City). Ihre IP-Adresse wird hierfür an niemanden übermittelt und verlässt den Server nicht.',
+        'data_center' => 'Bei der statistischen Auswertung der Websites wird zudem über eine lokal auf dem Server installierte Datenbank (MaxMind GeoLite2-ASN) ermittelt, zu welchem Netzbetreiber Ihre IP-Adresse gehört. Stammt der Aufruf aus dem Netz eines Rechenzentrums oder Hosting-Anbieters, wird er als von einem automatisierten Programm stammend gekennzeichnet. Der Netzbetreiber selbst wird nicht gespeichert; Ihre IP-Adresse wird auch hierfür an niemanden übermittelt und verlässt den Server nicht.',
     ],
 
     'cookies' => [

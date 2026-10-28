@@ -214,6 +214,12 @@ final class NoticeComposer
             $paragraphs[] = $this->t('ip.geolocation');
         }
 
+        // Only website measurement looks up the network operator, and only
+        // once the GeoLite2-ASN database is on this instance.
+        if ($this->tracksSites() && $this->snapshot->dataCenterDetectionAvailable()) {
+            $paragraphs[] = $this->t('ip.data_center');
+        }
+
         return new NoticeSection($this->t('ip.heading'), $paragraphs);
     }
 
