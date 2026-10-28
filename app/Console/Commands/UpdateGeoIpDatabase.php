@@ -7,11 +7,17 @@ use Illuminate\Support\Facades\Http;
 
 class UpdateGeoIpDatabase extends Command
 {
-    public const DOWNLOAD_URL = 'https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz';
+    public const DOWNLOAD_URL = 'https://download.maxmind.com/geoip/databases/%s/download?suffix=tar.gz';
+
+    /**
+     * City and region for the statistics; the network operator (ASN) to
+     * recognise traffic out of data centers as automated.
+     */
+    public const EDITIONS = ['GeoLite2-City', 'GeoLite2-ASN'];
 
     protected $signature = 'marketix:geoip:update';
 
-    protected $description = 'Download the MaxMind GeoLite2-City database';
+    protected $description = 'Download the MaxMind GeoLite2-City and GeoLite2-ASN databases';
 
     public function handle(): int
     {
@@ -35,7 +41,20 @@ class UpdateGeoIpDatabase extends Command
         // an uncatchable fatal error. Raise the limit for this command only.
         ini_set('memory_limit', '512M');
 
-        $this->info('Downloading GeoLite2-City database…');
+        foreach (self::EDITIONS as $edition) {
+            if (! $this->download($edition, $accountId, $licenseKey)) {
+                return self::FAILURE;
+            }
+        }
+
+        $this->info('GeoIP databases updated successfully.');
+
+        return self::SUCCESS;
+    }
+
+    private function download(string $edition, string $accountId, string $licenseKey): bool
+    {
+        $this->info("Downloading {$edition} database…");
 
         // Stream download to a temp file
         $tmpFile = tempnam(sys_get_temp_dir(), 'geoip').'.tar.gz';
@@ -43,18 +62,18 @@ class UpdateGeoIpDatabase extends Command
         $response = Http::withBasicAuth($accountId, $licenseKey)
             ->withOptions(['sink' => $tmpFile])
             ->timeout(120)
-            ->get(self::DOWNLOAD_URL);
+            ->get(sprintf(self::DOWNLOAD_URL, $edition));
 
         if (! $response->successful()) {
             $this->error("Download failed: HTTP {$response->status()}");
             @unlink($tmpFile);
 
-            return self::FAILURE;
+            return false;
         }
 
         $this->info('Extracting…');
 
-        $extractDir = sys_get_temp_dir().'/geoip_extract_'.time();
+        $extractDir = sys_get_temp_dir().'/geoip_extract_'.$edition.'_'.time();
         mkdir($extractDir, 0755, true);
 
         try {
@@ -63,18 +82,20 @@ class UpdateGeoIpDatabase extends Command
         } catch (\Throwable $e) {
             $this->error("Extraction failed: {$e->getMessage()}");
             @unlink($tmpFile);
+            $this->deleteDirectory($extractDir);
 
-            return self::FAILURE;
+            return false;
         }
 
         // Locate the .mmdb file inside the extracted directory
         $mmdbFiles = glob($extractDir.'/*/*.mmdb');
 
         if (empty($mmdbFiles)) {
-            $this->error('GeoLite2-City.mmdb not found in archive.');
+            $this->error("{$edition}.mmdb not found in archive.");
             @unlink($tmpFile);
+            $this->deleteDirectory($extractDir);
 
-            return self::FAILURE;
+            return false;
         }
 
         $destDir = storage_path('app/geoip');
@@ -82,7 +103,7 @@ class UpdateGeoIpDatabase extends Command
             mkdir($destDir, 0755, true);
         }
 
-        $dest = $destDir.'/GeoLite2-City.mmdb';
+        $dest = $destDir.'/'.$edition.'.mmdb';
         rename($mmdbFiles[0], $dest);
 
         // Cleanup
@@ -90,9 +111,8 @@ class UpdateGeoIpDatabase extends Command
         $this->deleteDirectory($extractDir);
 
         $this->info("Database saved to {$dest}");
-        $this->info('GeoIP database updated successfully.');
 
-        return self::SUCCESS;
+        return true;
     }
 
     private function deleteDirectory(string $dir): void

@@ -9,7 +9,7 @@ class TestGeoIpLookup extends Command
 {
     protected $signature = 'marketix:geoip:test {ip : The IP address to look up}';
 
-    protected $description = 'Look up an IP address against the MaxMind GeoLite2 database';
+    protected $description = 'Look up an IP address against the MaxMind GeoLite2 databases';
 
     public function handle(GeoIpService $geoIp): int
     {
@@ -29,13 +29,20 @@ class TestGeoIpLookup extends Command
 
         $geo = $geoIp->lookup($ip);
 
-        $this->table(
-            ['Field', 'Value'],
-            collect($geo)
-                ->reject(fn ($value) => is_array($value))
-                ->map(fn ($value, $key) => [$key, $value ?? '—'])
-                ->values(),
-        );
+        $rows = collect($geo)
+            ->reject(fn ($value) => is_array($value))
+            ->map(fn ($value, $key) => [$key, $value ?? '—'])
+            ->values();
+
+        if ($geoIp->detectsDataCenters()) {
+            $network = $geoIp->network($ip);
+
+            $rows->push(['asn', $network['asn'] ?? '—']);
+            $rows->push(['network', $network['organization'] ?? '—']);
+            $rows->push(['data_center', $geoIp->fromDataCenter($ip) ? 'yes (counted as bot)' : 'no']);
+        }
+
+        $this->table(['Field', 'Value'], $rows);
 
         // GeoLite2 (free) frequently resolves datacenter/VPN/anycast IPs to
         // country level only, so an empty city is expected for those ranges.

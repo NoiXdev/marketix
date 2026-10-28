@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Support\DataCenterNetworks;
 use GeoIp2\Database\Reader;
 
 class GeoIpService
 {
     private ?Reader $reader = null;
+
+    private ?Reader $asnReader = null;
 
     public function __construct()
     {
@@ -14,6 +17,12 @@ class GeoIpService
 
         if (file_exists($path)) {
             $this->reader = new Reader($path);
+        }
+
+        $asnPath = storage_path('app/geoip/GeoLite2-ASN.mmdb');
+
+        if (file_exists($asnPath)) {
+            $this->asnReader = new Reader($asnPath);
         }
     }
 
@@ -56,8 +65,47 @@ class GeoIpService
         }
     }
 
+    /**
+     * The autonomous system (network operator) the IP belongs to.
+     *
+     * @return array{asn: int, organization: ?string}|null
+     */
+    public function network(string $ip): ?array
+    {
+        if (! $this->asnReader) {
+            return null;
+        }
+
+        try {
+            $record = $this->asnReader->asn($ip);
+        } catch (\Exception) {
+            return null;
+        }
+
+        if ($record->autonomousSystemNumber === null) {
+            return null;
+        }
+
+        return [
+            'asn' => $record->autonomousSystemNumber,
+            'organization' => $record->autonomousSystemOrganization,
+        ];
+    }
+
+    public function fromDataCenter(string $ip): bool
+    {
+        $network = $this->network($ip);
+
+        return $network !== null && DataCenterNetworks::contains($network['asn'], $network['organization']);
+    }
+
     public function isAvailable(): bool
     {
         return $this->reader !== null;
+    }
+
+    public function detectsDataCenters(): bool
+    {
+        return $this->asnReader !== null;
     }
 }

@@ -32,11 +32,12 @@ class RecordEventJob implements ShouldQueue
         private ?array $props,
         private string $path,
         private ?string $referer,
+        private bool $fromDataCenter = false,
     ) {}
 
     public function handle(): void
     {
-        $isBot = CrawlerDetector::isBot($this->userAgent);
+        $isBot = $this->fromDataCenter || CrawlerDetector::isBot($this->userAgent);
 
         $visit = app(VisitResolver::class)->resolve(
             $this->siteId,

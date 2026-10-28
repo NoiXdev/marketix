@@ -8,6 +8,7 @@ use App\Jobs\RecordPageViewJob;
 use App\Models\Event;
 use App\Models\PageView;
 use App\Models\Site;
+use App\Services\GeoIpService;
 use App\Support\VisitorHash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -337,5 +338,31 @@ class AnalyticsIngestionTest extends TestCase
         $this->hit($site, ['type' => 'consent', 'path' => '/lp', 'visitor_id' => 'abc'])->assertStatus(204);
 
         $this->assertSame(VisitorHash::for('203.0.113.9', 'Mozilla/5.0 (TestAgent)', $site->id), $site->visits()->sole()->visitor_hash);
+    }
+
+    public function test_hits_from_a_data_center_are_recorded_as_bots(): void
+    {
+        $this->app->instance(GeoIpService::class, new class extends GeoIpService
+        {
+            public function __construct() {}
+
+            public function fromDataCenter(string $ip): bool
+            {
+                return $ip === '198.51.100.20';
+            }
+        });
+        $site = Site::factory()->create(['tracking_mode' => TrackingMode::Cookieless]);
+
+        $this->hit($site, ['path' => '/lp'], '198.51.100.20')->assertStatus(202);
+        $this->hit($site, ['type' => 'event', 'name' => 'signup', 'path' => '/lp'], '198.51.100.20')->assertStatus(202);
+        $this->hit($site, ['path' => '/lp'])->assertStatus(202);
+
+        $bot = VisitorHash::for('198.51.100.20', 'Mozilla/5.0 (TestAgent)', $site->id);
+
+        $this->assertTrue($site->visits()->where('visitor_hash', $bot)->sole()->is_bot);
+        $this->assertFalse($site->visits()->where('visitor_hash', '!=', $bot)->sole()->is_bot);
+        $this->assertTrue(PageView::where('visitor_hash', $bot)->sole()->is_bot);
+        $this->assertFalse(PageView::where('site_id', $site->id)->where('visitor_hash', '!=', $bot)->sole()->is_bot);
+        $this->assertTrue(Event::where('site_id', $site->id)->sole()->is_bot);
     }
 }

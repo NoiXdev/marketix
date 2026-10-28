@@ -107,6 +107,9 @@ class CloudflareClientIpTest extends TestCase
             /** @var list<string> */
             public array $lookups = [];
 
+            /** @var list<string> */
+            public array $networkChecks = [];
+
             public function __construct() {}
 
             public function lookup(string $ip): array
@@ -114,6 +117,13 @@ class CloudflareClientIpTest extends TestCase
                 $this->lookups[] = $ip;
 
                 return ['country' => null, 'city' => null, 'country_code' => null, 'region' => null, 'subdivision_code' => null];
+            }
+
+            public function fromDataCenter(string $ip): bool
+            {
+                $this->networkChecks[] = $ip;
+
+                return false;
             }
         };
         $this->app->instance(GeoIpService::class, $geo);
@@ -127,5 +137,7 @@ class CloudflareClientIpTest extends TestCase
         ], content: json_encode(['site' => $site->tracking_id, 'path' => '/']))->assertStatus(202);
 
         $this->assertSame([self::VISITOR], $geo->lookups);
+        // The data center check judges the visitor's network, not Cloudflare's
+        $this->assertSame([self::VISITOR], $geo->networkChecks);
     }
 }
