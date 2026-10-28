@@ -94,6 +94,18 @@ class FaviconFetcher
     /** @return array{0: string, 1: string}|null */
     private function fetch(string $host): ?array
     {
+        $icon = $this->fetchFromOrigin($host);
+
+        if ($icon === null && ! str_starts_with($host, 'www.')) {
+            $icon = $this->fetchFromOrigin('www.'.$host);
+        }
+
+        return $icon;
+    }
+
+    /** @return array{0: string, 1: string}|null */
+    private function fetchFromOrigin(string $host): ?array
+    {
         if (! $this->hostIsPublic($host)) {
             return null;
         }
