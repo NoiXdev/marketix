@@ -108,6 +108,26 @@ class FaviconEndpointTest extends TestCase
         $this->assertSame(self::PNG, $response->getContent());
     }
 
+    public function test_it_falls_back_to_the_www_host_when_the_apex_redirects(): void
+    {
+        $this->resolveTo([
+            'example.io' => ['93.184.216.34'],
+            'www.example.io' => ['93.184.216.34'],
+        ]);
+        Http::fake([
+            'https://example.io/favicon.ico' => Http::response('', 301, ['Location' => 'https://www.example.io/favicon.ico']),
+            'https://example.io/' => Http::response('', 301, ['Location' => 'https://www.example.io/']),
+            'https://www.example.io/favicon.ico' => Http::response(self::PNG, 200, ['Content-Type' => 'image/x-icon']),
+        ]);
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('app.favicon.show', ['domain' => 'example.io']));
+        $response->assertOk();
+        $this->assertSame('image/x-icon', $response->headers->get('Content-Type'));
+        $this->assertSame(self::PNG, $response->getContent());
+    }
+
     public function test_it_falls_back_to_a_globe_when_no_icon_exists(): void
     {
         $this->resolveTo(['noicons.test' => ['93.184.216.34']]);
