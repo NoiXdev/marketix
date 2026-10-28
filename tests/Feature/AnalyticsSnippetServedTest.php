@@ -18,6 +18,8 @@ class AnalyticsSnippetServedTest extends TestCase
         // consent contract: strict boolean check, reacts to CMP consent changes
         $this->assertStringContainsString('marketix:consent', $contents);
         $this->assertStringContainsString('=== true', $contents);
+        // automated browsers send nothing
+        $this->assertStringContainsString('navigator.webdriver', $contents);
         // no external dependencies
         $this->assertStringNotContainsString('import ', $contents);
         $this->assertStringNotContainsString('require(', $contents);

@@ -7,7 +7,7 @@ const source = readFileSync(new URL('../../analytics/mx.js', import.meta.url), '
 type Hit = Record<string, unknown>;
 
 // Runs the snippet against a minimal browser: cookies, window events and the hits it sends
-async function loadTracker(trackingMode: string, consent: boolean, settings: Record<string, unknown> = {}) {
+async function loadTracker(trackingMode: string, consent: boolean, settings: Record<string, unknown> = {}, webdriver = false) {
   const hits: Hit[] = [];
   const cookies = new Map<string, string>();
   const listeners = new Map<string, Array<() => void>>();
@@ -50,6 +50,7 @@ async function loadTracker(trackingMode: string, consent: boolean, settings: Rec
     document,
     location: { protocol: 'https:', hostname: 'example.com', host: 'example.com', origin: 'https://example.com', pathname: '/', search: '', href: 'https://example.com/' },
     history: { pushState: () => {}, replaceState: () => {} },
+    navigator: { webdriver },
     crypto: { randomUUID: () => 'id-1' },
     innerHeight: 1000,
     pageYOffset: 0,
@@ -174,6 +175,15 @@ describe('cookieless tracking mode', () => {
 
     expect(tracker.hits).toHaveLength(2);
     tracker.hits.forEach((hit) => expect(hit).not.toHaveProperty('visitor_id'));
+    expect(tracker.cookie()).toBeUndefined();
+  });
+});
+
+describe('automated browsers', () => {
+  it('sends nothing when the browser is driven by WebDriver', async () => {
+    const tracker = await loadTracker('cookieless', true, {}, true);
+
+    expect(tracker.hits).toHaveLength(0);
     expect(tracker.cookie()).toBeUndefined();
   });
 });
