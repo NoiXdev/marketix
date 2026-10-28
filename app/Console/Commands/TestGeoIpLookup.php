@@ -31,7 +31,10 @@ class TestGeoIpLookup extends Command
 
         $this->table(
             ['Field', 'Value'],
-            collect($geo)->map(fn ($value, $key) => [$key, $value ?? '—'])->values(),
+            collect($geo)
+                ->reject(fn ($value) => is_array($value))
+                ->map(fn ($value, $key) => [$key, $value ?? '—'])
+                ->values(),
         );
 
         // GeoLite2 (free) frequently resolves datacenter/VPN/anycast IPs to
