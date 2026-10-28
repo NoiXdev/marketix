@@ -16,8 +16,8 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Records a single page view off the request hot-path and maintains its Visit
- * (session). Geo and visitor hash are resolved on the request and passed in,
- * so the raw IP never reaches the queue.
+ * (session). Geo, visitor hash and whether the IP belongs to a data center are
+ * resolved on the request and passed in, so the raw IP never reaches the queue.
  */
 class RecordPageViewJob implements ShouldQueue
 {
@@ -40,11 +40,12 @@ class RecordPageViewJob implements ShouldQueue
         private array $utm = [],
         private ?string $hostname = null,
         private ?string $title = null,
+        private bool $fromDataCenter = false,
     ) {}
 
     public function handle(): void
     {
-        $isBot = CrawlerDetector::isBot($this->userAgent);
+        $isBot = $this->fromDataCenter || CrawlerDetector::isBot($this->userAgent);
         $browser = UserAgent::browser($this->userAgent);
         $os = UserAgent::os($this->userAgent);
         $device = UserAgent::device($this->userAgent);

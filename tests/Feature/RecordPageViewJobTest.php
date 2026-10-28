@@ -118,6 +118,26 @@ class RecordPageViewJobTest extends TestCase
         $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'is_bot' => true]);
     }
 
+    public function test_hit_from_a_data_center_is_flagged_despite_a_browser_user_agent(): void
+    {
+        $site = Site::factory()->create();
+
+        (new RecordPageViewJob(
+            $site->id,
+            $site->project_id,
+            'headless-1',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+            '/home',
+            null,
+            'zh',
+            [],
+            fromDataCenter: true,
+        ))->handle();
+
+        $this->assertDatabaseHas('page_views', ['site_id' => $site->id, 'is_bot' => true]);
+        $this->assertDatabaseHas('visits', ['site_id' => $site->id, 'is_bot' => true]);
+    }
+
     public function test_user_agent_device_classifier(): void
     {
         $this->assertSame('Mobile', UserAgent::device('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'));

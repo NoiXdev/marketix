@@ -164,6 +164,7 @@ class AnalyticsIngestionController extends Controller
                 $props,
                 $path,
                 $data['referrer'] ?? null,
+                $this->geoIp->fromDataCenter($ip),
             );
 
             return response('', 202);
@@ -187,6 +188,7 @@ class AnalyticsIngestionController extends Controller
             $utm,
             $this->hostname($data['hostname'] ?? null),
             $this->title($data['title'] ?? null),
+            $this->geoIp->fromDataCenter($ip),
         );
 
         return response('', 202);
