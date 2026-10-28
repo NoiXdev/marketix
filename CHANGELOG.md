@@ -1,4 +1,18 @@
-## [2.9.0](https://github.com/NoiXdev/marketix/compare/v2.8.0...v) (2026-10-23)
+## [2.10.0](https://github.com/NoiXdev/marketix/compare/v2.9.0...v) (2026-10-28)
+
+
+### Features
+
+* **analytics:** count hits from data center networks as bots ([a0f5766](https://github.com/NoiXdev/marketix/commit/a0f576684d7c95dcdc76bc1b51922d0c5de8e5f7))
+* **analytics:** send nothing from automated browsers ([d78eab4](https://github.com/NoiXdev/marketix/commit/d78eab415aa44860ea303b12ec6cbb9e1d0eca5c))
+* **privacy:** describe the data center lookup in the notice ([11b255a](https://github.com/NoiXdev/marketix/commit/11b255aeb46cf7b9325d284a7deed388e11df31b))
+
+
+### Bug Fixes
+
+* **geoip:** stop the lookup command from failing on localized place names ([5db5216](https://github.com/NoiXdev/marketix/commit/5db52161f20363325b55f096feb648737bb0c769))
+
+## [2.9.0](https://github.com/NoiXdev/marketix/compare/v2.8.0...v2.9.0) (2026-10-23)
 
 
 ### Features
