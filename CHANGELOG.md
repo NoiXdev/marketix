@@ -1,4 +1,11 @@
-## [2.10.0](https://github.com/NoiXdev/marketix/compare/v2.9.0...v) (2026-10-28)
+## [2.10.1](https://github.com/NoiXdev/marketix/compare/v2.10.0...v) (2026-10-28)
+
+
+### Bug Fixes
+
+* **favicon:** fall back to the www host when the apex has no icon ([bcf0ff1](https://github.com/NoiXdev/marketix/commit/bcf0ff15b4ad520539b6c5400216a183b507d3fc))
+
+## [2.10.0](https://github.com/NoiXdev/marketix/compare/v2.9.0...v2.10.0) (2026-10-28)
 
 
 ### Features
