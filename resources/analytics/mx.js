@@ -1,6 +1,11 @@
 (function () {
   'use strict';
 
+  // Automated browsers (Selenium, Puppeteer, Playwright, PhantomJS, Cypress)
+  // announce themselves here while sending a genuine browser user agent, so
+  // the server could not tell them apart from people. Send nothing for them.
+  if (navigator.webdriver || window._phantom || window.callPhantom || window.__nightmare || window.Cypress) return;
+
   var script = document.currentScript;
   if (!script) return;
 
