@@ -152,6 +152,11 @@ class ProcessingSnapshotTest extends TestCase
             {
                 return true;
             }
+
+            public function detectsDataCenters(): bool
+            {
+                return true;
+            }
         });
 
         $project = Project::factory()->create();
@@ -193,6 +198,7 @@ class ProcessingSnapshotTest extends TestCase
             'pixel_link_count' => 1,
             'click_retention_days' => config('statistics.retention_months') * 30,
             'geolocation_available' => true,
+            'data_center_detection_available' => true,
             'uses_cookies' => true,
             'has_consentless_cookies' => true,
         ], $array);

@@ -177,6 +177,7 @@ export interface ProcessingSnapshot {
   pixel_link_count: number;
   click_retention_days: number;
   geolocation_available: boolean;
+  data_center_detection_available: boolean;
   uses_cookies: boolean;
   has_consentless_cookies: boolean;
 }

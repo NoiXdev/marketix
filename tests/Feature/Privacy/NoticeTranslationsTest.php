@@ -400,7 +400,7 @@ class NoticeTranslationsTest extends TestCase
         );
     }
 
-    /** The geolocation passage only renders when the database is present. */
+    /** The geolocation and data center passages only render when their databases are present. */
     private function withGeolocation(): void
     {
         $this->app->instance(GeoIpService::class, new class extends GeoIpService
@@ -408,6 +408,11 @@ class NoticeTranslationsTest extends TestCase
             public function __construct() {}
 
             public function isAvailable(): bool
+            {
+                return true;
+            }
+
+            public function detectsDataCenters(): bool
             {
                 return true;
             }

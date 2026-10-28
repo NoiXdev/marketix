@@ -109,6 +109,7 @@ return [
         'scope_clicks' => 'De bereikaanduiding is het betreffende project. Dezelfde persoon krijgt daardoor in verschillende projecten verschillende hashwaarden en is daarmee niet projectoverstijgend herkenbaar.',
         'scope_sites' => 'De bereikaanduiding is de betreffende website. Dezelfde persoon krijgt daardoor op verschillende websites verschillende hashwaarden en is daarmee niet websiteoverstijgend herkenbaar.',
         'geolocation' => 'Het toewijzen van land, regio en stad gebeurt via een lokaal op de server geïnstalleerde database (MaxMind GeoLite2-City). Uw IP-adres wordt hiervoor aan niemand doorgegeven en verlaat de server niet.',
+        'data_center' => 'Voor de statistische analyse van de websites wordt via een lokaal op de server geïnstalleerde database (MaxMind GeoLite2-ASN) bovendien vastgesteld tot welke netwerkbeheerder uw IP-adres behoort. Komt de aanvraag uit het netwerk van een datacenter of hostingprovider, dan wordt zij aangeduid als afkomstig van een geautomatiseerd programma. De netwerkbeheerder zelf wordt niet opgeslagen; ook hiervoor wordt uw IP-adres aan niemand doorgegeven en verlaat het de server niet.',
     ],
 
     'cookies' => [
