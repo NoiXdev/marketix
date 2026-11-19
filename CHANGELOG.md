@@ -1,4 +1,6 @@
-## [2.10.1](https://github.com/NoiXdev/marketix/compare/v2.10.0...v) (2026-10-28)
+## [2.10.2](https://github.com/NoiXdev/marketix/compare/v2.10.1...v) (2026-11-19)
+
+## [2.10.1](https://github.com/NoiXdev/marketix/compare/v2.10.0...v2.10.1) (2026-10-28)
 
 
 ### Bug Fixes
